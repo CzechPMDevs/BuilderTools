@@ -38,6 +38,33 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
+        if(empty($args[0])) {
+            $sender->sendMessage("---- BuilderTools Commands (1/3) ----\n".
+                "§2//draw: §fDraw witch blocks\n".
+                "§2//fill: §fFill selected position\n".
+                "§2//help: §fDisplays BuilderTools commands\n"/*.
+                "§2//hsphere: §fCreate hollow sphere"*/);
+            return;
+        }
+        if($args[0] == "2") {
+            $sender->sendMessage("---- BuilderTools Commands (2/3) ----\n".
+                "§2//pos1: §fSelect first position\n".
+                "§2//pos2: §fSelect second position\n".
+                "§2//replace: §fReplace selected blocks\n".
+                "§2//sphere: §fCreate sphere");
+            return;
+        }
+        if($args[0] == "3") {
+            $sender->sendMessage("---- §fBuilderTools Commands (3/3) ----\n".
+                "§2//wand: §fSwitch wand tool");
+            return;
+        }
+        $sender->sendMessage("---- §fBuilderTools Commands (1/3) ----\n".
+            "§2//draw: §fDraw witch blocks\n".
+            "§2//fill: §fFill selected position\n".
+            "§2//help: §fDisplays BuilderTools commands\n"/*.
+            "§2//hsphere: §fCreate hollow sphere"*/);
+        return;
     }
 
     /**

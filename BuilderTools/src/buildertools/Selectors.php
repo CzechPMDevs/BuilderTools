@@ -14,13 +14,51 @@ use pocketmine\Player;
 class Selectors {
 
     /** @var Position[] $pos1 */
-    public static $pos1 = [];
+    private static $pos1 = [];
 
     /** @var Position[] $pos2 */
-    public static $pos2 = [];
+    private static $pos2 = [];
 
     /** @var Player[] $wandSelectors */
-    public static $wandSelectors = [];
+    private static $wandSelectors = [];
+
+    /** @var int[] $drawingPlayers */
+    private static $drawingPlayers = [];
+
+    /**
+     * @param Player $player
+     * @param int $brush
+     */
+    public static function addDrawingPlayer(Player $player, int $brush, int $mode) {
+        self::$drawingPlayers[strtolower($player->getName())] = [$brush, $mode];
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function removeDrawnigPlayer(Player $player) {
+        unset(self::$drawingPlayers[strtolower($player->getName())]);
+    }
+
+    /**
+     * @param Player $player
+     * @return int
+     */
+    public static function getDrawingPlayerBrush(Player $player) {
+        return self::$drawingPlayers[strtolower($player->getName())][0];
+    }
+
+    public static function getDrawingPlayerMode(Player $player) {
+        return self::$drawingPlayers[strtolower($player->getName())][1];
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public static function isDrawingPlayer(Player $player) {
+        return boolval(isset(self::$drawingPlayers[strtolower($player->getName())]));
+    }
 
     /**
      * @param Player $player

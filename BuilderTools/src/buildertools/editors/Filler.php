@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace buildertools\editors;
 
+use buildertools\task\FillTask;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 
 /**
@@ -32,7 +34,8 @@ class Filler extends Editor {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
                     $count++;
                     $args = explode(",", strval($blocks));
-                    $level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock());
+                    #$level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock());
+                    FillTask::addBlock(new Position($x, $y, $z, $level), Item::fromString($args[array_rand($args, 1)])->getBlock());
                 }
             }
         }

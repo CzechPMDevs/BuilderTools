@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace buildertools;
 
+use buildertools\commands\DrawCommand;
 use buildertools\commands\FillCommand;
 use buildertools\commands\FirstPositionCommand;
 use buildertools\commands\HelpCommand;
+use buildertools\commands\HsphereCommand;
+use buildertools\commands\ReplaceCommand;
 use buildertools\commands\SecondPositionCommand;
+use buildertools\commands\SphereCommand;
 use buildertools\commands\WandCommand;
 use buildertools\editors\Editor;
 use buildertools\editors\Filler;
+use buildertools\editors\Printer;
+use buildertools\editors\Replacement;
 use buildertools\events\listener\EventListener;
+use buildertools\task\FillTask;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -36,26 +43,38 @@ class BuilderTools extends PluginBase {
         $this->initListner();
         $this->registerEditors();
         $this->sendLoadingInfo();
+        $this->registerTasks();
     }
 
     public function sendLoadingInfo() {
         $text = strval(
             "\n".
+            "§c--------------------------------\n".
             "§6§lCzechPMDevs §r§e>>> §bBuilderTools\n".
-            "§o§9WorldEdit plugin for PocketMine\n".
-            "§7Authors: GamakCZ\n".
-            "§7Version: ".$this->getDescription()->getVersion()."\n"
+            "§o§9Plugin like WorldEdit for PocketMine servers\n".
+            "§aAuthors: §7GamakCZ\n".
+            "§aVersion: §7".$this->getDescription()->getVersion()."\n".
+            "§aStatus: §7Loading...\n".
+            "§c--------------------------------"
         );
         if($this->isEnabled()) {
             $this->getLogger()->info($text);
+            sleep(1);
+            $this->getLogger()->info("§a--> Loaded!");
         }
         else {
             $this->getLogger()->critical("§4Submit issue to github.com/CzechPMDevs/BuilderTools/issues  to fix this error!");
         }
     }
 
+    public function registerTasks() {
+        $this->getServer()->getScheduler()->scheduleRepeatingTask(new FillTask(), 1);
+    }
+
     public function registerEditors() {
         self::$editors["Filler"] = new Filler;
+        self::$editors["Printer"] = new Printer;
+        self::$editors["Replacement"] = new Replacement();
     }
 
     public function initListner() {
@@ -69,6 +88,10 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new WandCommand);
         $map->register("BuilderTools", new FillCommand);
         $map->register("BuilderTools", new HelpCommand);
+        $map->register("BuilderTools", new DrawCommand);
+        $map->register("BuilderTools", new SphereCommand);
+        #$map->register("BuilderTools", new HsphereCommand);
+        $map->register("BuilderTools", new ReplaceCommand);
     }
 
     /**

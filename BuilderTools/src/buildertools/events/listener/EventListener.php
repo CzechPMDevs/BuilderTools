@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace buildertools\events\listener;
 
 use buildertools\BuilderTools;
+use buildertools\editors\Printer;
 use buildertools\Selectors;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
@@ -16,6 +17,16 @@ use pocketmine\level\Position;
  * @package buildertools\events\listener
  */
 class EventListener implements Listener {
+
+    public function onAirClick(PlayerInteractEvent $event) {
+        if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) return;
+        $position = $player->getTargetBlock(20)->asPosition();
+        $printer = BuilderTools::getEditor("Printer");
+        if($printer instanceof Printer) {
+            $printer->draw($position, Selectors::getDrawingPlayerBrush($player), $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerMode($player));
+        }
+        $event->setCancelled(true);
+    }
 
     /**
      * @param BlockBreakEvent $event
