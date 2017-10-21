@@ -1,0 +1,28 @@
+name: BuilderTools
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9]
+author: CzechPMDevs
+authors: [vixik]
+version: 1.0.0
+description: WorldEdit plugin
+main: buildertools\BuilderTools
+
+permissions:
+  bt.cmd:
+    default: op
+    description: Permissions for all BuilderTools commands
+    childern:
+      bt.cmd.pos1:
+        description: Permissions for //pos1
+        default: op
+      bt.cmd.pos2:
+        description: Permissions for //pos2
+        default: op
+      bt.cmd.set:
+        descripion: Permissions for //set
+        default: op
+      bt.cmd.wand:
+        description: Permissions for //wand
+        default: op
+      bt.cmd.help:
+        description: Permissions for //help
+        default: op

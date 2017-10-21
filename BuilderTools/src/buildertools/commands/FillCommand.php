@@ -1,0 +1,71 @@
+<?php
+
+namespace buildertools\commands;
+
+use buildertools\BuilderTools;
+use buildertools\editors\Filler;
+use buildertools\Selectors;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
+use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\Player;
+use pocketmine\plugin\Plugin;
+
+/**
+ * Class FillCommand
+ * @package buildertools\commands
+ */
+class FillCommand extends Command implements PluginIdentifiableCommand {
+
+    /**
+     * FillCommand constructor.
+     */
+    public function __construct() {
+        parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
+    }
+
+    /**
+     * @param CommandSender $sender
+     * @param string $commandLabel
+     * @param array $args
+     * @return void
+     */
+    public function execute(CommandSender $sender, string $commandLabel, array $args) {
+        if(!$sender instanceof Player) {
+            $sender->sendMessage("§cThis command can be used only in-game!");
+            return;
+        }
+        if(!$sender->hasPermission("bt.cmd.fill")) {
+            $sender->sendMessage("§cYou have not permissions to use this command!");
+            return;
+        }
+        if(empty($args[0])) {
+            $sender->sendMessage("§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
+        }
+        if(!Selectors::isSelected(1, $sender)) {
+            $sender->sendMessage("§cFirst you need to select the first position.");
+            return;
+        }
+        if(!Selectors::isSelected(2, $sender)) {
+            $sender->sendMessage("§cFirst you need to select the second position.");
+            return;
+        }
+        $firstPos = Selectors::getPosition($sender, 1);
+        $secondPos = Selectors::getPosition($sender, 2);
+        if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
+            $sender->sendMessage("§cPositions must be in same level");
+            return;
+        }
+        $filler = BuilderTools::getEditor("Filler");
+        if(!$filler instanceof Filler) return;
+        $count = $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0]);
+        $sender->sendMessage("§aSelected area was filled ({$count} blocks changed)!");
+    }
+
+    /**
+     * @return Plugin|BuilderTools $builderTools
+     */
+    public function getPlugin(): Plugin {
+        return BuilderTools::getInstance();
+    }
+}
