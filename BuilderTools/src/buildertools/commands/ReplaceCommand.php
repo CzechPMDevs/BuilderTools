@@ -45,23 +45,23 @@ class ReplaceCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(!Selectors::isSelected(1, $sender)) {
-            $sender->sendMessage("§cFirst you need to select the first position.");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
             return;
         }
         if(!Selectors::isSelected(2, $sender)) {
-            $sender->sendMessage("§cFirst you need to select the second position.");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
         $firstPos = Selectors::getPosition($sender, 1);
         $secondPos = Selectors::getPosition($sender, 2);
         if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
-            $sender->sendMessage("§cPositions must be in same level");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
         $filler = BuilderTools::getEditor("Replacement");
         if(!$filler instanceof Replacement) return;
         $count = $filler->replace($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0], $args[1]);
-        $sender->sendMessage("§aSelected area was filled ({$count} blocks changed)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area was filled ({$count} blocks changed)!");
     }
 
     /**

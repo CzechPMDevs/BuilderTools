@@ -40,26 +40,26 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(empty($args[0])) {
-            $sender->sendMessage("§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
         }
         if(!Selectors::isSelected(1, $sender)) {
-            $sender->sendMessage("§cFirst you need to select the first position.");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
             return;
         }
         if(!Selectors::isSelected(2, $sender)) {
-            $sender->sendMessage("§cFirst you need to select the second position.");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
         $firstPos = Selectors::getPosition($sender, 1);
         $secondPos = Selectors::getPosition($sender, 2);
         if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
-            $sender->sendMessage("§cPositions must be in same level");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
         $filler = BuilderTools::getEditor("Filler");
         if(!$filler instanceof Filler) return;
         $count = $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0]);
-        $sender->sendMessage("§aFilling selected area ({$count} blocks to change)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aFilling selected area ({$count} blocks to change)!");
     }
 
     /**
