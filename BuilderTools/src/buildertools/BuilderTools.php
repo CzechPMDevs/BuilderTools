@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace buildertools;
 
+use buildertools\commands\ClearInventoryCommand;
 use buildertools\commands\DrawCommand;
 use buildertools\commands\FillCommand;
 use buildertools\commands\FirstPositionCommand;
 use buildertools\commands\HelpCommand;
-use buildertools\commands\HsphereCommand;
+use buildertools\commands\IdCommand;
+use buildertools\commands\NaturalizeCommand;
 use buildertools\commands\ReplaceCommand;
 use buildertools\commands\SecondPositionCommand;
 use buildertools\commands\SphereCommand;
 use buildertools\commands\WandCommand;
 use buildertools\editors\Editor;
 use buildertools\editors\Filler;
+use buildertools\editors\Naturalizer;
 use buildertools\editors\Printer;
 use buildertools\editors\Replacement;
-use buildertools\events\listener\EventListener;
+use buildertools\event\listener\EventListener;
 use buildertools\task\FillTask;
 use pocketmine\plugin\PluginBase;
 
@@ -59,7 +62,6 @@ class BuilderTools extends PluginBase {
         );
         if($this->isEnabled()) {
             $this->getLogger()->info($text);
-            sleep(1);
             $this->getLogger()->info("§a--> Loaded!");
         }
         else {
@@ -68,13 +70,14 @@ class BuilderTools extends PluginBase {
     }
 
     public function registerTasks() {
-        $this->getServer()->getScheduler()->scheduleRepeatingTask(new FillTask(), 1);
+        $this->getServer()->getScheduler()->scheduleRepeatingTask(new FillTask, 1);
     }
 
     public function registerEditors() {
         self::$editors["Filler"] = new Filler;
         self::$editors["Printer"] = new Printer;
-        self::$editors["Replacement"] = new Replacement();
+        self::$editors["Replacement"] = new Replacement;
+        self::$editors["Naturalizer"] = new Naturalizer;
     }
 
     public function initListner() {
@@ -90,8 +93,10 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new HelpCommand);
         $map->register("BuilderTools", new DrawCommand);
         $map->register("BuilderTools", new SphereCommand);
-        #$map->register("BuilderTools", new HsphereCommand);
         $map->register("BuilderTools", new ReplaceCommand);
+        $map->register("BuilderTools", new IdCommand);
+        $map->register("BuilderTools", new ClearInventoryCommand);
+        $map->register("BuilderTools", new NaturalizeCommand);
     }
 
     /**

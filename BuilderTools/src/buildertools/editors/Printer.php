@@ -16,10 +16,9 @@ class Printer extends Editor {
 
     const CUBE = 0;
     const SPHERE = 1;
-    #const HSPHERE = 2;
 
     // TODO: add custom $mode
-    const CUSTOM = 3;
+    const CUSTOM = 2;
 
     /**
      * @param Position $position
@@ -52,10 +51,6 @@ class Printer extends Editor {
                     }
                 }
                 break;
-            /*case self::HSPHERE:
-                    $this->draw($position, $brush, $block, 1);
-                    $this->draw(Position::fromObject($position->add(-1, -1, -1), $position->getLevel()), $brush, Block::get(Block::AIR), 1);
-                break;*/
         }
 
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace buildertools\events\listener;
+namespace buildertools\event\listener;
 
 use buildertools\BuilderTools;
 use buildertools\editors\Printer;
