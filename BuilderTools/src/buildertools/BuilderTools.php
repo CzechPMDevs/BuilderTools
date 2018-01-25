@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace buildertools;
 
 use buildertools\commands\ClearInventoryCommand;
+use buildertools\commands\CopyCommand;
 use buildertools\commands\DrawCommand;
 use buildertools\commands\FillCommand;
 use buildertools\commands\FirstPositionCommand;
 use buildertools\commands\HelpCommand;
 use buildertools\commands\IdCommand;
 use buildertools\commands\NaturalizeCommand;
+use buildertools\commands\PasteCommand;
 use buildertools\commands\ReplaceCommand;
 use buildertools\commands\SecondPositionCommand;
 use buildertools\commands\SphereCommand;
 use buildertools\commands\WandCommand;
+use buildertools\editors\Copier;
 use buildertools\editors\Editor;
 use buildertools\editors\Filler;
 use buildertools\editors\Naturalizer;
@@ -78,6 +81,7 @@ class BuilderTools extends PluginBase {
         self::$editors["Printer"] = new Printer;
         self::$editors["Replacement"] = new Replacement;
         self::$editors["Naturalizer"] = new Naturalizer;
+        self::$editors["Copier"] = new Copier;
     }
 
     public function initListner() {
@@ -97,6 +101,8 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new IdCommand);
         $map->register("BuilderTools", new ClearInventoryCommand);
         $map->register("BuilderTools", new NaturalizeCommand);
+        $map->register("BuilderTools", new CopyCommand);
+        $map->register("BuilderTools", new PasteCommand);
     }
 
     /**

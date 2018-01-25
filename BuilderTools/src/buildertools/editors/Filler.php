@@ -27,7 +27,7 @@ class Filler extends Editor {
      * @param mixed $blocks
      * @return int
      */
-    public function fill(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, string $blocks):int {
+    public function fill(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, string $blocks, bool $force):int {
         $count = 0;
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
@@ -35,7 +35,13 @@ class Filler extends Editor {
                     $count++;
                     $args = explode(",", strval($blocks));
                     #$level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock());
-                    FillTask::addBlock(new Position($x, $y, $z, $level), Item::fromString($args[array_rand($args, 1)])->getBlock());
+                    if(!$force) {
+                        FillTask::addBlock(new Position($x, $y, $z, $level), Item::fromString($args[array_rand($args, 1)])->getBlock());
+                    }
+                    else {
+                        $level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock());
+                    }
+
                 }
             }
         }

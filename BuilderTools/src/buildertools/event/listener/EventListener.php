@@ -23,7 +23,7 @@ class EventListener implements Listener {
         $position = $player->getTargetBlock(20)->asPosition();
         $printer = BuilderTools::getEditor("Printer");
         if($printer instanceof Printer) {
-            $printer->draw($position, Selectors::getDrawingPlayerBrush($player), $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerMode($player));
+            $printer->draw($position, Selectors::getDrawingPlayerBrush($player), $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player));
         }
         $event->setCancelled(true);
     }

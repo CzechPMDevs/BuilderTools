@@ -39,7 +39,7 @@ class Copier extends Editor {
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                    $this->copyData[$player->getName()]["data"][$count] = [$player->asVector3()->add($vec = new Vector3($x, $y, $z)), $player->getLevel()->getBlock($vec)];
+                    $this->copyData[$player->getName()]["data"][$count] = [($vec = new Vector3($x, $y, $z))->subtract($player->asVector3()), $player->getLevel()->getBlock($vec)];
                     $count++;
                 }
             }
@@ -67,7 +67,7 @@ class Copier extends Editor {
          * @var Block $block
          */
         foreach ($blocks as [$vec, $block]) {
-            $player->getLevel()->setBlock($vec->subtract($center), $block, true, true);
+            $player->getLevel()->setBlock($vec->add($player->asVector3()), $block, true, true);
         }
     }
 

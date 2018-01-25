@@ -12,9 +12,16 @@ use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
+/**
+ * Class DrawCommand
+ * @package buildertools\commands
+ */
 class DrawCommand extends Command implements PluginIdentifiableCommand {
 
+    /** @var int $minBrush */
     private $minBrush = 1;
+
+    /** @var int $maxBrush */
     private $maxBrush = 6;
 
     /**
@@ -40,11 +47,11 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(empty($args[0])) {
-            $sender->sendMessage("§cUsage: §7//draw <brush: {$this->minBrush}-{$this->maxBrush} | on | off> <cube|sphere>");
+            $sender->sendMessage("§cUsage: §7//draw <brush: {$this->minBrush}-{$this->maxBrush} | on | off> <cube|sphere> <fall = false>");
             return;
         }
         if(!is_numeric($args[0]) && !in_array(strval($args[0]), ["on", "off"])) {
-            $sender->sendMessage("§cUsage: §7//draw <brush: {$this->minBrush}-{$this->maxBrush} | on | off> <cube|sphere>");
+            $sender->sendMessage("§cUsage: §7//draw <brush: {$this->minBrush}-{$this->maxBrush} | on | off> <cube|sphere> <fall = false>");
             return;
         }
         if(is_numeric($args[0]) && intval($args[0]) >= $this->maxBrush && intval($args[0]) <= $this->minBrush) {
@@ -53,7 +60,7 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
         }
         if($args[0] == "off") {
             Selectors::removeDrawnigPlayer($sender);
-            $sender->sendMessage(BuilderTools::getPrefix()."§aRemoved brush!");
+            $sender->sendMessage(BuilderTools::getPrefix()."§aBrush removed!");
             return;
         }
         $mode = 0;
@@ -66,8 +73,16 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
             $brush = intval($args[0]);
         }
 
-        Selectors::addDrawingPlayer($sender, $brush, $mode);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush #{$brush}!");
+        $fall = false;
+
+        if(isset($args[2])) {
+            if(is_bool(boolval($args[2]))) {
+                $fall = boolval($args[2]);
+            }
+        }
+
+        Selectors::addDrawingPlayer($sender, $brush, $mode, $fall);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(shape: §7{$args[1]} §a& ".strval($fall)."§a)!");
     }
 
     /**

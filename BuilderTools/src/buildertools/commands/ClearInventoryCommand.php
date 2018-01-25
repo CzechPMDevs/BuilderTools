@@ -11,6 +11,10 @@ use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
+/**
+ * Class ClearInventoryCommand
+ * @package buildertools\commands
+ */
 class ClearInventoryCommand extends Command implements PluginIdentifiableCommand {
 
     /**
@@ -29,6 +33,8 @@ class ClearInventoryCommand extends Command implements PluginIdentifiableCommand
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
+        $sender->getInventory()->clearAll();
+        $sender->sendMessage(BuilderTools::getPrefix()."§aInventory cleared!");
     }
 
     /**

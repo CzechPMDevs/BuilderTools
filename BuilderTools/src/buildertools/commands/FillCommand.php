@@ -43,6 +43,7 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
         }
         if(empty($args[0])) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...> [force = true]");
+            return;
         }
         if(!Selectors::isSelected(1, $sender)) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
@@ -58,9 +59,19 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
+
+        $force = true;
+
+        if(isset($args[1])) {
+            if(is_bool(boolval($args[1]))) {
+                $force = boolval($args[1]);
+            }
+        }
+
+
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor("Filler");
-        $count = $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0]);
+        $count = $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0], $force);
         $sender->sendMessage(BuilderTools::getPrefix()."§aFilling selected area ({$count} blocks to change)!");
     }
 

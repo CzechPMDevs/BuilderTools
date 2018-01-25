@@ -18,13 +18,13 @@ use pocketmine\plugin\Plugin;
  * Class CopyCommand
  * @package buildertools\commands
  */
-class CopyCommand extends Command implements PluginIdentifiableCommand {
+class PasteCommand extends Command implements PluginIdentifiableCommand {
 
     /**
-     * CopyCommand constructor.
+     * PasteCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/copy", "Copy selected area", null, []);
+        parent::__construct("/paste", "Paste copyed area", null, []);
     }
 
     /**
@@ -38,7 +38,7 @@ class CopyCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.copy")) {
+        if(!$sender->hasPermission("bt.cmd.paste")) {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
@@ -50,11 +50,10 @@ class CopyCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
-        $pos1 = Selectors::getPosition($sender, 1);
-        $pos2 = Selectors::getPosition($sender, 2);
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor("Copier");
-        $copier->copy($pos1->getX(), $pos1->getY(), $pos1->getZ(), $pos2->getX(), $pos2->getY(), $pos2->getZ(), $sender);
+        $copier->paste($sender);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area pasted!");
     }
 
     /**

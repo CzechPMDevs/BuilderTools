@@ -29,8 +29,8 @@ class Selectors {
      * @param Player $player
      * @param int $brush
      */
-    public static function addDrawingPlayer(Player $player, int $brush, int $mode) {
-        self::$drawingPlayers[strtolower($player->getName())] = [$brush, $mode];
+    public static function addDrawingPlayer(Player $player, int $brush, int $mode, bool $fall) {
+        self::$drawingPlayers[strtolower($player->getName())] = [$brush, $mode, $fall];
     }
 
     /**
@@ -48,8 +48,20 @@ class Selectors {
         return self::$drawingPlayers[strtolower($player->getName())][0];
     }
 
+    /**
+     * @param Player $player
+     * @return int
+     */
     public static function getDrawingPlayerMode(Player $player) {
         return self::$drawingPlayers[strtolower($player->getName())][1];
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public static function getDrawingPlayerFall(Player $player) {
+        return self::$drawingPlayers[strtolower($player->getName())][2];
     }
 
     /**
