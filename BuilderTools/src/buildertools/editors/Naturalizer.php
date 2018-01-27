@@ -32,12 +32,15 @@ class Naturalizer extends Editor {
 
     private function fix(Vector3 $vector3, Level $level, int $minX) {
         start:
-        if($level->getBlock($vector3)->getId() == Block::AIR) {
-            $vector3 = $vector3->add(0, -1, 0);
+        if($vector3->getX() > 0 && $level->getBlock($vector3)->getId() == Block::AIR) {
+            $vector3 = $vector3->subtract(0, 1, 0);
             goto start;
         }
-
+        if($vector3->getX() < 0) {
+            return;
+        }
         $level->setBlock($vector3, Block::get(Block::GRASS));
+
 
         $r = rand(3, 4);
 
@@ -45,7 +48,7 @@ class Naturalizer extends Editor {
             $level->setBlock($vector3->add(0, -$y, 0), Block::get(Block::DIRT));
         }
 
-        for($y = $vector3->getY()-$r; $y > $minX; $y--) {
+        for($y = $vector3->getY()-$r; $y >= $minX; $y--) {
             $level->setBlock(new Vector3($vector3->getX(), $y, $vector3->getZ()), Block::get(Block::STONE));
         }
     }

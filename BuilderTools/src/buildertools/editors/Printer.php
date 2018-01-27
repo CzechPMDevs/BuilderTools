@@ -25,7 +25,7 @@ class Printer extends Editor {
      * @param int $brush
      * @param Block $block
      */
-    public function draw(Position $position, int $brush, Block $block, int $mode, bool $fall) {
+    public function draw(Position $position, int $brush, Block $block, int $mode, bool $fall = false) {
         switch ($mode) {
             case self::CUBE:
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
@@ -34,7 +34,7 @@ class Printer extends Editor {
                             if($fall) {
                                 $bY = $y;
                                 check1:
-                                if($position->getLevel()->getBlock(new Vector3($x, $bY-1, $z))->getId() == 0) {
+                                if($bY-1 > 0 && $position->getLevel()->getBlock(new Vector3($x, $bY-1, $z))->getId() == 0) {
                                     $bY--;
                                     goto check1;
                                 }
@@ -61,7 +61,7 @@ class Printer extends Editor {
                                 if($fall) {
                                     $bY = $y;
                                     check2:
-                                    if($position->getLevel()->getBlock(new Vector3($x, $bY-1, $z))->getId() == 0) {
+                                    if($bY-1 > 0 && $position->getLevel()->getBlock(new Vector3($x, $bY-1, $z))->getId() == 0) {
                                         $bY--;
                                         goto check2;
                                     }

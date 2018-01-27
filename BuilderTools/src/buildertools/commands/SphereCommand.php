@@ -44,7 +44,7 @@ class SphereCommand extends Command implements PluginIdentifiableCommand {
         $block = Item::fromString($bargs[array_rand($bargs, 1)])->getBlock();
         $printer = BuilderTools::getEditor("Printer");
         if($printer instanceof Printer) {
-            $printer->draw($sender->asPosition(), $radius, $block, Printer::SPHERE);
+            $printer->draw($sender->asPosition(), $radius, $block, Printer::SPHERE, false);
         }
         $sender->sendMessage(BuilderTools::getPrefix()."§aSphere was created!");
     }
