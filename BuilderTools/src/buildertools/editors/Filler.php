@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace buildertools\editors;
 
-use buildertools\task\FillTask;
+use buildertools\BuilderTools;
+use buildertools\task\async\FillAsyncTask;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
+use pocketmine\Server;
 
 /**
  * Class Filler
@@ -23,30 +26,41 @@ class Filler extends Editor {
      * @param int $x2
      * @param int $y2
      * @param int $z2
+     * @param Player $player
      * @param Level $level
      * @param string $blocks
-     * @param bool $force
-     * @return int
+     * @param bool $async
+     * @return void
      */
-    public function fill(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, string $blocks, bool $force):int {
+    public function fill(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Player $player, Level $level, string $blocks, bool $async) {
+        
+        if($async) {
+            $data = [
+                "player" => $player->getName(),
+                "pos1" => array($x1, $y1, $z1, $level->getFolderName()),
+                "pos2" => array($x2, $y2, $y2, $level->getFolderName()),
+                "blocks" => $blocks
+            ];
+            $task = new FillAsyncTask($data);
+
+            
+            Server::getInstance()->getScheduler()->scheduleAsyncTask($task);
+            return;
+        }
+        
         $count = 0;
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
                     $count++;
                     $args = explode(",", strval($blocks));
-                    #$level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock());
-                    if($force === false) {
-                        FillTask::addBlock(new Position($x, $y, $z, $level), Item::fromString($args[array_rand($args, 1)])->getBlock());
-                    }
-                    else {
-                        $level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock());
-                    }
-
+                    $level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock(), true, true);
                 }
             }
         }
-        return $count;
+        
+        $player->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully filled! ($count blocks changed)!");
+        return;
     }
 
     public function getName(): string {

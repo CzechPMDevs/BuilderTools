@@ -14,9 +14,12 @@ use buildertools\commands\IdCommand;
 use buildertools\commands\NaturalizeCommand;
 use buildertools\commands\PasteCommand;
 use buildertools\commands\ReplaceCommand;
+use buildertools\commands\RotateCommand;
 use buildertools\commands\SecondPositionCommand;
 use buildertools\commands\SphereCommand;
+use buildertools\commands\UndoCommand;
 use buildertools\commands\WandCommand;
+use buildertools\editors\Canceller;
 use buildertools\editors\Copier;
 use buildertools\editors\Editor;
 use buildertools\editors\Filler;
@@ -24,7 +27,6 @@ use buildertools\editors\Naturalizer;
 use buildertools\editors\Printer;
 use buildertools\editors\Replacement;
 use buildertools\event\listener\EventListener;
-use buildertools\task\FillTask;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -42,13 +44,16 @@ class BuilderTools extends PluginBase {
     /** @var  Editor[] $editors */
     private static $editors = [];
 
+    /** @var EventListener $listener */
+    private static $listener;
+
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
+        $this->sendLoadingInfo();
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
-        $this->sendLoadingInfo();
         $this->registerTasks();
     }
 
@@ -58,7 +63,7 @@ class BuilderTools extends PluginBase {
             "§c--------------------------------\n".
             "§6§lCzechPMDevs §r§e>>> §bBuilderTools\n".
             "§o§9Plugin like WorldEdit for PocketMine servers\n".
-            "§aAuthors: §7GamakCZ\n".
+            "§aAuthors: §7VixikCZ\n".
             "§aVersion: §7".$this->getDescription()->getVersion()."\n".
             "§aStatus: §7Loading...\n".
             "§c--------------------------------"
@@ -73,7 +78,7 @@ class BuilderTools extends PluginBase {
     }
 
     public function registerTasks() {
-        $this->getServer()->getScheduler()->scheduleRepeatingTask(new FillTask, 1);
+        // FillTask removed (._.)
     }
 
     public function registerEditors() {
@@ -82,10 +87,11 @@ class BuilderTools extends PluginBase {
         self::$editors["Replacement"] = new Replacement;
         self::$editors["Naturalizer"] = new Naturalizer;
         self::$editors["Copier"] = new Copier;
+        self::$editors["Canceller"] = new Canceller;
     }
 
     public function initListner() {
-        $this->getServer()->getPluginManager()->registerEvents(new EventListener, $this);
+        $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
     }
 
     public function registerCommands() {
@@ -103,21 +109,30 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new NaturalizeCommand);
         $map->register("BuilderTools", new CopyCommand);
         $map->register("BuilderTools", new PasteCommand);
+        $map->register("BuilderTools", new RotateCommand);
+        $map->register("BuilderTools", new UndoCommand);
     }
 
     /**
      * @param string $name
-     * @return Editor
+     * @return Editor $editor
      */
     public static function getEditor(string $name):Editor {
         return self::$editors[$name];
     }
 
     /**
-     * @return string
+     * @return string $prefix
      */
     public static function getPrefix():string {
         return self::$prefix;
+    }
+
+    /**
+     * @return EventListener $listener
+     */
+    public static function getListener():EventListener {
+        return self::$listener;
     }
 
     /**

@@ -53,7 +53,7 @@ class PasteCommand extends Command implements PluginIdentifiableCommand {
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor("Copier");
         $copier->paste($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area pasted!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully pasted!");
     }
 
     /**

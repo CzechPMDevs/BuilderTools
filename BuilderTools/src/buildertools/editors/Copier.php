@@ -34,7 +34,12 @@ class Copier extends Editor {
      * @param int $z2
      */
     public function copy(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Player $player) {
-        $this->copyData[$player->getName()] = ["data" => [], "center" => $player->asPosition()];
+        $player->sendMessage("Direction: {$player->getDirection()}");
+        $this->copyData[$player->getName()] = [
+            "data" => [],
+            "center" => $player->asPosition(),
+            "direction" => $player->getDirection(),
+            "rotated" => false];
         $count = 0;
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
@@ -59,16 +64,120 @@ class Copier extends Editor {
         /** @var array $blocks */
         $blocks = $this->copyData[$player->getName()]["data"];
 
-        /** @var Position $center $center */
-        $center = $this->copyData[$player->getName()]["center"];
+        /** @var array $undo */
+        $undo = [];
 
         /**
          * @var Vector3 $vec
          * @var Block $block
          */
         foreach ($blocks as [$vec, $block]) {
+            if($player->getLevel()->getBlock($vec->add($player->asVector3()))->getId() != $block->getId()) {
+                array_push($undo, $player->getLevel()->getBlock($vec->add($player->asVector3())));
+            }
             $player->getLevel()->setBlock($vec->add($player->asVector3()), $block, true, true);
         }
+
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor("Canceller");
+        $canceller->addStep($player, $undo);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function addToRotate(Player $player) {
+        if(empty($this->copyData[$player->getName()])) {
+            $player->sendMessage(BuilderTools::getPrefix()."§cUse //copy first!");
+            return;
+        }
+        if($this->copyData[$player->getName()]["rotated"] == true) {
+            $player->sendMessage(BuilderTools::getPrefix()."§cSelected area is already rotated!");
+            return;
+        }
+        $player->sendMessage(BuilderTools::getPrefix()."Select direction to rotate moving.");
+        BuilderTools::getListener()->directionCheck[$player->getName()] = intval($player->getDirection());
+    }
+
+    /**
+     * @param Player $player
+     * @param int $fromDirection
+     * @param int $toDirection
+     */
+    public function rotate(Player $player, int $fromDirection, int $toDirection) {
+        $this->copyData[$player->getName()]["rotated"] = true;
+        $min = min($fromDirection, $toDirection);
+        $max = max($fromDirection, $toDirection);
+
+        if($min == $max) {
+            $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated!");
+            return;
+        }
+
+        $id = "{$fromDirection}:{$toDirection}";
+
+        switch ($id) {
+            case "0:0":
+            case "1:1":
+            case "2:2":
+            case "3:3":
+                $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
+                break;
+
+            case "0:1":
+            case "1:2":
+            case "2:3":
+                /**
+                 * @var Vector3 $vec
+                 * @var Block $block
+                 */
+                foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    $vec->setComponents($vec->getZ(), $vec->getY(), $vec->getX());
+                }
+                $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
+                break;
+
+            case "0:2":
+            case "1:3":
+            case "2:0":
+            case "3:1":
+                /**
+                 * @var Vector3 $vec
+                 * @var Block $block
+                 */
+                foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
+                }
+                $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
+                break;
+
+            case "1:0":
+            case "2:1":
+            case "3:2":
+                /**
+                 * @var Vector3 $vec
+                 * @var Block $block
+                 */
+                foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
+                }
+                /**
+                 * @var Vector3 $vec
+                 * @var Block $block
+                 */
+                foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    $vec->setComponents($vec->getZ(), $vec->getY(), $vec->getX());
+                }
+
+                $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
+                break;
+
+            case "3:0":
+
+                break;
+        }
+
+
     }
 
     public function flip() {

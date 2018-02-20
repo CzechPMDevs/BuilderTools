@@ -42,7 +42,7 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(empty($args[0])) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...> [force = true]");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...> [async = false]");
             return;
         }
         if(!Selectors::isSelected(1, $sender)) {
@@ -60,19 +60,18 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
 
-        $force = true;
+        $async = false;
 
         if(isset($args[1])) {
             if(is_bool(boolval($args[1]))) {
-                $force = boolval($args[1]);
+                $async = boolval($args[1]);
             }
         }
 
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor("Filler");
-        $count = $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0], $force);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aFilling selected area ({$count} blocks to change)!");
+        $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender, $firstPos->getLevel(), $args[0], $async);
     }
 
     /**

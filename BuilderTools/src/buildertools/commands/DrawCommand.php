@@ -82,7 +82,7 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
         }
 
         Selectors::addDrawingPlayer($sender, $brush, $mode, $fall);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(shape: §7{$args[1]} §a& ".strval($fall)."§a)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(shape: §7{$args[1]} §aFall:&$fall)!");
     }
 
     /**
