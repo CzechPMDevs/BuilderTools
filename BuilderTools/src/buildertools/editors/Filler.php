@@ -47,7 +47,10 @@ class Filler extends Editor {
             Server::getInstance()->getScheduler()->scheduleAsyncTask($task);
             return;
         }
-        
+
+        /** @var array $undo */
+        $undo = [];
+
         $count = 0;
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
@@ -58,7 +61,12 @@ class Filler extends Editor {
                 }
             }
         }
-        
+
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor("Canceller");
+
+
+
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully filled! ($count blocks changed)!");
         return;
     }

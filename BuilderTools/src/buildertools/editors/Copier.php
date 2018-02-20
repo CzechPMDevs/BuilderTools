@@ -32,9 +32,9 @@ class Copier extends Editor {
      * @param int $x2
      * @param int $y2
      * @param int $z2
+     * @param Player $player
      */
     public function copy(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Player $player) {
-        $player->sendMessage("Direction: {$player->getDirection()}");
         $this->copyData[$player->getName()] = [
             "data" => [],
             "center" => $player->asPosition(),

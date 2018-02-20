@@ -34,4 +34,11 @@ class SetupData {
     public static function setOption(string $option, int $setup) {
         self::$setup[$option] = $setup;
     }
+
+    /**
+     * @param array $options
+     */
+    public static function setAllOptions(array $options) {
+        self::$setup = $options;
+    }
 }

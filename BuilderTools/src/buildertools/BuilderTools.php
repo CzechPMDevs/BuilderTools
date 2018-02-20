@@ -13,6 +13,7 @@ use buildertools\commands\HelpCommand;
 use buildertools\commands\IdCommand;
 use buildertools\commands\NaturalizeCommand;
 use buildertools\commands\PasteCommand;
+use buildertools\commands\RedoCommand;
 use buildertools\commands\ReplaceCommand;
 use buildertools\commands\RotateCommand;
 use buildertools\commands\SecondPositionCommand;
@@ -111,6 +112,7 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new PasteCommand);
         $map->register("BuilderTools", new RotateCommand);
         $map->register("BuilderTools", new UndoCommand);
+        $map->register("BuilderTools", new RedoCommand);
     }
 
     /**

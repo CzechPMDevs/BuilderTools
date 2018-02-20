@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace buildertools\editors;
 
+use buildertools\BuilderTools;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 
 /**
  * Class Printer
@@ -16,16 +18,17 @@ class Printer extends Editor {
 
     const CUBE = 0;
     const SPHERE = 1;
-
-    // TODO: add custom $mode
     const CUSTOM = 2;
 
     /**
      * @param Position $position
      * @param int $brush
      * @param Block $block
+     * @param int $mode
+     * @param bool $fall
+     * @param Player|null $player
      */
-    public function draw(Position $position, int $brush, Block $block, int $mode, bool $fall = false) {
+    public function draw(Position $position, int $brush, Block $block, int $mode, bool $fall = false, Player $player = null) {
         switch ($mode) {
             case self::CUBE:
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
@@ -75,6 +78,45 @@ class Printer extends Editor {
                                 }
                             }
                         }
+                    }
+                }
+                break;
+            case self::CUSTOM:
+                /** @var Copier $copier */
+                $copier = BuilderTools::getEditor("Copier");
+                if(empty($copier->copyData[$player->getName()])) {
+                    $player->sendMessage(BuilderTools::getPrefix()."§cUse //copy first!");
+                    return;
+                }
+
+                /** @var array $blocks */
+                $blocks = $copier->copyData[$player->getName()]["data"];
+
+                if(!$fall) {
+
+
+                    /**
+                     * @var Vector3 $vec
+                     * @var Block $block
+                     */
+                    foreach ($blocks as [$vec, $block]) {
+                        $player->getLevel()->setBlock($vec->add($player->asVector3()), $block, true, true);
+                    }
+                }
+
+                else {
+                    /**
+                     * @var Vector3 $vec
+                     * @var Block $block
+                     */
+                    foreach ($blocks as [$vec, $block]) {
+                        $y = $vec->getY();
+                        check3:
+                        if($block->getLevel()->getBlock(new Vector3($vec->getX()+$player->getX(), $y, $vec->getZ()+$player->getZ()))->getId() == Block::AIR && $y >= 0) {
+                            $y--;
+                            goto check3;
+                        }
+                        $block->getLevel()->setBlock($vec->add($player->getX(), $y, $player->getZ()), $block, true, true);
                     }
                 }
                 break;
