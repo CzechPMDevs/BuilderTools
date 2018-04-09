@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace buildertools;
 
+use buildertools\commands\BiomeCommand;
 use buildertools\commands\ClearInventoryCommand;
 use buildertools\commands\CopyCommand;
+use buildertools\commands\DecorationCommand;
 use buildertools\commands\DrawCommand;
 use buildertools\commands\FillCommand;
 use buildertools\commands\FirstPositionCommand;
+use buildertools\commands\FixCommand;
+use buildertools\commands\FlipCommand;
 use buildertools\commands\HelpCommand;
 use buildertools\commands\IdCommand;
 use buildertools\commands\NaturalizeCommand;
@@ -18,16 +22,21 @@ use buildertools\commands\ReplaceCommand;
 use buildertools\commands\RotateCommand;
 use buildertools\commands\SecondPositionCommand;
 use buildertools\commands\SphereCommand;
+use buildertools\commands\TreeCommand;
 use buildertools\commands\UndoCommand;
 use buildertools\commands\WandCommand;
 use buildertools\editors\Canceller;
 use buildertools\editors\Copier;
+use buildertools\editors\Decorator;
+use buildertools\editors\Dyer;
 use buildertools\editors\Editor;
 use buildertools\editors\Filler;
+use buildertools\editors\Fixer;
 use buildertools\editors\Naturalizer;
 use buildertools\editors\Printer;
 use buildertools\editors\Replacement;
 use buildertools\event\listener\EventListener;
+use buildertools\utils\ConfigManager;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -48,6 +57,9 @@ class BuilderTools extends PluginBase {
     /** @var EventListener $listener */
     private static $listener;
 
+    /** @var ConfigManager $configManager */
+    private $configManager;
+
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
@@ -55,10 +67,15 @@ class BuilderTools extends PluginBase {
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
-        $this->registerTasks();
+        if($this->isEnabled()) {
+            $this->getLogger()->info("§a--> Loaded!");
+        }
+        else {
+            $this->getLogger()->critical("§4Submit issue to github.com/CzechPMDevs/BuilderTools/issues  to fix this error!");
+        }
     }
 
-    public function sendLoadingInfo() {
+    private function sendLoadingInfo() {
         $text = strval(
             "\n".
             "§c--------------------------------\n".
@@ -69,33 +86,29 @@ class BuilderTools extends PluginBase {
             "§aStatus: §7Loading...\n".
             "§c--------------------------------"
         );
-        if($this->isEnabled()) {
-            $this->getLogger()->info($text);
-            $this->getLogger()->info("§a--> Loaded!");
-        }
-        else {
-            $this->getLogger()->critical("§4Submit issue to github.com/CzechPMDevs/BuilderTools/issues  to fix this error!");
-        }
+        $this->getLogger()->info($text);
     }
 
-    public function registerTasks() {
-        // FillTask removed (._.)
-    }
-
-    public function registerEditors() {
+    private function registerEditors() {
         self::$editors["Filler"] = new Filler;
         self::$editors["Printer"] = new Printer;
         self::$editors["Replacement"] = new Replacement;
         self::$editors["Naturalizer"] = new Naturalizer;
         self::$editors["Copier"] = new Copier;
         self::$editors["Canceller"] = new Canceller;
+        self::$editors["Decorator"] = new Decorator;
+        self::$editors["Fixer"] = new Fixer;
     }
 
-    public function initListner() {
+    private function initListner() {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
     }
 
-    public function registerCommands() {
+    private function initConfig() {
+        $this->configManager = new ConfigManager($this);
+    }
+
+    private function registerCommands() {
         $map = $this->getServer()->getCommandMap();
         $map->register("BuilderTools", new FirstPositionCommand);
         $map->register("BuilderTools", new SecondPositionCommand);
@@ -113,6 +126,10 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new RotateCommand);
         $map->register("BuilderTools", new UndoCommand);
         $map->register("BuilderTools", new RedoCommand);
+        $map->register("BuilderTools", new TreeCommand);
+        $map->register("BuilderTools", new DecorationCommand);
+        $map->register("BuilderTools", new FlipCommand);
+        $map->register("BuilderTools", new FixCommand);
     }
 
     /**

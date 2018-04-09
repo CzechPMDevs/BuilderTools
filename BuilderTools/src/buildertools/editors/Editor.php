@@ -12,6 +12,15 @@ use buildertools\BuilderTools;
  */
 abstract class Editor {
 
+    const CANCELLER = "Canceller";
+    const COPIER = "Copier";
+    const DECORATOR = "Decorator";
+    const FILLER = "Filler";
+    const FIXER = "Fixer";
+    const NATURALIZER = "Naturalizer";
+    const PRINTER = "Printer";
+    const REPLACEMENT = "Replacement";
+
     /**
      * @return string
      */

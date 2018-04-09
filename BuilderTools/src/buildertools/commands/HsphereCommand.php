@@ -15,49 +15,43 @@ use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
 /**
- * Class CubeCommand
+ * Class HsphereCommand
  * @package buildertools\commands
  */
-class CubeCommand extends Command implements PluginIdentifiableCommand {
+class HsphereCommand extends Command implements PluginIdentifiableCommand {
 
     /**
-     * CubeCommand constructor.
+     * SphereCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/cube", "Create cube", null, []);
+        parent::__construct("/hsphere", "Create hsphere", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.cube")) {
+        if(!$sender->hasPermission("bt.cmd.sphere")) {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
         if(empty($args[0])) {
-            $sender->sendMessage("§7Usage: §c//cube <id1:dmg1,id2:dmg2,...> <radius>");
+            $sender->sendMessage("§cUsage: §7//hsphere <id1:dmg1,id2:dmg2:,...> <radius>");
             return;
         }
-        $radius = isset($args[1]) ? $args[1] : 5;
+        $radius = isset($args[1]) ? intval($args[1]) : 5;
         $bargs = explode(",", strval($args[0]));
         $block = Item::fromString($bargs[array_rand($bargs, 1)])->getBlock();
 
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
-        $printer->draw($sender->asPosition(), $radius, $block, Printer::CUBE);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube was created!");
+        $printer->draw($sender->asPosition(), $radius, $block, Printer::HSPHERE, false);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere was created!");
     }
 
     /**
-     * @return Plugin|BuilderTools $plugin
+     * @return Plugin|BuilderTools
      */
     public function getPlugin(): Plugin {
         return BuilderTools::getInstance();

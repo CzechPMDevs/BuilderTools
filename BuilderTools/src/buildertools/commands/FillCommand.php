@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace buildertools\commands;
 
 use buildertools\BuilderTools;
+use buildertools\editors\Editor;
 use buildertools\editors\Filler;
 use buildertools\Selectors;
 use pocketmine\command\Command;
@@ -70,7 +71,7 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
 
 
         /** @var Filler $filler */
-        $filler = BuilderTools::getEditor("Filler");
+        $filler = BuilderTools::getEditor(Editor::FILLER);
         $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender, $firstPos->getLevel(), $args[0], $async);
     }
 

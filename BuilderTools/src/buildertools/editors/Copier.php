@@ -39,7 +39,8 @@ class Copier extends Editor {
             "data" => [],
             "center" => $player->asPosition(),
             "direction" => $player->getDirection(),
-            "rotated" => false];
+            "rotated" => false
+        ];
         $count = 0;
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
@@ -173,14 +174,32 @@ class Copier extends Editor {
                 break;
 
             case "3:0":
-
+                /**
+                 * @var Vector3 $vec
+                 * @var Block $block
+                 */
+                foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
+                }
+                $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
                 break;
         }
 
 
     }
 
-    public function flip() {
+    /**
+     * @param Player $player
+     */
+    public function flip(Player $player) {
+        /**
+         * @var Vector3 $vec
+         * @var Block $block
+         */
+        foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+            $vec->setComponents($vec->getX(), -$vec->getY(), $vec->getZ());
+        }
 
+        $player->sendMessage(BuilderTools::getPrefix()."§aSelected area flipped!");
     }
 }

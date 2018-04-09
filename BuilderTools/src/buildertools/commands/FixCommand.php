@@ -5,60 +5,70 @@ declare(strict_types=1);
 namespace buildertools\commands;
 
 use buildertools\BuilderTools;
-use buildertools\editors\Copier;
 use buildertools\editors\Editor;
+use buildertools\editors\Fixer;
 use buildertools\Selectors;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
-use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
 /**
- * Class CopyCommand
+ * Class FixCommand
  * @package buildertools\commands
  */
-class PasteCommand extends Command implements PluginIdentifiableCommand {
+class FixCommand extends Command implements PluginIdentifiableCommand {
 
     /**
-     * PasteCommand constructor.
+     * FixCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/paste", "Paste copyed area", null, []);
+        parent::__construct("/fix", "Fix selected area");
     }
 
     /**
      * @param CommandSender $sender
      * @param string $commandLabel
      * @param array $args
-     * @return void
+     * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.paste")) {
+
+        if(!$sender->hasPermission("bt.cmd.fill")) {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
+
         if(!Selectors::isSelected(1, $sender)) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
             return;
         }
+
         if(!Selectors::isSelected(2, $sender)) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->paste($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully pasted!");
+
+        $firstPos = Selectors::getPosition($sender, 1);
+        $secondPos = Selectors::getPosition($sender, 2);
+
+        if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
+            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
+            return;
+        }
+
+        /** @var Fixer $fixer */
+        $fixer = BuilderTools::getEditor(Editor::FILLER);
+        $fixer->fix($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
     }
 
     /**
-     * @return Plugin|BuilderTools
+     * @return Plugin
      */
     public function getPlugin(): Plugin {
         return BuilderTools::getInstance();

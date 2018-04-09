@@ -4,6 +4,47 @@ declare(strict_types=1);
 
 namespace buildertools\commands;
 
-class FlipCommand {
+use buildertools\BuilderTools;
+use buildertools\editors\Copier;
+use buildertools\editors\Editor;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
+use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\Player;
+use pocketmine\plugin\Plugin;
 
+/**
+ * Class FlipCommand
+ * @package buildertools\commands
+ */
+class FlipCommand extends Command implements PluginIdentifiableCommand {
+
+    /**
+     * FlipCommand constructor.
+     */
+    public function __construct() {
+        parent::__construct("/flip", "Flip selected area", null, []);
+    }
+
+    public function execute(CommandSender $sender, string $commandLabel, array $args) {
+        if(!$sender instanceof Player) {
+            return;
+        }
+
+        if(!$sender->hasPermission("bt.cmd.flip")) {
+            $sender->sendMessage("§cYou do not have permissions to use this command.");
+            return;
+        }
+
+        /** @var Copier $copier */
+        $copier = BuilderTools::getEditor(Editor::COPIER);
+        $copier->flip($sender);
+    }
+
+    /**
+     * @return Plugin|BuilderTools $plugin
+     */
+    public function getPlugin(): Plugin {
+        return BuilderTools::getInstance();
+    }
 }

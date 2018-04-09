@@ -7,7 +7,9 @@ namespace buildertools\editors;
 use buildertools\BuilderTools;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
+use pocketmine\math\Math;
 use pocketmine\math\Vector3;
+use pocketmine\math\VectorMath;
 use pocketmine\Player;
 
 /**
@@ -16,9 +18,10 @@ use pocketmine\Player;
  */
 class Printer extends Editor {
 
+    const CUSTOM = -1;
     const CUBE = 0;
     const SPHERE = 1;
-    const CUSTOM = 2;
+    const HSPHERE = 2;
 
     /**
      * @param Position $position
@@ -29,6 +32,7 @@ class Printer extends Editor {
      * @param Player|null $player
      */
     public function draw(Position $position, int $brush, Block $block, int $mode, bool $fall = false, Player $player = null) {
+        $undo = [];
         switch ($mode) {
             case self::CUBE:
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
@@ -42,12 +46,17 @@ class Printer extends Editor {
                                     goto check1;
                                 }
                                 else {
+                                    $undo[] = $position->getLevel()->getBlock(new Vector3($x, $bY, $z));
                                     $position->getLevel()->setBlock(new Vector3($x, $bY, $z), $block, true, true);
                                 }
                             }
                             else {
-                                $vector = new Vector3($x, $y, $z);
-                                $position->getLevel()->setBlock($vector, $block, false, false);
+                                if(!($y < 0)) {
+                                    $vector = new Vector3($x, $y, $z);
+                                    $undo[] = $position->getLevel()->getBlock($vector);
+                                    $position->getLevel()->setBlock($vector, $block, true, true);
+                                }
+
                             }
                         }
                     }
@@ -60,7 +69,7 @@ class Printer extends Editor {
                         $ysqr = ($position->getY()-$y) * ($position->getY()-$y);
                         for ($z = $position->getZ()-$brush; $z <= $position->getZ()+$brush; $z++) {
                             $zsqr = ($position->getZ()-$z) * ($position->getZ()-$z);
-                            if(($xsqr + $ysqr + $zsqr) < ($brush*$brush)) {
+                            if(($xsqr + $ysqr + $zsqr) <= ($brush*$brush)) {
                                 if($fall) {
                                     $bY = $y;
                                     check2:
@@ -69,12 +78,16 @@ class Printer extends Editor {
                                         goto check2;
                                     }
                                     else {
+                                        $undo[] = $position->getLevel()->getBlock(new Vector3($x, $bY, $z));
                                         $position->getLevel()->setBlock(new Vector3($x, $bY, $z), $block, true, true);
                                     }
                                 }
                                 else {
-                                    $vector = new Vector3($x, $y, $z);
-                                    $position->getLevel()->setBlock($vector, $block, false, false);
+                                    if(!($y < 0)) {
+                                        $undo[] = $position->getLevel()->getBlock(new Vector3($x, $y, $z));
+                                        $vector = new Vector3($x, $y, $z);
+                                        $position->getLevel()->setBlock($vector, $block, true, true);
+                                    }
                                 }
                             }
                         }
@@ -100,6 +113,7 @@ class Printer extends Editor {
                      * @var Block $block
                      */
                     foreach ($blocks as [$vec, $block]) {
+                        $undo[] = $position->getLevel()->getBlock($vec->add($player->asVector3()));
                         $player->getLevel()->setBlock($vec->add($player->asVector3()), $block, true, true);
                     }
                 }
@@ -116,11 +130,16 @@ class Printer extends Editor {
                             $y--;
                             goto check3;
                         }
+                        $undo[] = $position->getLevel()->getBlock($vec->add($player->getX(), $y, $player->getZ()));
                         $block->getLevel()->setBlock($vec->add($player->getX(), $y, $player->getZ()), $block, true, true);
                     }
                 }
                 break;
         }
+
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor("Canceller");
+        $canceller->addStep($player, $undo);
 
     }
 

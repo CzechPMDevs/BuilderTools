@@ -17,10 +17,15 @@ use pocketmine\Server;
  */
 class Canceller extends Editor {
 
+    /** @var array $undoData */
     public $undoData = [];
 
+    /** @var array $redoData */
     public $redoData = [];
 
+    /**
+     * @return string $name
+     */
     public function getName(): string {
         return "Canceller";
     }
@@ -39,7 +44,7 @@ class Canceller extends Editor {
      */
     public function undo(Player $player) {
 
-        if(count($this->undoData[$player->getName()]) == 0) {
+        if(empty($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
             $player->sendMessage(BuilderTools::getPrefix()."§cThere are not actions to undo!");
             return;
         }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace buildertools\commands;
 
 use buildertools\BuilderTools;
+use buildertools\editors\Editor;
 use buildertools\editors\Filler;
 use buildertools\editors\Naturalizer;
 use buildertools\Selectors;
@@ -57,8 +58,8 @@ class NaturalizeCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         /** @var Naturalizer $filler */
-        $filler = BuilderTools::getEditor("Naturalizer");
-        $count = $filler->naturalize($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel());
+        $filler = BuilderTools::getEditor(Editor::NATURALIZER);
+        $count = $filler->naturalize($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized!");
     }
 

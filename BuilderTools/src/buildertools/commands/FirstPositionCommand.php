@@ -41,7 +41,7 @@ class FirstPositionCommand extends Command implements PluginIdentifiableCommand 
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
-        Selectors::addSelector($sender, 1, $position = new Position(intval($sender->getX()), intval($sender->getY()), intval($sender->getZ()), $sender->getLevel()));
+        Selectors::addSelector($sender, 1, $position = new Position((int)round($sender->getX()), (int)round($sender->getY()), (int)round($sender->getZ()), $sender->getLevel()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
     }
 

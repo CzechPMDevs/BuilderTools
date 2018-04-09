@@ -3,6 +3,7 @@
 namespace buildertools\commands;
 
 use buildertools\BuilderTools;
+use buildertools\editors\Editor;
 use buildertools\editors\Filler;
 use buildertools\editors\Replacement;
 use buildertools\Selectors;
@@ -58,9 +59,10 @@ class ReplaceCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
-        $filler = BuilderTools::getEditor("Replacement");
-        if(!$filler instanceof Replacement) return;
-        $count = $filler->replace($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0], $args[1]);
+
+        /** @var Replacement $replacement */
+        $replacement = BuilderTools::getEditor(Editor::REPLACEMENT);
+        $count = $replacement->replace($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0], $args[1], $sender);
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area was filled ({$count} blocks changed)!");
     }
 

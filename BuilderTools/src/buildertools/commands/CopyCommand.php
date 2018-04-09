@@ -6,6 +6,7 @@ namespace buildertools\commands;
 
 use buildertools\BuilderTools;
 use buildertools\editors\Copier;
+use buildertools\editors\Editor;
 use buildertools\Selectors;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -53,7 +54,7 @@ class CopyCommand extends Command implements PluginIdentifiableCommand {
         $pos1 = Selectors::getPosition($sender, 1);
         $pos2 = Selectors::getPosition($sender, 2);
         /** @var Copier $copier */
-        $copier = BuilderTools::getEditor("Copier");
+        $copier = BuilderTools::getEditor(Editor::COPIER);
         $copier->copy($pos1->getX(), $pos1->getY(), $pos1->getZ(), $pos2->getX(), $pos2->getY(), $pos2->getZ(), $sender);
     }
 

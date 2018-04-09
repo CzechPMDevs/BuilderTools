@@ -57,6 +57,7 @@ class Filler extends Editor {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
                     $count++;
                     $args = explode(",", strval($blocks));
+                    $undo[] = $level->getBlock(new Vector3($x, $y, $z));
                     $level->setBlock(new Vector3($x, $y, $z), Item::fromString($args[array_rand($args, 1)])->getBlock(), true, true);
                 }
             }
@@ -64,7 +65,7 @@ class Filler extends Editor {
 
         /** @var Canceller $canceller */
         $canceller = BuilderTools::getEditor("Canceller");
-
+        $canceller->addStep($player, $undo);
 
 
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully filled! ($count blocks changed)!");

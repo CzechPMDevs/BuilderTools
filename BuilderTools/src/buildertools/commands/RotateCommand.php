@@ -6,6 +6,7 @@ namespace buildertools\commands;
 
 use buildertools\BuilderTools;
 use buildertools\editors\Copier;
+use buildertools\editors\Editor;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
@@ -36,7 +37,7 @@ class RotateCommand extends Command implements PluginIdentifiableCommand {
         }
 
         /** @var Copier $copier */
-        $copier = BuilderTools::getEditor("Copier");
+        $copier = BuilderTools::getEditor(Editor::COPIER);
 
         $copier->addToRotate($sender);
     }

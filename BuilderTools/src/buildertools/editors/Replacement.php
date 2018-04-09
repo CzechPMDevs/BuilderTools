@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace buildertools\editors;
 
+use buildertools\BuilderTools;
 use pocketmine\block\Block;
+use pocketmine\event\Cancellable;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 
 /**
  * Class Replacement
@@ -27,19 +30,24 @@ class Replacement extends Editor {
      * @param string $blocks
      * @return int
      */
-    public function replace($x1, $y1, $z1, $x2, $y2, $z2, Level $level, string $blocksToReplace, string $blocks) {
+    public function replace($x1, $y1, $z1, $x2, $y2, $z2, Level $level, string $blocksToReplace, string $blocks, Player $player) {
         $count = 0;
+        $undo = [];
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
                     $vec = new Vector3($x, $y, $z);
                     if($this->inBlockArgs($level->getBlock($vec), $blocksToReplace)) {
+                        $undo[] = $level->getBlock($vec);
                         $level->setBlock($vec, $this->getRandomBlock($blocks));
                         $count++;
                     }
                 }
             }
         }
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor("Canceller");
+        $canceller->addStep($player, $undo);
         return $count;
     }
 

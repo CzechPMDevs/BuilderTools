@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace buildertools\commands;
 
 use buildertools\BuilderTools;
+use buildertools\editors\Editor;
 use buildertools\editors\Printer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -42,10 +43,10 @@ class SphereCommand extends Command implements PluginIdentifiableCommand {
         $radius = isset($args[1]) ? intval($args[1]) : 5;
         $bargs = explode(",", strval($args[0]));
         $block = Item::fromString($bargs[array_rand($bargs, 1)])->getBlock();
-        $printer = BuilderTools::getEditor("Printer");
-        if($printer instanceof Printer) {
-            $printer->draw($sender->asPosition(), $radius, $block, Printer::SPHERE, false);
-        }
+
+        /** @var Printer $printer */
+        $printer = BuilderTools::getEditor(Editor::PRINTER);
+        $printer->draw($sender->asPosition(), $radius, $block, Printer::SPHERE, false);
         $sender->sendMessage(BuilderTools::getPrefix()."§aSphere was created!");
     }
 

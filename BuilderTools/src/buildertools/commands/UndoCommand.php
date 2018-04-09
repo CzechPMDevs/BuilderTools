@@ -6,6 +6,7 @@ namespace buildertools\commands;
 
 use buildertools\BuilderTools;
 use buildertools\editors\Canceller;
+use buildertools\editors\Editor;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
@@ -42,8 +43,7 @@ class UndoCommand extends Command implements PluginIdentifiableCommand {
         }
 
         /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor("Canceller");
-
+        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
         $canceller->undo($sender);
     }
 
