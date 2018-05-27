@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace buildertools\utils;
 
 use buildertools\BuilderTools;
-use buildertools\editors\Canceller;
 use buildertools\editors\Editor;
-use buildertools\editors\Filler;
 use pocketmine\utils\Config;
 
 /**
@@ -20,7 +18,7 @@ class ConfigManager {
     private $plugin;
 
     /** @var array $config */
-    private static $config = [];
+    protected static $config = [];
 
     /**
      * ConfigManager constructor.
@@ -32,14 +30,20 @@ class ConfigManager {
     }
 
     protected function loadConfig() {
+        // create data folder
         if(!is_dir($this->plugin->getDataFolder())) {
             @mkdir($this->plugin->getDataFolder());
         }
+        // save default config
         if(!is_file($this->plugin->getDataFolder())) {
             $this->plugin->saveResource("/config.yml", true);
         }
+        // loads config
         $config = new Config($this->plugin->getDataFolder()."/config.yml", Config::YAML);
         self::$config = $config->getAll();
+        // debug
+        Log::debug("Config loaded!", $this);
+        if(self::$config["debug"]) var_dump(self::$config);
     }
 
     /**

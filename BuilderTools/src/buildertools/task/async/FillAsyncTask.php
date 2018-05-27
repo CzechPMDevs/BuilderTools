@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace buildertools\task\async;
 
-
 use buildertools\BuilderTools;
 use buildertools\editors\Canceller;
 use pocketmine\item\Item;
@@ -20,22 +19,24 @@ use pocketmine\Server;
  */
 class FillAsyncTask extends AsyncTask {
 
-    /** @var array $data */
-    public $data;
+    /** @var string $fillData*/
+    public $fillData;
 
     /**
      * FillAsyncTask constructor.
      * @param array $fillData
      */
     public function __construct(array $fillData) {
-        $this->data = $fillData;
+        $this->fillData = serialize($fillData);
     }
 
     /**
      * @task
      */
     public function onRun() {
-        $this->setResult(serialize($this->data), false);
+        $data = unserialize($this->fillData);
+        var_dump($data);
+        $this->setResult($data);
     }
 
     /**
@@ -44,7 +45,9 @@ class FillAsyncTask extends AsyncTask {
      * @param Server $server
      */
     public function onCompletion(Server $server) {
-        $result = $this->data;
+        $result = $this->getResult();
+
+        $time = microtime(true);
 
         if($result === null) {
             $server->getLogger()->critical("§cNULL");
@@ -85,10 +88,11 @@ class FillAsyncTask extends AsyncTask {
 
         /** @var Canceller $canceller */
         $canceller = BuilderTools::getEditor("Canceller");
-
         $canceller->addStep($player, $undo);
 
-        $player->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully filled using async task! ($count blocks changed!)");
+        $time = round(microtime(true)-$time, 4);
+
+        $player->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully filled in $time sec. using async task! ($count blocks changed!)");
         
     }
 }

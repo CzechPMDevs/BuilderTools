@@ -33,12 +33,12 @@ class Filler extends Editor {
      * @return void
      */
     public function fill(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Player $player, Level $level, string $blocks, bool $async) {
-        
+
         if($async) {
             $data = [
                 "player" => $player->getName(),
                 "pos1" => array($x1, $y1, $z1, $level->getFolderName()),
-                "pos2" => array($x2, $y2, $y2, $level->getFolderName()),
+                "pos2" => array($x2, $y2, $z2, $level->getFolderName()),
                 "blocks" => $blocks
             ];
             $task = new FillAsyncTask($data);
@@ -47,6 +47,8 @@ class Filler extends Editor {
             Server::getInstance()->getScheduler()->scheduleAsyncTask($task);
             return;
         }
+
+        $time = microtime(true);
 
         /** @var array $undo */
         $undo = [];
@@ -67,8 +69,9 @@ class Filler extends Editor {
         $canceller = BuilderTools::getEditor("Canceller");
         $canceller->addStep($player, $undo);
 
+        $time = round(microtime(true)-$time, 4);
 
-        $player->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully filled! ($count blocks changed)!");
+        $player->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully filled in ($time) sec! ($count blocks changed)!");
         return;
     }
 

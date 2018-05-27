@@ -38,9 +38,11 @@ class Naturalizer extends Editor {
         $this->getPlugin()->getServer()->getPluginManager()->callEvent($event);
         if($event->isCancelled()) return;
 
+        $settings = $event->getSettings();
+
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                $this->fix(new Vector3($x, max($y1, $y2), $z), $level, min($y1, $y2));
+                $this->fix(new Vector3($x, max($y1, $y2), $z), $level, min($y1, $y2), (bool)$settings["force-fill"], (bool)$settings["save-undo"]);
             }
         }
 
@@ -50,7 +52,7 @@ class Naturalizer extends Editor {
         $this->undo = [];
     }
 
-    private function fix(Vector3 $vector3, Level $level, int $minX) {
+    private function fix(Vector3 $vector3, Level $level, int $minY, bool $force, bool $undo) {
         start:
         if($vector3->getX() > 1 && $level->getBlock($vector3)->getId() == Block::AIR) {
             $vector3 = $vector3->subtract(0, 1, 0);
@@ -61,19 +63,20 @@ class Naturalizer extends Editor {
             return;
         }
 
-        $level->setBlock($vector3, Block::get(Block::GRASS));
+        if($undo) $this->undo[] = $level->getBlock($vector3);
+        $level->setBlock($vector3, Block::get(Block::GRASS), $force);
 
 
         $r = rand(3, 4);
 
         for($y = 1; $y < $r; $y++) {
-            $this->undo[] = $level->getBlock($vector3->add(0, -$y, 0));
-            $level->setBlock($vector3->add(0, -$y, 0), Block::get(Block::DIRT));
+            if($undo) $this->undo[] = $level->getBlock($vector3->add(0, -$y, 0));
+            $level->setBlock($vector3->add(0, -$y, 0), Block::get(Block::DIRT), $force);
         }
 
-        for($y = $vector3->getY()-$r; $y >= $minX; $y--) {
-            $this->undo[] = $level->getBlock(new Vector3($vector3->getX(), $y, $vector3->getZ()));
-            $level->setBlock(new Vector3($vector3->getX(), $y, $vector3->getZ()), Block::get(Block::STONE));
+        for($y = $vector3->getY()-$r; $y >= $minY; $y--) {
+            if($undo) $this->undo[] = $level->getBlock(new Vector3($vector3->getX(), $y, $vector3->getZ()));
+            $level->setBlock(new Vector3($vector3->getX(), $y, $vector3->getZ()), Block::get(Block::STONE), $force);
         }
     }
 

@@ -39,7 +39,7 @@ class FixCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
 
-        if(!$sender->hasPermission("bt.cmd.fill")) {
+        if(!$sender->hasPermission("bt.cmd.fix")) {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
@@ -63,7 +63,7 @@ class FixCommand extends Command implements PluginIdentifiableCommand {
         }
 
         /** @var Fixer $fixer */
-        $fixer = BuilderTools::getEditor(Editor::FILLER);
+        $fixer = BuilderTools::getEditor(Editor::FIXER);
         $fixer->fix($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
     }
 

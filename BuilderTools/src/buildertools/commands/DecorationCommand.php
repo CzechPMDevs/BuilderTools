@@ -43,7 +43,7 @@ class DecorationCommand extends Command implements PluginIdentifiableCommand {
         /** @var Decorator $decorator */
         $decorator = BuilderTools::getEditor(Editor::DECORATOR);
 
-        $decorator->addDecoration($sender, $args[0], intval($args[1]), $percentage);
+        $decorator->addDecoration($sender, $args[0], (int)round($args[1]), $percentage);
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aDecoration placed!");
     }

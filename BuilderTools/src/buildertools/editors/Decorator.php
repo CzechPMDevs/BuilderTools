@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace buildertools\editors;
 
+use buildertools\BuilderTools;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -26,12 +27,13 @@ class Decorator extends Editor {
      * @param string $blocks
      * @param int $radius
      * @param int $percentage
+     * @param null $player
      */
-    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage) {
+    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, $player = null) {
         $undo = [];
         for ($x = $center->getX()-$radius; $x <= $center->getX()+$radius; $x++) {
             for ($z = $center->getZ()-$radius; $z <= $center->getZ()+$radius; $z++) {
-                if(rand($percentage, 100) == 100) {
+                if(rand(1, 100) <= $percentage) {
                     $y = $center->getY()+$radius;
                     check:
                     if($y > 0) {
@@ -41,13 +43,18 @@ class Decorator extends Editor {
                             goto check;
                         }
                         else {
-                            $blockArgs = explode($blocks,",");
+                            $blockArgs = explode(",", $blocks);
                             array_push($undo, $center->getLevel()->getBlock($vec));
-                            $center->getLevel()->setBlock($vec, Item::fromString($blockArgs[array_rand($blockArgs,1)])->getBlock(), true, true);
+                            $undo[] = $center->getLevel()->getBlock($vec->add(0, 1));
+                            $center->getLevel()->setBlock($vec->add(0, 1), Item::fromString($blockArgs[array_rand($blockArgs,1)])->getBlock(), true, true);
                         }
                     }
                 }
             }
         }
+
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor("Canceller");
+        $canceller->addStep($player, $undo);
     }
 }

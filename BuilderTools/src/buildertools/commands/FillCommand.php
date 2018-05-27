@@ -70,6 +70,7 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
         }
 
 
+
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
         $filler->fill($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender, $firstPos->getLevel(), $args[0], $async);

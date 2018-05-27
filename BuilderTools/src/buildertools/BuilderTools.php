@@ -7,6 +7,7 @@ namespace buildertools;
 use buildertools\commands\BiomeCommand;
 use buildertools\commands\ClearInventoryCommand;
 use buildertools\commands\CopyCommand;
+use buildertools\commands\CubeCommand;
 use buildertools\commands\DecorationCommand;
 use buildertools\commands\DrawCommand;
 use buildertools\commands\FillCommand;
@@ -78,13 +79,13 @@ class BuilderTools extends PluginBase {
     private function sendLoadingInfo() {
         $text = strval(
             "\n".
-            "§c--------------------------------\n".
-            "§6§lCzechPMDevs §r§e>>> §bBuilderTools\n".
-            "§o§9Plugin like WorldEdit for PocketMine servers\n".
-            "§aAuthors: §7VixikCZ\n".
-            "§aVersion: §7".$this->getDescription()->getVersion()."\n".
-            "§aStatus: §7Loading...\n".
-            "§c--------------------------------"
+            "--------------------------------\n".
+            "CzechPMDevs >>> BuilderTools\n".
+            "Plugin like WorldEdit for PocketMine servers\n".
+            "Authors: VixikCZ\n".
+            "Version: ".$this->getDescription()->getVersion()."\n".
+            "Status: Loading...\n".
+            "--------------------------------"
         );
         $this->getLogger()->info($text);
     }
@@ -130,6 +131,7 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new DecorationCommand);
         $map->register("BuilderTools", new FlipCommand);
         $map->register("BuilderTools", new FixCommand);
+        $map->register("BuilderTools", new CubeCommand);
     }
 
     /**

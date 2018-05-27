@@ -3,10 +3,16 @@
 namespace buildertools\editors;
 
 use buildertools\BuilderTools;
+use buildertools\event\FixEvent;
+use buildertools\utils\ConfigManager;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
+use pocketmine\tile\Banner;
+use pocketmine\tile\Bed;
+use pocketmine\tile\Chest;
+use pocketmine\tile\Sign;
 
 /**
  * Class Fixer
@@ -27,7 +33,7 @@ class Fixer extends Editor {
         192 => [Block::FENCE, 4],
         193 => [Block::FENCE, 5],
         166 => [Block::INVISIBLE_BEDROCK, 0],
-        144 => [Block::AIR, 0], // mob heads
+        #144 => [Block::AIR, 0], // mob heads
         208 => [Block::GRASS_PATH, 0],
         198 => [Block::END_ROD, 0],
         126 => [Block::WOODEN_SLAB, ""],
@@ -49,17 +55,51 @@ class Fixer extends Editor {
      * @param Player $player
      */
     public function fix($x1, $y1, $z1, $x2, $y2, $z2, Level $level, Player $player) {
+        $settings = ConfigManager::getSettings($this);
+
+        $event = new FixEvent($player, $level, new Vector3($x1, $y1, $z1), new Vector3($x2, $y2, $z2), $settings);
+        $this->getPlugin()->getServer()->getPluginManager()->callEvent($event);
+
+        if($event->isCancelled()) return;
+
+        $settings = $event->getSettings();
+        $blocks = array_merge(self::$blocks, (array)$settings["added-blocks"]);
+        if($settings["remove-heads"]) $blocks = array_merge($blocks, [144 => [Block::AIR, 0]]);
+
         $count = 0;
         $undo = [];
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
                     $id = $level->getBlock(new Vector3($x, $y, $z))->getId();
-                    if(isset(self::$blocks[$id])) {
-                        $undo[] = $level->getBlock(new Vector3($x, $y, $z));
-                        $level->setBlockIdAt($x, $y, $z, self::$blocks[$id][0]);
-                        if(is_int(self::$blocks[$id][1])) $level->setBlockDataAt($x, $y, $z, self::$blocks[$id][1]);
+                    if(isset($blocks[$id])) {
+                        if($settings["save-undo"]) $undo[] = $level->getBlock(new Vector3($x, $y, $z));
+                        $level->setBlockIdAt($x, $y, $z, $blocks[$id][0]);
+                        if(is_int(self::$blocks[$id][1])) $level->setBlockDataAt($x, $y, $z, $blocks[$id][1]);
                         $count++;
+                    }
+
+                    if($settings["fix-tiles"]) {
+                        switch ($id) {
+                            case Block::CHEST:
+                                if($level->getTile(new Vector3($x, $y, $z)) === null)
+                                    $level->addTile(new Chest($level, Chest::createNBT(new Vector3($x, $y, $z))));
+                                break;
+                            case Block::SIGN_POST:
+                            case Block::WALL_SIGN:
+                                if($level->getTile(new Vector3($x, $y, $z)) === null)
+                                    $level->addTile(new Sign($level, Sign::createNBT(new Vector3($x, $y, $z))));
+                                break;
+                            case Block::BED_BLOCK:
+                                if($level->getTile(new Vector3($x, $y, $z)) === null)
+                                    $level->addTile(new Bed($level, Bed::createNBT(new Vector3($x, $y, $z))));
+                                break;
+                            case Block::STANDING_BANNER:
+                            case Block::WALL_BANNER:
+                                if($level->getTile(new Vector3($x, $y, $z)) === null)
+                                    $level->addTile(new Banner($level, Banner::createNBT(new Vector3($x, $y, $z))));
+                                break;
+                        }
                     }
                 }
             }
