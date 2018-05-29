@@ -65,6 +65,7 @@ class BuilderTools extends PluginBase {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
         $this->sendLoadingInfo();
+        $this->initConfig();
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
