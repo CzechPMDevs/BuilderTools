@@ -36,14 +36,13 @@ class ConfigManager {
         }
         // save default config
         if(!is_file($this->plugin->getDataFolder())) {
-            $this->plugin->saveResource("/config.yml", true);
+            $this->plugin->saveResource("/config.yml");
         }
         // loads config
         $config = new Config($this->plugin->getDataFolder()."/config.yml", Config::YAML);
         self::$config = $config->getAll();
         // debug
         Log::debug("Config loaded!", $this);
-        if(self::$config["debug"]) var_dump(self::$config);
     }
 
     /**
@@ -51,6 +50,6 @@ class ConfigManager {
      * @return array $settings
      */
     public static function getSettings(Editor $editor): array {
-        return isset(self::$config[strtolower(get_class($editor))]) ? self::$config[strtolower(get_class($editor))] : [];
+        return isset(self::$config[strtolower($editor->getName())]) ? self::$config[strtolower($editor->getName())] : [];
     }
 }
