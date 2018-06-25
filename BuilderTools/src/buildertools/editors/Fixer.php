@@ -33,7 +33,6 @@ class Fixer extends Editor {
         192 => [Block::FENCE, 4],
         193 => [Block::FENCE, 5],
         166 => [Block::INVISIBLE_BEDROCK, 0],
-        #144 => [Block::AIR, 0], // mob heads
         208 => [Block::GRASS_PATH, 0],
         198 => [Block::END_ROD, 0],
         126 => [Block::WOODEN_SLAB, ""],
@@ -63,11 +62,13 @@ class Fixer extends Editor {
         if($event->isCancelled()) return;
 
         $settings = $event->getSettings();
+
         $blocks = self::$blocks;
-        foreach ((array)$settings["added-blocks"] as $index => $value) {
-            self::$blocks[$index] = $value;
+        foreach ((array)$settings["added-blocks"] as $cId => $cBlockArgs) {
+            $blocks[$cId] = (array)$cBlockArgs;
         }
-        if($settings["remove-heads"]) $blocks[144] = [0, 0];
+
+        if($settings["remove-heads"]) $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];
 
         $count = 0;
         $undo = [];
@@ -106,6 +107,11 @@ class Fixer extends Editor {
                     }
                 }
             }
+        }
+        if($settings["save-undo"]) {
+            /** @var Canceller $canceller */
+            $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+            $canceller->addStep($player, $undo);
         }
         $player->sendMessage(BuilderTools::getPrefix()."Selected area successfully fixed! ($count blocks changed!)");
     }

@@ -64,11 +64,10 @@ class BuilderTools extends PluginBase {
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
-        $this->initConfig();
         $this->sendLoadingInfo();
-        $this->initConfig();
         $this->registerCommands();
         $this->initListner();
+        $this->initConfig();
         $this->registerEditors();
         if($this->isEnabled()) {
             $this->getLogger()->info("§a--> Loaded!");

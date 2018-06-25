@@ -62,7 +62,7 @@ class Printer extends Editor {
                     }
                 }
                 break;
-            /*case self::SPHERE:
+            case self::SPHERE:
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
                     $xsqr = ($position->getX()-$x) * ($position->getX()-$x);
                     for ($y = $position->getY()-$brush; $y <= $position->getY()+$brush; $y++) {
@@ -93,45 +93,8 @@ class Printer extends Editor {
                         }
                     }
                 }
-                break;*/
-            case self::SPHERE:
-                $lengthSq = function ($x, $y, $z) {
-                    return ($x << 2 + $y << 2 + $z << 2);
-                };
-
-                $ir = 1/$brush;
-
-                $nextXn = 0;
-                for ($x = 0; $x <= $brush; ++$x) {
-                    $xn = $nextXn;
-                    $nextXn = ($x+1)*$ir;
-
-
-                    $nextYn = 0;
-                    for ($y = 0; $y <= $brush; ++$y) {
-                        $yn = $nextYn;
-                        $nextYn = ($y+1)*$ir;
-
-                        $nextZn = 0;
-                        for ($z = 0; $z <= $brush; ++$z) {
-                            $zn = $nextZn;
-                            $nextZn = ($z+1)*$ir;
-
-                            if ($lengthSq($nextXn, $yn, $zn) + $lengthSq($xn, $nextYn, $zn) + $lengthSq($xn, $yn, $nextZn) <= 3) {
-                                $position->getLevel()->setBlock($position->add($x, $y, $z), $block);
-                                $position->getLevel()->setBlock($position->add(-$x, $y, $z), $block);
-                                $position->getLevel()->setBlock($position->add($x, $y, -$z), $block);
-                                $position->getLevel()->setBlock($position->add(-$x, -$y, $z), $block);
-                                $position->getLevel()->setBlock($position->add($x, -$y, -$z), $block);
-                                $position->getLevel()->setBlock($position->add(-$x, $y, -$z), $block);
-                                $position->getLevel()->setBlock($position->add($x, -$y, $z), $block);
-                                $position->getLevel()->setBlock($position->add(-$x, -$y, -$z), $block);
-                            }
-                        }
-                    }
-                }
                 break;
-            case self::HSPHERE:
+            case self::HSPHERE: // DOES NOT WORK
                 $toChange = [];
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
                     $xsqr = ($position->getX()-$x) * ($position->getX()-$x);
@@ -139,7 +102,7 @@ class Printer extends Editor {
                         $ysqr = ($position->getY()-$y) * ($position->getY()-$y);
                         for ($z = $position->getZ()-$brush; $z <= $position->getZ()+$brush; $z++) {
                             $zsqr = ($position->getZ()-$z) * ($position->getZ()-$z);
-                            if(($xsqr + $ysqr + $zsqr) <= $brush << 2) {
+                            if(($asqr = ($xsqr + $ysqr + $zsqr)) <= $brush << 2 && $asqr < ($brush-1) << 2) {
                                 if($fall) {
                                     $bY = $y;
                                     if($bY-1 > 0 && $position->getLevel()->getBlock(new Vector3($x, $bY-1, $z))->getId() == 0) {

@@ -35,14 +35,16 @@ class ConfigManager {
             @mkdir($this->plugin->getDataFolder());
         }
         // save default config
-        if(!is_file($this->plugin->getDataFolder())) {
-            $this->plugin->saveResource("/config.yml");
+        if(!is_file($this->plugin->getDataFolder() . DIRECTORY_SEPARATOR . "config.yml")) {
+            $this->plugin->saveResource(DIRECTORY_SEPARATOR . "config.yml", \false);
         }
         // loads config
-        $config = new Config($this->plugin->getDataFolder()."/config.yml", Config::YAML);
+        $config = new Config($this->plugin->getDataFolder() . DIRECTORY_SEPARATOR . "config.yml", Config::YAML);
         self::$config = $config->getAll();
+
         // debug
         Log::debug("Config loaded!", $this);
+        if(self::$config["debug"]) var_dump(self::$config);
     }
 
     /**

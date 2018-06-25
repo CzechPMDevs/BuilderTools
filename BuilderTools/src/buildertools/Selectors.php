@@ -28,8 +28,6 @@ class Selectors {
     /**
      * @param Player $player
      * @param int $brush
-     * @param int $mode
-     * @param bool $fall
      */
     public static function addDrawingPlayer(Player $player, int $brush, int $mode, bool $fall) {
         self::$drawingPlayers[strtolower($player->getName())] = [$brush, $mode, $fall];

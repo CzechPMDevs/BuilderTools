@@ -44,7 +44,7 @@ class Filler extends Editor {
             $task = new FillAsyncTask($data);
 
             
-            $this->getPlugin()->getServer()->getAsyncPool()->submitTask($task);
+            Server::getInstance()->getScheduler()->scheduleAsyncTask($task);
             return;
         }
 
