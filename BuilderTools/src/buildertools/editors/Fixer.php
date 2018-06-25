@@ -63,8 +63,11 @@ class Fixer extends Editor {
         if($event->isCancelled()) return;
 
         $settings = $event->getSettings();
-        $blocks = array_merge(self::$blocks, (array)$settings["added-blocks"]);
-        if($settings["remove-heads"]) $blocks = array_merge($blocks, [144 => [Block::AIR, 0]]);
+        $blocks = self::$blocks;
+        foreach ((array)$settings["added-blocks"] as $index => $value) {
+            self::$blocks[$index] = $value;
+        }
+        if($settings["remove-heads"]) $blocks[144] = [0, 0];
 
         $count = 0;
         $undo = [];
@@ -75,7 +78,7 @@ class Fixer extends Editor {
                     if(isset($blocks[$id])) {
                         if($settings["save-undo"]) $undo[] = $level->getBlock(new Vector3($x, $y, $z));
                         $level->setBlockIdAt($x, $y, $z, $blocks[$id][0]);
-                        if(is_int(self::$blocks[$id][1])) $level->setBlockDataAt($x, $y, $z, $blocks[$id][1]);
+                        if(is_int($blocks[$id][1])) $level->setBlockDataAt($x, $y, $z, $blocks[$id][1]);
                         $count++;
                     }
 
