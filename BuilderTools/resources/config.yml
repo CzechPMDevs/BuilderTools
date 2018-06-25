@@ -31,9 +31,9 @@ debug: true
 ### > Commands
 ## /
 
-# ClearInventory command:
-
 # Copy command:
+copier:
+  save-undo: true
 
 # Cube command:
 
@@ -47,7 +47,6 @@ debug: true
 
 # Fix command:
 fixer:
-  force-fill: false
   save-undo: true
   remove-heads: true
   fix-tiles: true

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace buildertools\editors;
 use buildertools\BuilderTools;
+use buildertools\utils\ConfigManager;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -117,6 +118,8 @@ class Copier extends Editor {
 
         $id = "{$fromDirection}:{$toDirection}";
 
+        $undo = [];
+
         switch ($id) {
             case "0:0":
             case "1:1":
@@ -133,6 +136,9 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    if(ConfigManager::getSettings($this)["save-undo"]) {
+                        $undo[] = $block;
+                    }
                     $vec->setComponents($vec->getZ(), $vec->getY(), $vec->getX());
                 }
                 $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
@@ -147,6 +153,9 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    if(ConfigManager::getSettings($this)["save-undo"]) {
+                        $undo[] = $block;
+                    }
                     $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
                 }
                 $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
@@ -160,6 +169,9 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    if(ConfigManager::getSettings($this)["save-undo"]) {
+                        $undo[] = $block;
+                    }
                     $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
                 }
                 /**
@@ -167,6 +179,9 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    if(ConfigManager::getSettings($this)["save-undo"]) {
+                        $undo[] = $block;
+                    }
                     $vec->setComponents($vec->getZ(), $vec->getY(), $vec->getX());
                 }
 
@@ -179,27 +194,43 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                    if(ConfigManager::getSettings($this)["save-undo"]) {
+                        $undo[] = $block;
+                    }
                     $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
                 }
                 $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
                 break;
         }
 
-
+        if(ConfigManager::getSettings($this)["save-undo"]) {
+            /** @var Canceller $canceller */
+            $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+            $canceller->addStep($player, $undo);
+        }
     }
 
     /**
      * @param Player $player
      */
     public function flip(Player $player) {
+        $undo = [];
         /**
          * @var Vector3 $vec
          * @var Block $block
          */
         foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+            if(ConfigManager::getSettings($this)["save-undo"]) {
+                $undo[] = $block;
+            }
             $vec->setComponents($vec->getX(), -$vec->getY(), $vec->getZ());
         }
 
+        if(ConfigManager::getSettings($this)["save-undo"]) {
+            /** @var Canceller $canceller */
+            $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+            $canceller->addStep($player, $undo);
+        }
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected area flipped!");
     }
 }

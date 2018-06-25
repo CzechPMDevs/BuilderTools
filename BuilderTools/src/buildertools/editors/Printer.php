@@ -169,9 +169,8 @@ class Printer extends Editor {
         }
 
         /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor("Canceller");
-        #$canceller->addStep($player, $undo);
-
+        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+        $canceller->addStep($player, $undo);
     }
 
     /**

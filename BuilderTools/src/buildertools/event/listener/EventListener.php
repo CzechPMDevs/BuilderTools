@@ -130,7 +130,7 @@ class EventListener implements Listener {
      * @param PlayerInteractEvent $event
      */
     public function onBlockTouch(PlayerInteractEvent $event) {
-        if(!Selectors::isWandSelector($player = $event->getPlayer())) return;
+        if(!Selectors::isWandSelector($player = $event->getPlayer()) || $event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
         Selectors::addSelector($player, 2, $position = new Position(intval($event->getBlock()->getX()), intval($event->getBlock()->getY()), intval($event->getBlock()->getZ()), $player->getLevel()));
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
         $event->setCancelled(true);
