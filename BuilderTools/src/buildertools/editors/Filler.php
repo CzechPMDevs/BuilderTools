@@ -8,15 +8,12 @@ use buildertools\BuilderTools;
 use buildertools\editors\object\BlockList;
 use buildertools\editors\object\EditorResult;
 use buildertools\task\async\FillAsyncTask;
-use buildertools\utils\ConfigManager;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
-use pocketmine\level\Position;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use pocketmine\Server;
 
 /**
  * Class Filler
