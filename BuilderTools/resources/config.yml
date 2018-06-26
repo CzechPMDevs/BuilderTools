@@ -28,42 +28,34 @@ config-version: 1.1.0
 debug: true
 
 ## \
-### > Commands
+### > Editors
 ## /
 
-# Copy command:
 copier:
+  # Saves undo at //paste, //flip and //rotate
   save-undo: true
 
-# Cube command:
+canceller:
+  # Saves undo at //redo
+  save-undo: true
+  # Saves redo at //undo
+  save-redo: true
 
-# Decoration command:
-
-# Draw command:
-
-# Fill command:
-
-# FirstPosition command:
-
-# Fix command:
 fixer:
+  # Saves undo at //fix
   save-undo: true
+  # Remove heads when //fix
   remove-heads: true
+  # Fix tiles NBT (Chest, ...)
   fix-tiles: true
   added-blocks: [] # How to add blocks? Look at the wiki (https://github.com/CzechPMDevs/BuilderTools/wiki)!
 
-# Flip command:
 
-# Help command:
-
-# Hsphere command:
-
-# Id command:
-
-## Naturalize command:
 naturalizer:
   force-fill: false
-  save-undo: true # Adding step to //undo
-  dirt-count: [3, 5] # Count dirt blocks (random -> [min - 4, max -5])
+  # Saves undo at //naturalize
+  save-undo: true
+  # Count of dirt blocks (random -> [min - 3, max - 5])
+  dirt-count: [3, 5]
 
 ...

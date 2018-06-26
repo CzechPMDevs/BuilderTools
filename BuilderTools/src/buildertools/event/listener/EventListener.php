@@ -31,6 +31,9 @@ class EventListener implements Listener {
     /** @var array $rotateCache */
     public $rotateCache = [];
 
+    /** @var array $wandClicks */
+    private $wandClicks = [];
+
     /**
      * @param PlayerMoveEvent $event
      */
@@ -131,6 +134,9 @@ class EventListener implements Listener {
      */
     public function onBlockTouch(PlayerInteractEvent $event) {
         if(!Selectors::isWandSelector($player = $event->getPlayer()) || $event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
+        // antispam ._.
+        if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) return;
+        $this->wandClicks[$player->getName()] = microtime(true);
         Selectors::addSelector($player, 2, $position = new Position(intval($event->getBlock()->getX()), intval($event->getBlock()->getY()), intval($event->getBlock()->getZ()), $player->getLevel()));
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
         $event->setCancelled(true);
