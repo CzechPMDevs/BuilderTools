@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace buildertools\editors;
 
 use buildertools\BuilderTools;
+use buildertools\editors\object\BlockList;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\Player;
 use pocketmine\block\Block;
@@ -33,11 +34,11 @@ class Canceller extends Editor {
 
     /**
      * @param Player $player
-     * @param array $blocks
+     * @param BlockList $blocks
      */
-    public function addStep(Player $player, $blocks) {
-        if(empty($this->undoData[$player->getName()])) $this->undoData[$player->getName()] = [];
-        array_push($this->undoData[$player->getName()], $blocks);
+    public function addStep(Player $player, BlockList $blocks) {
+        #if(empty($this->undoData[$player->getName()])) $this->undoData[$player->getName()] = [];
+        $this->undoData[$player->getName()][] = $blocks;
     }
 
     /**
@@ -45,7 +46,7 @@ class Canceller extends Editor {
      */
     public function undo(Player $player) {
 
-        if(empty($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
+        if(!isset($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
             $player->sendMessage(BuilderTools::getPrefix()."§cThere are not actions to undo!");
             return;
         }
@@ -65,16 +66,15 @@ class Canceller extends Editor {
             $block->getLevel()->setBlock($block->asVector3(), $block, true, true);
         }
 
-        $index = intval(count($this->undoData[$player->getName()])-1);
-
         $this->addRedo($player, $redo);
 
-        unset($this->undoData[$player->getName()][$index]);
+        array_pop($this->undoData[$player->getName()]);
     }
 
-    private function addRedo(Player $player, $blocks) {
+    private function addRedo(Player $player, BlockList $blocks) {
         if(empty($this->redoData[$player->getName()])) $this->redoData[$player->getName()] = [];
-        array_push($this->redoData[$player->getName()], $blocks);
+        #array_push($this->redoData[$player->getName()], $blocks);
+        $this->redoData[$player->getName()][] = $blocks;
     }
 
     public function redo(Player $player) {
@@ -87,7 +87,7 @@ class Canceller extends Editor {
             $last = $this->redoData[$player->getName()][0];
         }
         else {
-            $last = end($this->redoData);
+            $last = end($this->redoData[$player->getName()]);
         }
 
         $undo = [];
@@ -98,9 +98,8 @@ class Canceller extends Editor {
             $block->getLevel()->setBlock($block->asVector3(), $block, true, true);
         }
 
-        $index = intval(count($this->redoData[$player->getName()])-1);
         $this->addStep($player, $undo);
 
-        unset($this->redoData[$player->getName()][$index]);
+        array_pop($this->redoData[$player->getName()]);
     }
 }

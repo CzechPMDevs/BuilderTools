@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace buildertools;
 
-use buildertools\commands\BiomeCommand;
 use buildertools\commands\ClearInventoryCommand;
 use buildertools\commands\CopyCommand;
 use buildertools\commands\CubeCommand;
@@ -29,7 +28,6 @@ use buildertools\commands\WandCommand;
 use buildertools\editors\Canceller;
 use buildertools\editors\Copier;
 use buildertools\editors\Decorator;
-use buildertools\editors\Dyer;
 use buildertools\editors\Editor;
 use buildertools\editors\Filler;
 use buildertools\editors\Fixer;

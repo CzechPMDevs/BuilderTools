@@ -30,18 +30,12 @@ class FillAsyncTask extends AsyncTask {
         $this->fillData = serialize($fillData);
     }
 
-    /**
-     * @task
-     */
     public function onRun() {
         $data = unserialize($this->fillData);
-        var_dump($data);
         $this->setResult($data);
     }
 
     /**
-     * @asyncTask
-     *
      * @param Server $server
      */
     public function onCompletion(Server $server) {
