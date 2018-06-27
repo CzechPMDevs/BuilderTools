@@ -1,10 +1,27 @@
 <?php
 
+/**
+ * Copyright 2018 CzechPMDevs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace buildertools\editors;
 
 use buildertools\BuilderTools;
+use buildertools\editors\object\BlockList;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Math;
@@ -30,9 +47,12 @@ class Printer extends Editor {
      * @param int $mode
      * @param bool $fall
      * @param Player|null $player
+     * @param bool $fastFill
      */
-    public function draw(Position $position, int $brush, Block $block, int $mode, bool $fall = false, Player $player = null) {
-        $undo = [];
+    public function draw(Position $position, int $brush, Block $block, int $mode, bool $fall = false, Player $player = null, bool $fastFill = true) {
+        $blockList = new BlockList;
+        $blockList->setLevel($position->getLevel());
+
         switch ($mode) {
             case self::CUBE:
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
@@ -46,15 +66,12 @@ class Printer extends Editor {
                                     goto check1;
                                 }
                                 else {
-                                    $undo[] = $position->getLevel()->getBlock(new Vector3($x, $bY, $z));
-                                    $position->getLevel()->setBlock(new Vector3($x, $bY, $z), $block, true, true);
+                                    $blockList->addBlock(new Vector3($x, $bY, $z), $block);
                                 }
                             }
                             else {
                                 if(!($y < 0)) {
-                                    $vector = new Vector3($x, $y, $z);
-                                    $undo[] = $position->getLevel()->getBlock($vector);
-                                    $position->getLevel()->setBlock($vector, $block, true, true);
+                                    $blockList->addBlock(new Vector3($x, $y, $z), $block);
                                 }
 
                             }
@@ -62,6 +79,7 @@ class Printer extends Editor {
                     }
                 }
                 break;
+
             case self::SPHERE:
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
                     $xsqr = ($position->getX()-$x) * ($position->getX()-$x);
@@ -78,15 +96,12 @@ class Printer extends Editor {
                                         goto check2;
                                     }
                                     else {
-                                        $undo[] = $position->getLevel()->getBlock(new Vector3($x, $bY, $z));
-                                        $position->getLevel()->setBlock(new Vector3($x, $bY, $z), $block, true, true);
+                                        $blockList->addBlock(new Vector3($x, $bY, $z), $block);
                                     }
                                 }
                                 else {
                                     if(!($y < 0)) {
-                                        $undo[] = $position->getLevel()->getBlock(new Vector3($x, $y, $z));
-                                        $vector = new Vector3($x, $y, $z);
-                                        $position->getLevel()->setBlock($vector, $block, true, true);
+                                        $blockList->addBlock(new Vector3($x, $y, $z), $block);
                                     }
                                 }
                             }
@@ -94,6 +109,7 @@ class Printer extends Editor {
                     }
                 }
                 break;
+
             case self::HSPHERE: // DOES NOT WORK
                 $toChange = [];
                 for ($x = $position->getX()-$brush; $x <= $position->getX()+$brush; $x++) {
@@ -125,6 +141,7 @@ class Printer extends Editor {
                     }
                 }
                 break;
+
             case self::CUSTOM:
                 /** @var Copier $copier */
                 $copier = BuilderTools::getEditor("Copier");
@@ -144,7 +161,6 @@ class Printer extends Editor {
                      * @var Block $block
                      */
                     foreach ($blocks as [$vec, $block]) {
-                        $undo[] = $position->getLevel()->getBlock($vec->add($player->asVector3()));
                         $player->getLevel()->setBlock($vec->add($player->asVector3()), $block, true, true);
                     }
                 }
@@ -168,9 +184,16 @@ class Printer extends Editor {
                 break;
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $undo);
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(static::FILLER);
+        $filler->fill($player, $blockList, $fastFill);
+    }
+
+    /**
+     * @param Position $vector
+     */
+    public function makeSphere(Position $vector) {
+
     }
 
     /**

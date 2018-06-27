@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright 2018 CzechPMDevs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace buildertools\editors;
@@ -81,15 +97,24 @@ class Filler extends Editor {
     /**
      * @param Player $player
      * @param BlockList $blockList
-     * @param bool $fastFill
-     * @param bool $saveUndo
-     * @param bool $saveRedo
+     * @param bool[] $settings
      *
      * @return EditorResult
      */
-    public function fill(Player $player, BlockList $blockList, $fastFill = true, $saveUndo = true, $saveRedo = false): EditorResult {
+    public function fill(Player $player, BlockList $blockList, array $settings = []): EditorResult {
         $startTime = microtime(true);
         $blocks = $blockList->getAll();
+
+        /** @var bool $fastFill */
+        $fastFill = true;
+        /** @var bool $saveUndo */
+        $saveUndo = false;
+        /** @var bool $saveRedo */
+        $saveRedo = true;
+
+        if(isset($settings["fastFill"]) && is_bool($settings["fastFill"])) $fastFill = $settings["fastFill"];
+        if(isset($settings["saveUndo"]) && is_bool($settings["saveUndo"])) $saveUndo = $settings["saveUndo"];
+        if(isset($settings["saveRedo"]) && is_bool($settings["saveRedo"])) $saveRedo = $settings["saveRedo"];
 
         $undoList = new BlockList;
         $redoList = new BlockList;
@@ -153,8 +178,18 @@ class Filler extends Editor {
 
         $reloadChunks($blockList->getLevel(), $minX, $minZ, $maxX, $maxZ);
 
-        $canceller = new Canceller;
-        $canceller->addStep($player, $undoList);
+        if($saveUndo) {
+            /** @var Canceller $canceller */
+            $canceller = BuilderTools::getEditor(static::CANCELLER);
+            $canceller->addStep($player, $undoList);
+        }
+
+        if($saveRedo) {
+            /** @var Canceller $canceller */
+            $canceller = BuilderTools::getEditor(static::CANCELLER);
+            $canceller->addRedo($player, $redoList);
+        }
+
 
         return new EditorResult(count($blocks), microtime(true)-$startTime);
     }

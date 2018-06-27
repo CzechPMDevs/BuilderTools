@@ -1,11 +1,28 @@
 <?php
 
+/**
+ * Copyright 2018 CzechPMDevs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace buildertools\event\listener;
 
 use buildertools\BuilderTools;
 use buildertools\editors\Copier;
+use buildertools\editors\Editor;
 use buildertools\editors\Printer;
 use buildertools\Selectors;
 use pocketmine\event\block\BlockBreakEvent;
@@ -98,7 +115,7 @@ class EventListener implements Listener {
         $player->sendMessage(BuilderTools::getPrefix()."§aRotating selected area...");
 
         /** @var Copier $copier */
-        $copier = BuilderTools::getEditor("Copier");
+        $copier = BuilderTools::getEditor(Editor::COPIER);
 
         $copier->rotate($player, $this->toRotate[$player->getName()][1], $this->toRotate[$player->getName()][2]);
         unset($this->toRotate[$player->getName()]);
@@ -112,9 +129,9 @@ class EventListener implements Listener {
     public function onAirClick(PlayerInteractEvent $event) {
         if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) return;
         $position = $player->getTargetBlock(50)->asPosition();
-        $printer = BuilderTools::getEditor("Printer");
+        $printer = BuilderTools::getEditor(Editor::PRINTER);
         if($printer instanceof Printer) {
-            $printer->draw($position, Selectors::getDrawingPlayerBrush($player), $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player), $player);
+            $printer->draw($position, Selectors::getDrawingPlayerBrush($player), $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player), $player, false);
         }
         $event->setCancelled(true);
     }

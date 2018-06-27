@@ -18,34 +18,30 @@
 
 declare(strict_types=1);
 
-namespace buildertools\editors;
+namespace buildertools\utils;
 
-use buildertools\BuilderTools;
+use pocketmine\level\Position;
+use pocketmine\math\Vector3;
 
 /**
- * Class Editor
- * @package buildertools\editors
+ * Class Math
+ * @package buildertools\utils
  */
-abstract class Editor {
-
-    const CANCELLER = "Canceller";
-    const COPIER = "Copier";
-    const DECORATOR = "Decorator";
-    const FILLER = "Filler";
-    const FIXER = "Fixer";
-    const NATURALIZER = "Naturalizer";
-    const PRINTER = "Printer";
-    const REPLACEMENT = "Replacement";
+class Math {
 
     /**
-     * @return string
+     * @param Vector3 $vector3
+     * @return Vector3 $vector3
      */
-    abstract function getName():string;
+    public static function roundVector3(Vector3 $vector3): Vector3 {
+        return new Vector3((int)round($vector3->getX()), (int)round($vector3->getY()), (int)round($vector3->getZ()));
+    }
 
     /**
-     * @return BuilderTools
+     * @param Position $position
+     * @return Position $position
      */
-    public function getPlugin():BuilderTools {
-        return BuilderTools::getInstance();
+    public static function roundPosition(Position $position): Position {
+        return Position::fromObject(self::roundVector3($position), $position->getLevel());
     }
 }

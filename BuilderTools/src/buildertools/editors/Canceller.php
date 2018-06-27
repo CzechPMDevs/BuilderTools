@@ -1,11 +1,28 @@
 <?php
 
+/**
+ * Copyright 2018 CzechPMDevs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace buildertools\editors;
 
 use buildertools\BuilderTools;
 use buildertools\editors\object\BlockList;
+use buildertools\editors\object\EditorResult;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\Player;
 use pocketmine\block\Block;
@@ -37,43 +54,37 @@ class Canceller extends Editor {
      * @param BlockList $blocks
      */
     public function addStep(Player $player, BlockList $blocks) {
-        #if(empty($this->undoData[$player->getName()])) $this->undoData[$player->getName()] = [];
         $this->undoData[$player->getName()][] = $blocks;
     }
 
     /**
      * @param Player $player
+     * @return EditorResult|null
      */
-    public function undo(Player $player) {
-
+    public function undo(Player $player): EditorResult {
         if(!isset($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
             $player->sendMessage(BuilderTools::getPrefix()."§cThere are not actions to undo!");
-            return;
+            return new EditorResult(0, 0, true);
         }
 
-        if(count($this->undoData[$player->getName()]) == 1) {
-            $last = $this->undoData[$player->getName()][0];
+        if(count($this->undoData[$player->getName()]) == 1 && isset($this->undoData[$player->getName()][0])) {
+            $blockList = $this->undoData[$player->getName()][0];
         }
         else {
-            $last = end($this->undoData[$player->getName()]);
+            $blockList = end($this->undoData[$player->getName()]);
         }
 
-        $redo = [];
-
-        /** @var Block $block */
-        foreach ($last as $block) {
-            $redo[] = $block->getLevel()->getBlock($block->asVector3());
-            $block->getLevel()->setBlock($block->asVector3(), $block, true, true);
-        }
-
-        $this->addRedo($player, $redo);
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(static::FILLER);
+        $result = $filler->fill($player, $blockList, [
+            "saveUndo" => false,
+            "saveRedo" => true
+        ]);
 
         array_pop($this->undoData[$player->getName()]);
     }
 
-    private function addRedo(Player $player, BlockList $blocks) {
-        if(empty($this->redoData[$player->getName()])) $this->redoData[$player->getName()] = [];
-        #array_push($this->redoData[$player->getName()], $blocks);
+    public function addRedo(Player $player, BlockList $blocks) {
         $this->redoData[$player->getName()][] = $blocks;
     }
 
@@ -83,22 +94,19 @@ class Canceller extends Editor {
             return;
         }
 
-        if(count($this->redoData) == 1) {
-            $last = $this->redoData[$player->getName()][0];
+        if(count($this->redoData) == 1 && isset($this->redoData[$player->getName()][0])) {
+            $blockList = $this->redoData[$player->getName()][0];
         }
         else {
-            $last = end($this->redoData[$player->getName()]);
+            $blockList = end($this->redoData[$player->getName()]);
         }
 
-        $undo = [];
-
-        /** @var Block $block */
-        foreach ($last as $block) {
-            $undo[] = $block->getLevel()->getBlock($block->asVector3());
-            $block->getLevel()->setBlock($block->asVector3(), $block, true, true);
-        }
-
-        $this->addStep($player, $undo);
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(static::FILLER);
+        $result = $filler->fill($player, $blockList, [
+            "saveUndo" => true,
+            "saveRedo" => false
+        ]);
 
         array_pop($this->redoData[$player->getName()]);
     }
