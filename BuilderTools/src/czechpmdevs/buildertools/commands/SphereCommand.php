@@ -58,13 +58,13 @@ class SphereCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         $radius = isset($args[1]) ? intval($args[1]) : 5;
-        $bargs = explode(",", strval($args[0]));
-        $block = Item::fromString($bargs[array_rand($bargs, 1)])->getBlock();
+
+        $startTime = microtime(true);
 
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
-        $printer->draw(new Position((int)$sender->getX(), (int)$sender->getY(), (int)$sender->getZ(), $sender->getLevel()), $radius, $block, Printer::SPHERE, false, $sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere was created!");
+        $printer->makeSphere($sender, $sender, $radius, $args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere was created in ".microtime(true)-$startTime."!");
     }
 
     /**

@@ -1,9 +1,0 @@
---- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools
-branches:
-- master
-- test
-projects:
-  BuilderTools:
-    path: BuilderTools/
-    icon: "worker.png"
-...

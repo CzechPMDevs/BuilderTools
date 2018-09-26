@@ -22,11 +22,10 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
-use pocketmine\math\Math;
 use pocketmine\math\Vector3;
-use pocketmine\math\VectorMath;
 use pocketmine\Player;
 
 /**
@@ -48,7 +47,7 @@ class Printer extends Editor {
      */
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0, bool $fall = false) {
         $undoList = new BlockList;
-
+        $center = Math::roundPosition($center);
         switch ($mode) {
             case self::CUBE:
                 for ($x = $center->getX()-$brush; $x <= $center->getX()+$brush; $x++) {
@@ -67,6 +66,7 @@ class Printer extends Editor {
                 break;
 
             case self::SPHERE:
+                echo "making sphere\n";
                 for ($x = $center->getX()-$brush; $x <= $center->getX()+$brush; $x++) {
                     $xsqr = ($center->getX()-$x) * ($center->getX()-$x);
                     for ($y = $center->getY()-$brush; $y <= $center->getY()+$brush; $y++) {
@@ -99,18 +99,33 @@ class Printer extends Editor {
      */
     private function throwBlock(Position $position, Block $block): Vector3 {
         $level = $position->getLevel();
-        $y = $block->getY();
+
+        $x = $position->getX();
+        $y = $position->getY();
+        $z = $position->getZ();
+
+        $finalY = $y;
+
+        for($a = $y+1; $a > 0 && $level->getBlockIdAt($x, $a-1, $z) == Block::AIR; $a--) {
+            $finalY = $a-1;
+        }
+
+        $level->setBlockIdAt($x, $finalY, $z, $block->getId());
+        $level->setBlockDataAt($x, $finalY, $z, $block->getDamage());
+        return new Vector3($x, $finalY, $z);
+        /*
         back:
         if($level->getBlockIdAt($position->getX(), $y-1, $position->getZ()) == 0 && $y-1 > 0) {
             $y--;
             goto back;
         }
         else {
-            $level->setBlockIdAt($position->getX(), $y, $position->getZ(), $block->getId());
-            $level->setBlockDataAt($position->getX(), $y, $position->getZ(), $block->getDamage());
+            $level->setBlockIdAt($position->getX(), (int)$y, $position->getZ(), $block->getId());
+            $level->setBlockDataAt($position->getX(), (int)$y, $position->getZ(), $block->getDamage());
         }
 
         return new Vector3($position->getX(), $y, $position->getZ());
+        */
     }
 
     /**
@@ -120,6 +135,7 @@ class Printer extends Editor {
      * @param $blocks
      */
     public function makeSphere(Player $player, Position $center, int $radius, $blocks) {
+        $center = Math::roundPosition($center);
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
         for($x = $center->getX()-$radius; $x < $center->getX()+$radius; $x++) {
@@ -131,6 +147,29 @@ class Printer extends Editor {
                     if(($xsqr + $ysqr + $zsqr) <= ($radius*$radius)) {
                         $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blocks));
                     }
+                }
+            }
+        }
+
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $filler->fill($player, $blockList, ["saveUndo" => true]);
+    }
+
+    /**
+     * @param Player $player
+     * @param Position $center
+     * @param int $radius
+     * @param $blocks
+     */
+    public function makeCube(Player $player, Position $center, int $radius, $blocks) {
+        $center = Math::roundPosition($center);
+        $blockList = new BlockList();
+        $blockList->setLevel($center->getLevel());
+        for($x = $center->getX()-$radius; $x < $center->getX()+$radius; $x++) {
+            for($y = $center->getY()-$radius; $y < $center->getY()+$radius; $y++) {
+                for($z = $center->getZ()-$radius; $z < $center->getZ()+$radius; $z++) {
+                    $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blocks));
                 }
             }
         }

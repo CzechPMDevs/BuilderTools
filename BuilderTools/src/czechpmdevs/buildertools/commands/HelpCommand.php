@@ -37,7 +37,7 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
      * HelpCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/help", "Displays BuilderTools commands", null, ["/?", "buildertools"]);
+        parent::__construct("/commands", "Displays BuilderTools commands", null, ["/?", "buildertools"]);
     }
 
     /**

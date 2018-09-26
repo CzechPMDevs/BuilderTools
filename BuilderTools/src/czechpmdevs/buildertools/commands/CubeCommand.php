@@ -63,13 +63,13 @@ class CubeCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         $radius = isset($args[1]) ? $args[1] : 5;
-        $bargs = explode(",", strval($args[0]));
-        $block = Item::fromString($bargs[array_rand($bargs, 1)])->getBlock();
+
+        $startTime = microtime(true);
 
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
-        $printer->draw($sender, $radius, $block, Printer::CUBE);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube was created!");
+        $printer->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCube was created in ".round(microtime(true)-$startTime, 2)."!");
     }
 
     /**

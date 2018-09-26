@@ -131,7 +131,7 @@ class EventListener implements Listener {
      */
     public function onAirClick(PlayerInteractEvent $event) {
         if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) return;
-        $position = $player->getTargetBlock(50)->asPosition();
+        $position = $player->getTargetBlock(64)->asPosition();
         $printer = BuilderTools::getEditor(Editor::PRINTER);
         if($printer instanceof Printer) {
             $printer->draw($player, $position, $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerBrush($player), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player));
