@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\object\BlockList;
 use pocketmine\block\Block;
 use pocketmine\event\Cancellable;
 use pocketmine\item\Item;
@@ -35,62 +36,33 @@ use pocketmine\Player;
 class Replacement extends Editor {
 
     /**
-     * @param $x1
-     * @param $y1
-     * @param $z1
-     * @param $x2
-     * @param $y2
-     * @param $z2
+     * @param Vector3 $pos1
+     * @param Vector3 $pos2
      * @param Level $level
-     * @param string $blocksToReplace
+     *
+     * Blocks that will replaced
      * @param string $blocks
-     * @return int
+     *
+     * Blocks that will placed
+     * @param string $replace
+     *
+     * @return BlockList
      */
-    public function replace($x1, $y1, $z1, $x2, $y2, $z2, Level $level, string $blocksToReplace, string $blocks, Player $player) {
-        $count = 0;
-        $undo = [];
-        for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
-            for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
-                for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                    $vec = new Vector3($x, $y, $z);
-                    if($this->inBlockArgs($level->getBlock($vec), $blocksToReplace)) {
-                        $undo[] = $level->getBlock($vec);
-                        $level->setBlock($vec, $this->getRandomBlock($blocks));
-                        $count++;
+    public function prepareReplace(Vector3 $pos1, Vector3 $pos2, Level $level, string $blocks, string $replace): BlockList {
+        $blockList = new BlockList;
+        $blockList->setLevel($level);
+
+        for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
+            for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
+                for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
+                    if($this->isBlockInString($blocks, $level->getBlockIdAt($x, $y, $z))) {
+                        $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($replace));
                     }
                 }
             }
         }
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor("Canceller");
-        $canceller->addStep($player, $undo);
-        return $count;
-    }
 
-    /**
-     * @param Block $block
-     * @param string $blocks
-     * @return bool
-     */
-    public function inBlockArgs(Block $block, string $blocks) {
-        $return = false;
-        $args = explode(",", $blocks);
-        foreach ($args as $arg) {
-            $item = Item::fromString($arg);
-            if($block->getId() == $item->getId()) {
-                $return = true;
-            }
-        }
-        return $return;
-    }
-
-    /**
-     * @param string $blockArgs
-     * @return Block $block
-     */
-    public function getRandomBlock(string $blockArgs):Block {
-        $args = explode(",", $blockArgs);
-        return Item::fromString($args[array_rand($args, 1)])->getBlock();
+        return $blockList;
     }
 
     /**

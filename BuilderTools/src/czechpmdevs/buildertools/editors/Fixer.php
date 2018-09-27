@@ -36,6 +36,9 @@ use pocketmine\tile\Sign;
  */
 class Fixer extends Editor {
 
+    const REMOVE_HEADS = false;
+    const FIX_TILES = true;
+
     /**
      * @var array $blocks
      */
@@ -70,14 +73,9 @@ class Fixer extends Editor {
      * @param Player $player
      */
     public function fix($x1, $y1, $z1, $x2, $y2, $z2, Level $level, Player $player) {
-        $settings = ConfigManager::getSettings($this);
-
         $blocks = self::$blocks;
-        foreach ((array)$settings["added-blocks"] as $cId => $cBlockArgs) {
-            $blocks[$cId] = (array)$cBlockArgs;
-        }
 
-        if($settings["remove-heads"]) $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];
+        if(self::REMOVE_HEADS) $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];
 
         $count = 0;
         $undo = new BlockList();
@@ -88,13 +86,13 @@ class Fixer extends Editor {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
                     $id = $level->getBlock(new Vector3($x, $y, $z))->getId();
                     if(isset($blocks[$id])) {
-                        if($settings["save-undo"])  $undo->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockDataAt($x, $y, $z))));
+                        $undo->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockDataAt($x, $y, $z))));
                         $level->setBlockIdAt($x, $y, $z, $blocks[$id][0]);
                         if(is_int($blocks[$id][1])) $level->setBlockDataAt($x, $y, $z, $blocks[$id][1]);
                         $count++;
                     }
 
-                    if($settings["fix-tiles"]) {
+                    if(self::FIX_TILES) {
                         switch ($id) {
                             case Block::CHEST:
                                 if($level->getTile(new Vector3($x, $y, $z)) === null)
@@ -119,14 +117,15 @@ class Fixer extends Editor {
                 }
             }
         }
-        if($settings["save-undo"]) {
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-            $canceller->addStep($player, $undo);
-        }
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+        $canceller->addStep($player, $undo);
         $player->sendMessage(BuilderTools::getPrefix()."Selected area successfully fixed! ($count blocks changed!)");
     }
 
+    /**
+     * @return string
+     */
     public function getName(): string {
         return "Fixer";
     }

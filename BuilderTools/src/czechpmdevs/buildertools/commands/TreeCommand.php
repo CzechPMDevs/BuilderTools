@@ -61,7 +61,7 @@ class TreeCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
 
-        if(empty($args[0])) {
+        if(!isset($args[0])) {
             $sender->sendMessage("§cUsage: §7/tree <list|treeType>");
             return;
         }

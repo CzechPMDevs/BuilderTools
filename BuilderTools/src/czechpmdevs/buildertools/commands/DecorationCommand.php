@@ -29,6 +29,10 @@ use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
+/**
+ * Class DecorationCommand
+ * @package czechpmdevs\buildertools\commands
+ */
 class DecorationCommand extends Command implements PluginIdentifiableCommand {
 
     public function __construct() {

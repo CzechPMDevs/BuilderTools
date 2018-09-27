@@ -63,12 +63,12 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
-        if(empty($args[0])) {
-            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|custom|off> [brush: {$this->minBrush}-{$this->maxBrush} | on | off]  [fall = false]");
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|off> [brush: {$this->minBrush}-{$this->maxBrush} | on | off]  [fall = false]");
             return;
         }
         if(!in_array(strval($args[0]), ["on", "off", "cube", "sphere", "custom"])) {
-            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|custom|off> [brush: {$this->minBrush}-{$this->maxBrush}]  [fall = false]");
+            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|off> [brush: {$this->minBrush}-{$this->maxBrush}]  [fall = false]");
             return;
         }
         if(isset($args[1]) && is_numeric($args[1]) && intval($args[1]) >= $this->maxBrush && intval($args[1]) <= $this->minBrush) {
@@ -85,8 +85,6 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
 
         if($args[0] == "cube") $mode = Printer::CUBE;
         if($args[0] == "sphere") $mode = Printer::SPHERE;
-        if($args[0] == "hsphere") $mode = Printer::HSPHERE;
-        if($args[0] == "custom") $mode = -1;
 
         $brush = 1;
 
@@ -104,7 +102,7 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
 
         $fall = $fall ? "§2true§a" : "§cfalse§a";
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(shape: §7{$args[0]} §aFall:&$fall)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(§7shape: §a{$args[0]} §7Fall:$fall)!");
     }
 
     /**

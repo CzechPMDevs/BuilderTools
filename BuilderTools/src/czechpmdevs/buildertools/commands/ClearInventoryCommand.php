@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
@@ -49,8 +50,14 @@ class ClearInventoryCommand extends Command implements PluginIdentifiableCommand
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
-        $sender->getInventory()->clearAll();
-        $sender->sendMessage(BuilderTools::getPrefix()."§aInventory cleared!");
+
+        $removed = 0;
+        foreach ($sender->getInventory()->getContents() as $index => $item) {
+            $sender->getInventory()->setItem($index, Item::get(Item::AIR));
+            $removed++;
+        }
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§aInventory cleared, $removed items removed.");
     }
 
     /**

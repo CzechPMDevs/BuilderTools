@@ -78,7 +78,6 @@ class Canceller extends Editor {
         ]);
 
         $this->addRedo($player, $last = array_pop($this->undoData[$player->getName()]));
-        var_dump($last);
         return $result;
     }
 

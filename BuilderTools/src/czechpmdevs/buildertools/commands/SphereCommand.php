@@ -53,7 +53,7 @@ class SphereCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
-        if(empty($args[0])) {
+        if(!isset($args[0])) {
             $sender->sendMessage("§cUsage: §7//sphere <id1:dmg1,id2:dmg2:,...> <radius>");
             return;
         }
@@ -64,7 +64,7 @@ class SphereCommand extends Command implements PluginIdentifiableCommand {
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
         $printer->makeSphere($sender, $sender, $radius, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere was created in ".microtime(true)-$startTime."!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere created in ".microtime(true)-$startTime."!");
     }
 
     /**

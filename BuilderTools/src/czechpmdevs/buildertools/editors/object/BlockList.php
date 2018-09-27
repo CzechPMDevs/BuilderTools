@@ -57,10 +57,22 @@ class BlockList {
      * @param int $x
      * @param int $y
      * @param int $z
+     *
      * @return bool
      */
     public function isAirAt(int $x, int $y, int $z): bool {
         return isset($this->blockMap[$x][$y][$z]) && $this->blockMap[$x][$y][$z]->getId() == 0;
+    }
+
+    /**
+     * @param int $x
+     * @param int $y
+     * @param int $z
+     *
+     * @return bool
+     */
+    public function isAirAtLevel(int $x, int $y, int $z): bool {
+        return isset($this->blockMap[$x][$y][$z]) && $this->blockMap[$x][$y][$z]->getId() == 0 && $this->level->getBlockIdAt($x, $y, $z) == 0;
     }
 
     /**

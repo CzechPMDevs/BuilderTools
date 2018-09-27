@@ -53,8 +53,6 @@ class Naturalizer extends Editor {
      * @param Player $player
      */
     public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player) {
-        $settings = ConfigManager::getSettings($this);
-
 
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
@@ -71,7 +69,7 @@ class Naturalizer extends Editor {
     /**
      * @param Vector3 $vector3
      * @param Level $level
-     * @param int $min
+     * @param int $minY
      */
     private function fix(Vector3 $vector3, Level $level, int $minY) {
         start:

@@ -24,7 +24,6 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\block\Block;
-use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
@@ -89,6 +88,9 @@ class Filler extends Editor {
         if($saveRedo) $redoList->setLevel($blockList->getLevel());
 
         if(!$fastFill) {
+            /**
+             * @var Block $block
+             */
             foreach ($blocks as $block) {
                 if($saveUndo) {
                     $undoList->addBlock($block->asVector3(), $block->getLevel()->getBlock($block->asVector3()));

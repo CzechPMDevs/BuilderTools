@@ -53,6 +53,28 @@ abstract class Editor {
 
     /**
      * @param string $string
+     * @param int $id
+     *
+     * @return bool
+     */
+    public function isBlockInString(string $string, int $id): bool {
+        $itemArgs = explode(",", $string);
+
+        $items = [];
+        foreach ($itemArgs as $itemString) {
+            // Item::fromString() throws exception
+            try {
+                 $block = Item::fromString($itemString)->getBlock();
+                 $items[] =  $block->getId();
+            }
+            catch (\Exception $exception) {}
+        }
+
+        return (bool)in_array($id, $items);
+    }
+
+    /**
+     * @param string $string
      * @return Block $block
      */
     public function getBlockFromString(string $string): Block {

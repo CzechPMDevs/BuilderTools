@@ -58,7 +58,7 @@ class CubeCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
-        if(empty($args[0])) {
+        if(!isset($args[0])) {
             $sender->sendMessage("§7Usage: §c//cube <id1:dmg1,id2:dmg2,...> <radius>");
             return;
         }
@@ -69,7 +69,7 @@ class CubeCommand extends Command implements PluginIdentifiableCommand {
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
         $printer->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube was created in ".round(microtime(true)-$startTime, 2)."!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created in ".round(microtime(true)-$startTime, 2)."!");
     }
 
     /**

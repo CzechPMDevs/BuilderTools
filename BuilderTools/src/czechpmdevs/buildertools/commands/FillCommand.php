@@ -54,44 +54,44 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
+
         if(!$sender->hasPermission("bt.cmd.fill")) {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
+
         if(!isset($args[0])) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
             return;
         }
+
         if(!Selectors::isSelected(1, $sender)) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
             return;
         }
+
         if(!Selectors::isSelected(2, $sender)) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
+
         $firstPos = Selectors::getPosition($sender, 1);
         $secondPos = Selectors::getPosition($sender, 2);
+
         if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
 
-        $async = false;
-
-        if(isset($args[1])) {
-            if(is_bool(boolval($args[1]))) {
-                $async = boolval($args[1]);
-            }
-        }
+        $startTime = microtime(true);
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
 
         $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevel(), $args[0]);
-        $result = $filler->fill($sender, $blocks, ["saveUndo" => true]);
+        $result = $filler->fill($sender, $blocks);
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled, " . $result->countBlocks ." changed in " . round($result->time, 4) . "sec");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in " . round(microtime(true)-$startTime, 2) . " (" . $result->countBlocks . " block changed)");
     }
 
     /**

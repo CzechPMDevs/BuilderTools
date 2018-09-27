@@ -20,6 +20,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\Command;
@@ -56,7 +57,7 @@ class ReplaceCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cYou have not permissions to use this command!");
             return;
         }
-        if(empty($args[0]) || empty($args[1])) {
+        if(!isset($args[0]) || !isset($args[1])) {
             $sender->sendMessage("§cUsage: §7//replace <BlocksToReplace - id1:meta1,id2:meta2,...> <Blocks - id1:meta1,id2:meta2,...>");
             return;
         }
@@ -75,10 +76,18 @@ class ReplaceCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
 
+        $startTime = microtime(true);
+
         /** @var Replacement $replacement */
         $replacement = BuilderTools::getEditor(Editor::REPLACEMENT);
-        $count = $replacement->replace($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $firstPos->getLevel(), $args[0], $args[1], $sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area was filled ({$count} blocks changed)!");
+        $list = $replacement->prepareReplace($firstPos, $secondPos, $firstPos->getLevel(), $args[0], $args[1]);
+
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $result = $filler->fill($sender, $list);
+
+        $count = $result->countBlocks;
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in ".round(microtime(true)-$startTime, 2)." ({$count} blocks changed)!");
     }
 
     /**

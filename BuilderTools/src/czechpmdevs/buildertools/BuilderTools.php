@@ -73,16 +73,12 @@ class BuilderTools extends PluginBase {
     /** @var EventListener $listener */
     private static $listener;
 
-    /** @var ConfigManager $configManager */
-    private $configManager;
-
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
         $this->sendLoadingInfo();
         $this->registerCommands();
         $this->initListner();
-        $this->initConfig();
         $this->registerEditors();
         if($this->isEnabled()) {
             $this->getLogger()->info("§a--> Loaded!");
@@ -120,11 +116,6 @@ class BuilderTools extends PluginBase {
     private function initListner() {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
     }
-
-    private function initConfig() {
-        $this->configManager = new ConfigManager($this);
-    }
-
     private function registerCommands() {
         $map = $this->getServer()->getCommandMap();
         $map->register("BuilderTools", new FirstPositionCommand);
@@ -142,9 +133,9 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new PasteCommand);
         $map->register("BuilderTools", new RotateCommand);
         $map->register("BuilderTools", new UndoCommand);
-        $map->register("BuilderTools", new RedoCommand);
+        #$map->register("BuilderTools", new RedoCommand); taked down due to release
         $map->register("BuilderTools", new TreeCommand);
-        $map->register("BuilderTools", new DecorationCommand);
+        #$map->register("BuilderTools", new DecorationCommand); taked down due to release
         $map->register("BuilderTools", new FlipCommand);
         $map->register("BuilderTools", new FixCommand);
         $map->register("BuilderTools", new CubeCommand);
