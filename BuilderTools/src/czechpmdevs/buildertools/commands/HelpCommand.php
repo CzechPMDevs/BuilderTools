@@ -123,7 +123,7 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
                 "§2//pos2: §fSelect second position\n".
                 "§2//replace: §fReplace blocks in selected area\n".
                 "§2//sphere: §fCreate sphere\n" .
-                "§2//undo: §fUndo last action".
+                "§2//undo: §fUndo last action"
             );
             return;
         }
