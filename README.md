@@ -17,6 +17,9 @@
 	<a href="https://github.com/CzechPMDevs/BuilderTools/blob/master/LICENSE">
 		<img src="https://img.shields.io/github/license/CzechPMDevs/BuilderTools.svg?style=flat-square">
 	</a>
+	<a href="https://poggit.pmmp.io/p/BuilderTools">
+		<img src="https://poggit.pmmp.io/shield.state/BuilderTools?style=flat-square">
+	</a>
 <br><br>
 	✔️ Basic WorldEdit commands
     <br>
