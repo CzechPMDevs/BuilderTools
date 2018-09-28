@@ -67,7 +67,7 @@
 
 ## 🏠 BuilderTools commands:
 
-- All MultiWorld commands starts with `//`except for the `/buildertools` command that was added as an alias because `//help` not works in newer versions.
+- All BuilderTools commands starts with `//`except for the `/buildertools` command that was added as an alias because `//help` not works in newer versions.
 - In game, you can get list of all commands using commands `//commands`
 
 <br>
