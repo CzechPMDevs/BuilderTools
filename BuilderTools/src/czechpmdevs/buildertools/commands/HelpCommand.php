@@ -94,7 +94,7 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
             return;
         }*/
         if(!isset($args[0])) {
-            $sender->sendMessage("---- BuilderTools Commands (1/4) ----\n".
+            $sender->sendMessage("---- BuilderTools Commands (1/5) ----\n".
                 "§2//ci: §fClears your inventory\n".
                 "§2//copy: §fCopy selected area\n".
                 "§2//cube: §fCreate cube\n".
@@ -102,7 +102,7 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if($args[0] == "2") {
-            $sender->sendMessage("---- BuilderTools Commands (2/4) ----\n".
+            $sender->sendMessage("---- BuilderTools Commands (2/5) ----\n".
                 "§2//fill: §fFill selected area\n".
                 "§2//flip: §fFlip copied area\n".
                 "§2//commands: §fDisplays help pages\n".
@@ -110,20 +110,26 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if($args[0] == "3") {
-            $sender->sendMessage("---- §fBuilderTools Commands (3/4) ----\n".
+            $sender->sendMessage("---- §fBuilderTools Commands (3/5) ----\n".
+                "§2//merge §fMerge copied area\n".
                 "§2//naturalize §fNaturalize selected area\n".
                 "§2//paste §fPaste selected area\n".
-                "§2//pos1 §fSelect first position\n".
-                "§2//pos2: §fSelect second position\n"
+                "§2//pos1 §fSelect first position"
             );
             return;
         }
         if($args[0] == "4") {
-            $sender->sendMessage("---- §fBuilderTools Commands (4/4) ----\n".
+            $sender->sendMessage("---- §fBuilderTools Commands (4/5) ----\n".
+                "§2//pos2: §fSelect second position\n".
                 "§2//replace: §fReplace blocks in selected area\n".
                 "§2//sphere: §fCreate sphere\n" .
-                "§2//undo: §fUndo last action\n".
-                "§2//wand: §fSwitch wand command\n"
+                "§2//undo: §fUndo last action".
+            );
+            return;
+        }
+        if($args[0] == "5") {
+            $sender->sendMessage("---- §fBuilderTools Commands (4/5) ----\n".
+                "§2//wand: §fSwitch wand command"
             );
             return;
         }
