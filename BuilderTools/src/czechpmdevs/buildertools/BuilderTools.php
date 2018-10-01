@@ -76,30 +76,9 @@ class BuilderTools extends PluginBase {
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
-        $this->sendLoadingInfo();
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
-        if($this->isEnabled()) {
-            $this->getLogger()->info("§a--> Loaded!");
-        }
-        else {
-            $this->getLogger()->critical("§4Submit issue to github.com/CzechPMDevs/BuilderTools/issues  to fix this error!");
-        }
-    }
-
-    private function sendLoadingInfo() {
-        $text = strval(
-            "\n".
-            "--------------------------------\n".
-            "CzechPMDevs >>> BuilderTools\n".
-            "Plugin like WorldEdit for PocketMine servers\n".
-            "Authors: VixikCZ\n".
-            "Version: ".$this->getDescription()->getVersion()."\n".
-            "Status: Loading...\n".
-            "--------------------------------"
-        );
-        $this->getLogger()->info($text);
     }
 
     private function registerEditors() {
