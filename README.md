@@ -50,9 +50,7 @@
 
 <br>
 
-> **Download latest version [here](https://poggit.pmmp.io/r/34104/MultiWorld.phar)**
-
-> **All released versions [here](https://github.com/CzechPMDevs/MultiWorld/releases)**
+> **All released versions [here](https://github.com/CzechPMDevs/BuilderTools/releases)**
 > **Other plugins by CzechPMDevs [here](https://poggit.pmmp.io/plugins/by/CzechPMDevs)**
 
 <br>
