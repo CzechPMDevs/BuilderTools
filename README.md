@@ -104,7 +104,7 @@
 
 <br>
 
-**All MultiWorlds Permissions:**
+**All BuilderTools Permissions:**
 
 | Permission | Command | Opertor |
 | --- | --- | --- | 
