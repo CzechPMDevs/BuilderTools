@@ -100,7 +100,7 @@
 
 
 
-## 📃  Premissions:
+## 📃  Permissions:
 
 <br>
 
