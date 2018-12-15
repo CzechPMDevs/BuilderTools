@@ -112,9 +112,9 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new PasteCommand);
         $map->register("BuilderTools", new RotateCommand);
         $map->register("BuilderTools", new UndoCommand);
-        #$map->register("BuilderTools", new RedoCommand); taked down due to release
+        $map->register("BuilderTools", new RedoCommand);
         $map->register("BuilderTools", new TreeCommand);
-        #$map->register("BuilderTools", new DecorationCommand); taked down due to release
+        #$map->register("BuilderTools", new DecorationCommand); taken down due to release
         $map->register("BuilderTools", new FlipCommand);
         $map->register("BuilderTools", new FixCommand);
         $map->register("BuilderTools", new CubeCommand);
@@ -125,28 +125,28 @@ class BuilderTools extends PluginBase {
      * @param string $name
      * @return Editor $editor
      */
-    public static function getEditor(string $name):Editor {
+    public static function getEditor(string $name): Editor {
         return self::$editors[$name];
     }
 
     /**
      * @return string $prefix
      */
-    public static function getPrefix():string {
+    public static function getPrefix(): string {
         return self::$prefix;
     }
 
     /**
      * @return EventListener $listener
      */
-    public static function getListener():EventListener {
+    public static function getListener(): EventListener {
         return self::$listener;
     }
 
     /**
      * @return BuilderTools $instance
      */
-    public static function getInstance():BuilderTools {
+    public static function getInstance(): BuilderTools {
         return self::$instance;
     }
 }

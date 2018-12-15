@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Canceller;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
@@ -60,8 +61,11 @@ class RedoCommand extends Command implements PluginIdentifiableCommand {
 
         /** @var Canceller $canceller */
         $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->redo($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aUndo was cancelled!");
+
+        /** @var EditorResult $result */
+        $result = $canceller->redo($sender);
+
+        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aUndo was cancelled!");
     }
 
     /**

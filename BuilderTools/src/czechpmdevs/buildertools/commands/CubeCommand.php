@@ -69,7 +69,7 @@ class CubeCommand extends Command implements PluginIdentifiableCommand {
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
         $printer->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created in ".round(microtime(true)-$startTime, 2)."!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created in ".(string)round(microtime(true)-$startTime, 2)."!");
     }
 
     /**

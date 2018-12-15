@@ -20,7 +20,6 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
-use czechpmdevs\buildertools\utils\ConfigManager;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
@@ -77,20 +76,13 @@ class Fixer extends Editor {
 
         if(self::REMOVE_HEADS) $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];
 
-        $count = 0;
-        $undo = new BlockList();
-        $undo->setLevel($level);
+        $blockList = new BlockList();
+        $blockList->setLevel($level);
 
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                    $id = $level->getBlock(new Vector3($x, $y, $z))->getId();
-                    if(isset($blocks[$id])) {
-                        $undo->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockDataAt($x, $y, $z))));
-                        $level->setBlockIdAt($x, $y, $z, $blocks[$id][0]);
-                        if(is_int($blocks[$id][1])) $level->setBlockDataAt($x, $y, $z, $blocks[$id][1]);
-                        $count++;
-                    }
+                    $id = $level->getBlockIdAt($x, $y, $z);
 
                     if(self::FIX_TILES) {
                         switch ($id) {
@@ -114,13 +106,18 @@ class Fixer extends Editor {
                                 break;
                         }
                     }
+
+
+                    if(isset($blocks[$id])) $blockList->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockDataAt($x, $y, $z))));
                 }
             }
         }
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $undo);
-        $player->sendMessage(BuilderTools::getPrefix()."Selected area successfully fixed! ($count blocks changed!)");
+
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $result = $filler->fill($player, $blockList);
+
+        $player->sendMessage(BuilderTools::getPrefix()."Selected area successfully fixed! (".(string)($result->countBlocks)." blocks changed!)");
     }
 
     /**

@@ -91,7 +91,7 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
         $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevel(), $args[0]);
         $result = $filler->fill($sender, $blocks);
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in " . round(microtime(true)-$startTime, 2) . " (" . $result->countBlocks . " block changed)");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in " . (string)round(microtime(true)-$startTime, 2) . " (" . (string)$result->countBlocks . " block changed)");
     }
 
     /**

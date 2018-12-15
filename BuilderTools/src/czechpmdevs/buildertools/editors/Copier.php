@@ -22,9 +22,7 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
-use czechpmdevs\buildertools\utils\ConfigManager;
 use pocketmine\block\Block;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -76,7 +74,7 @@ class Copier extends Editor {
      * @param Player $player
      */
     public function merge(Player $player) {
-        if(empty($this->copyData[$player->getName()])) {
+        if(!isset($this->copyData[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
@@ -84,33 +82,29 @@ class Copier extends Editor {
         /** @var array $blocks */
         $blocks = $this->copyData[$player->getName()]["data"];
 
-        $undo = new BlockList();
-        $undo->getLevel();
+        $list = new BlockList();
+        $list->setLevel($player->getLevel());
 
         /**
          * @var Vector3 $vec
          * @var Block $block
          */
         foreach ($blocks as [$vec, $block]) {
-            if($player->getLevel()->getBlock($vec->add($player->asVector3()))->getId() != $block->getId()) {
-                $undo->addBlock($vec->add($player->asVector3()), $block);
-            }
             if($player->getLevel()->getBlock($vec->add($player->asVector3()))->getId() == 0) {
-                $player->getLevel()->setBlock($vec->add($player->asVector3()), $block, true, true);
+                $list->addBlock($vec->add($player->asVector3()), $block);
             }
-
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor("Canceller");
-        $canceller->addStep($player, $undo);
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $filler->fill($player, $list);
     }
 
     /**
      * @param Player $player
      */
     public function paste(Player $player) {
-        if(empty($this->copyData[$player->getName()])) {
+        if(!isset($this->copyData[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix()."§cUse //copy first!");
             return;
         }
@@ -118,29 +112,27 @@ class Copier extends Editor {
         /** @var array $blocks */
         $blocks = $this->copyData[$player->getName()]["data"];
 
-        $undo = new BlockList();
+        $list = new BlockList();
+        $list->setLevel($player->getLevel());
 
         /**
          * @var Vector3 $vec
          * @var Block $block
          */
         foreach ($blocks as [$vec, $block]) {
-            if($player->getLevel()->getBlock($vec->add($player->asVector3()))->getId() != $block->getId()) {
-                $undo->addBlock($vec->add($player->asVector3()), $block);
-            }
-            $player->getLevel()->setBlock($vec->add($player->asVector3()), $block, true, true);
+            $list->addBlock($vec->add($player->asVector3()), $block);
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor("Canceller");
-        $canceller->addStep($player, $undo);
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $filler->fill($player, $list);
     }
 
     /**
      * @param Player $player
      */
     public function addToRotate(Player $player) {
-        if(empty($this->copyData[$player->getName()])) {
+        if(!isset($this->copyData[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix()."§cUse //copy first!");
             return;
         }
@@ -244,11 +236,9 @@ class Copier extends Editor {
                 break;
         }
 
-        if(ConfigManager::getSettings($this)["save-undo"]) {
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-            $canceller->addStep($player, $undo);
-        }
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+        $canceller->addStep($player, $undo);
     }
 
     /**
@@ -266,11 +256,10 @@ class Copier extends Editor {
             $vec->setComponents($vec->getX(), -$vec->getY(), $vec->getZ());
         }
 
-        if(ConfigManager::getSettings($this)["save-undo"]) {
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-            $canceller->addStep($player, $undo);
-        }
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+        $canceller->addStep($player, $undo);
+        
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected area flipped!");
     }
 }

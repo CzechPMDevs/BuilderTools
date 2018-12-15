@@ -24,10 +24,13 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\block\Block;
+use pocketmine\entity\Entity;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\FullChunkDataPacket;
 use pocketmine\Player;
+use raklib\protocol\EncapsulatedPacket;
 
 /**
  * Class Filler
@@ -73,9 +76,9 @@ class Filler extends Editor {
         /** @var bool $fastFill */
         $fastFill = true;
         /** @var bool $saveUndo */
-        $saveUndo = false;
+        $saveUndo = true;
         /** @var bool $saveRedo */
-        $saveRedo = true;
+        $saveRedo = false;
 
         if(isset($settings["fastFill"]) && is_bool($settings["fastFill"])) $fastFill = $settings["fastFill"];
         if(isset($settings["saveUndo"]) && is_bool($settings["saveUndo"])) $saveUndo = $settings["saveUndo"];
@@ -87,10 +90,11 @@ class Filler extends Editor {
         if($saveUndo) $undoList->setLevel($blockList->getLevel());
         if($saveRedo) $redoList->setLevel($blockList->getLevel());
 
+        /*
         if(!$fastFill) {
             /**
              * @var Block $block
-             */
+             *./
             foreach ($blocks as $block) {
                 if($saveUndo) {
                     $undoList->addBlock($block->asVector3(), $block->getLevel()->getBlock($block->asVector3()));
@@ -100,13 +104,15 @@ class Filler extends Editor {
                 }
                 $block->getLevel()->setBlock($block->asVector3(), $block, false, false);
             }
-            /** @var Canceller $canceller */
+
+            /** @var Canceller $canceller *./
             $canceller = BuilderTools::getEditor(static::CANCELLER);
             $canceller->addStep($player, $undoList);
-            return new EditorResult(count($blocks), microtime(true)-$startTime);
-        }
 
-        $iterator = new SubChunkIteratorManager($blockList->getLevel(), true);
+            return new EditorResult(count($blocks), microtime(true)-$startTime);
+        }*/
+
+        $iterator = new SubChunkIteratorManager($blockList->getLevel());
 
         /** @var int $minX */
         $minX = null;
@@ -127,7 +133,30 @@ class Filler extends Editor {
         $reloadChunks = function (Level $level, int $x1, int $z1, int $x2, int $z2) {
             for($x = $x1 >> 4; $x <= $x2 >> 4; $x++) {
                 for($z = $z1 >> 4; $z <= $z2 >> 4; $z++) {
-                    $level->setChunk($x, $z, $level->getChunk($x, $z));
+                    $tiles = $level->getChunkTiles($x, $z);
+                    $entities = $level->getChunkEntities($x, $z);
+
+                    $chunk = $level->getChunk($x, $z);
+                    $level->setChunk($x, $z, $chunk);
+
+                    foreach ($tiles as $tile) {
+                        $tile->closed = false;
+                        $tile->setLevel($level);
+                        $level->addTile($tile);
+                    }
+
+
+                    foreach ($level->getChunkLoaders($x, $z) as $chunkLoader) {
+                        if($chunkLoader instanceof Player) {
+                            $pk = new FullChunkDataPacket();
+                            $pk->chunkX = $x;
+                            $pk->chunkZ = $z;
+                            $pk->data = $chunk->networkSerialize();
+                            $chunkLoader->dataPacket($pk);
+                        }
+
+                        $level->clearChunkCache($x, $z);
+                    }
                 }
             }
         };
@@ -139,12 +168,13 @@ class Filler extends Editor {
             if($maxX === null || $block->getX() > $maxX) $maxX = $block->getX();
             if($maxZ === null || $block->getZ() > $maxZ) $maxZ = $block->getZ();
 
-            $iterator->moveTo($block->getX(), $block->getY(), $block->getZ());
-            $undoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
+            $iterator->moveTo((int)$block->getX(), (int)$block->getY(), (int)$block->getZ());
+            if($saveUndo) $undoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
+            if($saveRedo) $redoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
             $iterator->currentSubChunk->setBlock($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f, $block->getId(), $block->getDamage());
         }
 
-        $reloadChunks($blockList->getLevel(), $minX, $minZ, $maxX, $maxZ);
+        $reloadChunks($blockList->getLevel(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
 
         if($saveUndo) {
             /** @var Canceller $canceller */

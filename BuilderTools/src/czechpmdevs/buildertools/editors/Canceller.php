@@ -77,7 +77,8 @@ class Canceller extends Editor {
             "saveRedo" => true
         ]);
 
-        $this->addRedo($player, $last = array_pop($this->undoData[$player->getName()]));
+        array_pop($this->undoData[$player->getName()]);
+
         return $result;
     }
 
@@ -91,11 +92,12 @@ class Canceller extends Editor {
 
     /**
      * @param Player $player
+     * @return EditorResult
      */
     public function redo(Player $player) {
-        if(empty($this->redoData[$player->getName()]) || count($this->redoData[$player->getName()]) == 0) {
+        if(!isset($this->redoData[$player->getName()]) || count($this->redoData[$player->getName()]) == 0) {
             $player->sendMessage(BuilderTools::getPrefix()."§cThere are not actions to redo!");
-            return;
+            return new EditorResult(0, 0, true);
         }
 
         if(count($this->redoData) == 1 && isset($this->redoData[$player->getName()][0])) {
@@ -111,5 +113,6 @@ class Canceller extends Editor {
 
         array_pop($this->redoData[$player->getName()]);
 
+        return $result;
     }
 }

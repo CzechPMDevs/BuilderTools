@@ -60,8 +60,9 @@ class UndoCommand extends Command implements PluginIdentifiableCommand {
 
         /** @var Canceller $canceller */
         $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->undo($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled!");
+        $result = $canceller->undo($sender);
+
+        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled!");
     }
 
     /**
