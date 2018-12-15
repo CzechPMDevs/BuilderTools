@@ -50,7 +50,7 @@ class SphereCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(!$sender->hasPermission("bt.cmd.sphere")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         if(!isset($args[0])) {

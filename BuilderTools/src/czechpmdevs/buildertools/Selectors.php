@@ -41,6 +41,9 @@ class Selectors {
     /** @var int[] $drawingPlayers */
     private static $drawingPlayers = [];
 
+    /** @var Player[] $blockInfoPlayers */
+    private static $blockInfoPlayers = [];
+
     /**
      * @param Player $player
      * @param int $brush
@@ -85,7 +88,7 @@ class Selectors {
      * @return bool
      */
     public static function isDrawingPlayer(Player $player) {
-        return boolval(isset(self::$drawingPlayers[strtolower($player->getName())]));
+        return (bool)isset(self::$drawingPlayers[strtolower($player->getName())]);
     }
 
     /**
@@ -124,10 +127,10 @@ class Selectors {
      */
     public static function isSelected(int $pos, Player $player):bool {
         if($pos == 1) {
-            return boolval(isset(self::$pos1[strtolower($player->getName())]));
+            return (bool)isset(self::$pos1[strtolower($player->getName())]);
         }
         if($pos == 2) {
-            return boolval(isset(self::$pos2[strtolower($player->getName())]));
+            return (bool)isset(self::$pos2[strtolower($player->getName())]);
         }
         return false;
     }
@@ -146,9 +149,29 @@ class Selectors {
 
     /**
      * @param Player $player
+     */
+    public static function switchBlockInfoSelector(Player $player) {
+        if(isset(self::$blockInfoPlayers[strtolower($player->getName())])) {
+            unset(self::$blockInfoPlayers[strtolower($player->getName())]);
+        }
+        else {
+            self::$blockInfoPlayers[strtolower($player->getName())] = $player;
+        }
+    }
+
+    /**
+     * @param Player $player
      * @return bool
      */
     public static function isWandSelector(Player $player):bool {
-        return boolval(isset(self::$wandSelectors[strtolower($player->getName())]));
+        return (bool)isset(self::$wandSelectors[strtolower($player->getName())]);
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public static function isBlockInfoPlayer(Player $player) {
+        return (bool)isset(self::$blockInfoPlayers[strtolower($player->getName())]);
     }
 }

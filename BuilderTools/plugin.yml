@@ -12,6 +12,9 @@ permissions:
     default: op
     description: Permissions for all BuilderTools commands
     childern:
+      bt.cmd.blockinfo:
+        description: Permissions for //blockinfo
+        default: op
       bt.cmd.pos1:
         description: Permissions for //pos1
         default: op

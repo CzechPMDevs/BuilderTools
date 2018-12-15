@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
 use pocketmine\block\Block;
+use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -31,6 +32,39 @@ use pocketmine\Player;
  * @package buildertools\editors
  */
 class Copier extends Editor {
+
+    public const FLIP_DATA = [
+        // stairs
+        0 => [
+            0 => 4,
+            1 => 5,
+            2 => 6,
+            3 => 7,
+            4 => 0,
+            5 => 1,
+            6 => 2,
+            7 => 3
+        ],
+        // slabs
+        1 => [
+            0 => 8,
+            1 => 9,
+            2 => 10,
+            3 => 11,
+            4 => 12,
+            5 => 13,
+            6 => 14,
+            7 => 15,
+            8 => 0,
+            9 => 1,
+            10 => 2,
+            11 => 3,
+            12 => 4,
+            13 => 5,
+            14 => 6,
+            15 => 7
+        ]
+    ];
 
     /** @var array $copyData */
     public $copyData = [];
@@ -161,8 +195,6 @@ class Copier extends Editor {
 
         $id = "{$fromDirection}:{$toDirection}";
 
-        $undo = new BlockList();
-
         switch ($id) {
             case "0:0":
             case "1:1":
@@ -179,7 +211,6 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-                    $undo->addBlock($block, $block);
                     $vec->setComponents($vec->getZ(), $vec->getY(), $vec->getX());
                 }
                 $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
@@ -194,7 +225,6 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-                    $undo->addBlock($block, $block);
                     $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
                 }
                 $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
@@ -208,7 +238,6 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-                    $undo->addBlock($block, $block);
                     $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
                 }
                 /**
@@ -216,7 +245,6 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-                    $undo->addBlock($block, $block);
                     $vec->setComponents($vec->getZ(), $vec->getY(), $vec->getX());
                 }
 
@@ -229,37 +257,31 @@ class Copier extends Editor {
                  * @var Block $block
                  */
                 foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-                    $undo->addBlock($block, $block);
                     $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
                 }
                 $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
                 break;
         }
-
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $undo);
     }
 
     /**
      * @param Player $player
      */
     public function flip(Player $player) {
-        $undo = new BlockList();
-        $undo->setLevel($player->getLevel());
         /**
          * @var Vector3 $vec
          * @var Block $block
          */
         foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-            $undo->addBlock($block, $block);
             $vec->setComponents($vec->getX(), -$vec->getY(), $vec->getZ());
+            if(in_array($block->getId(), [Block::OAK_STAIRS, Block::COBBLESTONE_STAIRS, Block::ACACIA_STAIRS, Block::ACACIA_STAIRS, Block::DARK_OAK_STAIRS, Block::JUNGLE_STAIRS, Block::NETHER_BRICK_STAIRS, Block::PURPUR_STAIRS, Block::QUARTZ_STAIRS, Block::BRICK_STAIRS])) {
+                $block->setDamage(self::FLIP_DATA[0][$block->getDamage()]);
+            }
+            if(in_array($block->getId(), [Block::STONE_SLAB, Block::STONE_SLAB2, Block::WOODEN_SLAB])) {
+                $block->setDamage(self::FLIP_DATA[1][$block->getDamage()]);
+            }
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $undo);
-        
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected area flipped!");
     }
 }

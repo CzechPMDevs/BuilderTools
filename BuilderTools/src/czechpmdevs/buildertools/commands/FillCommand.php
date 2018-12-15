@@ -56,7 +56,7 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
         }
 
         if(!$sender->hasPermission("bt.cmd.fill")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
 

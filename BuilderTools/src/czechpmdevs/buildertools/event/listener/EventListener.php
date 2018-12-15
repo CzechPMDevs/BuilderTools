@@ -31,6 +31,7 @@ use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\level\Position;
+use pocketmine\network\mcpe\protocol\TextPacket;
 use pocketmine\Player;
 
 /**
@@ -51,6 +52,9 @@ class EventListener implements Listener {
     /** @var array $wandClicks */
     private $wandClicks = [];
 
+    /** @var array $blockInfoClicks */
+    private $blockInfoClicks = [];
+
     /**
      * @param PlayerMoveEvent $event
      */
@@ -61,11 +65,11 @@ class EventListener implements Listener {
 
         $player = $event->getPlayer();
 
-        if(empty($this->directionCheck[$player->getName()])) {
+        if(!isset($this->directionCheck[$player->getName()])) {
             return;
         }
 
-        $direction = intval($this->directionCheck[$player->getName()]);
+        $direction = (int)$this->directionCheck[$player->getName()];
 
         if($direction != $player->getDirection()) {
             if(isset($this->rotateCache[$player->getName()])) {
@@ -94,7 +98,7 @@ class EventListener implements Listener {
         $msg = explode(" ", strtolower($event->getMessage()))[0];
 
 
-        if(empty($this->toRotate[$player->getName()])) {
+        if(!isset($this->toRotate[$player->getName()])) {
             return;
         }
 
@@ -153,13 +157,26 @@ class EventListener implements Listener {
      * @param PlayerInteractEvent $event
      */
     public function onBlockTouch(PlayerInteractEvent $event) {
-        if(!Selectors::isWandSelector($player = $event->getPlayer()) || $event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
-        // antispam ._.
-        if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) return;
-        $this->wandClicks[$player->getName()] = microtime(true);
-        Selectors::addSelector($player, 2, $position = new Position(intval($event->getBlock()->getX()), intval($event->getBlock()->getY()), intval($event->getBlock()->getZ()), $player->getLevel()));
-        $player->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
-        $event->setCancelled(true);
+        if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
+        if(Selectors::isWandSelector($player = $event->getPlayer())) {
+            // antispam ._.
+            if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) return;
+            $this->wandClicks[$player->getName()] = microtime(true);
+            Selectors::addSelector($player, 2, $position = new Position(intval($event->getBlock()->getX()), intval($event->getBlock()->getY()), intval($event->getBlock()->getZ()), $player->getLevel()));
+            $player->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
+            $event->setCancelled(true);
+        }
+        if(Selectors::isBlockInfoPlayer($player = $event->getPlayer())) {
+            // antispam ._.
+            if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true)-$this->blockInfoClicks[$player->getName()] < 0.5) return;
+            $this->blockInfoClicks[$player->getName()] = microtime(true);
+            $block = $event->getBlock();
+            $player->sendTip("§aID: §7" . (string)$block->getId(). ":" . (string)$block->getDamage() . "\n" .
+            "§aName: §7" . (string)$block->getName() . "\n" .
+            "§aPosition: §7" . (string)$block->getX() . ", " . (string)$block->getY() . ", " . (string)$block->getZ() . "\n" .
+            "§aLevel: §7" . $block->getLevel()->getName());
+            $event->setCancelled(true);
+        }
     }
 
     /**

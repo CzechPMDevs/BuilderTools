@@ -55,7 +55,7 @@ class MergeCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(!$sender->hasPermission("bt.cmd.paste")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         if(!Selectors::isSelected(1, $sender)) {

@@ -52,7 +52,7 @@ class IdCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(!$sender->hasPermission("bt.cmd.id")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         $sender->sendMessage(BuilderTools::getPrefix()."§aID: §9{$sender->getInventory()->getItemInHand()->getId()}:{$sender->getInventory()->getItemInHand()->getDamage()}");

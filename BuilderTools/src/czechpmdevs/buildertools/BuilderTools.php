@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools;
 
+use czechpmdevs\buildertools\commands\BlockInfoCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
 use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
-use czechpmdevs\buildertools\commands\DecorationCommand;
 use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
@@ -52,7 +52,6 @@ use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\event\listener\EventListener;
-use czechpmdevs\buildertools\utils\ConfigManager;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -119,6 +118,7 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new FixCommand);
         $map->register("BuilderTools", new CubeCommand);
         $map->register("BuilderTools", new MergeCommand);
+        $map->register("BuilderTools", new BlockInfoCommand);
     }
 
     /**

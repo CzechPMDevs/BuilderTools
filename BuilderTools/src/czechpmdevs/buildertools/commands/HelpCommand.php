@@ -51,7 +51,7 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
         }
         if(!$sender->hasPermission("bt.cmd.help")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         /* FIXING TWO COMMANDS IN PROGRESS

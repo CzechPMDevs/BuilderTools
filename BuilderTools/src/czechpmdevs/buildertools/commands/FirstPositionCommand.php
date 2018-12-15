@@ -54,7 +54,7 @@ class FirstPositionCommand extends Command implements PluginIdentifiableCommand 
             return;
         }
         if(!$sender->hasPermission("bt.cmd.pos1")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         Selectors::addSelector($sender, 1, $position = new Position((int)round($sender->getX()), (int)round($sender->getY()), (int)round($sender->getZ()), $sender->getLevel()));

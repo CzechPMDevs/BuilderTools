@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
@@ -27,16 +29,16 @@ use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
 /**
- * Class WandCommand
- * @package buildertools\commands
+ * Class BlockInfoCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class WandCommand extends Command implements PluginIdentifiableCommand {
+class BlockInfoCommand extends Command implements PluginIdentifiableCommand {
 
     /**
-     * WandCommand constructor.
+     * ReplaceCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/wand", "Switch wand tool", null, []);
+        parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi"]);
     }
 
     /**
@@ -48,18 +50,19 @@ class WandCommand extends Command implements PluginIdentifiableCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
-        }
-        if(!$sender->hasPermission("bt.cmd.wand")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
-        Selectors::switchWandSelector($sender);
-        $switch = Selectors::isWandSelector($sender) ? "ON" : "OFF";
-        $sender->sendMessage(BuilderTools::getPrefix()."§aWand tool turned {$switch}!");
+        if(!$sender->hasPermission("bt.cmd.blockinfo")) {
+            $sender->sendMessage("§cYou do not have not permissions to use this command!");
+            return;
+        }
+
+        Selectors::switchBlockInfoSelector($sender);
+        $sender->sendMessage(BuilderTools::getPrefix() . "Block info mode turned " . (Selectors::isBlockInfoPlayer($sender) ? "on" : "off") . "!");
     }
 
     /**
-     * @return Plugin|BuilderTools
+     * @return Plugin|BuilderTools $builderTools
      */
     public function getPlugin(): Plugin {
         return BuilderTools::getInstance();

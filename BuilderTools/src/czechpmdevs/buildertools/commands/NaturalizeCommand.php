@@ -56,7 +56,7 @@ class NaturalizeCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(!$sender->hasPermission("bt.cmd.fill")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         if(!Selectors::isSelected(1, $sender)) {

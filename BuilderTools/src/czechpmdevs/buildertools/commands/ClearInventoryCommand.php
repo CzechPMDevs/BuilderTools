@@ -47,7 +47,7 @@ class ClearInventoryCommand extends Command implements PluginIdentifiableCommand
             return;
         }
         if(!$sender->hasPermission("bt.cmd.clearinventory")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
 

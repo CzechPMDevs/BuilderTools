@@ -54,7 +54,7 @@ class ReplaceCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
         if(!$sender->hasPermission("bt.cmd.replace")) {
-            $sender->sendMessage("§cYou have not permissions to use this command!");
+            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         if(!isset($args[0]) || !isset($args[1])) {
