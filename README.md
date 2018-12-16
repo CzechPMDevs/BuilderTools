@@ -98,6 +98,7 @@
 | **//naturalize** | **Replaces blocks in selected area to grass,dirt and stone** <br><br>Usage: `//naturalize` |
 | **//id** | **Displays id of item in your hand** <br><br>Usage: `//id` |
 | **//clearinventory** | **Clears inventory** <br><br>Usage: `//clearinventory`<br>Alias: `//ci`  |
+| **//blockinfo** | **Switch block info mode** <br><br>Usage: `//blockinfo`<br>Alias: `//bi`<br><br>In blockinfo mode you can get information about block by touching it.  |
 
 
 
@@ -128,6 +129,7 @@
 | bt.cmd.naturalize | `//naturalize` | ✔️ |
 | bt.cmd.id | `//id` | ✔️ |
 | bt.cmd.clearinventory | `//clearinventory` | ✔️ |
+| bt.cmd.blockinfo | `//blockinfo` | ✔️ |
 
 ## 💰 Credits
 
