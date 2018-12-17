@@ -22,10 +22,9 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
-use czechpmdevs\buildertools\event\NaturalizeEvent;
-use czechpmdevs\buildertools\utils\ConfigManager;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
+use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -53,49 +52,57 @@ class Naturalizer extends Editor {
      * @param Player $player
      */
     public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player) {
+        $list = new BlockList();
+        $list->saveBlockMap(true);
+        $list->setLevel($level);
 
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                $this->fix(new Vector3($x, max($y1, $y2), $z), $level, min($y1, $y2));
+                $this->fix($list, new Vector2($x, $z), (int)min($y1, $y2), (int)max($y1, $y2), $level);
             }
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor("Canceller");
-        $canceller->addStep($player, $this->undo);
-        $this->undo = [];
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $filler->fill($player, $list);
     }
 
     /**
-     * @param Vector3 $vector3
+     * @param BlockList $list
+     * @param Vector2 $vector2
      * @param Level $level
      * @param int $minY
+     * @param int $maxY
      */
-    private function fix(Vector3 $vector3, Level $level, int $minY) {
-        start:
-        if($vector3->getX() > 1 && $level->getBlock($vector3)->getId() == Block::AIR) {
-            $vector3 = $vector3->subtract(0, 1, 0);
-            goto start;
+    private function fix(BlockList $list, Vector2 $vector2, int $minY, int $maxY, Level $level) {
+        $x = (int)$vector2->getX();
+        $z = (int)$vector2->getY();
+
+        $blockY = null;
+        for($y = $minY; $y < $maxY; $y++) {
+            if($level->getBlockIdAt($x, $y, $z) !== Block::AIR && ($blockY === null || $blockY < $y)) {
+                $blockY = $y;
+            }
         }
 
-        if($vector3->getX() < 0) {
-            return;
-        }
+        if($blockY === null) return;
 
-        $this->undo->addBlock($vector3, $level->getBlock($vector3));
-        $level->setBlockIdAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), Block::GRASS);
-
-
-        $r = rand(3, 4);
-
-        for($y = 1; $y < $r; $y++) {
-            $this->undo->addBlock($vector3, $level->getBlock($vector3->add(0, -$y, 0)));
-            $level->setBlockIdAt($vector3->getX(), $vector3->getY()-$y, $vector3->getZ(), Block::DIRT);
-        }
-
-        for($y = $vector3->getY()-$r; $y >= $minY; $y--) {
-            $this->undo->addBlock($vector3, $level->getBlock(new Vector3($vector3->getX(), $y, $vector3->getZ())));
-            $level->setBlockIdAt($vector3->getX(), $y, $vector3->getZ(), Block::STONE);
+        for($y = $blockY; $y > $minY; $y--) {
+            switch ($blockY-$y) {
+                case 0:
+                    $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::GRASS));
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                    $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::DIRT));
+                    break;
+                case 4:
+                    $list->addBlock(new Vector3($x, $y, $z), (rand(0, 1) ? Block::get(Block::DIRT) : Block::get(Block::STONE)));
+                    break;
+                default:
+                    $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::STONE));
+            }
         }
     }
 

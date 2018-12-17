@@ -61,7 +61,7 @@ class BlockList {
      * @return bool
      */
     public function isAirAt(int $x, int $y, int $z): bool {
-        return isset($this->blockMap[$x][$y][$z]) && $this->blockMap[$x][$y][$z]->getId() == 0;
+        return $this->isVectorInBlockMap(new Vector3($x, $y, $z)) && $this->blockMap[$x][$y][$z]->getId() == 0;
     }
 
     /**
@@ -71,8 +71,8 @@ class BlockList {
      *
      * @return bool
      */
-    public function isAirAtLevel(int $x, int $y, int $z): bool {
-        return isset($this->blockMap[$x][$y][$z]) && $this->blockMap[$x][$y][$z]->getId() == 0 && $this->level->getBlockIdAt($x, $y, $z) == 0;
+    public function isAirInLevel(int $x, int $y, int $z): bool {
+        return $this->isVectorInBlockMap(new Vector3($x, $y, $z)) && $this->blockMap[$x][$y][$z]->getId() == 0 && $this->level->getBlockIdAt($x, $y, $z) == 0;
     }
 
     /**
@@ -94,6 +94,23 @@ class BlockList {
      */
     public function getBlockMap() {
         return $this->blockMap;
+    }
+
+    /**
+     * @param Vector3 $vector3
+     * @return bool
+     */
+    public function isVectorInBlockMap(Vector3 $vector3): bool {
+        if(!isset($this->blocks[$vector3->getX()])) {
+            return false;
+        }
+        if(!isset($this->blocks[$vector3->getX()][$vector3->getY()])) {
+            return false;
+        }
+        if(!isset($this->blocks[$vector3->getX()][$vector3->getY()][$vector3->getZ()])) {
+            return false;
+        }
+        return true;
     }
 
     /**
