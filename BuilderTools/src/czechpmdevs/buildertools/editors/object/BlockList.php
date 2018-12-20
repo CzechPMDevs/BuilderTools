@@ -133,4 +133,24 @@ class BlockList {
     public function setAll(array $blocks) {
         $this->blocks = $blocks;
     }
+
+    /**
+     * @param array $copyData
+     * @param bool $saveBlockMap
+     * @return BlockList
+     */
+    public static function fromCopyData(array $copyData, bool $saveBlockMap = false): BlockList {
+        $list = new BlockList;
+        $list->saveBlockMap($saveBlockMap);
+
+        /**
+         * @var Vector3 $vector3
+         * @var Block $block
+         */
+        foreach ($copyData as [$vector3, $block]) {
+            $list->addBlock($vector3, $block);
+        }
+
+        return $list;
+    }
 }

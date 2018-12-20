@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -64,12 +65,11 @@ class CubeCommand extends Command implements PluginIdentifiableCommand {
         }
         $radius = isset($args[1]) ? $args[1] : 5;
 
-        $startTime = microtime(true);
-
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
-        $printer->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created in ".(string)round(microtime(true)-$startTime, 2)."!");
+        /** @var EditorResult $result */
+        $result = $printer->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." block changed)!");
     }
 
     /**

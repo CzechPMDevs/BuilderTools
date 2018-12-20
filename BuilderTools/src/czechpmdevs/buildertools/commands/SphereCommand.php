@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -57,14 +58,13 @@ class SphereCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cUsage: §7//sphere <id1:dmg1,id2:dmg2:,...> <radius>");
             return;
         }
-        $radius = isset($args[1]) ? intval($args[1]) : 5;
-
-        $startTime = microtime(true);
+        $radius = isset($args[1]) ? (int)($args[1]) : 5;
 
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
-        $printer->makeSphere($sender, $sender, $radius, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere created in ".(string)round(microtime(true)-$startTime, 2)."!");
+        /** @var EditorResult $result */
+        $result = $printer->makeSphere($sender, $sender, $radius, $args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
     }
 
     /**

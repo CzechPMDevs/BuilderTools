@@ -22,8 +22,10 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
+use pocketmine\level\format\EmptySubChunk;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -36,33 +38,11 @@ class Copier extends Editor {
     public const FLIP_DATA = [
         // stairs
         0 => [
-            0 => 4,
-            1 => 5,
-            2 => 6,
-            3 => 7,
-            4 => 0,
-            5 => 1,
-            6 => 2,
-            7 => 3
+            0 => 4, 1 => 5, 2 => 6, 3 => 7, 4 => 0, 5 => 1, 6 => 2, 7 => 3
         ],
         // slabs
         1 => [
-            0 => 8,
-            1 => 9,
-            2 => 10,
-            3 => 11,
-            4 => 12,
-            5 => 13,
-            6 => 14,
-            7 => 15,
-            8 => 0,
-            9 => 1,
-            10 => 2,
-            11 => 3,
-            12 => 4,
-            13 => 5,
-            14 => 6,
-            15 => 7
+            0 => 8, 1 => 9, 2 => 10, 3 => 11, 4 => 12, 5 => 13, 6 => 14, 7 => 15, 8 => 0, 9 => 1, 10 => 2, 11 => 3, 12 => 4, 13 => 5, 14 => 6, 15 => 7
         ]
     ];
 
@@ -96,7 +76,7 @@ class Copier extends Editor {
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                    $this->copyData[$player->getName()]["data"][$count] = [($vec = new Vector3($x, $y, $z))->subtract($player->asVector3()), $player->getLevel()->getBlock($vec)];
+                    $this->copyData[$player->getName()]["data"][$count] = [($vec = Math::roundVector3(new Vector3($x, $y, $z)))->subtract(Math::roundVector3($player->asVector3())), $player->getLevel()->getBlock($vec)];
                     $count++;
                 }
             }
@@ -266,12 +246,12 @@ class Copier extends Editor {
 
     /**
      * @param Player $player
-     */
+     *./
     public function flip(Player $player) {
         /**
          * @var Vector3 $vec
          * @var Block $block
-         */
+         *./
         foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
             $vec->setComponents($vec->getX(), -$vec->getY(), $vec->getZ());
             if(in_array($block->getId(), [Block::OAK_STAIRS, Block::COBBLESTONE_STAIRS, Block::ACACIA_STAIRS, Block::ACACIA_STAIRS, Block::DARK_OAK_STAIRS, Block::JUNGLE_STAIRS, Block::NETHER_BRICK_STAIRS, Block::PURPUR_STAIRS, Block::QUARTZ_STAIRS, Block::BRICK_STAIRS])) {
@@ -283,5 +263,65 @@ class Copier extends Editor {
         }
 
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected area flipped!");
+    }*/
+
+    /**
+     * @param Player $player
+     */
+    public function flip(Player $player) {
+        $list = BlockList::fromCopyData($this->copyData[$player->getName()]["data"], true);
+        /** @var int $minY */
+        $minY = null;
+        /** @var int $maxY */
+        $maxY = null;
+
+        // b = block :D
+        foreach ($list->getBlockMap() as $x => $yzb) {
+            foreach ($yzb as $y => $zb) {
+                if($minY === null || $minY > $y) $minY = $y;
+                if($maxY === null || $maxY < $y) $maxY = $y;
+            }
+        }
+
+        $middleY = $minY+((int)round(($maxY-$minY)/2));
+        $middleExist = is_int(($maxY-$minY)/2);
+
+        $fillList = new BlockList();
+
+        foreach ($list->getAll() as $block) {
+            if($middleExist && $block->getY() == $middleY) {
+                $fillList->addBlock($block->asVector3(), $block);
+            }
+            elseif($block->getY() < $middleY) {
+                if($middleExist)
+                    $fillList->addBlock(new Vector3($block->getX(), $middleY+abs($middleY-$block->getY()), $block->getZ()), $block);
+                else
+                    $fillList->addBlock(new Vector3($block->getX(), ($middleY-1)+abs(($middleY-1)-$block->getY())+1, $block->getZ()), $block);
+            }
+            // děláno na rychlo
+            else {
+                if($middleExist)
+                    $fillList->addBlock(new Vector3($block->getX(), $middleY-abs($middleY-$block->getY()), $block->getZ()), $block);
+                else
+                    $fillList->addBlock(new Vector3($block->getX(), ($middleY-(abs($middleY-$block->getY()))-1), $block->getZ()), $block);
+            }
+        }
+
+        $fixBlock = function (Block $block): Block {
+            if(in_array($block->getId(), [Block::OAK_STAIRS, Block::COBBLESTONE_STAIRS, Block::ACACIA_STAIRS, Block::ACACIA_STAIRS, Block::DARK_OAK_STAIRS, Block::JUNGLE_STAIRS, Block::NETHER_BRICK_STAIRS, Block::PURPUR_STAIRS, Block::QUARTZ_STAIRS, Block::BRICK_STAIRS])) {
+                $block->setDamage(self::FLIP_DATA[0][$block->getDamage()]);
+            }
+            if(in_array($block->getId(), [Block::STONE_SLAB, Block::STONE_SLAB2, Block::WOODEN_SLAB])) {
+                $block->setDamage(self::FLIP_DATA[1][$block->getDamage()]);
+            }
+            return $block;
+        };
+
+        $this->copyData[$player->getName()]["data"] = [];
+        foreach ($fillList->getAll() as $block) {
+            $this->copyData[$player->getName()]["data"][] = [$block->asVector3(), $fixBlock($block)];
+        }
+
+        $player->sendMessage(BuilderTools::getPrefix() . "Selected area flipped!");
     }
 }
