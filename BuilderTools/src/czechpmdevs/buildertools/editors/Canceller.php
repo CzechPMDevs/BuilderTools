@@ -104,14 +104,15 @@ class Canceller extends Editor {
             $blockList = $this->redoData[$player->getName()][0];
         }
         else {
-            $blockList = end($this->redoData[$player->getName()]);
+            $blockList = current($this->redoData[$player->getName()]);
         }
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(static::FILLER);
         $result = $filler->fill($player, $blockList);
 
-        array_pop($this->redoData[$player->getName()]);
+        #array_pop($this->redoData[$player->getName()]);
+        array_shift($this->redoData[$player->getName()]);
 
         return $result;
     }

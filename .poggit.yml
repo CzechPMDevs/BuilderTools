@@ -5,5 +5,5 @@ branches:
 projects:
   BuilderTools:
     path: BuilderTools/
-    icon: "worker.png"
+    icon: "icon.png"
 ...

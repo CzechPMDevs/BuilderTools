@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
@@ -124,8 +125,10 @@ class Printer extends Editor {
      * @param Position $center
      * @param int $radius
      * @param $blocks
+     *
+     * @return EditorResult
      */
-    public function makeSphere(Player $player, Position $center, int $radius, $blocks) {
+    public function makeSphere(Player $player, Position $center, int $radius, $blocks): EditorResult {
         $center = Math::roundPosition($center);
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
@@ -144,7 +147,7 @@ class Printer extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $blockList, ["saveUndo" => true]);
+        return $filler->fill($player, $blockList, ["saveUndo" => true]);
     }
 
     /**
@@ -152,8 +155,10 @@ class Printer extends Editor {
      * @param Position $center
      * @param int $radius
      * @param $blocks
+     *
+     * @return EditorResult
      */
-    public function makeCube(Player $player, Position $center, int $radius, $blocks) {
+    public function makeCube(Player $player, Position $center, int $radius, $blocks): EditorResult {
         $center = Math::roundPosition($center);
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
@@ -167,7 +172,7 @@ class Printer extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $blockList, ["saveUndo" => true]);
+        return $filler->fill($player, $blockList, ["saveUndo" => true]);
     }
 
     /**
