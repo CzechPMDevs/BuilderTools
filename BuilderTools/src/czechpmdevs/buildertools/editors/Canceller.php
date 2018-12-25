@@ -63,23 +63,15 @@ class Canceller extends Editor {
             return new EditorResult(0, 0, true);
         }
 
-        if(count($this->undoData[$player->getName()]) == 1 && isset($this->undoData[$player->getName()][0])) {
-            $blockList = $this->undoData[$player->getName()][0];
-        }
-        else {
-            $blockList = end($this->undoData[$player->getName()]);
-        }
+        $blockList = array_pop($this->undoData[$player->getName()]);
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(static::FILLER);
-        $result = $filler->fill($player, $blockList, [
+
+        return $filler->fill($player, $blockList, [
             "saveUndo" => false,
             "saveRedo" => true
         ]);
-
-        array_pop($this->undoData[$player->getName()]);
-
-        return $result;
     }
 
     /**
@@ -100,20 +92,10 @@ class Canceller extends Editor {
             return new EditorResult(0, 0, true);
         }
 
-        if(count($this->redoData) == 1 && isset($this->redoData[$player->getName()][0])) {
-            $blockList = $this->redoData[$player->getName()][0];
-        }
-        else {
-            $blockList = current($this->redoData[$player->getName()]);
-        }
+        $blockList = array_pop($this->redoData[$player->getName()]);
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(static::FILLER);
-        $result = $filler->fill($player, $blockList);
-
-        #array_pop($this->redoData[$player->getName()]);
-        array_shift($this->redoData[$player->getName()]);
-
-        return $result;
+        return $filler->fill($player, $blockList);
     }
 }
