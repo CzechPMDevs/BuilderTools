@@ -1,4 +1,4 @@
-<a align="center"><img src="https://i.ibb.co/BZS087v/nahledovka.png"></a>
+<a align="center"><img src="https://i.ibb.co/swwgvRV/n.png"></a>
 
 <p align="center">
 	<a href="https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools">
@@ -44,7 +44,8 @@
 ## ⬇️ Downloads:
 
 | Version | Phar Download | Zip Download | API | Stable | Pre release |
-| --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | 
+| 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | ✔️ | ❌ |
 | 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ✔️ | ✔️|
 | 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ❌ | ✔️|
 | 1.0.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.0.0/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.0.0.zip) | 3.0.0-ALPHA7 | ✔️ | ❌|
