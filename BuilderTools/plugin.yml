@@ -3,7 +3,7 @@ api: 3.0.0
 author: CzechPMDevs
 authors: [VixikCZ]
 version: 1.1.0
-description: an advanced WorldEdit plugin
+description: An advanced WorldEdit plugin
 main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
 

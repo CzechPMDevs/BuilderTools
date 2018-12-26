@@ -54,7 +54,6 @@ class RotateCommand extends Command implements PluginIdentifiableCommand {
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-
         $copier->addToRotate($sender);
     }
 

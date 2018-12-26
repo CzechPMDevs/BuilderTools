@@ -26,6 +26,7 @@ use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\level\format\EmptySubChunk;
+use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -37,13 +38,9 @@ class Copier extends Editor {
 
     public const FLIP_DATA = [
         // stairs
-        0 => [
-            0 => 4, 1 => 5, 2 => 6, 3 => 7, 4 => 0, 5 => 1, 6 => 2, 7 => 3
-        ],
+        0 => [0 => 4, 1 => 5, 2 => 6, 3 => 7, 4 => 0, 5 => 1, 6 => 2, 7 => 3],
         // slabs
-        1 => [
-            0 => 8, 1 => 9, 2 => 10, 3 => 11, 4 => 12, 5 => 13, 6 => 14, 7 => 15, 8 => 0, 9 => 1, 10 => 2, 11 => 3, 12 => 4, 13 => 5, 14 => 6, 15 => 7
-        ]
+        1 => [0 => 8, 1 => 9, 2 => 10, 3 => 11, 4 => 12, 5 => 13, 6 => 14, 7 => 15, 8 => 0, 9 => 1, 10 => 2, 11 => 3, 12 => 4, 13 => 5, 14 => 6, 15 => 7]
     ];
 
     /** @var array $copyData */
@@ -243,27 +240,6 @@ class Copier extends Editor {
                 break;
         }
     }
-
-    /**
-     * @param Player $player
-     *./
-    public function flip(Player $player) {
-        /**
-         * @var Vector3 $vec
-         * @var Block $block
-         *./
-        foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-            $vec->setComponents($vec->getX(), -$vec->getY(), $vec->getZ());
-            if(in_array($block->getId(), [Block::OAK_STAIRS, Block::COBBLESTONE_STAIRS, Block::ACACIA_STAIRS, Block::ACACIA_STAIRS, Block::DARK_OAK_STAIRS, Block::JUNGLE_STAIRS, Block::NETHER_BRICK_STAIRS, Block::PURPUR_STAIRS, Block::QUARTZ_STAIRS, Block::BRICK_STAIRS])) {
-                $block->setDamage(self::FLIP_DATA[0][$block->getDamage()]);
-            }
-            if(in_array($block->getId(), [Block::STONE_SLAB, Block::STONE_SLAB2, Block::WOODEN_SLAB])) {
-                $block->setDamage(self::FLIP_DATA[1][$block->getDamage()]);
-            }
-        }
-
-        $player->sendMessage(BuilderTools::getPrefix()."§aSelected area flipped!");
-    }*/
 
     /**
      * @param Player $player
