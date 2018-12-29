@@ -44,4 +44,14 @@ class Math {
     public static function roundPosition(Position $position): Position {
         return Position::fromObject(self::roundVector3($position), $position->getLevel());
     }
+
+    /**
+     * @param float|int $x
+     * @param float|int $y
+     * @param float|int $z
+     * @return float|int
+     */
+    public static function lengthSq($x, $y, $z){
+        return ($x * $x) + ($y * $y) + ($z * $z);
+    }
 }

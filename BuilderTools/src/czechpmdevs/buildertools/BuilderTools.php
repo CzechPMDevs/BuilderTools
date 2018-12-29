@@ -30,6 +30,8 @@ use czechpmdevs\buildertools\commands\FirstPositionCommand;
 use czechpmdevs\buildertools\commands\FixCommand;
 use czechpmdevs\buildertools\commands\FlipCommand;
 use czechpmdevs\buildertools\commands\HelpCommand;
+use czechpmdevs\buildertools\commands\HollowCubeCommand;
+use czechpmdevs\buildertools\commands\HollowSphereCommand;
 use czechpmdevs\buildertools\commands\IdCommand;
 use czechpmdevs\buildertools\commands\MergeCommand;
 use czechpmdevs\buildertools\commands\NaturalizeCommand;
@@ -37,6 +39,7 @@ use czechpmdevs\buildertools\commands\PasteCommand;
 use czechpmdevs\buildertools\commands\RedoCommand;
 use czechpmdevs\buildertools\commands\ReplaceCommand;
 use czechpmdevs\buildertools\commands\RotateCommand;
+use czechpmdevs\buildertools\commands\SchematicCommand;
 use czechpmdevs\buildertools\commands\SecondPositionCommand;
 use czechpmdevs\buildertools\commands\SphereCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
@@ -52,6 +55,7 @@ use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\event\listener\EventListener;
+use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -72,12 +76,16 @@ class BuilderTools extends PluginBase {
     /** @var EventListener $listener */
     private static $listener;
 
+    /** @var SchematicsManager $schematicManager */
+    private static $schematicsManager;
+
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
+        self::$schematicsManager = new SchematicsManager($this);
     }
 
     private function registerEditors() {
@@ -94,6 +102,7 @@ class BuilderTools extends PluginBase {
     private function initListner() {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
     }
+
     private function registerCommands() {
         $map = $this->getServer()->getCommandMap();
         $map->register("BuilderTools", new FirstPositionCommand);
@@ -103,6 +112,7 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new HelpCommand);
         $map->register("BuilderTools", new DrawCommand);
         $map->register("BuilderTools", new SphereCommand);
+        $map->register("BuilderTools", new HollowSphereCommand);
         $map->register("BuilderTools", new ReplaceCommand);
         $map->register("BuilderTools", new IdCommand);
         $map->register("BuilderTools", new ClearInventoryCommand);
@@ -117,8 +127,10 @@ class BuilderTools extends PluginBase {
         $map->register("BuilderTools", new FlipCommand);
         $map->register("BuilderTools", new FixCommand);
         $map->register("BuilderTools", new CubeCommand);
+        $map->register("BuilderTools", new HollowCubeCommand);
         $map->register("BuilderTools", new MergeCommand);
         $map->register("BuilderTools", new BlockInfoCommand);
+        $map->register("BuilderTools", new SchematicCommand);
     }
 
     /**
@@ -141,6 +153,13 @@ class BuilderTools extends PluginBase {
      */
     public static function getListener(): EventListener {
         return self::$listener;
+    }
+
+    /**
+     * @return SchematicsManager $schematicsManager
+     */
+    public static function getSchematicsManager(): SchematicsManager {
+        return self::$schematicsManager;
     }
 
     /**

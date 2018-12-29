@@ -42,6 +42,9 @@ class BlockList {
     /** @var bool $saveBlockMap */
     private $saveBlockMap = false;
 
+    /** @var Vector3 $playerPosition */
+    private $playerPosition = null;
+
     /**
      * @param Vector3 $pos
      * @param Block $block
@@ -135,6 +138,35 @@ class BlockList {
     }
 
     /**
+     * @return Vector3|null
+     */
+    public function getPlayerPosition(): ?Vector3 {
+        return $this->playerPosition;
+    }
+
+    /**
+     * @param Vector3 $position
+     */
+    public function setPlayerPosition(Vector3 $position) {
+        $this->playerPosition = $position;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function toCopyData(): array {
+        $data = [];
+        $data["center"] = $this->playerPosition === null ? new Vector3(0, 0, 0) : $this->playerPosition;
+        $data["direction"] = 0;
+        $data["rotated"] = false;
+        foreach ($this->blocks as $index => $block) {
+            $data["data"][$index] = [$block->asVector3(), $block];
+        }
+        return $data;
+    }
+
+    /**
      * @param array $copyData
      * @param bool $saveBlockMap
      * @return BlockList
@@ -142,12 +174,13 @@ class BlockList {
     public static function fromCopyData(array $copyData, bool $saveBlockMap = false): BlockList {
         $list = new BlockList;
         $list->saveBlockMap($saveBlockMap);
+        $list->setPlayerPosition($copyData["center"]);
 
         /**
          * @var Vector3 $vector3
          * @var Block $block
          */
-        foreach ($copyData as [$vector3, $block]) {
+        foreach ($copyData["data"] as [$vector3, $block]) {
             $list->addBlock($vector3, $block);
         }
 

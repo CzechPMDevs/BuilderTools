@@ -62,6 +62,29 @@ class Fixer extends Editor {
     ];
 
     /**
+     * @param BlockList $blockList
+     */
+    public function fixBlockList(BlockList $blockList) {
+        $blocks = [];
+        foreach ($blockList->getAll() as $block) {
+            $id = $block->getId();
+            $damage = $block->getDamage();
+            $x = $block->getX();
+            $y = $block->getY();
+            $z = $block->getZ();
+            if(isset(self::$blocks[$id])) {
+                $id = self::$blocks[$id][0];
+                if(is_int(self::$blocks[$id][1])) $damage = self::$blocks[$id][1];
+            }
+
+            $block = Block::get($id, $damage);
+            $block->setComponents($x, $y, $z);
+            $blocks[] = $block;
+        }
+        $blockList->setAll($blocks);
+    }
+
+    /**
      * @param $x1
      * @param $y1
      * @param $z1

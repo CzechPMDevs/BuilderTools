@@ -269,7 +269,7 @@ class Copier extends Editor {
      * @param Player $player
      */
     public function flip(Player $player) {
-        $list = BlockList::fromCopyData($this->copyData[$player->getName()]["data"], true);
+        $list = BlockList::fromCopyData($this->copyData[$player->getName()], true);
         /** @var int $minY */
         $minY = null;
         /** @var int $maxY */

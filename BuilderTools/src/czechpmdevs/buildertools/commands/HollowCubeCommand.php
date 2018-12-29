@@ -21,27 +21,26 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
-use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
 /**
- * Class CopyCommand
- * @package buildertools\commands
+ * Class HollowCubeCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class PasteCommand extends Command implements PluginIdentifiableCommand {
+class HollowCubeCommand extends Command implements PluginIdentifiableCommand {
 
     /**
-     * PasteCommand constructor.
+     * CubeCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/paste", "Paste copyed area", null, []);
+        parent::__construct("/hcube", "Create hollow cube", null, []);
     }
 
     /**
@@ -55,18 +54,25 @@ class PasteCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.paste")) {
+        if(!$sender->hasPermission("bt.cmd.hcube")) {
             $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->paste($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully pasted!");
+        if(!isset($args[0])) {
+            $sender->sendMessage("§7Usage: §c//hcube <id1:dmg1,id2:dmg2,...> <radius>");
+            return;
+        }
+        $radius = isset($args[1]) ? $args[1] : 5;
+
+        /** @var Printer $printer */
+        $printer = BuilderTools::getEditor(Editor::PRINTER);
+        /** @var EditorResult $result */
+        $result = $printer->makeHollowCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cube created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." block changed)!");
     }
 
     /**
-     * @return Plugin|BuilderTools
+     * @return Plugin|BuilderTools $plugin
      */
     public function getPlugin(): Plugin {
         return BuilderTools::getInstance();

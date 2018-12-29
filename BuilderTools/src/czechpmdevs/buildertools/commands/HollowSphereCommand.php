@@ -21,48 +21,56 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
 /**
- * Class CopyCommand
- * @package buildertools\commands
+ * Class HollowSphereCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class PasteCommand extends Command implements PluginIdentifiableCommand {
+class HollowSphereCommand extends Command implements PluginIdentifiableCommand {
 
     /**
-     * PasteCommand constructor.
+     * SphereCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/paste", "Paste copyed area", null, []);
+        parent::__construct("/hsphere", "Create hollow sphere", null, []);
     }
 
     /**
      * @param CommandSender $sender
      * @param string $commandLabel
      * @param array $args
-     * @return void
+     * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.paste")) {
+        if(!$sender->hasPermission("bt.cmd.hsphere")) {
             $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->paste($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully pasted!");
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//hsphere <id1:dmg1,id2:dmg2:,...> <radius>");
+            return;
+        }
+        $radius = isset($args[1]) ? (int)($args[1]) : 5;
+
+        /** @var Printer $printer */
+        $printer = BuilderTools::getEditor(Editor::PRINTER);
+        /** @var EditorResult $result */
+        $result = $printer->makeHollowSphere($sender, $sender, $radius, $args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aHollow sphere created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
     }
 
     /**
