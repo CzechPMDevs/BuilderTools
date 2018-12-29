@@ -59,3 +59,4 @@ permissions:
         default: op
       bt.cmd.schematic:
         description: Permission for //schematics
+        default: op
