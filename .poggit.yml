@@ -2,6 +2,8 @@
 branches:
 - master
 - test
+- 1.1.0
+- 1.2.0
 projects:
   BuilderTools:
     path: BuilderTools/
