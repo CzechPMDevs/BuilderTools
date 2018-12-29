@@ -1,7 +1,6 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools
 branches:
 - master
-- test
 - 1.1.0
 - 1.2.0
 projects:
