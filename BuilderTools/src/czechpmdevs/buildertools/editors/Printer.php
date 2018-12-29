@@ -60,8 +60,7 @@ class Printer extends Editor {
                                 $undoList->addBlock($finalPos, $block);
                             } else {
                                 if($y > 0) {
-                                    $center->getLevel()->setBlockIdAt($x, $y, $z, $block->getId());
-                                    $center->getLevel()->setBlockDataAt($x, $y, $z, $block->getDamage());
+                                    $center->getLevel()->setBlockAt($x, $y, $z, $block);
                                     $undoList->addBlock(new Vector3($x, $y, $z), $block);
                                 }
                             }
@@ -84,8 +83,7 @@ class Printer extends Editor {
                                 }
                                 else {
                                     if($y > 0) {
-                                        $center->getLevel()->setBlockIdAt($x, $y, $z, $block->getId());
-                                        $center->getLevel()->setBlockDataAt($x, $y, $z, $block->getDamage());
+                                        $center->getLevel()->setBlockAt($x, $y, $z, $block);
                                         $undoList->addBlock(new Vector3($x, $y, $z), $block);
                                     }
                                 }
@@ -112,12 +110,11 @@ class Printer extends Editor {
 
         $finalY = $y;
 
-        for($a = $y+1; $a > 0 && $level->getBlockIdAt($x, $a-1, $z) == Block::AIR; $a--) {
+        for($a = $y+1; $a > 0 && $level->getBlockAt($x, $a-1, $z)->getId() == Block::AIR; $a--) {
             $finalY = $a-1;
         }
 
-        $level->setBlockIdAt($x, $finalY, $z, $block->getId());
-        $level->setBlockDataAt($x, $finalY, $z, $block->getDamage());
+        $level->setBlockAt($x, $finalY, $z, $block);
         return new Vector3($x, $finalY, $z);
     }
 

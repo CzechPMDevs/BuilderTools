@@ -307,6 +307,7 @@ class Copier extends Editor {
             }
         }
 
+        /*
         $fixBlock = function (Block $block): Block {
             if(in_array($block->getId(), [Block::OAK_STAIRS, Block::COBBLESTONE_STAIRS, Block::ACACIA_STAIRS, Block::ACACIA_STAIRS, Block::DARK_OAK_STAIRS, Block::JUNGLE_STAIRS, Block::NETHER_BRICK_STAIRS, Block::PURPUR_STAIRS, Block::QUARTZ_STAIRS, Block::BRICK_STAIRS])) {
                 $block->setDamage(self::FLIP_DATA[0][$block->getDamage()]);
@@ -315,11 +316,11 @@ class Copier extends Editor {
                 $block->setDamage(self::FLIP_DATA[1][$block->getDamage()]);
             }
             return $block;
-        };
+        };*/
 
         $this->copyData[$player->getName()]["data"] = [];
         foreach ($fillList->getAll() as $block) {
-            $this->copyData[$player->getName()]["data"][] = [$block->asVector3(), $fixBlock($block)];
+            $this->copyData[$player->getName()]["data"][] = [$block->asVector3(), $block];
         }
 
         $player->sendMessage(BuilderTools::getPrefix() . "Selected area flipped!");

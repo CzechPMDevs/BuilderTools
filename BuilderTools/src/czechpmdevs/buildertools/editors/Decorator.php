@@ -62,7 +62,7 @@ class Decorator extends Editor {
                             $blockArgs = explode(",", $blocks);
                             array_push($undo, $center->getLevel()->getBlock($vec));
                             $undo[] = $center->getLevel()->getBlock($vec->add(0, 1));
-                            $center->getLevel()->setBlock($vec->add(0, 1), Item::fromString($blockArgs[array_rand($blockArgs,1)])->getBlock(), true, true);
+                            $center->getLevel()->setBlock($vec->add(0, 1), Item::fromString($blockArgs[array_rand($blockArgs,1)])->getBlock());
                         }
                     }
                 }

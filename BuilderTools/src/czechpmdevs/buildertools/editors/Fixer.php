@@ -28,6 +28,7 @@ use pocketmine\tile\Banner;
 use pocketmine\tile\Bed;
 use pocketmine\tile\Chest;
 use pocketmine\tile\Sign;
+use pocketmine\tile\Tile;
 
 /**
  * Class Fixer
@@ -105,9 +106,10 @@ class Fixer extends Editor {
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                    $id = $level->getBlockIdAt($x, $y, $z);
+                    #$id = $level->getBlockIdAt($x, $y, $z);
+                    $id = $level->getBlockAt($x, $y, $z)->getId();
 
-                    if(self::FIX_TILES) {
+                    if(self::FIX_TILES && \pocketmine\BASE_VERSION != "4.0.0") {
                         switch ($id) {
                             case Block::CHEST:
                                 if($level->getTile(new Vector3($x, $y, $z)) === null)
@@ -131,7 +133,7 @@ class Fixer extends Editor {
                     }
 
 
-                    if(isset($blocks[$id])) $blockList->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockDataAt($x, $y, $z))));
+                    if(isset($blocks[$id])) $blockList->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockAt($x, $y, $z)->getDamage())));
                 }
             }
         }

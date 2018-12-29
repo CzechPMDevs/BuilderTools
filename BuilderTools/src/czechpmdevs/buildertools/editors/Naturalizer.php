@@ -80,7 +80,7 @@ class Naturalizer extends Editor {
 
         $blockY = null;
         for($y = $minY; $y < $maxY; $y++) {
-            if($level->getBlockIdAt($x, $y, $z) !== Block::AIR && ($blockY === null || $blockY < $y)) {
+            if($level->getBlockAt($x, $y, $z)->getId() !== Block::AIR && ($blockY === null || $blockY < $y)) {
                 $blockY = $y;
             }
         }
