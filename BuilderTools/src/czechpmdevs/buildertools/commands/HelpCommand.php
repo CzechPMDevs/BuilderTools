@@ -48,7 +48,7 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
     public static function buildPages() {
         $commandsPerList = self::COMMANDS_PER_PAGE;
 
-        $count = 1+(int)(count(BuilderTools::getAllCommands())/$commandsPerList);
+        $count = (int)(count(BuilderTools::getAllCommands())/$commandsPerList);
         $list = 1;
         $command = 1;
         $text = "";

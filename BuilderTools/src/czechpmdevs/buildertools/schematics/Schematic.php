@@ -28,7 +28,6 @@ use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\Player;
 
 /**
  * Class Schematic
@@ -111,28 +110,16 @@ class Schematic {
                 }
             }
         }
-        elseif($this->data->offsetExists("BlockData")) {
-            $data = $this->data->getByteArray("BlockData");
-
-            $i = 0;
-            for($y = 0; $y < $this->height; $y++) {
-                for ($z = 0; $z < $this->length; $z++) {
-                    for($x = 0; $x < $this->width; $x++) {
-                        $damage = ord($data{$i});
-                        $id = ord($data{$i});
-                        if($damage >= 16) $damage = 0; // prevents bug
-                        $this->blockList->addBlock(new Vector3($x, $y, $z), Block::get($id, $damage));
-                        $i++;
-                    }
-                }
-            }
+        // WORLDEDIT BY SK89Q and Sponge schematics
+        else {
+            BuilderTools::getInstance()->getLogger()->error("Could not load schematic {$this->file}: BuilderTools supports only MCEdit schematic format.");
         }
 
         if($this->materials == "Classic" || $this->materials == "Alpha") {
             $this->materials = "Pocket";
             /** @var Fixer $fixer */
             $fixer = BuilderTools::getEditor(Editor::FIXER);
-            $fixer->fixBlockList($this->blockList);
+            $this->blockList = $fixer->fixBlockList($this->blockList);
         }
     }
 

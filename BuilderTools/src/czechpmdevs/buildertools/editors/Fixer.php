@@ -28,7 +28,6 @@ use pocketmine\tile\Banner;
 use pocketmine\tile\Bed;
 use pocketmine\tile\Chest;
 use pocketmine\tile\Sign;
-use pocketmine\tile\Tile;
 
 /**
  * Class Fixer
@@ -64,9 +63,10 @@ class Fixer extends Editor {
 
     /**
      * @param BlockList $blockList
+     * @return BlockList
      */
-    public function fixBlockList(BlockList $blockList) {
-        $blocks = [];
+    public function fixBlockList(BlockList $blockList): BlockList {
+        $newList = new BlockList();
         foreach ($blockList->getAll() as $block) {
             $id = $block->getId();
             $damage = $block->getDamage();
@@ -74,15 +74,15 @@ class Fixer extends Editor {
             $y = $block->getY();
             $z = $block->getZ();
             if(isset(self::$blocks[$id])) {
-                $id = self::$blocks[$id][0];
                 if(is_int(self::$blocks[$id][1])) $damage = self::$blocks[$id][1];
+                $id = self::$blocks[$id][0];
             }
 
             $block = Block::get($id, $damage);
             $block->setComponents($x, $y, $z);
-            $blocks[] = $block;
+            $newList->addBlock($block->asVector3(), $block);
         }
-        $blockList->setAll($blocks);
+        return $newList;
     }
 
     /**

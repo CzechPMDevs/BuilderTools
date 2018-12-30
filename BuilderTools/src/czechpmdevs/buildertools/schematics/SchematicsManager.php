@@ -84,6 +84,7 @@ class SchematicsManager {
             $player->sendMessage(BuilderTools::getPrefix(). "§cType //schem load <filename> to load schematic first!");
             return;
         }
+
         $schematic = $this->players[$player->getName()];
 
         $fillList = new BlockList();
