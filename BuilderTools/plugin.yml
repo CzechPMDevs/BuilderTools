@@ -60,3 +60,15 @@ permissions:
       bt.cmd.schematic:
         description: Permission for //schematics
         default: op
+      bt.cmd.cylinder:
+        description: Permission for //cylinder
+        default: op
+      bt.cmd.hcylinder:
+        description: Permission for //hcylinder
+        default: op
+      bt.cmd.pyrdamid:
+        description: Permission for //pyramid
+        default: op
+      bt.cmd.hpyrdamid:
+        description: Permission for //hpyramid
+        default: op

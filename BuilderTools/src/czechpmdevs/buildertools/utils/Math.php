@@ -51,7 +51,8 @@ class Math {
      * @param float|int $z
      * @return float|int
      */
-    public static function lengthSq($x, $y, $z){
+    public static function lengthSq($x, $y, $z = null) {
+        if($z === null) return ($x * $x) + ($y * $y);
         return ($x * $x) + ($y * $y) + ($z * $z);
     }
 }

@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\commands\BlockInfoCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
 use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
+use czechpmdevs\buildertools\commands\CylinderCommand;
 use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
@@ -31,11 +32,14 @@ use czechpmdevs\buildertools\commands\FixCommand;
 use czechpmdevs\buildertools\commands\FlipCommand;
 use czechpmdevs\buildertools\commands\HelpCommand;
 use czechpmdevs\buildertools\commands\HollowCubeCommand;
+use czechpmdevs\buildertools\commands\HollowCylinderCommand;
+use czechpmdevs\buildertools\commands\HollowPyramidCommand;
 use czechpmdevs\buildertools\commands\HollowSphereCommand;
 use czechpmdevs\buildertools\commands\IdCommand;
 use czechpmdevs\buildertools\commands\MergeCommand;
 use czechpmdevs\buildertools\commands\NaturalizeCommand;
 use czechpmdevs\buildertools\commands\PasteCommand;
+use czechpmdevs\buildertools\commands\PyramidCommand;
 use czechpmdevs\buildertools\commands\RedoCommand;
 use czechpmdevs\buildertools\commands\ReplaceCommand;
 use czechpmdevs\buildertools\commands\RotateCommand;
@@ -134,7 +138,11 @@ class BuilderTools extends PluginBase {
             new BlockInfoCommand,
             new ClearInventoryCommand,
             new NaturalizeCommand,
-            new SchematicCommand
+            new SchematicCommand,
+            new PyramidCommand,
+            new HollowPyramidCommand,
+            new CylinderCommand,
+            new HollowCylinderCommand
         ];
         foreach (self::$commands as $command) {
             $map->register("BuilderTools", $command);
