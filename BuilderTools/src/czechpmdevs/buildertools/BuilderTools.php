@@ -56,6 +56,7 @@ use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use pocketmine\command\Command;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -78,6 +79,9 @@ class BuilderTools extends PluginBase {
 
     /** @var SchematicsManager $schematicManager */
     private static $schematicsManager;
+
+    /** @var Command[] $commands */
+    private static $commands = [];
 
     public function onEnable() {
         self::$instance = $this;
@@ -105,32 +109,37 @@ class BuilderTools extends PluginBase {
 
     private function registerCommands() {
         $map = $this->getServer()->getCommandMap();
-        $map->register("BuilderTools", new FirstPositionCommand);
-        $map->register("BuilderTools", new SecondPositionCommand);
-        $map->register("BuilderTools", new WandCommand);
-        $map->register("BuilderTools", new FillCommand);
-        $map->register("BuilderTools", new HelpCommand);
-        $map->register("BuilderTools", new DrawCommand);
-        $map->register("BuilderTools", new SphereCommand);
-        $map->register("BuilderTools", new HollowSphereCommand);
-        $map->register("BuilderTools", new ReplaceCommand);
-        $map->register("BuilderTools", new IdCommand);
-        $map->register("BuilderTools", new ClearInventoryCommand);
-        $map->register("BuilderTools", new NaturalizeCommand);
-        $map->register("BuilderTools", new CopyCommand);
-        $map->register("BuilderTools", new PasteCommand);
-        $map->register("BuilderTools", new RotateCommand);
-        $map->register("BuilderTools", new UndoCommand);
-        $map->register("BuilderTools", new RedoCommand);
-        $map->register("BuilderTools", new TreeCommand);
-        #$map->register("BuilderTools", new DecorationCommand); taken down due to release
-        $map->register("BuilderTools", new FlipCommand);
-        $map->register("BuilderTools", new FixCommand);
-        $map->register("BuilderTools", new CubeCommand);
-        $map->register("BuilderTools", new HollowCubeCommand);
-        $map->register("BuilderTools", new MergeCommand);
-        $map->register("BuilderTools", new BlockInfoCommand);
-        $map->register("BuilderTools", new SchematicCommand);
+        self::$commands = [
+            new FirstPositionCommand,
+            new SecondPositionCommand,
+            new WandCommand,
+            new FillCommand,
+            new HelpCommand,
+            new DrawCommand,
+            new SphereCommand,
+            new HollowSphereCommand,
+            new ReplaceCommand,
+            new IdCommand,
+            new CubeCommand,
+            new HollowCubeCommand,
+            new CopyCommand,
+            new PasteCommand,
+            new MergeCommand,
+            new RotateCommand,
+            new FlipCommand,
+            new UndoCommand,
+            new RedoCommand,
+            new TreeCommand,
+            new FixCommand,
+            new BlockInfoCommand,
+            new ClearInventoryCommand,
+            new NaturalizeCommand,
+            new SchematicCommand
+        ];
+        foreach (self::$commands as $command) {
+            $map->register("BuilderTools", $command);
+        }
+        HelpCommand::buildPages();
     }
 
     /**
@@ -139,6 +148,13 @@ class BuilderTools extends PluginBase {
      */
     public static function getEditor(string $name): Editor {
         return self::$editors[$name];
+    }
+
+    /**
+     * @return Command[] $commands
+     */
+    public static function getAllCommands(): array {
+        return self::$commands;
     }
 
     /**

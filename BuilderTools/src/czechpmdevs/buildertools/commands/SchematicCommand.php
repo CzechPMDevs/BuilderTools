@@ -23,6 +23,8 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\schematics\Schematic;
+use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
@@ -57,8 +59,8 @@ class SchematicCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
-        if(!isset($args[0]) || !in_array($args[0], ["load"])) {
-            $sender->sendMessage("§cUsage: §7//schem <reload|load|list> [filename]");
+        if(!isset($args[0]) || !in_array($args[0], ["load", "reload", "list", "paste"])) {
+            $sender->sendMessage("§cUsage: §7//schem <reload|load|list|paste> [filename]");
             return;
         }
         switch ($args[0]) {
@@ -75,17 +77,19 @@ class SchematicCommand extends Command implements PluginIdentifiableCommand {
                     return;
                 }
 
-                /** @var Copier $copier */
-                $copier = BuilderTools::getEditor(Editor::COPIER);
-                $copier->copyData[$sender->getName()] = $schematic->getBlockList()->toCopyData();
-                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic copied to clipboard!");
+                BuilderTools::getSchematicsManager()->addToPaste($sender, $schematic);
+                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic copied to clipboard, type §2//schem paste§a to paste!");
+                break;
+            case "paste":
+                BuilderTools::getSchematicsManager()->pasteSchematic($sender);
+                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic pasted successfully!");
                 break;
             case "list":
                 $list = [];
                 foreach (BuilderTools::getSchematicsManager()->getLoadedSchematics() as $name => $schematic) {
-                    $list[] = "§a- {$name}: ".$schematic->getXAxis()*$schematic->getYAxis()*$schematic->getZAxis()." blocks ({$schematic->getXAxis()}x{$schematic->getYAxis()}x{$schematic->getZAxis()})";
+                    $list[] = $name;
                 }
-                $sender->sendMessage(BuilderTools::getPrefix() . (string)count($list) . " loaded schematics:\n" . implode("\n", $list));
+                $sender->sendMessage(BuilderTools::getPrefix() . (string)count($list) . " loaded schematics: " . implode(", ", $list));
                 break;
             case "reload":
                 BuilderTools::getSchematicsManager()->loadSchematics();

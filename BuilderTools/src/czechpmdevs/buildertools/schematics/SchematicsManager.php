@@ -21,6 +21,11 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\schematics;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\Filler;
+use czechpmdevs\buildertools\editors\object\BlockList;
+use const pocketmine\BASE_VERSION;
+use const pocketmine\BUILD_NUMBER;
+use pocketmine\Player;
 
 /**
  * Class SchematicsManager
@@ -33,6 +38,9 @@ class SchematicsManager {
 
     /** @var Schematic[] $schematics */
     public $schematics = [];
+
+    /** @var Schematic[] $players */
+    public $players;
 
     /**
      * SchematicsManager constructor.
@@ -58,6 +66,36 @@ class SchematicsManager {
         foreach (glob($this->plugin->getDataFolder() . "schematics/*.schematic") as $file) {
             $this->schematics[basename($file, ".schematic")] = new Schematic($file);
         }
+    }
+
+    /**
+     * @param Player $player
+     * @param Schematic $schematic
+     */
+    public function addToPaste(Player $player, Schematic $schematic) {
+        $this->players[$player->getName()] = $schematic;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function pasteSchematic(Player $player) {
+        if(!isset($this->players[$player->getName()])) {
+            $player->sendMessage(BuilderTools::getPrefix(). "§cType //schem load <filename> to load schematic first!");
+            return;
+        }
+        $schematic = $this->players[$player->getName()];
+
+        $fillList = new BlockList();
+        $fillList->setLevel($player->getLevel());
+        foreach ($schematic->getBlockList()->getAll() as $block) {
+            $fillList->addBlock($block->add($player), $block);
+        }
+
+        /** @var Filler $filler */
+        $filler = new Filler();
+        $filler->fill($player, $fillList);
+        $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
     }
 
     /**

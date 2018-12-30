@@ -54,6 +54,10 @@ class FlipCommand extends Command implements PluginIdentifiableCommand {
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
+
+        if(!isset($copier->copyData[$sender->getName()])) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+        }
         $copier->flip($sender);
     }
 

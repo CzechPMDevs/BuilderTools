@@ -33,11 +33,54 @@ use pocketmine\plugin\Plugin;
  */
 class HelpCommand extends Command implements PluginIdentifiableCommand {
 
+    public const COMMANDS_PER_PAGE = 5;
+
+    /** @var string[] $pages */
+    public static $pages = [];
+
     /**
      * HelpCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/commands", "Displays BuilderTools commands", null, ["/?", "buildertools"]);
+        parent::__construct("/commands", "Displays BuilderTools commands", null, ["/?", "buildertools", "/help"]);
+    }
+
+    public static function buildPages() {
+        $commandsPerList = self::COMMANDS_PER_PAGE;
+
+        $count = 1+(int)(count(BuilderTools::getAllCommands())/$commandsPerList);
+        $list = 1;
+        $command = 1;
+        $text = "";
+        $all = 0;
+
+        //sort
+        $commands = [];
+
+        /**
+         * @var Command $cmd
+         */
+        foreach (BuilderTools::getAllCommands() as $i => $cmd) {
+            $commands[$i] = $cmd->getName();
+        }
+
+        asort($commands);
+
+        foreach ($commands as $index => $name) {
+            $all++;
+            if($command == 1) {
+                $text = "§2--- Showing help page {$list} of {$count} ---";
+            }
+            $text .= "\n§2/{$name}: §f" . BuilderTools::getAllCommands()[$index]->getDescription();
+            if($command == self::COMMANDS_PER_PAGE || (count(BuilderTools::getAllCommands()) == $all)) {
+                $command = 1;
+                self::$pages[$list] = $text;
+                $list++;
+            }
+            else {
+                $command++;
+            }
+        }
     }
 
     /**
@@ -54,87 +97,12 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
-        /* FIXING TWO COMMANDS IN PROGRESS
-         * if(empty($args[0])) {
-            $sender->sendMessage("---- BuilderTools Commands (1/5) ----\n".
-                "§2//ci: §fClears your inventory\n".
-                "§2//copy: §fCopy selected area\n".
-                "§2//cube: §fCreate cube\n".
-                "§2//decoration: §fNatural decoration commands");
-            return;
-        }
-        if($args[0] == "2") {
-            $sender->sendMessage("---- BuilderTools Commands (2/5) ----\n".
-                "§2//draw: §fSelect first position\n".
-                "§2//fill: §fFill selected area\n".
-                "§2//flip: §fFlip copied area\n".
-                "§2//commands: §fDisplays help pages");
-            return;
-        }
-        if($args[0] == "3") {
-            $sender->sendMessage("---- §fBuilderTools Commands (3/5) ----\n".
-                "§2//id §fDisplays item id\n".
-                "§2//naturalize §fNaturalize selected area\n".
-                "§2//paste §fPaste selected area\n".
-                "§2//pos1 §fSelect first position");
-            return;
-        }
-        if($args[0] == "4") {
-            $sender->sendMessage("---- §fBuilderTools Commands (4/5) ----\n".
-                "§2//pos2: §fSelect second position\n".
-                "§2//redo: §fRedo last BuilderTools action\n".
-                "§2//replace: §fReplace blocks in selected area\n".
-                "§2//sphere: §fCreate sphere\n");
-            return;
-        }
-        if($args[0] == "5") {
-            $sender->sendMessage("---- §fBuilderTools Commands (4/5) ----\n".
-                "§2//undo: §fUndo last action\n".
-                "§2//wand: §fSwitch wand command\n");
-            return;
-        }*/
-        if(!isset($args[0])) {
-            $sender->sendMessage("---- BuilderTools Commands (1/5) ----\n".
-                "§2//ci: §fClears your inventory\n".
-                "§2//copy: §fCopy selected area\n".
-                "§2//cube: §fCreate cube\n".
-                "§2//draw: §fSelect first position");
-            return;
-        }
-        if($args[0] == "2") {
-            $sender->sendMessage("---- BuilderTools Commands (2/5) ----\n".
-                "§2//fill: §fFill selected area\n".
-                "§2//flip: §fFlip copied area\n".
-                "§2//commands: §fDisplays help pages\n".
-                "§2//id §fDisplays item id");
-            return;
-        }
-        if($args[0] == "3") {
-            $sender->sendMessage("---- §fBuilderTools Commands (3/5) ----\n".
-                "§2//merge §fMerge copied area\n".
-                "§2//naturalize §fNaturalize selected area\n".
-                "§2//paste §fPaste selected area\n".
-                "§2//pos1 §fSelect first position"
-            );
-            return;
-        }
-        if($args[0] == "4") {
-            $sender->sendMessage("---- §fBuilderTools Commands (4/5) ----\n".
-                "§2//pos2: §fSelect second position\n".
-                "§2//replace: §fReplace blocks in selected area\n".
-                "§2//sphere: §fCreate sphere\n" .
-                "§2//undo: §fUndo last action"
-            );
-            return;
-        }
-        if($args[0] == "5") {
-            $sender->sendMessage("---- §fBuilderTools Commands (4/5) ----\n".
-                "§2//wand: §fSwitch wand command"
-            );
-            return;
+        $page = 1;
+        if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands())/self::COMMANDS_PER_PAGE))) {
+            $page = (int)$args[0];
         }
 
-        return;
+        $sender->sendMessage(self::$pages[$page]);
     }
 
     /**
