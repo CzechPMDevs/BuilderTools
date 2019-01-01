@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\utils\Math;
+use const pocketmine\BASE_VERSION;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -67,7 +68,14 @@ class Printer extends Editor {
                                 $undoList->addBlock($finalPos, $block);
                             } else {
                                 if($y > 0) {
-                                    $center->getLevel()->setBlockAt($x, $y, $z, $block);
+                                    $level = $center->getLevel();
+                                    if(version_compare(BASE_VERSION, "4.0.0") < 0) {
+                                        $level->setBlockIdAt($x, $y, $z, $block->getId());
+                                        $level->setBlockDataAt($x, $y, $z, $block->getDamage());
+                                    }
+                                    else {
+                                        $level->setBlockAt($x, $y, $z, $block);
+                                    }
                                     $undoList->addBlock(new Vector3($x, $y, $z), $block);
                                 }
                             }
@@ -90,7 +98,14 @@ class Printer extends Editor {
                                 }
                                 else {
                                     if($y > 0) {
-                                        $center->getLevel()->setBlockAt($x, $y, $z, $block);
+                                        $level = $center->getLevel();
+                                        if(version_compare(BASE_VERSION, "4.0.0") < 0) {
+                                            $level->setBlockIdAt($x, $y, $z, $block->getId());
+                                            $level->setBlockDataAt($x, $y, $z, $block->getDamage());
+                                        }
+                                        else {
+                                            $level->setBlockAt($x, $y, $z, $block);
+                                        }
                                         $undoList->addBlock(new Vector3($x, $y, $z), $block);
                                     }
                                 }
@@ -121,7 +136,14 @@ class Printer extends Editor {
             $finalY = $a-1;
         }
 
-        $level->setBlockAt($x, $finalY, $z, $block);
+        if(version_compare(BASE_VERSION, "4.0.0") < 0) {
+            $level->setBlockIdAt($x, $finalY, $z, $block->getId());
+            $level->setBlockDataAt($x, $finalY, $z, $block->getDamage());
+        }
+        else {
+            $level->setBlockAt($x, $finalY, $z, $block);
+        }
+
         return new Vector3($x, $finalY, $z);
     }
 
