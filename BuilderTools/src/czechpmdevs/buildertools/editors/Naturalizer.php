@@ -95,13 +95,19 @@ class Naturalizer extends Editor {
                 case 1:
                 case 2:
                 case 3:
-                    $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::DIRT));
+                    if($level->getBlockAt($x, $y, $z)->getId() != Block::AIR) {
+                        $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::DIRT));
+                    }
                     break;
                 case 4:
-                    $list->addBlock(new Vector3($x, $y, $z), (rand(0, 1) ? Block::get(Block::DIRT) : Block::get(Block::STONE)));
+                    if($level->getBlockAt($x, $y, $z)->getId() != Block::AIR) {
+                        $list->addBlock(new Vector3($x, $y, $z), (rand(0, 1) ? Block::get(Block::DIRT) : Block::get(Block::STONE)));
+                    }
                     break;
                 default:
-                    $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::STONE));
+                    if($level->getBlockAt($x, $y, $z)->getId() != Block::AIR) {
+                        $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::STONE));
+                    }
             }
         }
     }
