@@ -162,12 +162,13 @@ class Filler extends Editor {
             if($maxX === null || $block->getX() > $maxX) $maxX = $block->getX();
             if($maxZ === null || $block->getZ() > $maxZ) $maxZ = $block->getZ();
 
+            $iterator->moveTo((int)$block->getX(), (int)$block->getY(), (int)$block->getZ());
+
             if($iterator->currentSubChunk === null) {
                 $this->getPlugin()->getLogger()->error("Error while filling: Could not found sub chunk at {$block->getX()}:{$block->getY()}:{$block->getZ()}");
                 continue;
             }
 
-            $iterator->moveTo((int)$block->getX(), (int)$block->getY(), (int)$block->getZ());
             if($saveUndo) $undoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
             if($saveRedo) $redoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
             $iterator->currentSubChunk->setBlock($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f, $block->getId(), $block->getDamage());
