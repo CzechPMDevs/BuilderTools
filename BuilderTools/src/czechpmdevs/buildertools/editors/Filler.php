@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\block\Block;
+use pocketmine\level\format\SubChunkInterface;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
@@ -161,6 +162,11 @@ class Filler extends Editor {
             if($minZ === null || $block->getZ() < $minZ) $minZ = $block->getZ();
             if($maxX === null || $block->getX() > $maxX) $maxX = $block->getX();
             if($maxZ === null || $block->getZ() > $maxZ) $maxZ = $block->getZ();
+
+            if(!$iterator->currentSubChunk instanceof SubChunkInterface) {
+                $this->getPlugin()->getLogger()->error("Error while filling: Could not found sub chunk at {$block->getX()}:{$block->getY()}:{$block->getZ()}");
+                continue;
+            }
 
             $iterator->moveTo((int)$block->getX(), (int)$block->getY(), (int)$block->getZ());
             if($saveUndo) $undoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
