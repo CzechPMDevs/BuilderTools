@@ -23,17 +23,14 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class RotateCommand
  * @package buildertools\commands
  */
-class RotateCommand extends Command implements PluginIdentifiableCommand {
+class RotateCommand extends BuilderToolsCommand {
 
     /**
      * RotateCommand constructor.
@@ -47,21 +44,9 @@ class RotateCommand extends Command implements PluginIdentifiableCommand {
             return;
         }
 
-        if(!$sender->hasPermission("bt.cmd.rotate")) {
-            $sender->sendMessage("§cYou do not have permissions to use this command.");
-            return;
-        }
-
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
 
         $copier->addToRotate($sender);
-    }
-
-    /**
-     * @return Plugin|BuilderTools $plugin
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

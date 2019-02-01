@@ -24,19 +24,16 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\Printer;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class HollowSphereCommand
  * @package czechpmdevs\buildertools\commands
  */
-class HollowSphereCommand extends Command implements PluginIdentifiableCommand {
+class HollowSphereCommand extends BuilderToolsCommand {
 
     /**
      * SphereCommand constructor.
@@ -56,14 +53,6 @@ class HollowSphereCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.hsphere")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//hsphere <id1:dmg1,id2:dmg2:,...> <radius>");
-            return;
-        }
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
 
         /** @var Printer $printer */
@@ -71,12 +60,5 @@ class HollowSphereCommand extends Command implements PluginIdentifiableCommand {
         /** @var EditorResult $result */
         $result = $printer->makeHollowSphere($sender, $sender, $radius, $args[0]);
         $sender->sendMessage(BuilderTools::getPrefix() . "§aHollow sphere created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

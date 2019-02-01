@@ -24,17 +24,14 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class FixCommand
  * @package buildertools\commands
  */
-class FixCommand extends Command implements PluginIdentifiableCommand {
+class FixCommand extends BuilderToolsCommand {
 
     /**
      * FixCommand constructor.
@@ -52,11 +49,6 @@ class FixCommand extends Command implements PluginIdentifiableCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-
-        if(!$sender->hasPermission("bt.cmd.fix")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
 
@@ -81,12 +73,5 @@ class FixCommand extends Command implements PluginIdentifiableCommand {
         /** @var Fixer $fixer */
         $fixer = BuilderTools::getEditor(Editor::FIXER);
         $fixer->fix($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
-    }
-
-    /**
-     * @return Plugin
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

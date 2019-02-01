@@ -24,17 +24,14 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class CopyCommand
  * @package buildertools\commands
  */
-class CopyCommand extends Command implements PluginIdentifiableCommand {
+class CopyCommand extends BuilderToolsCommand {
 
     /**
      * CopyCommand constructor.
@@ -54,10 +51,6 @@ class CopyCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.copy")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
         if(!Selectors::isSelected(1, $sender)) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
             return;
@@ -71,12 +64,5 @@ class CopyCommand extends Command implements PluginIdentifiableCommand {
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
         $copier->copy($pos1->getX(), $pos1->getY(), $pos1->getZ(), $pos2->getX(), $pos2->getY(), $pos2->getZ(), $sender);
-    }
-
-    /**
-     * @return Plugin|BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

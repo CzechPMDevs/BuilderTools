@@ -23,17 +23,14 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Canceller;
 use czechpmdevs\buildertools\editors\Editor;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class UndoCommand
  * @package buildertools\commands
  */
-class UndoCommand extends Command implements PluginIdentifiableCommand {
+class UndoCommand extends BuilderToolsCommand {
 
     /**
      * UndoCommand constructor.
@@ -53,10 +50,6 @@ class UndoCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.undo")) {
-            $sender->sendMessage("§cYou do not have permissions to use this command!");
-            return;
-        }
 
         /** @var Canceller $canceller */
         $canceller = BuilderTools::getEditor(Editor::CANCELLER);
@@ -65,10 +58,4 @@ class UndoCommand extends Command implements PluginIdentifiableCommand {
         if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled!");
     }
 
-    /**
-     * @return Plugin&BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
-    }
 }

@@ -25,17 +25,14 @@ use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\schematics\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class SchematicCommand
  * @package czechpmdevs\buildertools\commands
  */
-class SchematicCommand extends Command implements PluginIdentifiableCommand {
+class SchematicCommand extends BuilderToolsCommand {
 
     /**
      * SchematicCommand constructor.
@@ -53,10 +50,6 @@ class SchematicCommand extends Command implements PluginIdentifiableCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.schematic")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         if(!isset($args[0]) || !in_array($args[0], ["load", "reload", "list", "paste"])) {
@@ -96,12 +89,5 @@ class SchematicCommand extends Command implements PluginIdentifiableCommand {
                 $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematics reloaded. Type §2//schem list §ato get list of all loaded schematics.");
                 break;
         }
-    }
-
-    /**
-     * @return Plugin|BuilderTools $plugin
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

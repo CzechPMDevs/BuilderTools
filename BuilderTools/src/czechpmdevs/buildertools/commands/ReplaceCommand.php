@@ -23,17 +23,14 @@ use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class ReplaceCommand
  * @package buildertools\commands
  */
-class ReplaceCommand extends Command implements PluginIdentifiableCommand {
+class ReplaceCommand extends BuilderToolsCommand {
 
     /**
      * ReplaceCommand constructor.
@@ -51,10 +48,6 @@ class ReplaceCommand extends Command implements PluginIdentifiableCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.replace")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         if(!isset($args[0]) || !isset($args[1])) {
@@ -88,12 +81,5 @@ class ReplaceCommand extends Command implements PluginIdentifiableCommand {
 
         $count = $result->countBlocks;
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in ".round(microtime(true)-$startTime, 2)." ({$count} blocks changed)!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools $builderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

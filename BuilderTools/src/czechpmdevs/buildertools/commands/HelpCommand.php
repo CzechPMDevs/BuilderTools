@@ -21,17 +21,14 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class HelpCommand
  * @package buildertools\commands
  */
-class HelpCommand extends Command implements PluginIdentifiableCommand {
+class HelpCommand extends BuilderToolsCommand {
 
     public const COMMANDS_PER_PAGE = 5;
 
@@ -93,22 +90,11 @@ class HelpCommand extends Command implements PluginIdentifiableCommand {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
         }
-        if(!$sender->hasPermission("bt.cmd.help")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
         $page = 1;
         if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands())/self::COMMANDS_PER_PAGE))) {
             $page = (int)$args[0];
         }
 
         $sender->sendMessage(self::$pages[$page]);
-    }
-
-    /**
-     * @return Plugin|BuilderTools $builderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

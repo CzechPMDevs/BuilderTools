@@ -25,17 +25,14 @@ use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class NaturalizeCommand
  * @package buildertools\commands
  */
-class NaturalizeCommand extends Command implements PluginIdentifiableCommand {
+class NaturalizeCommand extends BuilderToolsCommand {
 
     /**
      * NaturalizeCommand constructor.
@@ -53,10 +50,6 @@ class NaturalizeCommand extends Command implements PluginIdentifiableCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.fill")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
         if(!Selectors::isSelected(1, $sender)) {
@@ -77,12 +70,5 @@ class NaturalizeCommand extends Command implements PluginIdentifiableCommand {
         $filler = BuilderTools::getEditor(Editor::NATURALIZER);
         $count = $filler->naturalize($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools $builderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

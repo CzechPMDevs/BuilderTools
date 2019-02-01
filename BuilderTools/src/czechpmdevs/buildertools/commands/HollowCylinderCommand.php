@@ -24,17 +24,14 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\Printer;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class CylinderCommand
  * @package czechpmdevs\buildertools\commands
  */
-class HollowCylinderCommand extends Command implements PluginIdentifiableCommand {
+class HollowCylinderCommand extends BuilderToolsCommand {
 
     /**
      * SphereCommand constructor.
@@ -55,10 +52,6 @@ class HollowCylinderCommand extends Command implements PluginIdentifiableCommand
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.hcylinder")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
         if(!isset($args[0])) {
             $sender->sendMessage("§cUsage: §7//hcylinder <id1:dmg1,id2:dmg2:,...> [radius] [height]");
             return;
@@ -74,12 +67,5 @@ class HollowCylinderCommand extends Command implements PluginIdentifiableCommand
         $result = $printer->makeHollowCylinder($sender, $sender, $radius, $height, $args[0]);
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cylinder created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

@@ -21,18 +21,15 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\item\Item;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class ClearInventoryCommand
  * @package buildertools\commands
  */
-class ClearInventoryCommand extends Command implements PluginIdentifiableCommand {
+class ClearInventoryCommand extends BuilderToolsCommand {
 
     /**
      * ClearInventoryCommand constructor.
@@ -46,11 +43,6 @@ class ClearInventoryCommand extends Command implements PluginIdentifiableCommand
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.clearinventory")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
-
         $removed = 0;
         foreach ($sender->getInventory()->getContents() as $index => $item) {
             $sender->getInventory()->setItem($index, Item::get(Item::AIR));
@@ -58,12 +50,5 @@ class ClearInventoryCommand extends Command implements PluginIdentifiableCommand
         }
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aInventory cleared, $removed items removed.");
-    }
-
-    /**
-     * @return Plugin|BuilderTools $plugin
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

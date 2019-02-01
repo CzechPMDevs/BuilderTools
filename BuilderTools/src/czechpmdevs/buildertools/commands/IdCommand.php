@@ -21,17 +21,14 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class IdCommand
  * @package buildertools\commands
  */
-class IdCommand extends Command implements PluginIdentifiableCommand {
+class IdCommand extends BuilderToolsCommand {
 
     /**
      * IdCommand constructor.
@@ -51,17 +48,6 @@ class IdCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.id")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
         $sender->sendMessage(BuilderTools::getPrefix()."§aID: §9{$sender->getInventory()->getItemInHand()->getId()}:{$sender->getInventory()->getItemInHand()->getDamage()}");
-    }
-
-    /**
-     * @return Plugin|BuilderTools $plugin
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

@@ -21,22 +21,19 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\level\generator\object\BirchTree;
 use pocketmine\level\generator\object\JungleTree;
 use pocketmine\level\generator\object\OakTree;
 use pocketmine\level\generator\object\SpruceTree;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 use pocketmine\utils\Random;
 
 /**
  * Class TreeCommand
  * @package buildertools\commands
  */
-class TreeCommand extends Command implements PluginIdentifiableCommand {
+class TreeCommand extends BuilderToolsCommand {
 
     /**
      * TreeCommand constructor.
@@ -54,10 +51,6 @@ class TreeCommand extends Command implements PluginIdentifiableCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.tree")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
             return;
         }
 
@@ -96,12 +89,4 @@ class TreeCommand extends Command implements PluginIdentifiableCommand {
         $object->placeObject($sender->getLevel(), (int)$sender->getX(), (int)$sender->getY(), (int)$sender->getZ(), new Random($sender->getLevel()->getSeed()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aObject {$args[0]} placed!");
     }
-
-    /**
-     * @return BuilderTools $plugin
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
-    }
-
 }

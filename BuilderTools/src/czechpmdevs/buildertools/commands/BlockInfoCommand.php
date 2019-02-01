@@ -22,17 +22,14 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class BlockInfoCommand
  * @package czechpmdevs\buildertools\commands
  */
-class BlockInfoCommand extends Command implements PluginIdentifiableCommand {
+class BlockInfoCommand extends BuilderToolsCommand {
 
     /**
      * ReplaceCommand constructor.
@@ -52,19 +49,7 @@ class BlockInfoCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.blockinfo")) {
-            $sender->sendMessage("§cYou do not have not permissions to use this command!");
-            return;
-        }
-
         Selectors::switchBlockInfoSelector($sender);
         $sender->sendMessage(BuilderTools::getPrefix() . "Block info mode turned " . (Selectors::isBlockInfoPlayer($sender) ? "on" : "off") . "!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools $builderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

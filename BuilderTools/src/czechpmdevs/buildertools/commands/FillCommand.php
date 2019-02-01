@@ -24,17 +24,14 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class FillCommand
  * @package buildertools\commands
  */
-class FillCommand extends Command implements PluginIdentifiableCommand {
+class FillCommand extends BuilderToolsCommand {
 
     /**
      * FillCommand constructor.
@@ -54,12 +51,6 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
             $sender->sendMessage("§cThis command can be used only in-game!");
             return;
         }
-
-        if(!$sender->hasPermission("bt.cmd.fill")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
-
         if(!isset($args[0])) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
             return;
@@ -92,12 +83,5 @@ class FillCommand extends Command implements PluginIdentifiableCommand {
         $result = $filler->fill($sender, $blocks);
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in " . (string)round(microtime(true)-$startTime, 2) . " (" . (string)$result->countBlocks . " block changed)");
-    }
-
-    /**
-     * @return Plugin|BuilderTools $builderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }
