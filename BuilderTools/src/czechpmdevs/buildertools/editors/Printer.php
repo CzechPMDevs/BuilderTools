@@ -158,7 +158,7 @@ class Printer extends Editor {
      */
     public function makeSphere(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList();
+        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
         $blockList->setLevel($center->getLevel());
 
         $invRadiusX = 1 / $radius;
@@ -241,7 +241,7 @@ class Printer extends Editor {
      */
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList();
+        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
         $blockList->setLevel($center->getLevel());
 
         if ($height == 0) {
@@ -321,7 +321,7 @@ class Printer extends Editor {
      * @return EditorResult
      */
     public function makePyramid(Player $player, Position $center, int $size, $blocks, bool $hollow = false): EditorResult {
-        $blockList = new BlockList();
+        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
         $blockList->setLevel($center->getLevel());
         $height = $size;
         for ($y = 0; $y <= $height; ++$y) {
@@ -366,7 +366,7 @@ class Printer extends Editor {
      */
     public function makeCube(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList();
+        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
         $blockList->setLevel($center->getLevel());
         for($x = $center->getX()-$radius; $x < $center->getX()+$radius; $x++) {
             for($y = $center->getY()-$radius; $y < $center->getY()+$radius; $y++) {
