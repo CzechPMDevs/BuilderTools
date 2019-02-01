@@ -45,7 +45,7 @@ class IdCommand extends BuilderToolsCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         $sender->sendMessage(BuilderTools::getPrefix()."§aID: §9{$sender->getInventory()->getItemInHand()->getId()}:{$sender->getInventory()->getItemInHand()->getDamage()}");

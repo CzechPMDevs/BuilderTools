@@ -39,14 +39,20 @@ class RotateCommand extends BuilderToolsCommand {
         parent::__construct("/rotate", "Rotate selected area", null, []);
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $commandLabel
+     * @param array $args
+     * @return mixed|void
+     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-
         $copier->addToRotate($sender);
     }
 }

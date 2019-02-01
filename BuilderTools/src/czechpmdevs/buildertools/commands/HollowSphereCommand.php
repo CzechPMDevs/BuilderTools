@@ -50,7 +50,7 @@ class HollowSphereCommand extends BuilderToolsCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         $radius = isset($args[1]) ? (int)($args[1]) : 5;

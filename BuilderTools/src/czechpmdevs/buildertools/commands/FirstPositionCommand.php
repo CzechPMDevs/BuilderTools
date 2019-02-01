@@ -47,7 +47,7 @@ class FirstPositionCommand extends BuilderToolsCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         Selectors::addSelector($sender, 1, $position = new Position((int)round($sender->getX()), (int)round($sender->getY()), (int)round($sender->getZ()), $sender->getLevel()));

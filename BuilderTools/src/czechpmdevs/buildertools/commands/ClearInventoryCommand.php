@@ -40,7 +40,7 @@ class ClearInventoryCommand extends BuilderToolsCommand {
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         $removed = 0;

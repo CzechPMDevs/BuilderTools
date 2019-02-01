@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -87,9 +88,6 @@ class HelpCommand extends BuilderToolsCommand {
      * @return void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
-        }
         $page = 1;
         if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands())/self::COMMANDS_PER_PAGE))) {
             $page = (int)$args[0];
