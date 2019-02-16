@@ -246,14 +246,31 @@ class Copier extends Editor {
 
     /**
      * @param Player $player
-     *./
+     */
     public function flip(Player $player) {
+        $minY = null;
+        $maxY = null;
+
+        /**
+         * @var Vector3 $vec
+         */
+        foreach ($this->copyData[$player->getName()]["data"] as [$vec]) {
+            if($minY === null || $vec->getY() < $minY) {
+                $minY = $vec->getY();
+            }
+            if($maxY === null || $vec->getY() > $maxY) {
+                $maxY = $vec->getY();
+            }
+        }
+
+        $add = (int)round(abs($maxY-$minY)/2);
+
         /**
          * @var Vector3 $vec
          * @var Block $block
-         *./
+         */
         foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-            $vec->setComponents($vec->getX(), -$vec->getY(), $vec->getZ());
+            $vec->setComponents($vec->getX(), (-$vec->getY())+$add, $vec->getZ());
             if(in_array($block->getId(), [Block::OAK_STAIRS, Block::COBBLESTONE_STAIRS, Block::ACACIA_STAIRS, Block::ACACIA_STAIRS, Block::DARK_OAK_STAIRS, Block::JUNGLE_STAIRS, Block::NETHER_BRICK_STAIRS, Block::PURPUR_STAIRS, Block::QUARTZ_STAIRS, Block::BRICK_STAIRS])) {
                 $block->setDamage(self::FLIP_DATA[0][$block->getDamage()]);
             }
@@ -263,16 +280,16 @@ class Copier extends Editor {
         }
 
         $player->sendMessage(BuilderTools::getPrefix()."§aSelected area flipped!");
-    }*/
+    }
 
     /**
      * @param Player $player
-     */
+     *./
     public function flip(Player $player) {
         $list = BlockList::fromCopyData($this->copyData[$player->getName()], true);
-        /** @var int $minY */
+        /** @var int $minY *./
         $minY = null;
-        /** @var int $maxY */
+        /** @var int $maxY *./
         $maxY = null;
 
         // b = block :D
@@ -316,7 +333,7 @@ class Copier extends Editor {
                 $block->setDamage(self::FLIP_DATA[1][$block->getDamage()]);
             }
             return $block;
-        };*/
+        };*./
 
         $this->copyData[$player->getName()]["data"] = [];
         foreach ($fillList->getAll() as $block) {
@@ -324,5 +341,5 @@ class Copier extends Editor {
         }
 
         $player->sendMessage(BuilderTools::getPrefix() . "Selected area flipped!");
-    }
+    }*/
 }
