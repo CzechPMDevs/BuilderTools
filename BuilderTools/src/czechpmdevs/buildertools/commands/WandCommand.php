@@ -21,6 +21,9 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\EnchantmentInstance;
+use pocketmine\item\Item;
 use pocketmine\Player;
 
 /**
@@ -45,6 +48,14 @@ class WandCommand extends BuilderToolsCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
+            return;
+        }
+        if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
+            $item = Item::get(Item::WOODEN_AXE);
+            $item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
+            $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(50), 1));
+            $sender->getInventory()->addItem($item);
+            $sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
             return;
         }
         Selectors::switchWandSelector($sender);

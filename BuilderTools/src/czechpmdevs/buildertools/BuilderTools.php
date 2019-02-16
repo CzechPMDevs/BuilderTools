@@ -61,6 +61,7 @@ use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
+use pocketmine\item\enchantment\Enchantment;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -97,6 +98,7 @@ class BuilderTools extends PluginBase {
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
+        $this->registerEnchantment();
         self::$schematicsManager = new SchematicsManager($this);
     }
 
@@ -120,6 +122,10 @@ class BuilderTools extends PluginBase {
 
     private function initListner() {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
+    }
+
+    private function registerEnchantment() {
+        Enchantment::registerEnchantment(new Enchantment(50, "BuilderTools", Enchantment::RARITY_COMMON, 0, 0, 1));
     }
 
     private function registerCommands() {

@@ -23,6 +23,9 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\EnchantmentInstance;
+use pocketmine\item\Item;
 use pocketmine\Player;
 
 /**
@@ -35,7 +38,7 @@ class BlockInfoCommand extends BuilderToolsCommand {
      * ReplaceCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi"]);
+        parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi", "/debug"]);
     }
 
     /**
@@ -47,6 +50,14 @@ class BlockInfoCommand extends BuilderToolsCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
+            return;
+        }
+        if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
+            $item = Item::get(Item::STICK);
+            $item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
+            $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(50), 1));
+            $sender->getInventory()->addItem($item);
+            $sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
             return;
         }
         Selectors::switchBlockInfoSelector($sender);
