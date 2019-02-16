@@ -87,13 +87,24 @@ class BuilderTools extends PluginBase {
     /** @var Command[] $commands */
     private static $commands = [];
 
+    /** @var array $config */
+    private static $configuration = [];
+
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
+        $this->initConfig();
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
         self::$schematicsManager = new SchematicsManager($this);
+    }
+
+    private function initConfig() {
+        if(!is_dir($this->getDataFolder())) {
+            @mkdir($this->getDataFolder());
+        }
+        self::$configuration = $this->getConfig()->getAll();
     }
 
     private function registerEditors() {
@@ -170,6 +181,13 @@ class BuilderTools extends PluginBase {
      */
     public static function getPrefix(): string {
         return self::$prefix;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getConfiguration(): array {
+        return self::$configuration;
     }
 
     /**

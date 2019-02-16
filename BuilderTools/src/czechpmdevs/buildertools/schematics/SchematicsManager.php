@@ -23,8 +23,6 @@ namespace czechpmdevs\buildertools\schematics;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\object\BlockList;
-use const pocketmine\BASE_VERSION;
-use const pocketmine\BUILD_NUMBER;
 use pocketmine\Player;
 
 /**
@@ -63,8 +61,12 @@ class SchematicsManager {
 
     public function loadSchematics() {
         $this->schematics = [];
+        $unloaded = BuilderTools::getConfiguration()["schematics"]["load"] != "startup";
         foreach (glob($this->plugin->getDataFolder() . "schematics/*.schematic") as $file) {
-            $this->schematics[basename($file, ".schematic")] = new Schematic($file);
+            if($unloaded)
+                $this->schematics[basename($file, ".schematic")] = new UnloadedSchematic($file);
+            else
+                $this->schematics[basename($file, ".schematic")] = new Schematic($file);
         }
     }
 
@@ -86,10 +88,16 @@ class SchematicsManager {
         }
 
         $schematic = $this->players[$player->getName()];
+        $blockList = $schematic->getBlockList();
+
+        if($blockList === null) {
+            $player->sendMessage(BuilderTools::getPrefix() . "§cInvalid schematic format (Sponge) isn't supported.");
+            return;
+        }
 
         $fillList = new BlockList();
         $fillList->setLevel($player->getLevel());
-        foreach ($schematic->getBlockList()->getAll() as $block) {
+        foreach ($blockList->getAll() as $block) {
             $fillList->addBlock($block->add($player), $block);
         }
 

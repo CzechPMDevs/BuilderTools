@@ -53,6 +53,12 @@ class HollowSphereCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
+
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//hsphere <id1:dmg1,id2:dmg2:,...> [radius]");
+            return;
+        }
+
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
 
         /** @var Printer $printer */

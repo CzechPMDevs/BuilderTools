@@ -56,6 +56,7 @@ class HollowCubeCommand extends BuilderToolsCommand {
             $sender->sendMessage("§7Usage: §c//hcube <id1:dmg1,id2:dmg2,...> <radius>");
             return;
         }
+
         $radius = isset($args[1]) ? (int)$args[1] : 5;
 
         /** @var Printer $printer */

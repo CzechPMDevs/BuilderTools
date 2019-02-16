@@ -70,7 +70,7 @@ class Schematic {
      *
      * Classic -> MC:JAVA world format
      * Pocket -> MC:BEDROCK world format
-     * Alpha -> MC:ALPHA world format - is not supported
+     * Alpha -> MC:ALPHA world format - same as java
      */
     protected $materials = "Classic";
 
@@ -126,7 +126,7 @@ class Schematic {
     /**
      * @return BlockList
      */
-    public function getBlockList(): BlockList {
+    public function getBlockList(): ?BlockList {
         return $this->blockList;
     }
 

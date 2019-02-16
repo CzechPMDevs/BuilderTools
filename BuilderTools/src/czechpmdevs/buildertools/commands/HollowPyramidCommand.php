@@ -53,7 +53,7 @@ class HollowPyramidCommand extends BuilderToolsCommand {
             return;
         }
         if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//hpyramid <id1:dmg1,id2:dmg2:,...> [size]");
+            $sender->sendMessage("§cUsage: §7//hpyramid <id1:dmg1,id2:dmg2,...> [size]");
             return;
         }
 

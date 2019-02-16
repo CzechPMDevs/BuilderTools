@@ -53,7 +53,7 @@ class HollowCylinderCommand extends BuilderToolsCommand {
             return;
         }
         if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//hcylinder <id1:dmg1,id2:dmg2:,...> [radius] [height]");
+            $sender->sendMessage("§cUsage: §7//hcylinder <id1:dmg1,id2:dmg2:...> [radius] [height]");
             return;
         }
 
