@@ -366,15 +366,15 @@ class Printer extends Editor {
      */
     public function makeCube(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
+        $blockList = new BlockList(BlockList::SAVE_TYPE_NORMAL);
         $blockList->setLevel($center->getLevel());
-        for($x = $center->getX()-$radius; $x < $center->getX()+$radius; $x++) {
-            for($y = $center->getY()-$radius; $y < $center->getY()+$radius; $y++) {
-                for($z = $center->getZ()-$radius; $z < $center->getZ()+$radius; $z++) {
+        for($x = -$radius; $x <= $radius; $x++) {
+            for($y = -$radius; $y <= $radius; $y++) {
+                for($z = -$radius; $z <= $radius; $z++) {
                     if($hollow) {
-                        if($x == $center->getX()+$radius || $y == $center->getY()+$radius || $z == $center->getZ()+$radius) $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blocks));
+                        if(in_array($radius, [$x, $y, $z, -$x, -$y, -$z])) $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
                     } else {
-                        $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blocks));
+                        $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
                     }
                 }
             }
