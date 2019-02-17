@@ -33,6 +33,7 @@
     <br><br>
 </p>
 
+<p align="center">1.2 Release date: 16.3. 2019</p>
 
 ## 👍 1.1 Update:
 > - Plugin cleanup
