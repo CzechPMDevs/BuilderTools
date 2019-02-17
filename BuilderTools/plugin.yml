@@ -72,3 +72,6 @@ permissions:
       bt.cmd.hpyrdamid:
         description: Permission for //hpyramid
         default: op
+      bt.cmd.stack:
+        description: Permission for //stack
+        default: op

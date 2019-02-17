@@ -22,10 +22,12 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\level\format\EmptySubChunk;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -34,6 +36,10 @@ use pocketmine\Player;
  * @package buildertools\editors
  */
 class Copier extends Editor {
+
+    public const DIRECTION_PLAYER = 0;
+    public const DIRECTION_UP = 1;
+    public const DIRECTION_DOWN = 2;
 
     public const FLIP_DATA = [
         // stairs
@@ -248,6 +254,11 @@ class Copier extends Editor {
      * @param Player $player
      */
     public function flip(Player $player) {
+        if(!isset($this->copyData[$player->getName()])) {
+            $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+                return;
+        }
+
         $minY = null;
         $maxY = null;
 
@@ -284,62 +295,111 @@ class Copier extends Editor {
 
     /**
      * @param Player $player
-     *./
-    public function flip(Player $player) {
-        $list = BlockList::fromCopyData($this->copyData[$player->getName()], true);
-        /** @var int $minY *./
-        $minY = null;
-        /** @var int $maxY *./
-        $maxY = null;
-
-        // b = block :D
-        foreach ($list->getBlockMap() as $x => $yzb) {
-            foreach ($yzb as $y => $zb) {
-                if($minY === null || $minY > $y) $minY = $y;
-                if($maxY === null || $maxY < $y) $maxY = $y;
-            }
+     * @param int $pasteCount
+     * @param int $mode
+     */
+    public function stack(Player $player, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER) {
+        if (!isset($this->copyData[$player->getName()])) {
+            $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+            return;
         }
 
-        $middleY = $minY+((int)round(($maxY-$minY)/2));
-        $middleExist = is_int(($maxY-$minY)/2);
+        $list = new BlockList();
+        $list->setLevel($player->getLevel());
 
-        $fillList = new BlockList();
+        /** @var Position $center */
+        $center = $this->copyData[$player->getName()]["center"];
+        $center = $center->add(1, 0 , 1); // why???
 
-        foreach ($list->getAll() as $block) {
-            if($middleExist && $block->getY() == $middleY) {
-                $fillList->addBlock($block->asVector3(), $block);
-            }
-            elseif($block->getY() < $middleY) {
-                if($middleExist)
-                    $fillList->addBlock(new Vector3($block->getX(), $middleY+abs($middleY-$block->getY()), $block->getZ()), $block);
-                else
-                    $fillList->addBlock(new Vector3($block->getX(), ($middleY-1)+abs(($middleY-1)-$block->getY())+1, $block->getZ()), $block);
-            }
-            // děláno na rychlo
-            else {
-                if($middleExist)
-                    $fillList->addBlock(new Vector3($block->getX(), $middleY-abs($middleY-$block->getY()), $block->getZ()), $block);
-                else
-                    $fillList->addBlock(new Vector3($block->getX(), ($middleY-(abs($middleY-$block->getY()))-1), $block->getZ()), $block);
-            }
+        switch ($mode) {
+            case self::DIRECTION_PLAYER:
+                $d = $player->getDirection();
+                switch ($d) {
+                    case 0:
+                    case 2:
+                        $minX = null;
+                        $maxX = null;
+
+                        /**
+                         * @var Vector3 $vec
+                         */
+                        foreach ($this->copyData[$player->getName()]["data"] as [$vec]) {
+                            if ($minX === null || $vec->getX() < $minX) {
+                                $minX = $vec->getX();
+                            }
+                            if ($maxX === null || $vec->getX() > $maxX) {
+                                $maxX = $vec->getX();
+                            }
+                        }
+
+                        $length = (int)(round(abs($maxX - $minX))+1);
+                        if ($d == 2) $length = -$length;
+                        for ($pasted = 0; $pasted < $pasteCount; ++$pasted) {
+                            $addX = $length * $pasted;
+                            foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                                $list->addBlock($center->add($vec->add($addX)), $block);
+                            }
+                        }
+                        break;
+                    case 1:
+                    case 3:
+                        $minZ = null;
+                        $maxZ = null;
+
+                        /**
+                         * @var Vector3 $vec
+                         */
+                        foreach ($this->copyData[$player->getName()]["data"] as [$vec]) {
+                            if ($minZ === null || $vec->getZ() < $minZ) {
+                                $minZ = $vec->getZ();
+                            }
+                            if ($maxZ === null || $vec->getZ() > $maxZ) {
+                                $maxZ = $vec->getZ();
+                            }
+                        }
+
+                        $length = (int)(round(abs($maxZ - $minZ))+1);
+                        if ($d == 3) $length = -$length;
+                        for ($pasted = 0; $pasted < $pasteCount; ++$pasted) {
+                            $addZ = $length * $pasted;
+                            foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                                $list->addBlock($center->add($vec->add(0, 0, $addZ)), $block);
+                            }
+                        }
+                        break;
+                }
+                break;
+            case self::DIRECTION_UP:
+            case self::DIRECTION_DOWN:
+                $minY = null;
+                $maxY = null;
+
+                /**
+                 * @var Vector3 $vec
+                 */
+                foreach ($this->copyData[$player->getName()]["data"] as [$vec]) {
+                    if ($minY === null || $vec->getY() < $minY) {
+                        $minY = $vec->getY();
+                    }
+                    if ($maxY === null || $vec->getY() > $maxY) {
+                        $maxY = $vec->getY();
+                    }
+                }
+
+                $length = (int)(round(abs($maxY - $minY))+1);
+                if ($mode == self::DIRECTION_DOWN) $length = -$length;
+                for ($pasted = 0; $pasted <= $pasteCount; ++$pasted) {
+                    $addY = $length * $pasted;
+                    foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
+                        $list->addBlock($center->add($vec->add(0, $addY)), $block);
+                    }
+                }
+                break;
         }
 
-        /*
-        $fixBlock = function (Block $block): Block {
-            if(in_array($block->getId(), [Block::OAK_STAIRS, Block::COBBLESTONE_STAIRS, Block::ACACIA_STAIRS, Block::ACACIA_STAIRS, Block::DARK_OAK_STAIRS, Block::JUNGLE_STAIRS, Block::NETHER_BRICK_STAIRS, Block::PURPUR_STAIRS, Block::QUARTZ_STAIRS, Block::BRICK_STAIRS])) {
-                $block->setDamage(self::FLIP_DATA[0][$block->getDamage()]);
-            }
-            if(in_array($block->getId(), [Block::STONE_SLAB, Block::STONE_SLAB2, Block::WOODEN_SLAB])) {
-                $block->setDamage(self::FLIP_DATA[1][$block->getDamage()]);
-            }
-            return $block;
-        };*./
-
-        $this->copyData[$player->getName()]["data"] = [];
-        foreach ($fillList->getAll() as $block) {
-            $this->copyData[$player->getName()]["data"][] = [$block->asVector3(), $block];
-        }
-
-        $player->sendMessage(BuilderTools::getPrefix() . "Selected area flipped!");
-    }*/
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(self::FILLER);
+        $filler->fill($player, $list);
+        $player->sendMessage(BuilderTools::getPrefix()."§aCopied area stacked!");
+    }
 }

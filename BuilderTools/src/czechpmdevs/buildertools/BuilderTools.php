@@ -46,6 +46,7 @@ use czechpmdevs\buildertools\commands\RotateCommand;
 use czechpmdevs\buildertools\commands\SchematicCommand;
 use czechpmdevs\buildertools\commands\SecondPositionCommand;
 use czechpmdevs\buildertools\commands\SphereCommand;
+use czechpmdevs\buildertools\commands\StackCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
 use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
@@ -159,7 +160,8 @@ class BuilderTools extends PluginBase {
             new PyramidCommand,
             new HollowPyramidCommand,
             new CylinderCommand,
-            new HollowCylinderCommand
+            new HollowCylinderCommand,
+            new StackCommand
         ];
         foreach (self::$commands as $command) {
             $map->register("BuilderTools", $command);
