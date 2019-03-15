@@ -26,7 +26,7 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
-use pocketmine\level\format\EmptySubChunk
+use pocketmine\level\format\EmptySubChunk;
 use pocketmine\level\Position;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
