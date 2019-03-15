@@ -32,8 +32,6 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
-use pocketmine\network\mcpe\protocol\TextPacket;
-use pocketmine\Player;
 
 /**
  * Class EventListener

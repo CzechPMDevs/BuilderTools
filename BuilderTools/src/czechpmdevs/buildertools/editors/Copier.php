@@ -26,8 +26,9 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
-use pocketmine\level\format\EmptySubChunk;
+use pocketmine\level\format\EmptySubChunk
 use pocketmine\level\Position;
+use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -43,13 +44,9 @@ class Copier extends Editor {
 
     public const FLIP_DATA = [
         // stairs
-        0 => [
-            0 => 4, 1 => 5, 2 => 6, 3 => 7, 4 => 0, 5 => 1, 6 => 2, 7 => 3
-        ],
+        0 => [0 => 4, 1 => 5, 2 => 6, 3 => 7, 4 => 0, 5 => 1, 6 => 2, 7 => 3],
         // slabs
-        1 => [
-            0 => 8, 1 => 9, 2 => 10, 3 => 11, 4 => 12, 5 => 13, 6 => 14, 7 => 15, 8 => 0, 9 => 1, 10 => 2, 11 => 3, 12 => 4, 13 => 5, 14 => 6, 15 => 7
-        ]
+        1 => [0 => 8, 1 => 9, 2 => 10, 3 => 11, 4 => 12, 5 => 13, 6 => 14, 7 => 15, 8 => 0, 9 => 1, 10 => 2, 11 => 3, 12 => 4, 13 => 5, 14 => 6, 15 => 7]
     ];
 
     /** @var array $copyData */
