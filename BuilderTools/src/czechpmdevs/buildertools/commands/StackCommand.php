@@ -27,30 +27,53 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 /**
- * Class FlipCommand
- * @package buildertools\commands
+ * Class StackCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class FlipCommand extends BuilderToolsCommand {
+class StackCommand extends BuilderToolsCommand {
 
     /**
-     * FlipCommand constructor.
+     * StackCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/flip", "Flip selected area", null, []);
+        parent::__construct("/stack", "Stack copied area", null, []);
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $commandLabel
+     * @param array $args
+     * @return void
+     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//stack <count> [side|up|down]");
+            return;
+        }
+        if(!is_numeric($args[0])) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cType number!");
+            return;
+        }
+
+        $count = (int)$args[0];
+        $mode = Copier::DIRECTION_PLAYER;
+        if(isset($args[1])) {
+            switch (strtoupper($args[1])) {
+                case "UP":
+                    $mode = Copier::DIRECTION_UP;
+                    break;
+                case "DOWN":
+                    $mode = Copier::DIRECTION_DOWN;
+                    break;
+            }
+        }
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-
-        if(!isset($copier->copyData[$sender->getName()])) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
-        }
-        $copier->flip($sender);
+        $copier->stack($sender, $count, $mode);
     }
 }

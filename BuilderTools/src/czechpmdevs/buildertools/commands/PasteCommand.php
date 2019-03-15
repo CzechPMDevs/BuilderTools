@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,15 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\level\Position;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class CopyCommand
  * @package buildertools\commands
  */
-class PasteCommand extends Command implements PluginIdentifiableCommand {
+class PasteCommand extends BuilderToolsCommand {
 
     /**
      * PasteCommand constructor.
@@ -52,31 +49,12 @@ class PasteCommand extends Command implements PluginIdentifiableCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.paste")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
-            return;
-        }
-        if(!Selectors::isSelected(1, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
-            return;
-        }
-        if(!Selectors::isSelected(2, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
         $copier->paste($sender);
         $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully pasted!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

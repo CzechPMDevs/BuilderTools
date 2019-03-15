@@ -23,36 +23,39 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
+use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\Selectors;
+use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 /**
- * Class FillCommand
- * @package buildertools\commands
+ * Class MoveCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class FillCommand extends BuilderToolsCommand {
+class MoveCommand extends BuilderToolsCommand {
 
     /**
-     * FillCommand constructor.
+     * MoveCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
+        parent::__construct("/move", "Move selected area", null, []);
     }
 
     /**
      * @param CommandSender $sender
      * @param string $commandLabel
      * @param array $args
-     * @return void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        if(!isset($args[0])) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
+
+        if(count($args) < 3 || !is_numeric($args[0]) || !is_numeric($args[1]) || !is_numeric($args[2])) {
+            $sender->sendMessage("§cUsage: §7//move <x> <y> <z>");
             return;
         }
 
@@ -74,14 +77,15 @@ class FillCommand extends BuilderToolsCommand {
             return;
         }
 
-        $startTime = microtime(true);
-
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
 
-        $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevel(), $args[0]);
-        $result = $filler->fill($sender, $blocks);
+        $blocks = BlockList::build($sender->getLevel(), $firstPos, $secondPos);
+        $toFill = $blocks->add(new Vector3((int)$args[0], (int)$args[1], (int)$args[2]));
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in " . (string)round(microtime(true)-$startTime, 2) . " (" . (string)$result->countBlocks . " block changed)");
+        $toRemove = $filler->prepareFill($firstPos, $secondPos, $firstPos->getLevel(), "air", true);
+
+        $filler->fill($sender, $toRemove);
+        $filler->fill($sender, $toFill);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ class Decorator extends Editor {
                             $blockArgs = explode(",", $blocks);
                             array_push($undo, $center->getLevel()->getBlock($vec));
                             $undo[] = $center->getLevel()->getBlock($vec->add(0, 1));
-                            $center->getLevel()->setBlock($vec->add(0, 1), Item::fromString($blockArgs[array_rand($blockArgs,1)])->getBlock(), true, true);
+                            $center->getLevel()->setBlock($vec->add(0, 1), Item::fromString($blockArgs[array_rand($blockArgs,1)])->getBlock());
                         }
                     }
                 }

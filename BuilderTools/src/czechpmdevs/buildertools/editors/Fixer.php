@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,30 @@ class Fixer extends Editor {
     ];
 
     /**
+     * @param BlockList $blockList
+     * @return BlockList
+     */
+    public function fixBlockList(BlockList $blockList): BlockList {
+        $newList = new BlockList();
+        foreach ($blockList->getAll() as $block) {
+            $id = $block->getId();
+            $damage = $block->getDamage();
+            $x = $block->getX();
+            $y = $block->getY();
+            $z = $block->getZ();
+            if(isset(self::$blocks[$id])) {
+                if(is_int(self::$blocks[$id][1])) $damage = self::$blocks[$id][1];
+                $id = self::$blocks[$id][0];
+            }
+
+            $block = Block::get($id, $damage);
+            $block->setComponents($x, $y, $z);
+            $newList->addBlock($block->asVector3(), $block);
+        }
+        return $newList;
+    }
+
+    /**
      * @param $x1
      * @param $y1
      * @param $z1
@@ -82,9 +106,10 @@ class Fixer extends Editor {
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
             for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
                 for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                    $id = $level->getBlockIdAt($x, $y, $z);
+                    #$id = $level->getBlockIdAt($x, $y, $z);
+                    $id = $level->getBlockAt($x, $y, $z)->getId();
 
-                    if(self::FIX_TILES) {
+                    if(self::FIX_TILES && \pocketmine\BASE_VERSION != "4.0.0") {
                         switch ($id) {
                             case Block::CHEST:
                                 if($level->getTile(new Vector3($x, $y, $z)) === null)
@@ -108,7 +133,7 @@ class Fixer extends Editor {
                     }
 
 
-                    if(isset($blocks[$id])) $blockList->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockDataAt($x, $y, $z))));
+                    if(isset($blocks[$id])) $blockList->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockAt($x, $y, $z)->getDamage())));
                 }
             }
         }

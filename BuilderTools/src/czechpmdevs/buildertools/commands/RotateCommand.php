@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,14 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class RotateCommand
  * @package buildertools\commands
  */
-class RotateCommand extends Command implements PluginIdentifiableCommand {
+class RotateCommand extends BuilderToolsCommand {
 
     /**
      * RotateCommand constructor.
@@ -42,25 +39,20 @@ class RotateCommand extends Command implements PluginIdentifiableCommand {
         parent::__construct("/rotate", "Rotate selected area", null, []);
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $commandLabel
+     * @param array $args
+     * @return mixed|void
+     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            return;
-        }
-
-        if(!$sender->hasPermission("bt.cmd.rotate")) {
-            $sender->sendMessage("§cYou do not have permissions to use this command.");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
         $copier->addToRotate($sender);
-    }
-
-    /**
-     * @return Plugin|BuilderTools $plugin
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

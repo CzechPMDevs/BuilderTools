@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ class Naturalizer extends Editor {
 
         $blockY = null;
         for($y = $minY; $y < $maxY; $y++) {
-            if($level->getBlockIdAt($x, $y, $z) !== Block::AIR && ($blockY === null || $blockY < $y)) {
+            if($level->getBlockAt($x, $y, $z)->getId() !== Block::AIR && ($blockY === null || $blockY < $y)) {
                 $blockY = $y;
             }
         }
@@ -95,13 +95,19 @@ class Naturalizer extends Editor {
                 case 1:
                 case 2:
                 case 3:
-                    $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::DIRT));
+                    if($level->getBlockAt($x, $y, $z)->getId() != Block::AIR) {
+                        $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::DIRT));
+                    }
                     break;
                 case 4:
-                    $list->addBlock(new Vector3($x, $y, $z), (rand(0, 1) ? Block::get(Block::DIRT) : Block::get(Block::STONE)));
+                    if($level->getBlockAt($x, $y, $z)->getId() != Block::AIR) {
+                        $list->addBlock(new Vector3($x, $y, $z), (rand(0, 1) ? Block::get(Block::DIRT) : Block::get(Block::STONE)));
+                    }
                     break;
                 default:
-                    $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::STONE));
+                    if($level->getBlockAt($x, $y, $z)->getId() != Block::AIR) {
+                        $list->addBlock(new Vector3($x, $y, $z), Block::get(Block::STONE));
+                    }
             }
         }
     }

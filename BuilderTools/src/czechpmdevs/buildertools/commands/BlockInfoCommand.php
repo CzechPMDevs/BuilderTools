@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,23 +22,23 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\EnchantmentInstance;
+use pocketmine\item\Item;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class BlockInfoCommand
  * @package czechpmdevs\buildertools\commands
  */
-class BlockInfoCommand extends Command implements PluginIdentifiableCommand {
+class BlockInfoCommand extends BuilderToolsCommand {
 
     /**
      * ReplaceCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi"]);
+        parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi", "/debug"]);
     }
 
     /**
@@ -49,22 +49,18 @@ class BlockInfoCommand extends Command implements PluginIdentifiableCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        if(!$sender->hasPermission("bt.cmd.blockinfo")) {
-            $sender->sendMessage("§cYou do not have not permissions to use this command!");
+        if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
+            $item = Item::get(Item::STICK);
+            $item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
+            $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(50), 1));
+            $sender->getInventory()->addItem($item);
+            $sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
             return;
         }
-
         Selectors::switchBlockInfoSelector($sender);
         $sender->sendMessage(BuilderTools::getPrefix() . "Block info mode turned " . (Selectors::isBlockInfoPlayer($sender) ? "on" : "off") . "!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools $builderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

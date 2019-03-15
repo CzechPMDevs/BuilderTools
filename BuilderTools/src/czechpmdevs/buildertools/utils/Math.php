@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,5 +43,16 @@ class Math {
      */
     public static function roundPosition(Position $position): Position {
         return Position::fromObject(self::roundVector3($position), $position->getLevel());
+    }
+
+    /**
+     * @param float|int $x
+     * @param float|int $y
+     * @param float|int $z
+     * @return float|int
+     */
+    public static function lengthSq($x, $y, $z = null) {
+        if($z === null) return ($x * $x) + ($y * $y);
+        return ($x * $x) + ($y * $y) + ($z * $z);
     }
 }

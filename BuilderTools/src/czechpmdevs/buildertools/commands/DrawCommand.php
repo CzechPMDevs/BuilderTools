@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,14 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class DrawCommand
  * @package buildertools\commands
  */
-class DrawCommand extends Command implements PluginIdentifiableCommand {
+class DrawCommand extends BuilderToolsCommand {
 
     /** @var int $minBrush */
     private $minBrush = 1;
@@ -56,11 +53,7 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.draw")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         if(!isset($args[0])) {
@@ -103,12 +96,5 @@ class DrawCommand extends Command implements PluginIdentifiableCommand {
         $fall = $fall ? "§2true§a" : "§cfalse§a";
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(§7shape: §a{$args[0]} §7Fall:$fall)!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

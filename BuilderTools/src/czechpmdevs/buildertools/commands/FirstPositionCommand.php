@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,15 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\level\Position;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class FirstPositionCommand
  * @package buildertools\commands
  */
-class FirstPositionCommand extends Command implements PluginIdentifiableCommand {
+class FirstPositionCommand extends BuilderToolsCommand {
 
     /**
      * FirstPositionCommand constructor.
@@ -50,21 +47,10 @@ class FirstPositionCommand extends Command implements PluginIdentifiableCommand 
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.pos1")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         Selectors::addSelector($sender, 1, $position = new Position((int)round($sender->getX()), (int)round($sender->getY()), (int)round($sender->getZ()), $sender->getLevel()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
-    }
-
-    /**
-     * @return Plugin|BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

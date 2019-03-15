@@ -1,9 +1,8 @@
 name: BuilderTools
-api: 3.0.0
+api: [3.0.0, 4.0.0]
 author: CzechPMDevs
 authors: [VixikCZ]
-version: 1.1.0
-description: An advanced WorldEdit plugin
+version: 1.2.0-beta1
 main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
 
@@ -50,4 +49,34 @@ permissions:
         default: op
       bt.cmd.paste:
         description: Permissions for //paste
+        default: op
+      bt.cmd.hsphere:
+        descripton: Permissions for //hsphere
+        default: op
+      bt.cmd.hcube:
+        description: Permission for //hcube
+        default: op
+      bt.cmd.schematic:
+        description: Permission for //schematics
+        default: op
+      bt.cmd.cylinder:
+        description: Permission for //cylinder
+        default: op
+      bt.cmd.hcylinder:
+        description: Permission for //hcylinder
+        default: op
+      bt.cmd.pyrdamid:
+        description: Permission for //pyramid
+        default: op
+      bt.cmd.hpyrdamid:
+        description: Permission for //hpyramid
+        default: op
+      bt.cmd.stack:
+        description: Permission for //stack
+        default: op
+      bt.cmd.outline:
+        description: Permission for //outline
+        default: op
+      bt.cmd.move:
+        description: Permission for //move
         default: op

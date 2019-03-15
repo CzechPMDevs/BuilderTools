@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,31 @@ use czechpmdevs\buildertools\commands\BlockInfoCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
 use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
+use czechpmdevs\buildertools\commands\CylinderCommand;
 use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
 use czechpmdevs\buildertools\commands\FixCommand;
 use czechpmdevs\buildertools\commands\FlipCommand;
 use czechpmdevs\buildertools\commands\HelpCommand;
+use czechpmdevs\buildertools\commands\HollowCubeCommand;
+use czechpmdevs\buildertools\commands\HollowCylinderCommand;
+use czechpmdevs\buildertools\commands\HollowPyramidCommand;
+use czechpmdevs\buildertools\commands\HollowSphereCommand;
 use czechpmdevs\buildertools\commands\IdCommand;
 use czechpmdevs\buildertools\commands\MergeCommand;
+use czechpmdevs\buildertools\commands\MoveCommand;
 use czechpmdevs\buildertools\commands\NaturalizeCommand;
+use czechpmdevs\buildertools\commands\OutlineCommand;
 use czechpmdevs\buildertools\commands\PasteCommand;
+use czechpmdevs\buildertools\commands\PyramidCommand;
 use czechpmdevs\buildertools\commands\RedoCommand;
 use czechpmdevs\buildertools\commands\ReplaceCommand;
 use czechpmdevs\buildertools\commands\RotateCommand;
+use czechpmdevs\buildertools\commands\SchematicCommand;
 use czechpmdevs\buildertools\commands\SecondPositionCommand;
 use czechpmdevs\buildertools\commands\SphereCommand;
+use czechpmdevs\buildertools\commands\StackCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
 use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
@@ -52,6 +62,9 @@ use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\event\listener\EventListener;
+use czechpmdevs\buildertools\schematics\SchematicsManager;
+use pocketmine\command\Command;
+use pocketmine\item\enchantment\Enchantment;
 use pocketmine\plugin\PluginBase;
 
 /**
@@ -72,12 +85,31 @@ class BuilderTools extends PluginBase {
     /** @var EventListener $listener */
     private static $listener;
 
+    /** @var SchematicsManager $schematicManager */
+    private static $schematicsManager;
+
+    /** @var Command[] $commands */
+    private static $commands = [];
+
+    /** @var array $config */
+    private static $configuration = [];
+
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
+        $this->initConfig();
         $this->registerCommands();
         $this->initListner();
         $this->registerEditors();
+        $this->registerEnchantment();
+        self::$schematicsManager = new SchematicsManager($this);
+    }
+
+    private function initConfig() {
+        if(!is_dir($this->getDataFolder())) {
+            @mkdir($this->getDataFolder());
+        }
+        self::$configuration = $this->getConfig()->getAll();
     }
 
     private function registerEditors() {
@@ -94,31 +126,51 @@ class BuilderTools extends PluginBase {
     private function initListner() {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
     }
+
+    private function registerEnchantment() {
+        Enchantment::registerEnchantment(new Enchantment(50, "BuilderTools", Enchantment::RARITY_COMMON, 0, 0, 1));
+    }
+
     private function registerCommands() {
         $map = $this->getServer()->getCommandMap();
-        $map->register("BuilderTools", new FirstPositionCommand);
-        $map->register("BuilderTools", new SecondPositionCommand);
-        $map->register("BuilderTools", new WandCommand);
-        $map->register("BuilderTools", new FillCommand);
-        $map->register("BuilderTools", new HelpCommand);
-        $map->register("BuilderTools", new DrawCommand);
-        $map->register("BuilderTools", new SphereCommand);
-        $map->register("BuilderTools", new ReplaceCommand);
-        $map->register("BuilderTools", new IdCommand);
-        $map->register("BuilderTools", new ClearInventoryCommand);
-        $map->register("BuilderTools", new NaturalizeCommand);
-        $map->register("BuilderTools", new CopyCommand);
-        $map->register("BuilderTools", new PasteCommand);
-        $map->register("BuilderTools", new RotateCommand);
-        $map->register("BuilderTools", new UndoCommand);
-        $map->register("BuilderTools", new RedoCommand);
-        $map->register("BuilderTools", new TreeCommand);
-        #$map->register("BuilderTools", new DecorationCommand); taken down due to release
-        $map->register("BuilderTools", new FlipCommand);
-        $map->register("BuilderTools", new FixCommand);
-        $map->register("BuilderTools", new CubeCommand);
-        $map->register("BuilderTools", new MergeCommand);
-        $map->register("BuilderTools", new BlockInfoCommand);
+        self::$commands = [
+            new FirstPositionCommand,
+            new SecondPositionCommand,
+            new WandCommand,
+            new FillCommand,
+            new HelpCommand,
+            new DrawCommand,
+            new SphereCommand,
+            new HollowSphereCommand,
+            new ReplaceCommand,
+            new IdCommand,
+            new CubeCommand,
+            new HollowCubeCommand,
+            new CopyCommand,
+            new PasteCommand,
+            new MergeCommand,
+            new RotateCommand,
+            new FlipCommand,
+            new UndoCommand,
+            new RedoCommand,
+            new TreeCommand,
+            new FixCommand,
+            new BlockInfoCommand,
+            new ClearInventoryCommand,
+            new NaturalizeCommand,
+            new SchematicCommand,
+            new PyramidCommand,
+            new HollowPyramidCommand,
+            new CylinderCommand,
+            new HollowCylinderCommand,
+            new StackCommand,
+            new OutlineCommand,
+            new MoveCommand
+        ];
+        foreach (self::$commands as $command) {
+            $map->register("BuilderTools", $command);
+        }
+        HelpCommand::buildPages();
     }
 
     /**
@@ -130,6 +182,13 @@ class BuilderTools extends PluginBase {
     }
 
     /**
+     * @return Command[] $commands
+     */
+    public static function getAllCommands(): array {
+        return self::$commands;
+    }
+
+    /**
      * @return string $prefix
      */
     public static function getPrefix(): string {
@@ -137,10 +196,24 @@ class BuilderTools extends PluginBase {
     }
 
     /**
+     * @return array
+     */
+    public static function getConfiguration(): array {
+        return self::$configuration;
+    }
+
+    /**
      * @return EventListener $listener
      */
     public static function getListener(): EventListener {
         return self::$listener;
+    }
+
+    /**
+     * @return SchematicsManager $schematicsManager
+     */
+    public static function getSchematicsManager(): SchematicsManager {
+        return self::$schematicsManager;
     }
 
     /**

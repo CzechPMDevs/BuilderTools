@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,15 +41,26 @@ class Filler extends Editor {
      * @param Vector3 $pos2
      * @param Level $level
      * @param string $blockArgs
-     * @return BlockList $blocks
+     * @param bool $filled
+     *
+     * @return BlockList
      */
-    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs): BlockList {
+    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, $filled = true): BlockList {
         $blockList = new BlockList;
         $blockList->setLevel($level);
 
         for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
             for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
                 for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
+                    if(!$filled) {
+                        if($x != min($pos1->getX(), $pos2->getX()) && $x != max($pos1->getX(), $pos2->getX())) {
+                            if($y != min($pos1->getY(), $pos2->getY()) && $y != max($pos1->getY(), $pos2->getY())) {
+                                if($z != min($pos1->getZ(), $pos2->getZ()) && $z != max($pos1->getZ(), $pos2->getZ())) {
+                                    continue;
+                                }
+                            }
+                        }
+                    }
                     $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blockArgs));
                 }
             }
@@ -71,14 +82,11 @@ class Filler extends Editor {
         /** @var  $blocks */
         $blocks = $blockList->getAll();
 
-        /** @var bool $fastFill */
-        $fastFill = true;
         /** @var bool $saveUndo */
         $saveUndo = true;
         /** @var bool $saveRedo */
         $saveRedo = false;
 
-        if(isset($settings["fastFill"]) && is_bool($settings["fastFill"])) $fastFill = $settings["fastFill"];
         if(isset($settings["saveUndo"]) && is_bool($settings["saveUndo"])) $saveUndo = $settings["saveUndo"];
         if(isset($settings["saveRedo"]) && is_bool($settings["saveRedo"])) $saveRedo = $settings["saveRedo"];
 
@@ -87,7 +95,6 @@ class Filler extends Editor {
 
         if($saveUndo) $undoList->setLevel($blockList->getLevel());
         if($saveRedo) $redoList->setLevel($blockList->getLevel());
-
 
         if(!$fastFill) {
             /**

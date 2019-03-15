@@ -21,36 +21,50 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 /**
- * Class FlipCommand
- * @package buildertools\commands
+ * Class CylinderCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class FlipCommand extends BuilderToolsCommand {
+class PyramidCommand extends BuilderToolsCommand {
 
     /**
-     * FlipCommand constructor.
+     * SphereCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/flip", "Flip selected area", null, []);
+        parent::__construct("/pyramid", "Create pyramid", null, []);
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $commandLabel
+     * @param array $args
+     *
+     * @return mixed|void
+     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-
-        if(!isset($copier->copyData[$sender->getName()])) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//pyramid <id1:dmg1,id2:dmg2:,...> [size]");
+            return;
         }
-        $copier->flip($sender);
+
+        $size = isset($args[1]) ? (int)($args[1]) : 5;
+
+        /** @var Printer $printer */
+        $printer = BuilderTools::getEditor(Editor::PRINTER);
+
+        /** @var EditorResult $result */
+        $result = $printer->makePyramid($sender, $sender, $size, $args[0]);
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§aPyramid created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
     }
 }

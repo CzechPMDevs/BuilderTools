@@ -21,28 +21,30 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Canceller;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 /**
- * Class UndoCommand
- * @package buildertools\commands
+ * Class CylinderCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class UndoCommand extends BuilderToolsCommand {
+class HollowCylinderCommand extends BuilderToolsCommand {
 
     /**
-     * UndoCommand constructor.
+     * SphereCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/undo", "Undo last BuilderTools actions", null, []);
+        parent::__construct("/hcylinder", "Create hollow cylinder", null, ["/hcyl"]);
     }
 
     /**
      * @param CommandSender $sender
      * @param string $commandLabel
      * @param array $args
+     *
      * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
@@ -50,12 +52,20 @@ class UndoCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//hcylinder <id1:dmg1,id2:dmg2:...> [radius] [height]");
+            return;
+        }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $result = $canceller->undo($sender);
+        $radius = isset($args[1]) ? (int)($args[1]) : 5;
+        $height = isset($args[2]) ? (int)($args[2]) : 8;
 
-        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled!");
+        /** @var Printer $printer */
+        $printer = BuilderTools::getEditor(Editor::PRINTER);
+
+        /** @var EditorResult $result */
+        $result = $printer->makeHollowCylinder($sender, $sender, $radius, $height, $args[0]);
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cylinder created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
     }
-
 }

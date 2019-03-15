@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,14 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 
 /**
  * Class MergeCommand
  * @package buildertools\commands
  */
-class MergeCommand extends Command implements PluginIdentifiableCommand {
+class MergeCommand extends BuilderToolsCommand {
 
     /**
      * PasteCommand constructor.
@@ -51,11 +48,7 @@ class MergeCommand extends Command implements PluginIdentifiableCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in-game!");
-            return;
-        }
-        if(!$sender->hasPermission("bt.cmd.paste")) {
-            $sender->sendMessage("§cYou do have not permissions to use this command!");
+            $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
         if(!Selectors::isSelected(1, $sender)) {
@@ -70,12 +63,5 @@ class MergeCommand extends Command implements PluginIdentifiableCommand {
         $copier = BuilderTools::getEditor(Editor::COPIER);
         $copier->merge($sender);
         $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully merged!");
-    }
-
-    /**
-     * @return Plugin|BuilderTools
-     */
-    public function getPlugin(): Plugin {
-        return BuilderTools::getInstance();
     }
 }

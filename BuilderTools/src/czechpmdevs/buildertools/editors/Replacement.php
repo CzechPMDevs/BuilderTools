@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2018 CzechPMDevs
+ * Copyright (C) 2018-2019  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class Replacement extends Editor {
         for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
             for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
                 for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
-                    if($this->isBlockInString($blocks, $level->getBlockIdAt($x, $y, $z))) {
+                    if($this->isBlockInString($blocks, $level->getBlockAt($x, $y, $z)->getId())) {
                         $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($replace));
                     }
                 }

@@ -28,16 +28,16 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 /**
- * Class FillCommand
- * @package buildertools\commands
+ * Class OutlineCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class FillCommand extends BuilderToolsCommand {
+class OutlineCommand extends BuilderToolsCommand {
 
     /**
-     * FillCommand constructor.
+     * OutlineCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
+        parent::__construct("/outline", "Fills hollow selected area.", null, ["/hset"]);
     }
 
     /**
@@ -52,7 +52,7 @@ class FillCommand extends BuilderToolsCommand {
             return;
         }
         if(!isset($args[0])) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//outline <id1:meta1,id2:meta2,...>");
             return;
         }
 
@@ -79,7 +79,7 @@ class FillCommand extends BuilderToolsCommand {
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
 
-        $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevel(), $args[0]);
+        $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevel(), $args[0], false);
         $result = $filler->fill($sender, $blocks);
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in " . (string)round(microtime(true)-$startTime, 2) . " (" . (string)$result->countBlocks . " block changed)");
