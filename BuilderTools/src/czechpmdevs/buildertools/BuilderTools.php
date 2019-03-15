@@ -37,7 +37,9 @@ use czechpmdevs\buildertools\commands\HollowPyramidCommand;
 use czechpmdevs\buildertools\commands\HollowSphereCommand;
 use czechpmdevs\buildertools\commands\IdCommand;
 use czechpmdevs\buildertools\commands\MergeCommand;
+use czechpmdevs\buildertools\commands\MoveCommand;
 use czechpmdevs\buildertools\commands\NaturalizeCommand;
+use czechpmdevs\buildertools\commands\OutlineCommand;
 use czechpmdevs\buildertools\commands\PasteCommand;
 use czechpmdevs\buildertools\commands\PyramidCommand;
 use czechpmdevs\buildertools\commands\RedoCommand;
@@ -161,7 +163,9 @@ class BuilderTools extends PluginBase {
             new HollowPyramidCommand,
             new CylinderCommand,
             new HollowCylinderCommand,
-            new StackCommand
+            new StackCommand,
+            new OutlineCommand,
+            new MoveCommand
         ];
         foreach (self::$commands as $command) {
             $map->register("BuilderTools", $command);

@@ -192,6 +192,7 @@ class Copier extends Editor {
             case "0:1":
             case "1:2":
             case "2:3":
+            case "3:0":
                 /**
                  * @var Vector3 $vec
                  * @var Block $block
@@ -219,6 +220,7 @@ class Copier extends Editor {
             case "1:0":
             case "2:1":
             case "3:2":
+            case "0:3":
                 /**
                  * @var Vector3 $vec
                  * @var Block $block
@@ -234,17 +236,6 @@ class Copier extends Editor {
                     $vec->setComponents($vec->getZ(), $vec->getY(), $vec->getX());
                 }
 
-                $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
-                break;
-
-            case "3:0":
-                /**
-                 * @var Vector3 $vec
-                 * @var Block $block
-                 */
-                foreach ($this->copyData[$player->getName()]["data"] as [$vec, $block]) {
-                    $vec->setComponents(-$vec->getX(), $vec->getY(), -$vec->getZ());
-                }
                 $player->sendMessage(BuilderTools::getPrefix()."§aSelected area rotated! ($id)");
                 break;
         }

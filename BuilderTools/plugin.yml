@@ -75,3 +75,9 @@ permissions:
       bt.cmd.stack:
         description: Permission for //stack
         default: op
+      bt.cmd.outline:
+        description: Permission for //outline
+        default: op
+      bt.cmd.move:
+        description: Permission for //move
+        default: op

@@ -97,6 +97,50 @@ class BlockList extends BlockMap {
     }
 
     /**
+     * TODO: Implement other modes
+     *
+     * @param int|Vector3 $x
+     * @param int|null $y
+     * @param int|null $z
+     *
+     * @return BlockList
+     */
+    public function add($x = 0, $y = 0, $z = 0) {
+        $blockList = clone $this;
+        /** @var Vector3 $vec */
+        $vec = null;
+        if($x instanceof Vector3) {
+            $vec = $x;
+        } else {
+            $vec = new Vector3($x, $y, $z);
+        }
+        foreach ($blockList->getAll() as $block) {
+            $block->setComponents($block->getX()+$vec->getX(), $block->getY()+$vec->getY(), $block->getZ()+$vec->getZ());
+        }
+        return $blockList;
+    }
+
+    /**
+     * TODO: Implement other modes
+     *
+     * @param int|Vector3 $x
+     * @param int|null $y
+     * @param int|null $z
+     *
+     * @return BlockList
+     */
+    public function subtract($x = 0, $y = 0, $z = 0) {
+        /** @var Vector3 $vec */
+        $vec = null;
+        if($x instanceof Vector3) {
+            $vec = $x;
+        } else {
+            $vec = new Vector3($x, $y, $z);
+        }
+        return $this->add($vec->multiply(-1));
+    }
+
+    /**
      * @param Level $level
      */
     public function setLevel(Level $level) {
@@ -160,5 +204,28 @@ class BlockList extends BlockMap {
         }
 
         return $list;
+    }
+
+    /**
+     * @param Level $level
+     * @param Vector3 $pos1
+     * @param Vector3 $pos2
+     * @param int $save
+     *
+     * @return BlockList
+     */
+    public static function build(Level $level, Vector3 $pos1, Vector3 $pos2, int $save = self::SAVE_TYPE_NORMAL): BlockList {
+        $blockList = new BlockList($save);
+        $blockList->setLevel($level);
+
+        for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
+            for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
+                for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
+                    $blockList->addBlock($v = new Vector3($x, $y, $z), $level->getBlock($v));
+                }
+            }
+        }
+
+        return $blockList;
     }
 }
