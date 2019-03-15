@@ -1,3 +1,4 @@
+
 <a align="center"><img src="https://i.ibb.co/swwgvRV/n.png"></a>
 
 <p align="center">
@@ -21,9 +22,11 @@
 		<img src="https://poggit.pmmp.io/shield.state/BuilderTools?style=flat-square">
 	</a>
 <br><br>
-	✔️ Basic WorldEdit commands
+	✔️ Advanced WorldEdit commands
     <br>
     ✔️ Supports fast filling
+    <br>
+    ✔️ Schematics support
     <br>
     ✔️Simple hill making
     <br>
@@ -35,10 +38,12 @@
 
 <p align="center">1.2 Release date: 16.3. 2019</p>
 
-## 👍 1.1 Update:
+## 👍 1.2 Update:
 > - Plugin cleanup
-> - New Commands
-> - Plugin now supports 3.0.0+ api versions
+> - Lots of new commands
+> - Plugin now supports 4.0.0 api versions too
+> - Bug fixes
+> - Schematics support
 
 
 
@@ -46,6 +51,7 @@
 
 | Version | Phar Download | Zip Download | API | Stable | Pre release |
 | --- | --- | --- | --- | --- | --- | 
+| 1.2.0-beta1 | - | - | 3.x.x, 4.x.x | ✔️ | ✔️ |
 | 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | 3.x.x | ✔️ | ❌ |
 | 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ✔️ | ✔️|
 | 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ❌ | ✔️|
@@ -101,6 +107,14 @@
 | **//id** | **Displays id of item in your hand** <br><br>Usage: `//id` |
 | **//clearinventory** | **Clears inventory** <br><br>Usage: `//clearinventory`<br>Alias: `//ci`  |
 | **//blockinfo** | **Switch block info mode** <br><br>Usage: `//blockinfo`<br>Alias: `//bi`<br><br>In blockinfo mode you can get information about block by touching it.  |
+| **//hsphere** | **Creates hollow sphere** <br><br>Usage: `//hsphere <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow sphere in your position.  |
+| **//hcube** | **Creates hollow cube** <br><br>Usage: `//hcube <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cube in your position.  |
+| **//pyramid** | **Creates pyramid** <br><br>Usage: `//pyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates pyramid in your position.  |
+| **//hpyramid** | **Creates hollow pyramid** <br><br>Usage: `//hpyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow pyramid in your position.  |
+| **//stack** | **Stacks copied area** <br><br>Usage: `//stack <count> [side|up|down]`<br><br>Stacks blocks in line.  |
+| **//outline** | **Fills holow selected area** <br><br>Usage: `//outline <id1:dmg1,id2,...>`<br><br>Fills holow selected area.  |
+| **//move** | **Move blocks** <br><br>Usage: `//move <x> <y> <z>`<br><br>Move blocks in selected area.  |
+| **//schematic** | **Manage with schematics** <br><br>Usage: `//schem <reload|load|list|paste> [filename]`<br><br>Manage with schematics (reload - loads all schematics to memory; load - lodads schematics for //schem paste; list - displays list of loaded schematics.  |
 
 
 
@@ -110,8 +124,10 @@
 
 **All BuilderTools Permissions:**
 
+
+
 | Permission | Command | Opertor |
-| --- | --- | --- | 
+| --- | --- | --- | --- | ---- |
 | bt.cmd.help | `//commands` | ✔️ |
 | bt.cmd.pos1 | `//pos1` | ✔️ |
 | bt.cmd.pos2 | `//pos2` | ✔️ |
@@ -132,10 +148,48 @@
 | bt.cmd.id | `//id` | ✔️ |
 | bt.cmd.clearinventory | `//clearinventory` | ✔️ |
 | bt.cmd.blockinfo | `//blockinfo` | ✔️ |
+| bt.cmd.hsphere | `//hsphere` | ✔️ |
+| bt.cmd.hcube | `//hcube` | ✔️ |
+| bt.cmd.schematic | `//schematic` | ✔️ |
+| bt.cmd.cylinder | `//cylinder` | ✔️ |
+| bt.cmd.hcylinder | `//hcylinder` | ✔️ |
+| bt.cmd.pyramid | `//pyramid` | ✔️ |
+| bt.cmd.hpyramid | `//hpyramid` | ✔️ |
+| bt.cmd.stack | `//stack` | ✔️ |
+| bt.cmd.outline | `//outline` | ✔️ |
+| bt.cmd.move | `//move` | ✔️ |
+| bt.cmd.schematic | `//schematic` | ✔️ |
+
+## 🔧 Configuration
+- New in 1.2
+- Default configuration:
+```yaml
+---  
+# \  
+## > BuilderTools configuration file  
+# /  
+  
+# Do not change this!  
+config-version: 1.2.0  
+  
+schematics:  
+  # Available modes: startup, oncommand  
+ #  - startup - when plugin starts, all schematics will loaded #  - oncommand - schematics will been loaded when player use '//schem load' command  load: startup  
+  
+items:  
+  wand-axe:  
+    enabled: true  
+    name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"  
+  blockinfo-stick:  
+    enabled: false  
+    name: "§r§fDebug Stick\n§7§oTouch block for info"  
+...
+```
 
 ## 💰 Credits
 
 - Icon made by [Freepik](http://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
+- Design by kxj, discord kxj#5770
 
 ##  💡 License
 
