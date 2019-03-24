@@ -96,27 +96,6 @@ class Filler extends Editor {
         if($saveUndo) $undoList->setLevel($blockList->getLevel());
         if($saveRedo) $redoList->setLevel($blockList->getLevel());
 
-        if(!$fastFill) {
-            /**
-             * @var Block $block
-             */
-            foreach ($blocks as $block) {
-                if($saveUndo) {
-                    $undoList->addBlock($block->asVector3(), $block->getLevel()->getBlock($block->asVector3()));
-                }
-                if($saveRedo) {
-                    $redoList->addBlock($block->asVector3(), $block->getLevel()->getBlock($block->asVector3()));
-                }
-                $block->getLevel()->setBlock($block->asVector3(), $block, false, false);
-            }
-
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(static::CANCELLER);
-            $canceller->addStep($player, $undoList);
-
-            return new EditorResult(count($blocks), microtime(true)-$startTime);
-        }
-
         $iterator = new SubChunkIteratorManager($blockList->getLevel());
 
         /** @var int $minX */
