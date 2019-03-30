@@ -38,7 +38,7 @@ class PasteCommand extends BuilderToolsCommand {
      * PasteCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/paste", "Paste copyed area", null, []);
+        parent::__construct("/paste", "Paste copied area", null, []);
     }
 
     /**
