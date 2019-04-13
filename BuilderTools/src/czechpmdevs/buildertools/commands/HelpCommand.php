@@ -88,6 +88,7 @@ class HelpCommand extends BuilderToolsCommand {
      * @return void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
+        if(!$this->testPermission($sender)) return;
         $page = 1;
         if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands())/self::COMMANDS_PER_PAGE))) {
             $page = (int)$args[0];

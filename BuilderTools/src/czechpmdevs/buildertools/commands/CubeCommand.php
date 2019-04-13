@@ -48,6 +48,7 @@ class CubeCommand extends BuilderToolsCommand {
      * @return void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
+        if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;

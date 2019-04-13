@@ -6,6 +6,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
 
@@ -25,6 +26,19 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
     public function __construct(string $name, string $description = "", string $usageMessage = null, $aliases = []) {
         $this->setPermission($this->getPerms($name));
         parent::__construct($name, $description, $usageMessage, $aliases);
+    }
+
+    /**
+     * @param CommandSender $sender
+     * @param string $commandLabel
+     * @param array $args
+     * @return mixed|void
+     */
+    public function execute(CommandSender $sender, string $commandLabel, array $args) {
+        if(!$sender->hasPermission($this->getPermission())) {
+            $sender->sendMessage((string)$this->getPermissionMessage());
+            return;
+        }
     }
 
     /**
