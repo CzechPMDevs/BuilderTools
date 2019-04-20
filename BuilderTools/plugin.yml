@@ -10,7 +10,7 @@ permissions:
   bt.cmd:
     default: op
     description: Permissions for all BuilderTools commands
-    childern:
+    children:
       bt.cmd.blockinfo:
         description: Permissions for //blockinfo
         default: op
@@ -26,8 +26,8 @@ permissions:
       bt.cmd.wand:
         description: Permissions for //wand
         default: op
-      bt.cmd.help:
-        description: Permissions for //help
+      bt.cmd.commands:
+        description: Permissions for //commands
         default: op
       bt.cmd.sphere:
         description: Permissions for //sphere
@@ -80,3 +80,13 @@ permissions:
       bt.cmd.move:
         description: Permission for //move
         default: op
+      bt.cmd.replace:
+        description: Permission for //replace
+        default: op
+      bt.cmd.undo:
+        description: Permission for //undo
+        default: op
+      bt.cmd.redo:
+        description: Permission for //redo
+        default: op
+

@@ -119,6 +119,16 @@ class SchematicsManager {
      * @return Schematic[] $schematics
      */
     public function getLoadedSchematics(): array {
+        /** @var Schematic $value */
+        return array_filter($this->getAllSchematics(), function ($value) {
+            return $value->isLoaded;
+        }, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * @return Schematic[] $schematics
+     */
+    public function getAllSchematics(): array {
         return $this->schematics;
     }
 }

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
+use czechpmdevs\buildertools\async\SchematicLoadTask;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Fixer;
@@ -28,12 +29,19 @@ use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\Server;
 
 /**
  * Class Schematic
  * @package czechpmdevs\buildertools\schematics
  */
 class Schematic {
+
+    public const SCHEMATIC_NORMAL_TYPE = 0;
+    public const SCHEMATIC_UNLOADED_TYPE = 1;
+
+    /** @var bool $isLoaded */
+    public $isLoaded = false;
 
     /** @var string $file */
     protected $file;
@@ -80,47 +88,7 @@ class Schematic {
      * @param string $file
      */
     public function __construct(string $file) {
-        $this->file = $file;
-        $nbt = new BigEndianNBTStream();
-        $this->data = $nbt->readCompressed(file_get_contents($file));
-        $this->width = (int)$this->data->getShort("Width");
-        $this->height = (int)$this->data->getShort("Height");
-        $this->length = (int)$this->data->getShort("Length");
-
-        if($this->data->offsetExists("Materials")) {
-            $this->materials = $this->data->getString("Materials");
-        }
-
-        $this->blockList = new BlockList();
-
-        if($this->data->offsetExists("Blocks") && $this->data->offsetExists("Data")) {
-            $blocks = $this->data->getByteArray("Blocks");
-            $data = $this->data->getByteArray("Data");
-
-            $i = 0;
-            for($y = 0; $y < $this->height; $y++) {
-                for ($z = 0; $z < $this->length; $z++) {
-                    for($x = 0; $x < $this->width; $x++) {
-                        $id = ord($blocks{$i});
-                        $damage = ord($data{$i});
-                        if($damage >= 16) $damage = 0; // prevents bug
-                        $this->blockList->addBlock(new Vector3($x, $y, $z), Block::get($id, $damage));
-                        $i++;
-                    }
-                }
-            }
-        }
-        // WORLDEDIT BY SK89Q and Sponge schematics
-        else {
-            BuilderTools::getInstance()->getLogger()->error("Could not load schematic {$this->file}: BuilderTools supports only MCEdit schematic format.");
-        }
-
-        if($this->materials == "Classic" || $this->materials == "Alpha") {
-            $this->materials = "Pocket";
-            /** @var Fixer $fixer */
-            $fixer = BuilderTools::getEditor(Editor::FIXER);
-            $this->blockList = $fixer->fixBlockList($this->blockList);
-        }
+        Server::getInstance()->getAsyncPool()->submitTask(new SchematicLoadTask($file));
     }
 
     /**
@@ -156,5 +124,21 @@ class Schematic {
      */
     public function getZAxis(): int {
         return $this->getZAxis();
+    }
+
+    /**
+     * @param array $result
+     */
+    public function loadFromAsync(array $result) {
+        if($result["error"] !== "") {
+            BuilderTools::getInstance()->getLogger()->error($result["error"]);
+            return;
+        }
+        unset($result["error"]);
+
+        foreach ($result as $i => $v) {
+            $this->{$i} = $v;
+        }
+        $this->isLoaded = true;
     }
 }

@@ -25,6 +25,7 @@ class UnloadedSchematic extends Schematic {
      */
     public function __construct(string $file) {
         $this->file = $file;
+        $this->isLoaded = true;
         $nbt = new BigEndianNBTStream();
 
         /** @var CompoundTag $data */

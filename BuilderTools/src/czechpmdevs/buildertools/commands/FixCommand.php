@@ -65,7 +65,7 @@ class FixCommand extends BuilderToolsCommand {
 
         $firstPos = Selectors::getPosition($sender, 1);
         $secondPos = Selectors::getPosition($sender, 2);
-
+        
         if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
