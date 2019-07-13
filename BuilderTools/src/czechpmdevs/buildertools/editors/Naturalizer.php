@@ -52,8 +52,7 @@ class Naturalizer extends Editor {
      * @param Player $player
      */
     public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player) {
-        $list = new BlockList();
-        $list->saveBlockMap(true);
+        $list = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
         $list->setLevel($level);
 
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
