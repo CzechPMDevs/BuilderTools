@@ -28,6 +28,7 @@ use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\FullChunkDataPacket;
+use pocketmine\network\mcpe\protocol\LevelChunkPacket;
 use pocketmine\Player;
 
 /**
@@ -130,10 +131,15 @@ class Filler extends Editor {
 
                     foreach ($level->getChunkLoaders($x, $z) as $chunkLoader) {
                         if($chunkLoader instanceof Player) {
-                            $pk = new FullChunkDataPacket();
-                            $pk->chunkX = $x;
-                            $pk->chunkZ = $z;
-                            $pk->data = $chunk->networkSerialize();
+                            if(class_exists(FullChunkDataPacket::class)) {
+                                $pk = new FullChunkDataPacket();
+                                $pk->chunkX = $x;
+                                $pk->chunkZ = $z;
+                                $pk->data = $chunk->networkSerialize();
+                            }
+                            else {
+                                $pk = LevelChunkPacket::withoutCache($x, $z, $chunk->getSubChunkSendCount(), $chunk->networkSerialize());
+                            }
                             $chunkLoader->dataPacket($pk);
                         }
                     }
