@@ -23,8 +23,11 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\schematics\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\utils\Math;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -38,7 +41,7 @@ class SchematicCommand extends BuilderToolsCommand {
      * SchematicCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/schematic", "Schematics commands", null, ["/schem", "//schematics"]);
+        parent::__construct("/schematic", "Schematics commands", null, ["/schem", "/schematics"]);
     }
 
     /**
@@ -54,10 +57,37 @@ class SchematicCommand extends BuilderToolsCommand {
             return;
         }
         if(!isset($args[0]) || !in_array($args[0], ["load", "reload", "list", "paste"])) {
-            $sender->sendMessage("§cUsage: §7//schem <reload|load|list|paste> [filename]");
+            $sender->sendMessage("§cUsage: §7//schem <reload|load|create|list|paste> [filename]");
             return;
         }
         switch ($args[0]) {
+            case "create":
+                if(!isset($args[1])) {
+                    $sender->sendMessage("§cUsage: §7//schem <create> <filename>");
+                    break;
+                }
+
+                if(!Selectors::isSelected(1, $sender)) {
+                    $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
+                    return;
+                }
+
+                if(!Selectors::isSelected(2, $sender)) {
+                    $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
+                    return;
+                }
+
+                $axisVec = Math::calculateAxisVec(Selectors::getPosition($sender, 1), Selectors::getPosition($sender, 2));
+
+                $fileName = stripos($args[1], ".schematic") === false ? $args[1] . ".schematic" : str_replace(".schematic", "", $args[1]) . ".schematic";
+                $fileName = $this->getPlugin()->getDataFolder() . "schematics/" . $fileName;
+
+                $schematic = new Schematic(BlockList::build($sender->getLevel(), Selectors::getPosition($sender, 1), Selectors::getPosition($sender, 2)), $axisVec);
+                $schematic->save($fileName);
+
+                BuilderTools::getSchematicsManager()->registerSchematic($fileName, $schematic);
+                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic will be saved as $fileName");
+                break;
             case "load":
                 if(!isset($args[1])) {
                     $sender->sendMessage("§cUsage: §7//schem <load> <filename>");

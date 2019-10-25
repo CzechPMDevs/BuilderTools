@@ -102,6 +102,7 @@ class BuilderTools extends PluginBase {
         $this->initListner();
         $this->registerEditors();
         $this->registerEnchantment();
+        $this->sendWarnings();
         self::$schematicsManager = new SchematicsManager($this);
     }
 
@@ -171,6 +172,12 @@ class BuilderTools extends PluginBase {
             $map->register("BuilderTools", $command);
         }
         HelpCommand::buildPages();
+    }
+
+    public function sendWarnings() {
+        if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
+            $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml, disabling this option will be BuilderTools able to load bigger schematic files.");
+        }
     }
 
     /**

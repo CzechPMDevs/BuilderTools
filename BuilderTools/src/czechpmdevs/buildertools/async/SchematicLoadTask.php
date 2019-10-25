@@ -8,6 +8,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\schematics\Schematic;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
@@ -24,6 +25,10 @@ class SchematicLoadTask extends AsyncTask {
     /** @var string $path */
     public $path;
 
+    /**
+     * SchematicLoadTask constructor.
+     * @param string $path
+     */
     public function __construct(string $path) {
         $this->path = $path;
     }
@@ -36,12 +41,12 @@ class SchematicLoadTask extends AsyncTask {
 
             /** @var CompoundTag $data */
             $data = $nbt->readCompressed(file_get_contents($this->path));
-            $width = $result["width"] = (int)$data->getShort("Width");
-            $height = $result["height"] = (int)$data->getShort("Height");
-            $length = $result["length"] = (int)$data->getShort("Length");
+            $width = (int)$data->getShort("Width");
+            $height = (int)$data->getShort("Height");
+            $length = (int)$data->getShort("Length");
 
             if($data->offsetExists("Materials")) {
-                $materials = $result["materials"] = $data->getString("Materials");
+                $materials = $data->getString("Materials");
             }
 
             $blockList = new BlockList();
@@ -73,8 +78,9 @@ class SchematicLoadTask extends AsyncTask {
                 $blockList = (new Fixer())->fixBlockList($blockList);
             }
 
-            $result["materials"] = $materials;
-            $result["blockList"] = $blockList;
+            $result[] = $blockList;
+            $result[] = new Vector3($width, $height, $length);
+            $result[] = $materials;
 
             unset($blockList, $materials, $data, $width, $height, $length);
 
@@ -85,13 +91,14 @@ class SchematicLoadTask extends AsyncTask {
         }
     }
 
+    /**
+     * @param Server $server
+     */
     public function onCompletion(Server $server) {
         $result = $this->getResult();
         $file = $this->path;
 
         BuilderTools::getInstance()->getLogger()->info(basename($file, ".schematic") . " schematic loaded!");
-
-        $target = BuilderTools::getSchematicsManager()->getSchematic(basename($file, ".schematic"));
-        $target->loadFromAsync($result);
+        BuilderTools::getSchematicsManager()->registerSchematic($file, Schematic::loadFromAsync($result));
     }
 }

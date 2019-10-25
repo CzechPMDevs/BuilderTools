@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
+use czechpmdevs\buildertools\async\SchematicLoadTask;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\object\BlockList;
@@ -61,13 +62,26 @@ class SchematicsManager {
 
     public function loadSchematics() {
         $this->schematics = [];
-        $unloaded = BuilderTools::getConfiguration()["schematics"]["load"] != "startup";
+        //$unloaded = BuilderTools::getConfiguration()["schematics"]["load"] != "startup";
         foreach (glob($this->plugin->getDataFolder() . "schematics/*.schematic") as $file) {
-            if($unloaded)
-                $this->schematics[basename($file, ".schematic")] = new UnloadedSchematic($file);
-            else
-                $this->schematics[basename($file, ".schematic")] = new Schematic($file);
+            $this->loadSchematic($file);
         }
+    }
+
+    /**
+     * @param string $file
+     * @param Schematic $schematic
+     */
+    public function registerSchematic(string $file, Schematic $schematic) {
+        $this->schematics[$file] = $schematic;
+    }
+
+    /**
+     * @param string $path
+     */
+    public function loadSchematic(string $path) {
+        $this->plugin->getLogger()->info("Loading schematic from $path...");
+        $this->plugin->getServer()->getAsyncPool()->submitTask(new SchematicLoadTask($path));
     }
 
     /**

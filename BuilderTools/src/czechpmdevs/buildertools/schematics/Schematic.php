@@ -20,125 +20,33 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
-use czechpmdevs\buildertools\async\SchematicLoadTask;
+use czechpmdevs\buildertools\async\SchematicCreateTask;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\Fixer;
-use czechpmdevs\buildertools\editors\object\BlockList;
-use pocketmine\block\Block;
-use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNBTStream;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\Server;
 
 /**
  * Class Schematic
  * @package czechpmdevs\buildertools\schematics
  */
-class Schematic {
-
-    public const SCHEMATIC_NORMAL_TYPE = 0;
-    public const SCHEMATIC_UNLOADED_TYPE = 1;
-
-    /** @var bool $isLoaded */
-    public $isLoaded = false;
-
-    /** @var string $file */
-    protected $file;
-
-    /** @var CompoundTag $data */
-    protected $data;
-
-    /** @var BlockList $blockList */
-    protected $blockList;
+class Schematic extends SchematicData {
 
     /**
-     * @var int $width
-     *
-     * Size along the x axis
-     */
-    protected $width;
-
-    /**
-     * @var int $height
-     *
-     * Size along the y axis
-     */
-    protected $height;
-
-    /**
-     * @var int $length
-     *
-     * Size along the z axis
-     */
-    protected $length;
-
-    /**
-     * @var string $materials
-     *
-     * Classic -> MC:JAVA world format
-     * Pocket -> MC:BEDROCK world format
-     * Alpha -> MC:ALPHA world format - same as java
-     */
-    protected $materials = "Classic";
-
-
-    /**
-     * Schematic constructor.
      * @param string $file
      */
-    public function __construct(string $file) {
-        Server::getInstance()->getAsyncPool()->submitTask(new SchematicLoadTask($file));
-    }
-
-    /**
-     * @return BlockList
-     */
-    public function getBlockList(): ?BlockList {
-        return $this->blockList;
-    }
-
-    /**
-     * @return CompoundTag
-     */
-    public function getCompoundTag(): CompoundTag {
-        return $this->data;
-    }
-
-    /**
-     * @return int
-     */
-    public function getXAxis(): int {
-        return $this->width;
-    }
-
-    /**
-     * @return int
-     */
-    public function getYAxis(): int {
-        return $this->height;
-    }
-
-    /**
-     * @return int
-     */
-    public function getZAxis(): int {
-        return $this->getZAxis();
+    public function save(string $file) {
+        new SchematicCreateTask($file, $this->getBlockList(), $this->getAxisVector(), $this->materialType);
     }
 
     /**
      * @param array $result
+     * @return Schematic|null
      */
-    public function loadFromAsync(array $result) {
+    public static function loadFromAsync(array $result): ?Schematic {
         if($result["error"] !== "") {
             BuilderTools::getInstance()->getLogger()->error($result["error"]);
-            return;
+            return null;
         }
-        unset($result["error"]);
 
-        foreach ($result as $i => $v) {
-            $this->{$i} = $v;
-        }
-        $this->isLoaded = true;
+        unset($result["error"]);
+        return new Schematic(...$result);
     }
 }
