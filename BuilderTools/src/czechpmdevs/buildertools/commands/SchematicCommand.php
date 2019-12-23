@@ -56,7 +56,7 @@ class SchematicCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        if(!isset($args[0]) || !in_array($args[0], ["load", "reload", "list", "paste"])) {
+        if(!isset($args[0]) || !in_array($args[0], ["load", "reload", "list", "paste", "create"])) {
             $sender->sendMessage("§cUsage: §7//schem <reload|load|create|list|paste> [filename]");
             return;
         }
@@ -98,7 +98,7 @@ class SchematicCommand extends BuilderToolsCommand {
 
                 if($schematic === null) {
                     $sender->sendMessage(BuilderTools::getPrefix() . "§cSchematic was not found!");
-                    return;
+                    break;
                 }
 
                 BuilderTools::getSchematicsManager()->addToPaste($sender, $schematic);

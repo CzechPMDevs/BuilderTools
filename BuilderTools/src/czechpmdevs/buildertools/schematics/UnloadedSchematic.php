@@ -17,7 +17,10 @@ use pocketmine\nbt\tag\CompoundTag;
  * Class UnloadedSchematic
  * @package czechpmdevs\buildertools\schematics
  */
-class UnloadedSchematic extends Schematic {
+class UnloadedSchematic extends SchematicData {
+
+    /** @var string $file */
+    public $file;
 
     /**
      * UnloadedSchematic constructor.
@@ -25,7 +28,7 @@ class UnloadedSchematic extends Schematic {
      */
     public function __construct(string $file) {
         $this->file = $file;
-        $this->isLoaded = true;
+
         $nbt = new BigEndianNBTStream();
 
         /** @var CompoundTag $data */
@@ -35,8 +38,10 @@ class UnloadedSchematic extends Schematic {
         $this->length = (int)$data->getShort("Length");
 
         if($data->offsetExists("Materials")) {
-            $this->materials = $data->getString("Materials");
+            $this->materialType = $data->getString("Materials");
         }
+
+        $this->isLoaded = true;
 
         unset($data);
         unset($nbt);
@@ -87,8 +92,8 @@ class UnloadedSchematic extends Schematic {
             return null;
         }
 
-        if($this->materials == "Classic" || $this->materials == "Alpha") {
-            $this->materials = "Pocket";
+        if($this->materialType == "Classic" || $this->materialType == "Alpha") {
+            $this->materialType = "Pocket";
             /** @var Fixer $fixer */
             $fixer = BuilderTools::getEditor(Editor::FIXER);
             $list = $fixer->fixBlockList($list);

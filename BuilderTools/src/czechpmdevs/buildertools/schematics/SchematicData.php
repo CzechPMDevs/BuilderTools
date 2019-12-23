@@ -17,6 +17,9 @@ abstract class SchematicData {
     public const MATERIALS_BEDROCK = "Pocket";
     public const MATERIALS_ALPHA = "Alpha";
 
+    /** @var bool $isLoaded */
+    public $isLoaded = false;
+
     /** @var BlockList $blockList */
     protected $blockList;
 

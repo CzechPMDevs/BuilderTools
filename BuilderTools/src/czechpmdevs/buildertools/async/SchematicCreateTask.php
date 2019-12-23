@@ -6,6 +6,7 @@ namespace czechpmdevs\buildertools\async;
 
 use czechpmdevs\buildertools\editors\object\BlockList;
 use pocketmine\block\Block;
+use pocketmine\block\Thin;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\ByteArrayTag;
@@ -22,8 +23,11 @@ class SchematicCreateTask extends AsyncTask {
 
     public $file;
 
-    /** @var string $blocks */
+    /** @var string $blockList */
     public $blockList;
+
+    /** @var string $center */
+    public $center;
 
     /** @var string $axis */
     public $axis;
@@ -40,38 +44,62 @@ class SchematicCreateTask extends AsyncTask {
      */
     public function __construct(string $file, BlockList $blockList, Vector3 $axis, string $materials) {
         $this->file = $file;
-        $this->blockList = serialize($blockList);
+        $this->blockList = serialize($this->buildBlockMap($blockList));
         $this->axis = serialize($axis);
         $this->materials = $materials;
     }
 
+    /**
+     * @param BlockList $blockList
+     * @return array
+     */
+    public function buildBlockMap(BlockList $blockList): array {
+        $map = [];
+
+        foreach ($blockList->getAll() as $block) {
+            $map[$block->getX()][$block->getY()][$block->getZ()] = [$block->getId(), $block->getDamage()];
+        }
+
+        return $map;
+    }
+
     public function onRun() {
         try {
-            /** @var BlockList $blockList */
-            $blockList = unserialize($this->blockList);
+            /** @var array $map */
+            $map = unserialize($this->blockList);
             /** @var Vector3 $axis */
             $axis = unserialize($this->axis);
             /** @var string $materials */
             $materials = $this->materials;
 
-            // y -> z -> x
-            $map = [];
-
-            /**
-             * @var Block $block
-             */
-            foreach ($blockList->getAll() as $block) {
-                $map[$block->getY()][$block->getZ()][$block->getX()] = $block;
-            }
-
             $blocks = "";
             $data = "";
 
-            foreach ($map as $y => $zxData) {
-                foreach ($zxData as $z => $xData) {
-                    foreach ($xData as $x => $blockData) {
-                        $blocks .= chr($blockData->getId());
-                        $data .= chr($blockData->getDamage());
+            $minX = null;
+            $minY = null;
+            $minZ = null;
+
+            foreach ($map as $x => $yz) {
+                $minX = $minX === null || $minX > $x ? $x : $minX;
+                foreach ($yz as $y => $zb) {
+                    $minY = $minY === null || $minY > $y ? $y : $minY;
+                    foreach ($zb as $z => $b) {
+                        $minZ = $minZ === null || $minZ > $z ? $z : $minZ;
+                    }
+                }
+            }
+
+
+            for ($y = 0; $y < $axis->getY(); $y++) {
+                for ($z = 0; $z < $axis->getZ(); $z++) {
+                    for($x = 0; $x < $axis->getX(); $x++) {
+                        $block = [0, 0];
+                        if(isset($map[$x + $minX][$y + $minY][$z + $minZ])) {
+                            $block = $map[$x + $minX][$y + $minY][$z + $minZ];
+                        }
+
+                        $blocks .= chr($block[0]);
+                        $data .= chr($block[1]);
                     }
                 }
             }

@@ -73,7 +73,8 @@ class SchematicsManager {
      * @param Schematic $schematic
      */
     public function registerSchematic(string $file, Schematic $schematic) {
-        $this->schematics[$file] = $schematic;
+        $schematic->file = $file;
+        $this->schematics[basename($file, ".schematic")] = $schematic;
     }
 
     /**

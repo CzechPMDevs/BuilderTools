@@ -174,7 +174,7 @@ class BlockList extends BlockMap {
      */
     public function toCopyData(): array {
         $data = [];
-        $data["center"] = $this->playerPosition === null ? new Vector3(0, 0, 0) : $this->playerPosition;
+        $data["center"] = $this->playerPosition === null ? new Vector3(0, 0, 0) : $this->playerPosition->asVector3();
         $data["direction"] = 0;
         $data["rotated"] = false;
 

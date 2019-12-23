@@ -22,6 +22,9 @@ namespace czechpmdevs\buildertools\schematics;
 
 use czechpmdevs\buildertools\async\SchematicCreateTask;
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\object\BlockList;
+use pocketmine\math\Vector3;
+use pocketmine\Server;
 
 /**
  * Class Schematic
@@ -29,11 +32,25 @@ use czechpmdevs\buildertools\BuilderTools;
  */
 class Schematic extends SchematicData {
 
+    /** @var string $file */
+    public $file;
+
+    /**
+     * Schematic constructor.
+     * @param BlockList $blocks
+     * @param Vector3 $axisVector
+     * @param string $materialType
+     */
+    public function __construct(BlockList $blocks, Vector3 $axisVector, string $materialType = SchematicData::MATERIALS_BEDROCK) {
+        parent::__construct($blocks, $axisVector, $materialType);
+        $this->isLoaded = true;
+    }
+
     /**
      * @param string $file
      */
     public function save(string $file) {
-        new SchematicCreateTask($file, $this->getBlockList(), $this->getAxisVector(), $this->materialType);
+        Server::getInstance()->getAsyncPool()->submitTask(new SchematicCreateTask($file, $this->getBlockList(), $this->getAxisVector(), $this->materialType));
     }
 
     /**
