@@ -88,5 +88,7 @@ class MoveCommand extends BuilderToolsCommand {
 
         $filler->fill($sender, $toRemove);
         $filler->fill($sender, $toFill);
+
+        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area were successfully moved.");
     }
 }
