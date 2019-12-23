@@ -65,7 +65,7 @@ class DrawCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cUsage: §7//draw <cube|sphere|off> [brush: {$this->minBrush}-{$this->maxBrush}]  [fall = false]");
             return;
         }
-        if(isset($args[1]) && is_numeric($args[1]) && ((int)($args[1]) > $this->maxBrush || (int)($args[1]) < $this->minBrush)) {
+        if(isset($args[1]) && (!is_numeric($args[1]) || ((int)($args[1]) > $this->maxBrush || (int)($args[1]) < $this->minBrush))) {
             $sender->sendMessage("§cBrush #{$args[1]} wasn't found!");
             return;
         }
