@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\utils\Math;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
@@ -63,8 +64,12 @@ class Copier extends Editor {
      * @param int $y2
      * @param int $z2
      * @param Player $player
+     *
+     * @return EditorResult
      */
-    public function copy(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Player $player) {
+    public function copy(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Player $player): EditorResult {
+        $startTime = microtime(true);
+
         $this->copyData[$player->getName()] = [
             "data" => [],
             "center" => $player->asPosition(),
@@ -80,7 +85,8 @@ class Copier extends Editor {
                 }
             }
         }
-        $player->sendMessage(BuilderTools::getPrefix()."§a{$count} blocks copied to clipboard! Use //paste to paste");
+
+        return new EditorResult($count, microtime(true)-$startTime, false);
     }
 
     /**
