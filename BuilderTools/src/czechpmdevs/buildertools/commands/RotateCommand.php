@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\object\BlockList;
-use czechpmdevs\buildertools\Selectors;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -76,26 +74,22 @@ class RotateCommand extends BuilderToolsCommand {
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-
         if(!isset($copier->copyData[$sender->getName()])) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
 
-        $blockList = BlockList::fromCopyData($copier->copyData[$sender->getName()]);
         foreach ($args as $i => $arg) {
             if($i === 0) {
-                $blockList = RotationUtil::rotate($blockList, RotationUtil::Y_AXIS, RotationUtil::getRotation((int)$arg));
+                $copier->rotate($sender, RotationUtil::Y_AXIS, RotationUtil::getRotation((int)$arg));
             }
             elseif($i === 1) {
-                $blockList = RotationUtil::rotate($blockList, RotationUtil::X_AXIS, RotationUtil::getRotation((int)$arg));
+                $copier->rotate($sender, RotationUtil::X_AXIS, RotationUtil::getRotation((int)$arg));
             }
             elseif ($i === 2) {
-                $blockList = RotationUtil::rotate($blockList, RotationUtil::Z_AXIS, RotationUtil::getRotation((int)$arg));
+                $copier->rotate($sender, RotationUtil::Z_AXIS, RotationUtil::getRotation((int)$arg));
             }
         }
-
-        $copier->copyData[$sender->getName()] = $blockList->toCopyData();
 
         $sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are have been successfully rotated (in " . (string)round(microtime(true)-$startTime, 2) . " sec)!");
     }

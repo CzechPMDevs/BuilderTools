@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ class BuilderTools extends PluginBase {
             new PasteCommand,
             new MergeCommand,
             new RotateCommand,
-            new FlipCommand,
+//            new FlipCommand,
             new UndoCommand,
             new RedoCommand,
             new TreeCommand,
