@@ -13,6 +13,7 @@ use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 
@@ -35,12 +36,97 @@ class SchematicLoadTask extends AsyncTask {
 
     public function onRun() {
         try {
-            $result = ["error" => ""];
-            $materials = "Classic";
-            $nbt = new BigEndianNBTStream();
-
             /** @var CompoundTag $data */
-            $data = $nbt->readCompressed(file_get_contents($this->path));
+            $data = (new BigEndianNBTStream())->readCompressed(file_get_contents($this->path));
+            if($data->offsetExists("Blocks") && $data->offsetExists("Data")) {
+                $result = $this->loadMCEditFormat($data);
+            }
+            else {
+                $result = $this->loadSpongeFormat($data);
+            }
+
+            $this->setResult($result);
+        }
+        catch (\Exception $exception) {
+            $this->setResult(["error" => $exception->getMessage()]);
+        }
+    }
+
+    /**
+     * @param CompoundTag $data
+     * @return array
+     */
+    public function loadSpongeFormat(CompoundTag $data) {
+        try {
+            $width = (int)$data->getShort("Width");
+            $height = (int)$data->getShort("Height");
+            $length = (int)$data->getShort("Length");
+
+            $blockIdMap = json_decode(file_get_contents(\pocketmine\RESOURCE_PATH . "vanilla/block_id_map.json"), true);
+            var_dump($blockIdMap);
+
+            $palette = [];
+            /**
+             * @var string $index
+             * @var IntTag $value
+             */
+            foreach ($data->getCompoundTag("Palette")->getValue() as $index => $value) {
+                $blockIndex = explode("[", $index)[0];
+                $palette[$value->getValue()] = isset($blockIdMap[$blockIndex]) ? $blockIdMap[$blockIndex] : 0;
+                var_dump($blockIndex);
+            }
+
+            $blocks = $data->getByteArray("BlockData");
+            $blockList = new BlockList();
+
+            $index = 0;
+            $i = 0;
+
+            while ($i < strlen($blocks)) {
+                $value = 0;
+                $varintLength = 0;
+
+                while (true) {
+                    $value |= (((int)($blocks{$i})) & 127) << ($varintLength++ * 7);
+                    if($varintLength > 5) {
+                        return ["error" => "VarInt is too big"];
+                    }
+                    if ((((int)($blocks{$i})) & 128) != 128) {
+                        $i++;
+                        break;
+                    }
+                    $i++;
+                }
+
+                $y = $index / ($width * $length);
+                $z = ($index % ($width * $length)) / $width;
+                $x = ($index % ($width * $length)) % $width;
+
+                $id = $palette[$value];
+
+                $blockList->addBlock(new Vector3($x, $y, $z), Block::get($id));
+            }
+
+            return [
+                "error" => "",
+                (new Fixer())->fixBlockList($blockList), // I don't know any working mcpe schematics creator
+                new Vector3($width, $height, $length),
+                "Pocket"
+            ];
+        }
+        catch (\Exception $exception) {
+        }
+
+    }
+
+    /**
+     * @param CompoundTag $data
+     * @return array
+     */
+    public function loadMCEditFormat(CompoundTag $data) {
+        try {
+            $materials = "Classic";
+
             $width = (int)$data->getShort("Width");
             $height = (int)$data->getShort("Height");
             $length = (int)$data->getShort("Length");
@@ -78,16 +164,15 @@ class SchematicLoadTask extends AsyncTask {
                 $blockList = (new Fixer())->fixBlockList($blockList);
             }
 
-            $result[] = $blockList;
-            $result[] = new Vector3($width, $height, $length);
-            $result[] = $materials;
-
-            unset($blockList, $materials, $data, $width, $height, $length);
-
-            $this->setResult($result);
+            return [
+                "error" => "",
+                $blockList,
+                new Vector3($width, $height, $length),
+                $materials
+            ];
         }
         catch (\Error $exception) {
-            $this->setResult(["error" => $exception->getMessage()]);
+            return ["error" => $exception->getMessage()];
         }
     }
 

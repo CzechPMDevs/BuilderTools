@@ -46,6 +46,27 @@ class Math {
     }
 
     /**
+     * @param int $degrees
+     * @return int
+     */
+    public static function getBasicDegrees(int $degrees): int {
+        fixDegrees:
+        if($degrees < 0) {
+            $degrees += 360;
+        }
+
+        if($degrees >= 360) {
+            $degrees -= 360;
+        }
+
+        if(!($degrees >= 0 && $degrees < 360)) {
+            goto fixDegrees;
+        }
+
+        return $degrees;
+    }
+
+    /**
      * @param float|int $x
      * @param float|int $y
      * @param float|int $z

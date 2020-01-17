@@ -23,6 +23,9 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -52,8 +55,48 @@ class RotateCommand extends BuilderToolsCommand {
             return;
         }
 
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
+            return;
+        }
+
+        foreach ($args as $i => $arg) {
+            if(!is_numeric($arg)) {
+                $sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
+                return;
+            }
+
+            if(!RotationUtil::areDegreesValid((int)$arg)) {
+                $sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid degrees. You can rotate just about 90, 180 and 270 (-90) degrees!");
+                return;
+            }
+        }
+
+        $startTime = microtime(true);
+
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->addToRotate($sender);
+
+        if(!isset($copier->copyData[$sender->getName()])) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+            return;
+        }
+
+        $blockList = BlockList::fromCopyData($copier->copyData[$sender->getName()]);
+        foreach ($args as $i => $arg) {
+            if($i === 0) {
+                $blockList = RotationUtil::rotate($blockList, RotationUtil::Y_AXIS, RotationUtil::getRotation((int)$arg));
+            }
+            elseif($i === 1) {
+                $blockList = RotationUtil::rotate($blockList, RotationUtil::X_AXIS, RotationUtil::getRotation((int)$arg));
+            }
+            elseif ($i === 2) {
+                $blockList = RotationUtil::rotate($blockList, RotationUtil::Z_AXIS, RotationUtil::getRotation((int)$arg));
+            }
+        }
+
+        $copier->copyData[$sender->getName()] = $blockList->toCopyData();
+
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are have been successfully rotated (in " . (string)round(microtime(true)-$startTime, 2) . " sec)!");
     }
 }

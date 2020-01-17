@@ -33,9 +33,8 @@ class BlockList extends BlockMap {
 
     public const SAVE_TYPE_NORMAL = 0x01;
     public const SAVE_TYPE_BLOCKMAP = 0x02;
-    //public const SAVE_TYPE_OPTIMIZED = 0x03; TODO
 
-    /** @var bool $save */
+    /** @var int $save */
     private $save;
 
     /** @var Block[] $blocks */
@@ -46,6 +45,9 @@ class BlockList extends BlockMap {
 
     /** @var Vector3 $playerPosition */
     private $playerPosition = null;
+
+    /** @var BlockListMetadata $metadata */
+    private $metadata;
 
     /**
      * BlockList constructor.
@@ -143,7 +145,7 @@ class BlockList extends BlockMap {
     /**
      * @param Level $level
      */
-    public function setLevel(Level $level) {
+    public function setLevel(?Level $level) {
         $this->level = $level;
     }
 
@@ -227,5 +229,25 @@ class BlockList extends BlockMap {
         }
 
         return $blockList;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSaveType(): int {
+        return $this->save;
+    }
+
+    /**
+     * @param bool $build
+     *
+     * @return BlockListMetadata|null
+     */
+    public function getMetadata(bool $build = true): ?BlockListMetadata {
+        if(is_null($this->metadata) && $build) {
+            $this->metadata = new BlockListMetadata($this);
+        }
+
+        return $this->metadata;
     }
 }
