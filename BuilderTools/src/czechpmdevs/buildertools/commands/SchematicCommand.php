@@ -21,11 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\schematics\Schematic;
-use czechpmdevs\buildertools\schematics\SchematicsManager;
 use czechpmdevs\buildertools\Selectors;
 use czechpmdevs\buildertools\utils\Math;
 use pocketmine\command\CommandSender;
@@ -106,7 +103,6 @@ class SchematicCommand extends BuilderToolsCommand {
                 break;
             case "paste":
                 BuilderTools::getSchematicsManager()->pasteSchematic($sender);
-                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic pasted successfully!");
                 break;
             case "list":
                 $list = [];

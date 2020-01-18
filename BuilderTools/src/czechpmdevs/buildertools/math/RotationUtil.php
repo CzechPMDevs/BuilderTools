@@ -20,13 +20,13 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\utils;
 
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\block\UnknownBlock;
 use pocketmine\math\Vector3;
 
 /**
  * Class RotationUtil
- * @package czechpmdevs\buildertools\utils
+ * @package czechpmdevs\buildertools\math
  */
 class RotationUtil {
 
@@ -54,7 +54,7 @@ class RotationUtil {
             return $list;
         }
 
-        $blockList = new BlockList($list->getSaveType());
+        $blockList = new BlockList();
         $blockList->setLevel($list->getLevel());
 
         $backwardsVector = self::moveBlocksToCoordinatesAxisOrigin($blockList);
@@ -88,7 +88,7 @@ class RotationUtil {
     private static function rotate90(BlockList $list, int $axis): BlockList {
         switch ($axis) {
             case self::Y_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -102,7 +102,7 @@ class RotationUtil {
                 return $newList;
 
             case self::X_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -116,7 +116,7 @@ class RotationUtil {
                 return $newList;
 
             case self::Z_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -143,7 +143,7 @@ class RotationUtil {
     private static function rotate180(BlockList $list, int $axis): BlockList {
         switch ($axis) {
             case self::Y_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -157,7 +157,7 @@ class RotationUtil {
                 return $newList;
 
             case self::X_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -171,7 +171,7 @@ class RotationUtil {
                 return $newList;
 
             case self::Z_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -200,7 +200,7 @@ class RotationUtil {
     private static function rotate270(BlockList $list, int $axis): BlockList {
         switch ($axis) {
             case self::Y_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -214,7 +214,7 @@ class RotationUtil {
                 return $newList;
 
             case self::X_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -228,7 +228,7 @@ class RotationUtil {
                 return $newList;
 
             case self::Z_AXIS:
-                $newList = new BlockList($list->getSaveType());
+                $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
                 $newList->setPlayerPosition($list->getPlayerPosition());
 
@@ -347,11 +347,6 @@ class RotationUtil {
         $metadata = $list->getMetadata();
 
         $toAdd = new Vector3(-$metadata->minX, -$metadata->minY, -$metadata->minZ);
-
-        /*
-        foreach ($list->getAll() as $block) {
-            $block->setComponents($block->getX() + $toAdd->getX(), $block->getY() + $toAdd->getY(), $block->getZ() + $toAdd->getZ());
-        }*/
         $list->add($toAdd);
 
         $metadata->recalculateMetadata();

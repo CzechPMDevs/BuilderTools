@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\schematics;
 
 use czechpmdevs\buildertools\async\SchematicCreateTask;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
 

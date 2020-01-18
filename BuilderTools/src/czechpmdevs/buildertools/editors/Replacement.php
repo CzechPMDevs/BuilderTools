@@ -20,7 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\utils\BlockGenerator;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 
@@ -35,10 +36,10 @@ class Replacement extends Editor {
      * @param Vector3 $pos2
      * @param Level $level
      *
-     * Blocks that will replaced
+     * Blocks which will replaced
      * @param string $blocks
      *
-     * Blocks that will placed
+     * Blocks which will placed
      * @param string $replace
      *
      * @return BlockList
@@ -47,13 +48,9 @@ class Replacement extends Editor {
         $blockList = new BlockList;
         $blockList->setLevel($level);
 
-        for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
-            for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
-                for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
-                    if($this->isBlockInString($blocks, $level->getBlockAt($x, $y, $z)->getId())) {
-                        $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($replace));
-                    }
-                }
+        foreach (BlockGenerator::generateCuboid($pos1, $pos2) as [$x, $y, $z]) {
+            if($this->isBlockInString($blocks, $level->getBlockAt($x, $y, $z)->getId())) {
+                $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($replace));
             }
         }
 

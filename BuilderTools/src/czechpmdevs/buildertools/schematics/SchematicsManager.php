@@ -22,8 +22,8 @@ namespace czechpmdevs\buildertools\schematics;
 
 use czechpmdevs\buildertools\async\SchematicLoadTask;
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Filler;
-use czechpmdevs\buildertools\editors\object\BlockList;
 use pocketmine\Player;
 
 /**
@@ -95,11 +95,13 @@ class SchematicsManager {
 
     /**
      * @param Player $player
+     *
+     * @return bool
      */
-    public function pasteSchematic(Player $player) {
+    public function pasteSchematic(Player $player): bool {
         if(!isset($this->players[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix(). "§cType //schem load <filename> to load schematic first!");
-            return;
+            return false;
         }
 
         $schematic = $this->players[$player->getName()];
@@ -107,19 +109,26 @@ class SchematicsManager {
 
         if($blockList === null) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cInvalid schematic format (Sponge) isn't supported.");
-            return;
+            return false;
         }
 
         $fillList = new BlockList();
         $fillList->setLevel($player->getLevel());
+        $debugged = false;
+        $fillList->add($player);
+
         foreach ($blockList->getAll() as $block) {
-            $fillList->addBlock($block->add($player), $block);
+            if($block->getId() != 0 && !$debugged) {
+                var_dump($block);
+                $debugged = true;
+            }
         }
 
         /** @var Filler $filler */
         $filler = new Filler();
         $filler->fill($player, $fillList);
         $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
+        return true;
     }
 
     /**

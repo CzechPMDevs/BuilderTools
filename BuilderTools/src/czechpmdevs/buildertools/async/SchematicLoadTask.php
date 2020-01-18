@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright (C) 2018-2020  CzechPMDevs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
@@ -10,12 +26,15 @@ use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\schematics\Schematic;
 use pocketmine\block\Block;
+use pocketmine\block\Door;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
+use pocketmine\utils\BinaryDataException;
+use pocketmine\utils\BinaryStream;
 
 /**
  * Class SchematicLoadingTask
@@ -57,66 +76,7 @@ class SchematicLoadTask extends AsyncTask {
      * @return array
      */
     public function loadSpongeFormat(CompoundTag $data) {
-        try {
-            $width = (int)$data->getShort("Width");
-            $height = (int)$data->getShort("Height");
-            $length = (int)$data->getShort("Length");
-
-            $blockIdMap = json_decode(file_get_contents(\pocketmine\RESOURCE_PATH . "vanilla/block_id_map.json"), true);
-            var_dump($blockIdMap);
-
-            $palette = [];
-            /**
-             * @var string $index
-             * @var IntTag $value
-             */
-            foreach ($data->getCompoundTag("Palette")->getValue() as $index => $value) {
-                $blockIndex = explode("[", $index)[0];
-                $palette[$value->getValue()] = isset($blockIdMap[$blockIndex]) ? $blockIdMap[$blockIndex] : 0;
-                var_dump($blockIndex);
-            }
-
-            $blocks = $data->getByteArray("BlockData");
-            $blockList = new BlockList();
-
-            $index = 0;
-            $i = 0;
-
-            while ($i < strlen($blocks)) {
-                $value = 0;
-                $varintLength = 0;
-
-                while (true) {
-                    $value |= (((int)($blocks{$i})) & 127) << ($varintLength++ * 7);
-                    if($varintLength > 5) {
-                        return ["error" => "VarInt is too big"];
-                    }
-                    if ((((int)($blocks{$i})) & 128) != 128) {
-                        $i++;
-                        break;
-                    }
-                    $i++;
-                }
-
-                $y = $index / ($width * $length);
-                $z = ($index % ($width * $length)) / $width;
-                $x = ($index % ($width * $length)) % $width;
-
-                $id = $palette[$value];
-
-                $blockList->addBlock(new Vector3($x, $y, $z), Block::get($id));
-            }
-
-            return [
-                "error" => "",
-                (new Fixer())->fixBlockList($blockList), // I don't know any working mcpe schematics creator
-                new Vector3($width, $height, $length),
-                "Pocket"
-            ];
-        }
-        catch (\Exception $exception) {
-        }
-
+        return ["error" => "Sponge schematics still aren't supported. Try find schematics in MCEdit format."];
     }
 
     /**
@@ -182,6 +142,11 @@ class SchematicLoadTask extends AsyncTask {
     public function onCompletion(Server $server) {
         $result = $this->getResult();
         $file = $this->path;
+
+        if(isset($result["error"]) && $result["error"] !== "") {
+            BuilderTools::getInstance()->getLogger()->error("Could not load schematic $file: " . $result["error"]);
+            return;
+        }
 
         BuilderTools::getInstance()->getLogger()->info(basename($file, ".schematic") . " schematic loaded!");
         BuilderTools::getSchematicsManager()->registerSchematic($file, Schematic::loadFromAsync($result));

@@ -67,7 +67,7 @@ class CutCommand extends BuilderToolsCommand {
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->copy($pos1->getX(), $pos1->getY(), $pos1->getZ(), $pos2->getX(), $pos2->getY(), $pos2->getZ(), $sender);
+        $copier->copy($pos1, $pos2, $sender);
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);

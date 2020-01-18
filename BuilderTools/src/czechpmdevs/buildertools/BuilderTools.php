@@ -66,7 +66,12 @@ use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\nbt\LittleEndianNBTStream;
+use pocketmine\nbt\NetworkLittleEndianNBTStream;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\ListTag;
 use pocketmine\plugin\PluginBase;
+use const pocketmine\RESOURCE_PATH;
 
 /**
  * Class BuilderTools
@@ -152,7 +157,6 @@ class BuilderTools extends PluginBase {
             new PasteCommand,
             new MergeCommand,
             new RotateCommand,
-//            new FlipCommand,
             new UndoCommand,
             new RedoCommand,
             new TreeCommand,

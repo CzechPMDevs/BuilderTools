@@ -21,10 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\utils\BlockGenerator;
 use czechpmdevs\buildertools\utils\Math;
-use const pocketmine\BASE_VERSION;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -56,29 +56,22 @@ class Printer extends Editor {
      * @param bool $fall
      */
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $fall = false) {
-        $undoList = new BlockList;
+        $undoList = new BlockList();
         $center = Math::roundPosition($center);
         switch ($mode) {
             case self::CUBE:
-                for ($x = $center->getX()-$brush; $x <= $center->getX()+$brush; $x++) {
-                    for ($y = $center->getY()-$brush; $y <= $center->getY()+$brush; $y++) {
-                        for ($z = $center->getZ()-$brush; $z <= $center->getZ()+$brush; $z++) {
-                            if($fall) {
-                                $finalPos = $this->throwBlock(new Position($x, $y, $z, $center->getLevel()), $block);
-                                $undoList->addBlock($finalPos, $block);
-                            } else {
-                                if($y > 0) {
-                                    $level = $center->getLevel();
-                                    if(version_compare(BASE_VERSION, "4.0.0") < 0) {
-                                        $level->setBlockIdAt($x, $y, $z, $block->getId());
-                                        $level->setBlockDataAt($x, $y, $z, $block->getDamage());
-                                    }
-                                    else {
-                                        $level->setBlockAt($x, $y, $z, $block);
-                                    }
-                                    $undoList->addBlock(new Vector3($x, $y, $z), $block);
-                                }
-                            }
+                foreach (BlockGenerator::generateCuboid($center->subtract($brush, $brush, $brush), $center->add($brush, $brush, $brush)) as [$x, $y, $z]) {
+                    if ($fall) {
+                        $finalPos = $this->throwBlock(new Position($x, $y, $z, $center->getLevel()), $block);
+                        $undoList->addBlock($finalPos, $block);
+
+                    } else {
+                        if ($y > 0) {
+                            $level = $center->getLevel();
+                            $level->setBlockIdAt($x, $y, $z, $block->getId());
+                            $level->setBlockDataAt($x, $y, $z, $block->getDamage());
+
+                            $undoList->addBlock(new Vector3($x, $y, $z), $block);
                         }
                     }
                 }
@@ -99,13 +92,9 @@ class Printer extends Editor {
                                 else {
                                     if($y > 0) {
                                         $level = $center->getLevel();
-                                        if(version_compare(BASE_VERSION, "4.0.0") < 0) {
-                                            $level->setBlockIdAt($x, $y, $z, $block->getId());
-                                            $level->setBlockDataAt($x, $y, $z, $block->getDamage());
-                                        }
-                                        else {
-                                            $level->setBlockAt($x, $y, $z, $block);
-                                        }
+                                        $level->setBlockIdAt($x, $y, $z, $block->getId());
+                                        $level->setBlockDataAt($x, $y, $z, $block->getDamage());
+
                                         $undoList->addBlock(new Vector3($x, $y, $z), $block);
                                     }
                                 }
@@ -136,13 +125,8 @@ class Printer extends Editor {
             $finalY = $a-1;
         }
 
-        if(version_compare(BASE_VERSION, "4.0.0") < 0) {
-            $level->setBlockIdAt($x, $finalY, $z, $block->getId());
-            $level->setBlockDataAt($x, $finalY, $z, $block->getDamage());
-        }
-        else {
-            $level->setBlockAt($x, $finalY, $z, $block);
-        }
+        $level->setBlockIdAt($x, $finalY, $z, $block->getId());
+        $level->setBlockDataAt($x, $finalY, $z, $block->getDamage());
 
         return new Vector3($x, $finalY, $z);
     }
@@ -158,7 +142,7 @@ class Printer extends Editor {
      */
     public function makeSphere(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
+        $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
 
         $invRadiusX = 1 / $radius;
@@ -241,7 +225,7 @@ class Printer extends Editor {
      */
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
+        $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
 
         if ($height == 0) {
@@ -321,7 +305,7 @@ class Printer extends Editor {
      * @return EditorResult
      */
     public function makePyramid(Player $player, Position $center, int $size, $blocks, bool $hollow = false): EditorResult {
-        $blockList = new BlockList(BlockList::SAVE_TYPE_BLOCKMAP);
+        $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
         $height = $size;
         for ($y = 0; $y <= $height; ++$y) {
@@ -366,7 +350,7 @@ class Printer extends Editor {
      */
     public function makeCube(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList(BlockList::SAVE_TYPE_NORMAL);
+        $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
         for($x = -$radius; $x <= $radius; $x++) {
             for($y = -$radius; $y <= $radius; $y++) {

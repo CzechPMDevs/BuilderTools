@@ -25,7 +25,7 @@ use pocketmine\math\Vector3;
 
 /**
  * Class Math
- * @package buildertools\utils
+ * @package buildertools\math
  */
 class Math {
 
