@@ -19,7 +19,7 @@
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;

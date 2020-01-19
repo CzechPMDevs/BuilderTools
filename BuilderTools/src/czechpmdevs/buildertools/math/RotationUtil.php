@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\utils;
+namespace czechpmdevs\buildertools\math;
 
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\block\UnknownBlock;
@@ -58,7 +58,6 @@ class RotationUtil {
         $blockList->setLevel($list->getLevel());
 
         $backwardsVector = self::moveBlocksToCoordinatesAxisOrigin($blockList);
-        self::addUnknownToSquare($blockList, $axis); // it makes square
 
         switch ($rotation) {
             case self::ROTATE_90:
@@ -72,7 +71,6 @@ class RotationUtil {
                 break;
         }
 
-        self::removeUnknownBlocks($blockList);
         $blockList->getMetadata()->recalculateMetadata();
         $blockList->add($backwardsVector);
 
@@ -145,7 +143,6 @@ class RotationUtil {
             case self::Y_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -159,7 +156,6 @@ class RotationUtil {
             case self::X_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -173,7 +169,6 @@ class RotationUtil {
             case self::Z_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -202,7 +197,6 @@ class RotationUtil {
             case self::Y_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -216,7 +210,6 @@ class RotationUtil {
             case self::X_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -230,7 +223,6 @@ class RotationUtil {
             case self::Z_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -244,99 +236,6 @@ class RotationUtil {
             default:
                 return $list;
         }
-    }
-
-    /**
-     * @param BlockList $list
-     * @param int $axis
-     */
-    private static function addUnknownToSquare(BlockList $list, int $axis) {
-        switch ($axis) {
-            case self::Y_AXIS:
-                $blocks = [];
-                foreach ($list->getAll() as $block) {
-                    $blocks[$block->getY()][] = "$block->x:$block->z";
-                }
-
-                $max = max($list->getMetadata()->maxX, $list->getMetadata()->maxZ);
-                if($max % 2 == 0)
-                    $max++;
-
-                $list->getMetadata()->maxX = $list->getMetadata()->maxZ = $max;
-
-                for($i = 0; $i <= $max; $i++) { // x
-                    for($j = 0; $j <= $max; $j++) { // z
-                        for($y = 0; $y < $list->getMetadata()->maxY; $y++) {
-                            if(!in_array("$i:$j", $blocks[$y])) {
-                                $list->addBlock(new Vector3($i, $y, $j), new UnknownBlock(-1)); // if pmmp starts checking it, i will have to find empty id
-                            }
-                        }
-                    }
-                }
-                break;
-
-            case self::X_AXIS:
-                $blocks = [];
-                foreach ($list->getAll() as $block) {
-                    $blocks[$block->getX()][] = "$block->y:$block->z";
-                }
-
-                $max = max($list->getMetadata()->maxY, $list->getMetadata()->maxZ);
-                if($max % 2 == 0)
-                    $max++;
-
-                $list->getMetadata()->maxY = $list->getMetadata()->maxZ = $max;
-
-                for($i = 0; $i <= $max; $i++) { // y
-                    for($j = 0; $j <= $max; $j++) { // z
-                        for($x = 0; $x < $list->getMetadata()->maxX; $x++) {
-                            if(!in_array("$i:$j", $blocks[$x])) {
-                                $list->addBlock(new Vector3($x, $i, $j), new UnknownBlock(-1)); // if pmmp starts checking it, i will have to find empty id
-                            }
-                        }
-                    }
-                }
-                break;
-
-            case self::Z_AXIS:
-                $blocks = [];
-                foreach ($list->getAll() as $block) {
-                    $blocks[$block->getZ()][] = "$block->x:$block->y";
-                }
-
-                $max = max($list->getMetadata()->maxX, $list->getMetadata()->maxY);
-                if($max % 2 == 0)
-                    $max++;
-
-                $list->getMetadata()->maxX = $list->getMetadata()->maxY = $max;
-
-                for($i = 0; $i <= $max; $i++) { // x
-                    for($j = 0; $j <= $max; $j++) { // y
-                        for($z = 0; $z < $list->getMetadata()->maxZ; $z++) {
-                            if(!in_array("$i:$j", $blocks[$z])) {
-                                $list->addBlock(new Vector3($i, $j, $z), new UnknownBlock(-1)); // if pmmp starts checking it, i will have to find empty id
-                            }
-                        }
-                    }
-                }
-                break;
-        }
-    }
-
-    /**
-     * @param BlockList $list
-     * @return BlockList
-     */
-    private static function removeUnknownBlocks(BlockList $list): BlockList {
-        $blocks = [];
-        foreach ($list->getAll() as $block) {
-            if(!$block instanceof UnknownBlock) {
-                $blocks[] = $block;
-            }
-        }
-
-        $list->setAll($blocks);
-        return $list;
     }
 
     /**

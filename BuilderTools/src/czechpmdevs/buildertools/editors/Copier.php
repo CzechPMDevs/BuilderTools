@@ -24,9 +24,9 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\blockstorage\ClipboardData;
 use czechpmdevs\buildertools\editors\object\EditorResult;
-use czechpmdevs\buildertools\utils\BlockGenerator;
-use czechpmdevs\buildertools\utils\Math;
-use czechpmdevs\buildertools\utils\RotationUtil;
+use czechpmdevs\buildertools\math\BlockGenerator;
+use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\math\RotationUtil;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -63,14 +63,14 @@ class Copier extends Editor {
         $startTime = microtime(true);
 
         $clipboard = $this->copiedClipboards[$player->getName()] = new ClipboardData($player);
-        $clipboard->setPlayerPosition($player->asVector3());
+        $clipboard->setPlayerPosition(Math::roundVector3($player->asVector3()));
 
         $i = 0;
         foreach (BlockGenerator::generateCuboid($pos1, $pos2) as [$x, $y, $z]) {
             $blockPos = new Vector3($x, $y, $z);
 
             $block = $player->getLevel()->getBlock($blockPos);
-            $clipboard->addBlock(Math::roundVector3($blockPos->subtract($player->asVector3())), $block);
+            $clipboard->addBlock(Math::roundVector3($blockPos->subtract($clipboard->getPlayerPosition())), $block);
 
             $i++;
         }
@@ -87,12 +87,15 @@ class Copier extends Editor {
             return;
         }
 
+        $center = Math::roundVector3($player->asVector3());
         /** @var array $blocks */
         $blocks = [];
 
         foreach ($this->copiedClipboards[$player->getName()]->getAll() as $block) {
             if($block->getId() !== 0) {
-                $blocks[] = $block->add($player->asVector3());
+                $pos = $block->add($center);
+                $block->setComponents($pos->getX(), $pos->getY(), $pos->getZ());
+                $blocks[] = $block;
             }
         }
 
@@ -114,11 +117,14 @@ class Copier extends Editor {
             return;
         }
 
+        $center = Math::roundVector3($player->asVector3());
         /** @var array $blocks */
         $blocks = [];
 
         foreach ($this->copiedClipboards[$player->getName()]->getAll() as $block) {
-            $blocks[] = $block->add($player->asVector3());
+            $pos = $block->add($center);
+            $block->setComponents($pos->getX(), $pos->getY(), $pos->getZ());
+            $blocks[] = $block;
         }
 
         $list = new BlockList();

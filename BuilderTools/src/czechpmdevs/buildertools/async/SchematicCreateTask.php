@@ -20,9 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
 
-use czechpmdevs\buildertools\editors\object\BlockList;
-use pocketmine\block\Block;
-use pocketmine\block\Thin;
+
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\ByteArrayTag;

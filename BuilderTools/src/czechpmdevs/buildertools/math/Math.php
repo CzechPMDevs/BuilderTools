@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\utils;
+namespace czechpmdevs\buildertools\math;
 
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -34,7 +34,7 @@ class Math {
      * @return Vector3 $vector3
      */
     public static function roundVector3(Vector3 $vector3): Vector3 {
-        return new Vector3((int)round($vector3->getX()), (int)round($vector3->getY()), (int)round($vector3->getZ()));
+        return new Vector3((int)ceil($vector3->getX()), (int)ceil($vector3->getY()), (int)ceil($vector3->getZ()));
     }
 
     /**

@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\utils\RotationUtil;
+use czechpmdevs\buildertools\math\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -74,7 +74,7 @@ class RotateCommand extends BuilderToolsCommand {
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        if(!isset($copier->copyData[$sender->getName()])) {
+        if(!isset($copier->copiedClipboards[$sender->getName()])) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }

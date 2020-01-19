@@ -21,20 +21,15 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\async;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Fixer;
-use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\schematics\Schematic;
 use pocketmine\block\Block;
-use pocketmine\block\Door;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntTag;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use pocketmine\utils\BinaryDataException;
-use pocketmine\utils\BinaryStream;
 
 /**
  * Class SchematicLoadingTask

@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
-use czechpmdevs\buildertools\utils\BlockGenerator;
+use czechpmdevs\buildertools\math\BlockGenerator;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;

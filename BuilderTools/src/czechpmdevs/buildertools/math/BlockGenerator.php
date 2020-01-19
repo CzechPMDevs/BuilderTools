@@ -18,13 +18,13 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\utils;
+namespace czechpmdevs\buildertools\math;
 
 use pocketmine\math\Vector3;
 
 /**
  * Class BlockGenerator
- * @package czechpmdevs\buildertools\utils
+ * @package czechpmdevs\buildertools\math
  */
 class BlockGenerator {
 

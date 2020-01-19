@@ -24,7 +24,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\schematics\Schematic;
 use czechpmdevs\buildertools\Selectors;
-use czechpmdevs\buildertools\utils\Math;
+use czechpmdevs\buildertools\math\Math;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
