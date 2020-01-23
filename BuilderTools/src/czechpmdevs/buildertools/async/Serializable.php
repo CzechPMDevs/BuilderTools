@@ -18,30 +18,27 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\blockstorage;
-
-use pocketmine\math\Vector3;
+namespace czechpmdevs\buildertools\async;
 
 /**
- * Class ClipboardData
- * @package czechpmdevs\buildertools\editors\blockstorage
+ * Interface Serializable
+ * @package czechpmdevs\buildertools\async
  */
-class ClipboardData extends BlockList {
-
-    /** @var Vector3 $playerPosition */
-    private $playerPosition;
+interface Serializable {
 
     /**
-     * @param Vector3 $playerPosition
+     * Serializes object to string and allows to move it through threads
+     *
+     * @return string
      */
-    public function setPlayerPosition(Vector3 $playerPosition): void {
-        $this->playerPosition = $playerPosition;
-    }
+    public function serialize(): string;
 
     /**
-     * @return Vector3
+     * Deserializes object back to object
+     *
+     * @var string $serialized
+     * @return Serializable
      */
-    public function getPlayerPosition(): Vector3 {
-        return $this->playerPosition;
-    }
+    public static function deserialize(string $serialized): Serializable;
+
 }

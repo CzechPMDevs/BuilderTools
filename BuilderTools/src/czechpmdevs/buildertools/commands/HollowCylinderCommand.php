@@ -48,7 +48,8 @@ class HollowCylinderCommand extends BuilderToolsCommand {
      * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
+        parent::execute($sender, $commandLabel, $args);
+
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;

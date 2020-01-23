@@ -18,6 +18,7 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
 
     /**
      * BuilderToolsCommand constructor.
+     *
      * @param string $name
      * @param string $description
      * @param string|null $usageMessage
@@ -35,10 +36,7 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
      * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$sender->hasPermission($this->getPermission())) {
-            $sender->sendMessage((string)$this->getPermissionMessage());
-            return;
-        }
+        if(!$this->testPermission($sender)) return;
     }
 
     /**

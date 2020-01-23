@@ -21,8 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Canceller;
-use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\Clipboard;
+use czechpmdevs\buildertools\editors\object\EditorStep;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -46,17 +46,22 @@ class UndoCommand extends BuilderToolsCommand {
      * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
+        parent::execute($sender, $commandLabel, $args);
+
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $result = $canceller->undo($sender);
+        $clipboard = Clipboard::getClipboard($sender);
+        $step = $clipboard->getLastStep();
 
-        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled!");
+        if(!$step instanceof EditorStep) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cThere aren't any actions to undo.");
+            return;
+        }
+
+        if($step->useOn($sender)) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled!");
     }
 
 }

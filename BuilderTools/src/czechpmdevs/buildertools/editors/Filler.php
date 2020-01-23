@@ -21,7 +21,9 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\Clipboard;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\ClipboardData;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use pocketmine\block\Block;
@@ -89,11 +91,11 @@ class Filler extends Editor {
         if(isset($settings["saveUndo"]) && is_bool($settings["saveUndo"])) $saveUndo = $settings["saveUndo"];
         if(isset($settings["saveRedo"]) && is_bool($settings["saveRedo"])) $saveRedo = $settings["saveRedo"];
 
-        $undoList = new BlockList;
-        $redoList = new BlockList;
+        $undoClipboard = new ClipboardData();
+        $redoClipboard = new ClipboardData();
 
-        if($saveUndo) $undoList->setLevel($blockList->getLevel());
-        if($saveRedo) $redoList->setLevel($blockList->getLevel());
+        if($saveUndo) $undoClipboard->setLevel($blockList->getLevel());
+        if($saveRedo) $redoClipboard->setLevel($blockList->getLevel());
 
         $iterator = new SubChunkIteratorManager($blockList->getLevel());
 
@@ -155,27 +157,23 @@ class Filler extends Editor {
             $iterator->moveTo((int)$block->getX(), (int)$block->getY(), (int)$block->getZ());
 
             if($iterator->currentSubChunk === null) {
-                $this->getPlugin()->getLogger()->error("Error while filling: Could not found sub chunk at {$block->getX()}:{$block->getY()}:{$block->getZ()}");
+                BuilderTools::getInstance()->getLogger()->error("Error while filling: Could not found sub chunk at {$block->getX()}:{$block->getY()}:{$block->getZ()}");
                 continue;
             }
 
-            if($saveUndo) $undoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
-            if($saveRedo) $redoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
+            if($saveUndo) $undoClipboard->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
+            if($saveRedo) $redoClipboard->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
             $iterator->currentSubChunk->setBlock($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f, $block->getId(), $block->getDamage());
         }
 
         $reloadChunks($blockList->getLevel(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
 
         if($saveUndo) {
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(static::CANCELLER);
-            $canceller->addStep($player, $undoList);
+            Clipboard::getClipboard($player)->addStep($undoClipboard);
         }
 
         if($saveRedo) {
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(static::CANCELLER);
-            $canceller->addRedo($player, $redoList);
+            Clipboard::getClipboard($player)->addCancelledStep($redoClipboard);
         }
 
 
