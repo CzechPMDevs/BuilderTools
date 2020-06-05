@@ -51,7 +51,18 @@ class FirstPositionCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        Selectors::addSelector($sender, 1, $position = new Position((int)round($sender->getX()), (int)round($sender->getY()), (int)round($sender->getZ()), $sender->getLevel()));
+        if (isset($args[0])) {
+            if (isset($args[1])) {
+                if (isset($args[2])) {
+                    Selectors::addSelector($sender, 1, $position = new Position((int)intval($args[0]), (int)intval($args[1]), (int)intval($args[2]), $sender->getLevel()));
+                    $sender->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
+                                return;
+                }
+            }
+            $sender->sendMessage("§cInvalid coordinates given!");
+            return;
+        }
+        Selectors::addSelector($sender, 1, $position = new Position((int)intval($sender->getX()), (int)intval($sender->getY()), (int)intval($sender->getZ()), $sender->getLevel()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
     }
 }
