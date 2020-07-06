@@ -1,13 +1,29 @@
 <?php
 
+/**
+ * Copyright (C) 2018-2020  CzechPMDevs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Fixer;
-use czechpmdevs\buildertools\editors\object\BlockList;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
@@ -17,7 +33,10 @@ use pocketmine\nbt\tag\CompoundTag;
  * Class UnloadedSchematic
  * @package czechpmdevs\buildertools\schematics
  */
-class UnloadedSchematic extends Schematic {
+class UnloadedSchematic extends SchematicData {
+
+    /** @var string $file */
+    public $file;
 
     /**
      * UnloadedSchematic constructor.
@@ -25,7 +44,7 @@ class UnloadedSchematic extends Schematic {
      */
     public function __construct(string $file) {
         $this->file = $file;
-        $this->isLoaded = true;
+
         $nbt = new BigEndianNBTStream();
 
         /** @var CompoundTag $data */
@@ -35,8 +54,10 @@ class UnloadedSchematic extends Schematic {
         $this->length = (int)$data->getShort("Length");
 
         if($data->offsetExists("Materials")) {
-            $this->materials = $data->getString("Materials");
+            $this->materialType = $data->getString("Materials");
         }
+
+        $this->isLoaded = true;
 
         unset($data);
         unset($nbt);
@@ -87,8 +108,8 @@ class UnloadedSchematic extends Schematic {
             return null;
         }
 
-        if($this->materials == "Classic" || $this->materials == "Alpha") {
-            $this->materials = "Pocket";
+        if($this->materialType == "Classic" || $this->materialType == "Alpha") {
+            $this->materialType = "Pocket";
             /** @var Fixer $fixer */
             $fixer = BuilderTools::getEditor(Editor::FIXER);
             $list = $fixer->fixBlockList($list);

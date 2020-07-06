@@ -6,7 +6,7 @@ namespace czechpmdevs\buildertools\editors\object;
 
 use pocketmine\block\Block;
 use pocketmine\level\Level;
-use vixikhd\skywars\math\Vector3;
+use pocketmine\math\Vector3;
 
 /**
  * Class BlockMap

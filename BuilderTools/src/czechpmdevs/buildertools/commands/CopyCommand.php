@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,11 @@ class CopyCommand extends BuilderToolsCommand {
         }
         $pos1 = Selectors::getPosition($sender, 1);
         $pos2 = Selectors::getPosition($sender, 2);
+
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->copy($pos1->getX(), $pos1->getY(), $pos1->getZ(), $pos2->getX(), $pos2->getY(), $pos2->getZ(), $sender);
+        $result = $copier->copy($pos1, $pos2, $sender);
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§a{$result->countBlocks} blocks copied to clipboard! Use //paste to paste");
     }
 }

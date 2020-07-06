@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
-use czechpmdevs\buildertools\editors\object\BlockList;
 use czechpmdevs\buildertools\Selectors;
-use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -88,5 +87,7 @@ class MoveCommand extends BuilderToolsCommand {
 
         $filler->fill($sender, $toRemove);
         $filler->fill($sender, $toFill);
+
+        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area were successfully moved.");
     }
 }

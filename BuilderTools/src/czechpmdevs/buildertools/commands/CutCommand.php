@@ -23,20 +23,22 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\Filler;
+use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 /**
- * Class CopyCommand
- * @package buildertools\commands
+ * Class CutCommand
+ * @package czechpmdevs\buildertools\commands
  */
-class PasteCommand extends BuilderToolsCommand {
+class CutCommand extends BuilderToolsCommand {
 
     /**
-     * PasteCommand constructor.
+     * CutCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/paste", "Paste copied area", null, []);
+        parent::__construct("/cut", "Cut selected area", null, []);
     }
 
     /**
@@ -51,9 +53,26 @@ class PasteCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
+        if(!Selectors::isSelected(1, $sender)) {
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
+            return;
+        }
+        if(!Selectors::isSelected(2, $sender)) {
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
+            return;
+        }
+
+        $pos1 = Selectors::getPosition($sender, 1);
+        $pos2 = Selectors::getPosition($sender, 2);
+
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->paste($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully pasted!");
+        $copier->copy($pos1, $pos2, $sender);
+
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $blockList = $filler->prepareFill($pos1, $pos2, $sender->getLevel(), "0");
+        $filler->fill($sender, $blockList);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aThe selected area were cut out!");
     }
 }

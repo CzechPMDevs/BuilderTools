@@ -1,13 +1,29 @@
 <?php
 
+/**
+ * Copyright (C) 2018-2020  CzechPMDevs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Fixer;
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\schematics\Schematic;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
@@ -24,24 +40,54 @@ class SchematicLoadTask extends AsyncTask {
     /** @var string $path */
     public $path;
 
+    /**
+     * SchematicLoadTask constructor.
+     * @param string $path
+     */
     public function __construct(string $path) {
         $this->path = $path;
     }
 
     public function onRun() {
         try {
-            $result = ["error" => ""];
-            $materials = "Classic";
-            $nbt = new BigEndianNBTStream();
-
             /** @var CompoundTag $data */
-            $data = $nbt->readCompressed(file_get_contents($this->path));
-            $width = $result["width"] = (int)$data->getShort("Width");
-            $height = $result["height"] = (int)$data->getShort("Height");
-            $length = $result["length"] = (int)$data->getShort("Length");
+            $data = (new BigEndianNBTStream())->readCompressed(file_get_contents($this->path));
+            if($data->offsetExists("Blocks") && $data->offsetExists("Data")) {
+                $result = $this->loadMCEditFormat($data);
+            }
+            else {
+                $result = $this->loadSpongeFormat($data);
+            }
+
+            $this->setResult($result);
+        }
+        catch (\Exception $exception) {
+            $this->setResult(["error" => $exception->getMessage()]);
+        }
+    }
+
+    /**
+     * @param CompoundTag $data
+     * @return array
+     */
+    public function loadSpongeFormat(CompoundTag $data) {
+        return ["error" => "Sponge schematics still aren't supported. Try find schematics in MCEdit format."];
+    }
+
+    /**
+     * @param CompoundTag $data
+     * @return array
+     */
+    public function loadMCEditFormat(CompoundTag $data) {
+        try {
+            $materials = "Classic";
+
+            $width = (int)$data->getShort("Width");
+            $height = (int)$data->getShort("Height");
+            $length = (int)$data->getShort("Length");
 
             if($data->offsetExists("Materials")) {
-                $materials = $result["materials"] = $data->getString("Materials");
+                $materials = $data->getString("Materials");
             }
 
             $blockList = new BlockList();
@@ -73,25 +119,31 @@ class SchematicLoadTask extends AsyncTask {
                 $blockList = (new Fixer())->fixBlockList($blockList);
             }
 
-            $result["materials"] = $materials;
-            $result["blockList"] = $blockList;
-
-            unset($blockList, $materials, $data, $width, $height, $length);
-
-            $this->setResult($result);
+            return [
+                "error" => "",
+                $blockList,
+                new Vector3($width, $height, $length),
+                $materials
+            ];
         }
         catch (\Error $exception) {
-            $this->setResult(["error" => $exception->getMessage()]);
+            return ["error" => $exception->getMessage()];
         }
     }
 
+    /**
+     * @param Server $server
+     */
     public function onCompletion(Server $server) {
         $result = $this->getResult();
         $file = $this->path;
 
-        BuilderTools::getInstance()->getLogger()->info(basename($file, ".schematic") . " schematic loaded!");
+        if(isset($result["error"]) && $result["error"] !== "") {
+            BuilderTools::getInstance()->getLogger()->error("Could not load schematic $file: " . $result["error"]);
+            return;
+        }
 
-        $target = BuilderTools::getSchematicsManager()->getSchematic(basename($file, ".schematic"));
-        $target->loadFromAsync($result);
+        BuilderTools::getInstance()->getLogger()->info(basename($file, ".schematic") . " schematic loaded!");
+        BuilderTools::getSchematicsManager()->registerSchematic($file, Schematic::loadFromAsync($result));
     }
 }

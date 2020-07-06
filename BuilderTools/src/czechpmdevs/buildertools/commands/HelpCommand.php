@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 
 /**
  * Class HelpCommand
@@ -40,7 +39,7 @@ class HelpCommand extends BuilderToolsCommand {
      * HelpCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/commands", "Displays BuilderTools commands", null, ["/?", "buildertools", "/help"]);
+        parent::__construct("/help", "Displays BuilderTools commands", null, ["/?", "buildertools", "/commands"]);
     }
 
     public static function buildPages() {

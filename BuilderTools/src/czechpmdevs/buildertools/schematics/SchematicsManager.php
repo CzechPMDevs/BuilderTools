@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
+use czechpmdevs\buildertools\async\SchematicLoadTask;
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Filler;
-use czechpmdevs\buildertools\editors\object\BlockList;
 use pocketmine\Player;
 
 /**
@@ -61,13 +62,27 @@ class SchematicsManager {
 
     public function loadSchematics() {
         $this->schematics = [];
-        $unloaded = BuilderTools::getConfiguration()["schematics"]["load"] != "startup";
+        //$unloaded = BuilderTools::getConfiguration()["schematics"]["load"] != "startup";
         foreach (glob($this->plugin->getDataFolder() . "schematics/*.schematic") as $file) {
-            if($unloaded)
-                $this->schematics[basename($file, ".schematic")] = new UnloadedSchematic($file);
-            else
-                $this->schematics[basename($file, ".schematic")] = new Schematic($file);
+            $this->loadSchematic($file);
         }
+    }
+
+    /**
+     * @param string $file
+     * @param Schematic $schematic
+     */
+    public function registerSchematic(string $file, Schematic $schematic) {
+        $schematic->file = $file;
+        $this->schematics[basename($file, ".schematic")] = $schematic;
+    }
+
+    /**
+     * @param string $path
+     */
+    public function loadSchematic(string $path) {
+        $this->plugin->getLogger()->info("Loading schematic from $path...");
+        $this->plugin->getServer()->getAsyncPool()->submitTask(new SchematicLoadTask($path));
     }
 
     /**
@@ -80,11 +95,13 @@ class SchematicsManager {
 
     /**
      * @param Player $player
+     *
+     * @return bool
      */
-    public function pasteSchematic(Player $player) {
+    public function pasteSchematic(Player $player): bool {
         if(!isset($this->players[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix(). "§cType //schem load <filename> to load schematic first!");
-            return;
+            return false;
         }
 
         $schematic = $this->players[$player->getName()];
@@ -92,19 +109,26 @@ class SchematicsManager {
 
         if($blockList === null) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cInvalid schematic format (Sponge) isn't supported.");
-            return;
+            return false;
         }
 
         $fillList = new BlockList();
         $fillList->setLevel($player->getLevel());
+        $debugged = false;
+        $fillList->add($player);
+
         foreach ($blockList->getAll() as $block) {
-            $fillList->addBlock($block->add($player), $block);
+            if($block->getId() != 0 && !$debugged) {
+                var_dump($block);
+                $debugged = true;
+            }
         }
 
         /** @var Filler $filler */
         $filler = new Filler();
         $filler->fill($player, $fillList);
         $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
+        return true;
     }
 
     /**

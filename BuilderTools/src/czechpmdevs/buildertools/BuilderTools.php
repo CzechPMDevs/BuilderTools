@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\commands\BlockInfoCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
 use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
+use czechpmdevs\buildertools\commands\CutCommand;
 use czechpmdevs\buildertools\commands\CylinderCommand;
 use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
@@ -102,6 +103,7 @@ class BuilderTools extends PluginBase {
         $this->initListner();
         $this->registerEditors();
         $this->registerEnchantment();
+        $this->sendWarnings();
         self::$schematicsManager = new SchematicsManager($this);
     }
 
@@ -150,7 +152,6 @@ class BuilderTools extends PluginBase {
             new PasteCommand,
             new MergeCommand,
             new RotateCommand,
-            new FlipCommand,
             new UndoCommand,
             new RedoCommand,
             new TreeCommand,
@@ -165,12 +166,19 @@ class BuilderTools extends PluginBase {
             new HollowCylinderCommand,
             new StackCommand,
             new OutlineCommand,
-            new MoveCommand
+            new MoveCommand,
+            new CutCommand
         ];
         foreach (self::$commands as $command) {
             $map->register("BuilderTools", $command);
         }
         HelpCommand::buildPages();
+    }
+
+    public function sendWarnings() {
+        if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
+            $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
+        }
     }
 
     /**

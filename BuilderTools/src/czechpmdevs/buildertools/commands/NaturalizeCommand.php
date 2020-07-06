@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
@@ -67,9 +66,9 @@ class NaturalizeCommand extends BuilderToolsCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
-        /** @var Naturalizer $filler */
-        $filler = BuilderTools::getEditor(Editor::NATURALIZER);
-        $count = $filler->naturalize($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized!");
+        /** @var Naturalizer $naturalizer */
+        $naturalizer = BuilderTools::getEditor(Editor::NATURALIZER);
+        $count = $naturalizer->naturalize($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized ($count->countBlocks blocks changed)!");
     }
 }

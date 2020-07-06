@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\math\BlockGenerator;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
@@ -50,21 +51,18 @@ class Filler extends Editor {
         $blockList = new BlockList;
         $blockList->setLevel($level);
 
-        for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
-            for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
-                for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
-                    if(!$filled) {
-                        if($x != min($pos1->getX(), $pos2->getX()) && $x != max($pos1->getX(), $pos2->getX())) {
-                            if($y != min($pos1->getY(), $pos2->getY()) && $y != max($pos1->getY(), $pos2->getY())) {
-                                if($z != min($pos1->getZ(), $pos2->getZ()) && $z != max($pos1->getZ(), $pos2->getZ())) {
-                                    continue;
-                                }
-                            }
+        foreach (BlockGenerator::generateCuboid($pos1, $pos2) as [$x, $y, $z]) {
+            if(!$filled) {
+                if($x != min($pos1->getX(), $pos2->getX()) && $x != max($pos1->getX(), $pos2->getX())) {
+                    if($y != min($pos1->getY(), $pos2->getY()) && $y != max($pos1->getY(), $pos2->getY())) {
+                        if($z != min($pos1->getZ(), $pos2->getZ()) && $z != max($pos1->getZ(), $pos2->getZ())) {
+                            continue;
                         }
                     }
-                    $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blockArgs));
                 }
             }
+
+            $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blockArgs));
         }
 
         return $blockList;

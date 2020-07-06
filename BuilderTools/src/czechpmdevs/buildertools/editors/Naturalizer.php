@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2019  CzechPMDevs
+ * Copyright (C) 2018-2020  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\BlockList;
+use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector2;
@@ -50,10 +51,11 @@ class Naturalizer extends Editor {
      * @param int $z2
      * @param Level $level
      * @param Player $player
+     *
+     * @return EditorResult
      */
     public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player) {
         $list = new BlockList();
-        $list->saveBlockMap(true);
         $list->setLevel($level);
 
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
@@ -64,7 +66,7 @@ class Naturalizer extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $list);
+        return $filler->fill($player, $list);
     }
 
     /**
