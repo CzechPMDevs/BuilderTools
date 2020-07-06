@@ -21,8 +21,9 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\Clipboard;
-use czechpmdevs\buildertools\editors\object\EditorStep;
+use czechpmdevs\buildertools\editors\Canceller;
+use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -46,21 +47,18 @@ class RedoCommand extends BuilderToolsCommand {
      * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        parent::execute($sender, $commandLabel, $args);
-
+        if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
 
-        $clipboard = Clipboard::getClipboard($sender);
-        $step = $clipboard->getNextStep();
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
 
-        if(!$step instanceof EditorStep) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cThere aren't any actions to redo.");
-            return;
-        }
+        /** @var EditorResult $result */
+        $result = $canceller->redo($sender);
 
-        if($step->useOn($sender)) $sender->sendMessage(BuilderTools::getPrefix() . "§aUndo was cancelled!");
+        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aUndo was cancelled!");
     }
 }

@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors\blockstorage;
 
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 
 /**
  * Class ClipboardData
@@ -28,8 +29,19 @@ use pocketmine\math\Vector3;
  */
 class ClipboardData extends BlockList {
 
+    /** @var Player $player */
+    private $player;
+
     /** @var Vector3 $playerPosition */
     private $playerPosition;
+
+    /**
+     * ClipboardData constructor.
+     * @param Player $player
+     */
+    public function __construct(Player $player) {
+        $this->player = $player;
+    }
 
     /**
      * @param Vector3 $playerPosition
@@ -43,5 +55,12 @@ class ClipboardData extends BlockList {
      */
     public function getPlayerPosition(): Vector3 {
         return $this->playerPosition;
+    }
+
+    /**
+     * @return Player
+     */
+    public function getPlayer(): Player {
+        return $this->player;
     }
 }

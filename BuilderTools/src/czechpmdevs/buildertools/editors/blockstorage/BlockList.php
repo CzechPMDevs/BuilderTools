@@ -20,18 +20,15 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors\blockstorage;
 
-use czechpmdevs\buildertools\async\Serializable;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use pocketmine\Server;
-use pocketmine\Thread;
 
 /**
  * Class BlockList
  * @package buildertools\editors\object
  */
-class BlockList implements BlockStorage, Serializable {
+class BlockList implements BlockStorage {
 
     /** @var Block[] $blocks */
     private $blocks = [];
@@ -157,50 +154,5 @@ class BlockList implements BlockStorage, Serializable {
         }
 
         return $blockList;
-    }
-
-    /**
-     * @return string
-     */
-    public function serialize(): string {
-        $data = [
-            "level" => $this->getLevel()->getFolderName()
-        ];
-
-        foreach ($this->getAll() as $block) {
-            $data["blocks"][] = [
-                "position" => [$block->getX(), $block->getY(), $block->getZ()],
-                "id" => $block->getId(),
-                "meta" => $block->getDamage()
-            ];
-        }
-
-        return \serialize($data);
-    }
-
-    /**
-     * @param string $serialized
-     *
-     * @return BlockList
-     */
-    public static function deserialize(string $serialized): Serializable {
-        $data = unserialize($serialized);
-        $list = new BlockList();
-
-        /**
-         * @var array $pos
-         * @var int $id
-         * @var int $meta
-         */
-        foreach ($data["blocks"] as ["position" => $pos, "id" => $id, "meta" => $meta]) {
-            $pos = new Vector3(... $pos);
-            $list->addBlock($pos, Block::get($id, $meta));
-        }
-
-        if(!is_null($data["level"]) && is_null(\Thread::getCurrentThread())) {
-            $list->setLevel(Server::getInstance()->getLevelByName($data["level"]));
-        }
-
-        return $list;
     }
 }

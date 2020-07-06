@@ -27,8 +27,6 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\math\RotationUtil;
-use pocketmine\block\Block;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -91,8 +89,9 @@ class Copier extends Editor {
         /** @var array $blocks */
         $blocks = [];
 
-        foreach ($this->copiedClipboards[$player->getName()]->getAll() as $block) {
-            if($block->getId() !== 0) {
+        foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {
+            if($blockInClipboard->getId() !== 0) {
+                $block = clone $blockInClipboard;
                 $pos = $block->add($center);
                 $block->setComponents($pos->getX(), $pos->getY(), $pos->getZ());
                 $blocks[] = $block;
@@ -121,7 +120,8 @@ class Copier extends Editor {
         /** @var array $blocks */
         $blocks = [];
 
-        foreach ($this->copiedClipboards[$player->getName()]->getAll() as $block) {
+        foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {
+            $block = clone $blockInClipboard;
             $pos = $block->add($center);
             $block->setComponents($pos->getX(), $pos->getY(), $pos->getZ());
             $blocks[] = $block;

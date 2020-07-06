@@ -41,13 +41,13 @@ class SecondPositionCommand extends BuilderToolsCommand {
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        parent::execute($sender, $commandLabel, $args);
+        if(!$this->testPermission($sender)) return;
 
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        Selectors::addSelector($sender, 2, $position = new Position((int)round($sender->getX()), (int)round($sender->getY()), (int)round($sender->getZ()), $sender->getLevel()));
+        Selectors::addSelector($sender, 2, $position = new Position((int)$sender->getX(), (int)$sender->getY(), (int)$sender->getZ(), $sender->getLevel()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
     }
 }

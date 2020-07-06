@@ -20,10 +20,9 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
-use pocketmine\scheduler\AsyncTask;
-use pocketmine\Thread;
 
 /**
  * Class Editor
@@ -31,31 +30,14 @@ use pocketmine\Thread;
  */
 abstract class Editor {
 
-    public const CANCELLER = "Canceller";
-    public const COPIER = "Copier";
-    public const DECORATOR = "Decorator";
-    public const FILLER = "Filler";
-    public const FIXER = "Fixer";
-    public const NATURALIZER = "Naturalizer";
-    public const PRINTER = "Printer";
-    public const REPLACEMENT = "Replacement";
-
-    /** @var  Editor[] $editors */
-    private static $editors = [];
-
-    public static function init() {
-        if(!empty(self::$editors)) {
-            return;
-        }
-
-        self::$editors["Filler"] = new Filler;
-        self::$editors["Printer"] = new Printer;
-        self::$editors["Replacement"] = new Replacement;
-        self::$editors["Naturalizer"] = new Naturalizer;
-        self::$editors["Copier"] = new Copier;
-        self::$editors["Decorator"] = new Decorator;
-        self::$editors["Fixer"] = new Fixer;
-    }
+    const CANCELLER = "Canceller";
+    const COPIER = "Copier";
+    const DECORATOR = "Decorator";
+    const FILLER = "Filler";
+    const FIXER = "Fixer";
+    const NATURALIZER = "Naturalizer";
+    const PRINTER = "Printer";
+    const REPLACEMENT = "Replacement";
 
     /**
      * @return string
@@ -63,12 +45,10 @@ abstract class Editor {
     abstract function getName(): string;
 
     /**
-     * @param string $name
-     *
-     * @return Editor|null
+     * @return BuilderTools
      */
-    public static function getEditor(string $name): ?Editor {
-        return self::$editors[$name] ?? null;
+    public function getPlugin(): BuilderTools {
+        return BuilderTools::getInstance();
     }
 
     /**

@@ -23,9 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
 use pocketmine\Player;
 
 /**
@@ -48,8 +46,7 @@ class PasteCommand extends BuilderToolsCommand {
      * @return void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        parent::execute($sender, $commandLabel, $args);
-
+        if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;

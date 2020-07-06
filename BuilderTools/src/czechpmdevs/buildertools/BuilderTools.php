@@ -30,6 +30,7 @@ use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
 use czechpmdevs\buildertools\commands\FixCommand;
+use czechpmdevs\buildertools\commands\FlipCommand;
 use czechpmdevs\buildertools\commands\HelpCommand;
 use czechpmdevs\buildertools\commands\HollowCubeCommand;
 use czechpmdevs\buildertools\commands\HollowCylinderCommand;
@@ -52,7 +53,15 @@ use czechpmdevs\buildertools\commands\StackCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
 use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
+use czechpmdevs\buildertools\editors\Canceller;
+use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\editors\Decorator;
 use czechpmdevs\buildertools\editors\Editor;
+use czechpmdevs\buildertools\editors\Filler;
+use czechpmdevs\buildertools\editors\Fixer;
+use czechpmdevs\buildertools\editors\Naturalizer;
+use czechpmdevs\buildertools\editors\Printer;
+use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
@@ -71,6 +80,9 @@ class BuilderTools extends PluginBase {
     /** @var  string $prefix */
     private static $prefix;
 
+    /** @var  Editor[] $editors */
+    private static $editors = [];
+
     /** @var EventListener $listener */
     private static $listener;
 
@@ -87,11 +99,9 @@ class BuilderTools extends PluginBase {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
         $this->initConfig();
-
-        Editor::init();
-
         $this->registerCommands();
         $this->initListner();
+        $this->registerEditors();
         $this->registerEnchantment();
         $this->sendWarnings();
         self::$schematicsManager = new SchematicsManager($this);
@@ -104,6 +114,16 @@ class BuilderTools extends PluginBase {
         self::$configuration = $this->getConfig()->getAll();
     }
 
+    private function registerEditors() {
+        self::$editors["Filler"] = new Filler;
+        self::$editors["Printer"] = new Printer;
+        self::$editors["Replacement"] = new Replacement;
+        self::$editors["Naturalizer"] = new Naturalizer;
+        self::$editors["Copier"] = new Copier;
+        self::$editors["Canceller"] = new Canceller;
+        self::$editors["Decorator"] = new Decorator;
+        self::$editors["Fixer"] = new Fixer;
+    }
 
     private function initListner() {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
@@ -166,7 +186,7 @@ class BuilderTools extends PluginBase {
      * @return Editor $editor
      */
     public static function getEditor(string $name): Editor {
-        return Editor::getEditor($name);
+        return self::$editors[$name];
     }
 
     /**

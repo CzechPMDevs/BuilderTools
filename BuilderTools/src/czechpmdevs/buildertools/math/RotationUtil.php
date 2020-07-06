@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\math;
 
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
-use pocketmine\block\UnknownBlock;
 use pocketmine\math\Vector3;
 
 /**
@@ -88,7 +87,6 @@ class RotationUtil {
             case self::Y_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -102,7 +100,6 @@ class RotationUtil {
             case self::X_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 
@@ -116,7 +113,6 @@ class RotationUtil {
             case self::Z_AXIS:
                 $newList = new BlockList();
                 $newList->setLevel($list->getLevel());
-                $newList->setPlayerPosition($list->getPlayerPosition());
 
                 $metadata = $list->getMetadata();
 

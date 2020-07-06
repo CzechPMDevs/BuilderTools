@@ -35,8 +35,8 @@ use pocketmine\tile\Sign;
  */
 class Fixer extends Editor {
 
-    public const REMOVE_HEADS = false;
-    public const FIX_TILES = true;
+    const REMOVE_HEADS = false;
+    const FIX_TILES = true;
 
     /**
      * @var array $blocks

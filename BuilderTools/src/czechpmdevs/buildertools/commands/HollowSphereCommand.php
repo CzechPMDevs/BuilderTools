@@ -25,8 +25,6 @@ use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
-use pocketmine\level\Position;
 use pocketmine\Player;
 
 /**
@@ -49,8 +47,7 @@ class HollowSphereCommand extends BuilderToolsCommand {
      * @return mixed|void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        parent::execute($sender, $commandLabel, $args);
-
+        if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
