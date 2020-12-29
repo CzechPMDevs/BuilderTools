@@ -21,6 +21,7 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -70,19 +71,35 @@ class Fixer extends Editor {
         foreach ($blockList->getAll() as $block) {
             $id = $block->getId();
             $damage = $block->getDamage();
-            $x = $block->getX();
-            $y = $block->getY();
-            $z = $block->getZ();
             if(isset(self::$blocks[$id])) {
                 if(is_int(self::$blocks[$id][1])) $damage = self::$blocks[$id][1];
                 $id = self::$blocks[$id][0];
             }
+            if($id == BlockIds::TRAPDOOR) {
+                $damage = $this->fixTrapdoorDamage($damage);
+            }
+
 
             $block = Block::get($id, $damage);
-            $block->setComponents($x, $y, $z);
+            $block->setComponents($block->getX(), $block->getY(), $block->getZ());
             $newList->addBlock($block->asVector3(), $block);
         }
         return $newList;
+    }
+
+    /**
+     * @param int $damage
+     * @return int
+     */
+    private function fixTrapdoorDamage(int $damage): int {
+        $key = $damage >> 2;
+        if($key == 0) {
+            return 3 - $damage;
+        } elseif($key == 3) {
+            return 27 - $damage;
+        } else {
+            return 15 - $damage;
+        }
     }
 
     /**

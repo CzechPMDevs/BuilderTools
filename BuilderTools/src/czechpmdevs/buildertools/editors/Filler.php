@@ -78,12 +78,9 @@ class Filler extends Editor {
      */
     public function fill(Player $player, BlockList $blockList, array $settings = []): EditorResult {
         $startTime = microtime(true);
-        /** @var  $blocks */
         $blocks = $blockList->getAll();
 
-        /** @var bool $saveUndo */
         $saveUndo = true;
-        /** @var bool $saveRedo */
         $saveRedo = false;
 
         if(isset($settings["saveUndo"]) && is_bool($settings["saveUndo"])) $saveUndo = $settings["saveUndo"];

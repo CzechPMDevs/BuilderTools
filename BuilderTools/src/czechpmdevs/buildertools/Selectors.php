@@ -31,7 +31,6 @@ class Selectors {
 
     /** @var Position[] $pos1 */
     private static $pos1 = [];
-
     /** @var Position[] $pos2 */
     private static $pos2 = [];
 
@@ -40,13 +39,14 @@ class Selectors {
 
     /** @var int[] $drawingPlayers */
     private static $drawingPlayers = [];
-
     /** @var Player[] $blockInfoPlayers */
     private static $blockInfoPlayers = [];
 
     /**
      * @param Player $player
      * @param int $brush
+     * @param int $mode
+     * @param bool $fall
      */
     public static function addDrawingPlayer(Player $player, int $brush, int $mode, bool $fall) {
         self::$drawingPlayers[strtolower($player->getName())] = [$brush, $mode, $fall];
@@ -55,7 +55,7 @@ class Selectors {
     /**
      * @param Player $player
      */
-    public static function removeDrawnigPlayer(Player $player) {
+    public static function removeDrawingPlayer(Player $player) {
         unset(self::$drawingPlayers[strtolower($player->getName())]);
     }
 
@@ -63,7 +63,7 @@ class Selectors {
      * @param Player $player
      * @return int
      */
-    public static function getDrawingPlayerBrush(Player $player) {
+    public static function getDrawingPlayerBrush(Player $player): int {
         return self::$drawingPlayers[strtolower($player->getName())][0];
     }
 
@@ -71,7 +71,7 @@ class Selectors {
      * @param Player $player
      * @return int
      */
-    public static function getDrawingPlayerMode(Player $player) {
+    public static function getDrawingPlayerMode(Player $player): int {
         return self::$drawingPlayers[strtolower($player->getName())][1];
     }
 
@@ -79,7 +79,7 @@ class Selectors {
      * @param Player $player
      * @return bool
      */
-    public static function getDrawingPlayerFall(Player $player) {
+    public static function getDrawingPlayerFall(Player $player): bool {
         return self::$drawingPlayers[strtolower($player->getName())][2];
     }
 
@@ -87,7 +87,7 @@ class Selectors {
      * @param Player $player
      * @return bool
      */
-    public static function isDrawingPlayer(Player $player) {
+    public static function isDrawingPlayer(Player $player): bool {
         return (bool)isset(self::$drawingPlayers[strtolower($player->getName())]);
     }
 
@@ -110,13 +110,14 @@ class Selectors {
      * @param int $pos
      * @return Position $position
      */
-    public static function getPosition(Player $player, int $pos):Position {
+    public static function getPosition(Player $player, int $pos): ?Position {
         if($pos == 1) {
             return self::$pos1[strtolower($player->getName())];
         }
         if($pos == 2) {
             return self::$pos2[strtolower($player->getName())];
         }
+
         return null;
     }
 
@@ -125,13 +126,14 @@ class Selectors {
      * @param Player $player
      * @return bool
      */
-    public static function isSelected(int $pos, Player $player):bool {
+    public static function isSelected(int $pos, Player $player): bool {
         if($pos == 1) {
             return (bool)isset(self::$pos1[strtolower($player->getName())]);
         }
         if($pos == 2) {
             return (bool)isset(self::$pos2[strtolower($player->getName())]);
         }
+
         return false;
     }
 

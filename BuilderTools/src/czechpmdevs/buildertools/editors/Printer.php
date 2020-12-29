@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\editors\object\BlockMap;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
@@ -142,8 +143,8 @@ class Printer extends Editor {
      */
     public function makeSphere(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList();
-        $blockList->setLevel($center->getLevel());
+        $blockMap = new BlockMap();
+        $blockMap->setLevel($center->getLevel());
 
         $invRadiusX = 1 / $radius;
         $invRadiusY = 1 / $radius;
@@ -184,21 +185,21 @@ class Printer extends Editor {
                     }
 
 
-                    $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add($x, -$y, $z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add(-$x, -$y, $z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add($x, -$y, -$z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add(-$x, $y, -$z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add(-$x, -$y, -$z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add($x, -$y, $z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add(-$x, -$y, $z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add($x, -$y, -$z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add(-$x, $y, -$z), $this->getBlockFromString($blocks));
+                    $blockMap->addBlock($center->add(-$x, -$y, -$z), $this->getBlockFromString($blocks));
                 }
             }
         }
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->fill($player, $blockList);
+        return $filler->fill($player, $blockMap);
     }
 
     /**

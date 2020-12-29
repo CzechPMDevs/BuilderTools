@@ -37,7 +37,6 @@ class SchematicsManager {
 
     /** @var Schematic[] $schematics */
     public $schematics = [];
-
     /** @var Schematic[] $players */
     public $players;
 

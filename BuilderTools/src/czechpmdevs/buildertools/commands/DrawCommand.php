@@ -70,7 +70,7 @@ class DrawCommand extends BuilderToolsCommand {
             return;
         }
         if($args[0] == "off") {
-            Selectors::removeDrawnigPlayer($sender);
+            Selectors::removeDrawingPlayer($sender);
             $sender->sendMessage(BuilderTools::getPrefix()."§aBrush removed!");
             return;
         }

@@ -32,20 +32,18 @@ class BlockList implements BlockStorage {
 
     /** @var Block[] $blocks */
     private $blocks = [];
-
     /** @var Level $level */
     private $level;
-
     /** @var BlockListMetadata $metadata */
     private $metadata;
 
     /**
-     * @param Vector3 $pos
+     * @param Vector3 $position
      * @param Block $block
      */
-    public function addBlock(Vector3 $pos, Block $block): void {
+    public function addBlock(Vector3 $position, Block $block): void {
         $block = clone $block;
-        $block->setComponents($pos->getX(), $pos->getY(), $pos->getZ());
+        $block->setComponents($position->getX(), $position->getY(), $position->getZ());
         $this->blocks[] = $block;
     }
 
@@ -97,7 +95,7 @@ class BlockList implements BlockStorage {
      *
      * @return BlockList
      */
-    public function add($x = 0, $y = 0, $z = 0) {
+    public function add($x = 0, $y = 0, $z = 0): BlockList {
         $blockList = clone $this;
 
         /** @var Vector3 $vec */
@@ -122,7 +120,7 @@ class BlockList implements BlockStorage {
      *
      * @return BlockList
      */
-    public function subtract($x = 0, $y = 0, $z = 0) {
+    public function subtract($x = 0, $y = 0, $z = 0): BlockList {
         /** @var Vector3 $vec */
         $vec = null;
         if($x instanceof Vector3) {
