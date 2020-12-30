@@ -56,9 +56,7 @@ class RedoCommand extends BuilderToolsCommand {
         /** @var Canceller $canceller */
         $canceller = BuilderTools::getEditor(Editor::CANCELLER);
 
-        /** @var EditorResult $result */
         $result = $canceller->redo($sender);
-
         if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aUndo was cancelled!");
     }
 }

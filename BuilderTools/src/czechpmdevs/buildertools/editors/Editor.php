@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
+use Exception;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 
@@ -30,14 +31,14 @@ use pocketmine\item\Item;
  */
 abstract class Editor {
 
-    const CANCELLER = "Canceller";
-    const COPIER = "Copier";
-    const DECORATOR = "Decorator";
-    const FILLER = "Filler";
-    const FIXER = "Fixer";
-    const NATURALIZER = "Naturalizer";
-    const PRINTER = "Printer";
-    const REPLACEMENT = "Replacement";
+    public const CANCELLER = "Canceller";
+    public const COPIER = "Copier";
+    public const DECORATOR = "Decorator";
+    public const FILLER = "Filler";
+    public const FIXER = "Fixer";
+    public const NATURALIZER = "Naturalizer";
+    public const PRINTER = "Printer";
+    public const REPLACEMENT = "Replacement";
 
     /**
      * @return string
@@ -67,7 +68,7 @@ abstract class Editor {
                  $block = Item::fromString($itemString)->getBlock();
                  $items[] =  $block->getId();
             }
-            catch (\Exception $exception) {}
+            catch (Exception $exception) {}
         }
 
         return (bool)in_array($id, $items);
@@ -85,7 +86,7 @@ abstract class Editor {
         try {
             $item = Item::fromString($itemArgs[array_rand($itemArgs, 1)]);
         }
-        catch (\Exception $exception) {
+        catch (Exception $exception) {
             $item = Item::get(Item::AIR);
         }
 
@@ -96,7 +97,7 @@ abstract class Editor {
         try {
             $block = $item->getBlock();
         }
-        catch (\Exception $exception) {
+        catch (Exception $exception) {
             $block = Block::get(Block::AIR);
         }
 

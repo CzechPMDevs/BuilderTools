@@ -86,7 +86,6 @@ class Copier extends Editor {
         }
 
         $center = Math::roundVector3($player->asVector3());
-        /** @var array $blocks */
         $blocks = [];
 
         foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {
@@ -117,7 +116,6 @@ class Copier extends Editor {
         }
 
         $center = Math::roundVector3($player->asVector3());
-        /** @var array $blocks */
         $blocks = [];
 
         foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {

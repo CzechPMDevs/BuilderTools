@@ -63,9 +63,7 @@ class PyramidCommand extends BuilderToolsCommand {
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
 
-        /** @var EditorResult $result */
         $result = $printer->makePyramid($sender, $sender, $size, $args[0]);
-
         $sender->sendMessage(BuilderTools::getPrefix()."§aPyramid created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
     }
 }

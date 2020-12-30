@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\math;
 
+use Generator;
 use pocketmine\math\Vector3;
 
 /**
@@ -32,9 +33,9 @@ class BlockGenerator {
      * @param Vector3 $pos1
      * @param Vector3 $pos2
      *
-     * @return \Generator [$x, $y, $z]
+     * @return Generator [$x, $y, $z]
      */
-    public static function generateCuboid(Vector3 $pos1, Vector3 $pos2): \Generator {
+    public static function generateCuboid(Vector3 $pos1, Vector3 $pos2): Generator {
         for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
             for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
                 for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {

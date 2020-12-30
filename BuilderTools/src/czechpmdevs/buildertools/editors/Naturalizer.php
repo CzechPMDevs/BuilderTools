@@ -54,7 +54,7 @@ class Naturalizer extends Editor {
      *
      * @return EditorResult
      */
-    public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player) {
+    public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player): EditorResult {
         $list = new BlockList();
         $list->setLevel($level);
 

@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\async;
 
 
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use Exception;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\ByteArrayTag;
@@ -84,7 +85,7 @@ class SchematicCreateTask extends AsyncTask {
             $map = unserialize($this->blockList);
             /** @var Vector3 $axis */
             $axis = unserialize($this->axis);
-            /** @var string $materials */
+
             $materials = $this->materials;
 
             $blocks = "";
@@ -133,7 +134,7 @@ class SchematicCreateTask extends AsyncTask {
 
             file_put_contents($this->file, $fileData);
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             var_dump($e->getMessage());
         }
     }

@@ -55,7 +55,7 @@ class Canceller extends Editor {
 
     /**
      * @param Player $player
-     * @return EditorResult|null
+     * @return EditorResult
      */
     public function undo(Player $player): EditorResult {
         if(!isset($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
@@ -86,7 +86,7 @@ class Canceller extends Editor {
      * @param Player $player
      * @return EditorResult
      */
-    public function redo(Player $player) {
+    public function redo(Player $player): EditorResult {
         if(!isset($this->redoData[$player->getName()]) || count($this->redoData[$player->getName()]) == 0) {
             $player->sendMessage(BuilderTools::getPrefix()."§cThere are not actions to redo!");
             return new EditorResult(0, 0, true);

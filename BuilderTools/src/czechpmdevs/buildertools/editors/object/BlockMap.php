@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use Exception;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
@@ -99,13 +100,9 @@ class BlockMap extends BlockList {
      */
     public function isVectorInBlockMap(Vector3 $vector3): bool {
         try {
-            $block = $this->blockMap[$vector3->getX()][$vector3->getY()][$vector3->getZ()];
-            if($block instanceof Block) {
-                return true;
-            }
-            return false;
+            return $this->blockMap[$vector3->getX()][$vector3->getY()][$vector3->getZ()] instanceof Block;
         }
-        catch (\Exception $exception) {
+        catch (Exception $exception) {
             return false;
         }
     }

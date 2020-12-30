@@ -68,6 +68,7 @@ class NaturalizeCommand extends BuilderToolsCommand {
         }
         /** @var Naturalizer $naturalizer */
         $naturalizer = BuilderTools::getEditor(Editor::NATURALIZER);
+
         $count = $naturalizer->naturalize($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized ($count->countBlocks blocks changed)!");
     }

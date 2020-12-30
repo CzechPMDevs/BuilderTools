@@ -36,9 +36,6 @@ use pocketmine\tile\Sign;
  */
 class Fixer extends Editor {
 
-    const REMOVE_HEADS = false;
-    const FIX_TILES = true;
-
     /**
      * @var array $blocks
      */
@@ -103,19 +100,22 @@ class Fixer extends Editor {
     }
 
     /**
-     * @param $x1
-     * @param $y1
-     * @param $z1
-     * @param $x2
-     * @param $y2
-     * @param $z2
+     * @param int $x1
+     * @param int $y1
+     * @param int $z1
+     * @param int $x2
+     * @param int $y2
+     * @param int $z2
      * @param Level $level
      * @param Player $player
+     * @param bool $replaceHeads
+     * @param bool $fixTiles
      */
-    public function fix($x1, $y1, $z1, $x2, $y2, $z2, Level $level, Player $player) {
+    public function fix(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player, bool $replaceHeads = false, bool $fixTiles = true) {
         $blocks = self::$blocks;
 
-        if(self::REMOVE_HEADS) $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];
+        if($replaceHeads)
+            $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];
 
         $blockList = new BlockList();
         $blockList->setLevel($level);
@@ -126,7 +126,7 @@ class Fixer extends Editor {
                     #$id = $level->getBlockIdAt($x, $y, $z);
                     $id = $level->getBlockAt($x, $y, $z)->getId();
 
-                    if(self::FIX_TILES && \pocketmine\BASE_VERSION != "4.0.0") {
+                    if($fixTiles) {
                         switch ($id) {
                             case Block::CHEST:
                                 if($level->getTile(new Vector3($x, $y, $z)) === null)

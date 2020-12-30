@@ -63,9 +63,7 @@ class HollowPyramidCommand extends BuilderToolsCommand {
         /** @var Printer $printer */
         $printer = BuilderTools::getEditor(Editor::PRINTER);
 
-        /** @var EditorResult $result */
         $result = $printer->makeHollowPyramid($sender, $sender, $size, $args[0]);
-
         $sender->sendMessage(BuilderTools::getPrefix()."§aHollow pyramid created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
     }
 }

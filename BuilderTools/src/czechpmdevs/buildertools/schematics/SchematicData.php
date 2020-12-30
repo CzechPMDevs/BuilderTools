@@ -36,7 +36,7 @@ abstract class SchematicData {
     /** @var bool $isLoaded */
     public $isLoaded = false;
 
-    /** @var BlockList $blockList */
+    /** @var BlockList|null $blockList */
     protected $blockList;
 
     /**
@@ -65,12 +65,12 @@ abstract class SchematicData {
 
     /**
      * SchematicData constructor.
-     * @param BlockList $blocks
+     * @param BlockList $blockList
      * @param Vector3 $axisVector
      * @param string $materialType
      */
-    public function __construct(BlockList $blocks, Vector3 $axisVector, string $materialType = SchematicData::MATERIALS_BEDROCK) {
-        $this->blockList = $blocks;
+    public function __construct(BlockList $blockList, Vector3 $axisVector, string $materialType = SchematicData::MATERIALS_BEDROCK) {
+        $this->blockList = $blockList;
         $this->width = $axisVector->getX();
         $this->height = $axisVector->getY();
         $this->length = $axisVector->getZ();
@@ -78,7 +78,7 @@ abstract class SchematicData {
     }
 
     /**
-     * @return BlockList
+     * @return BlockList|null
      */
     public function getBlockList(): ?BlockList {
         return $this->blockList;

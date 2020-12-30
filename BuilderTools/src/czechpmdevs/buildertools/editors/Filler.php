@@ -94,22 +94,15 @@ class Filler extends Editor {
 
         $iterator = new SubChunkIteratorManager($blockList->getLevel());
 
-        /** @var int $minX */
+        /** @var int|null $minX */
         $minX = null;
-        /** @var int $maxX */
+        /** @var int|null $maxX */
         $maxX = null;
-        /** @var int $minZ */
+        /** @var int|null $minZ */
         $minZ = null;
-        /** @var int $maxZ */
+        /** @var int|null $maxZ */
         $maxZ = null;
 
-        /**
-         * @param Level $level
-         * @param int $x1
-         * @param int $z1
-         * @param $x2
-         * @param $z2
-         */
         $reloadChunks = function (Level $level, int $x1, int $z1, int $x2, int $z2) {
             for($x = $x1 >> 4; $x <= $x2 >> 4; $x++) {
                 for($z = $z1 >> 4; $z <= $z2 >> 4; $z++) {

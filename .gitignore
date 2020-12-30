@@ -1,2 +1,6 @@
 .idea
 out
+vendor
+composer.json
+composer.lock
+composer.phar

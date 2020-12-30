@@ -73,10 +73,10 @@ use pocketmine\plugin\PluginBase;
  */
 class BuilderTools extends PluginBase {
 
-    /** @var  BuilderTools $instance */
+    /** @var BuilderTools $instance */
     private static $instance;
 
-    /** @var  string $prefix */
+    /** @var string $prefix */
     private static $prefix;
 
     /** @var  Editor[] $editors */
@@ -99,7 +99,7 @@ class BuilderTools extends PluginBase {
         self::$prefix = "§7[BuilderTools] §a";
         $this->initConfig();
         $this->registerCommands();
-        $this->initListner();
+        $this->initListener();
         $this->registerEditors();
         $this->registerEnchantment();
         $this->sendWarnings();
@@ -124,7 +124,7 @@ class BuilderTools extends PluginBase {
         self::$editors["Fixer"] = new Fixer;
     }
 
-    private function initListner() {
+    private function initListener() {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
     }
 

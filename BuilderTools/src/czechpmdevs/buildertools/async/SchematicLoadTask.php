@@ -24,6 +24,8 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\Schematic;
+use Error;
+use Exception;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
@@ -61,7 +63,7 @@ class SchematicLoadTask extends AsyncTask {
 
             $this->setResult($result);
         }
-        catch (\Exception $exception) {
+        catch (Exception $exception) {
             $this->setResult(["error" => $exception->getMessage()]);
         }
     }
@@ -70,7 +72,7 @@ class SchematicLoadTask extends AsyncTask {
      * @param CompoundTag $data
      * @return array
      */
-    public function loadSpongeFormat(CompoundTag $data) {
+    public function loadSpongeFormat(CompoundTag $data): array {
         return ["error" => "Sponge schematics still aren't supported. Try find schematics in MCEdit format."];
     }
 
@@ -78,7 +80,7 @@ class SchematicLoadTask extends AsyncTask {
      * @param CompoundTag $data
      * @return array
      */
-    public function loadMCEditFormat(CompoundTag $data) {
+    public function loadMCEditFormat(CompoundTag $data): array {
         try {
             $materials = "Classic";
 
@@ -126,7 +128,7 @@ class SchematicLoadTask extends AsyncTask {
                 $materials
             ];
         }
-        catch (\Error $exception) {
+        catch (Error $exception) {
             return ["error" => $exception->getMessage()];
         }
     }

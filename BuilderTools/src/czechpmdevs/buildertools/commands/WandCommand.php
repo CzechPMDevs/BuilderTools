@@ -59,6 +59,7 @@ class WandCommand extends BuilderToolsCommand {
             $sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
             return;
         }
+
         Selectors::switchWandSelector($sender);
         $switch = Selectors::isWandSelector($sender) ? "ON" : "OFF";
         $sender->sendMessage(BuilderTools::getPrefix()."§aWand tool turned {$switch}!");

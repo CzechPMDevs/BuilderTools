@@ -34,7 +34,7 @@ class BlockList implements BlockStorage {
     private $blocks = [];
     /** @var Level $level */
     private $level;
-    /** @var BlockListMetadata $metadata */
+    /** @var BlockListMetadata|null $metadata */
     private $metadata;
 
     /**

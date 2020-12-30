@@ -37,7 +37,7 @@ class Selectors {
     /** @var Player[] $wandSelectors */
     private static $wandSelectors = [];
 
-    /** @var int[] $drawingPlayers */
+    /** @var array[] $drawingPlayers */
     private static $drawingPlayers = [];
     /** @var Player[] $blockInfoPlayers */
     private static $blockInfoPlayers = [];
@@ -165,7 +165,7 @@ class Selectors {
      * @param Player $player
      * @return bool
      */
-    public static function isWandSelector(Player $player):bool {
+    public static function isWandSelector(Player $player): bool {
         return (bool)isset(self::$wandSelectors[strtolower($player->getName())]);
     }
 
@@ -173,7 +173,7 @@ class Selectors {
      * @param Player $player
      * @return bool
      */
-    public static function isBlockInfoPlayer(Player $player) {
+    public static function isBlockInfoPlayer(Player $player): bool {
         return (bool)isset(self::$blockInfoPlayers[strtolower($player->getName())]);
     }
 }

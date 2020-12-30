@@ -39,10 +39,10 @@ class EditorResult {
      * EditorResult constructor.
      *
      * @param int $countBlocks
-     * @param $time
+     * @param float $time
      * @param bool $error
      */
-    public function __construct(int $countBlocks, $time, bool $error = false) {
+    public function __construct(int $countBlocks, float $time, bool $error = false) {
         $this->countBlocks = $countBlocks;
         $this->time = $time;
         $this->error = $error;

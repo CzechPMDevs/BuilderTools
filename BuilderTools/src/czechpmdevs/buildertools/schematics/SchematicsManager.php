@@ -51,11 +51,11 @@ class SchematicsManager {
     }
 
     public function init() {
-        if(!file_exists($this->plugin->getDataFolder() . "schematics")) {
-            @mkdir($this->plugin->getDataFolder() . "schematics");
+        if(!file_exists($this->getPlugin()->getDataFolder() . "schematics")) {
+            @mkdir($this->getPlugin()->getDataFolder() . "schematics");
         }
-        if(!file_exists($this->plugin->getDataFolder() . "schematics")) {
-            @mkdir($this->plugin->getDataFolder() . "schematics");
+        if(!file_exists($this->getPlugin()->getDataFolder() . "schematics")) {
+            @mkdir($this->getPlugin()->getDataFolder() . "schematics");
         }
     }
 
@@ -123,8 +123,7 @@ class SchematicsManager {
             }
         }
 
-        /** @var Filler $filler */
-        $filler = new Filler();
+        $filler = new Filler;
         $filler->fill($player, $fillList);
         $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
         return true;
@@ -153,5 +152,12 @@ class SchematicsManager {
      */
     public function getAllSchematics(): array {
         return $this->schematics;
+    }
+
+    /**
+     * @return BuilderTools
+     */
+    public function getPlugin(): BuilderTools {
+        return $this->plugin;
     }
 }

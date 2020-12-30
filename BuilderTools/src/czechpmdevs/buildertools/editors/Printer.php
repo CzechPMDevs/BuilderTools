@@ -40,9 +40,9 @@ class Printer extends Editor {
     public const CUBE = 0x00;
     public const SPHERE = 0x01;
     public const CYLINDER = 0x02;
-    public const HCUBE = 0x03;
-    public const HSPHERE = 0x04;
-    public const HCYLINDER = 0x05;
+    public const HOLLOW_CUBE = 0x03;
+    public const HOLLOW_SPHERE = 0x04;
+    public const HOLLOW_CYLINDER = 0x05;
 
     public const X_AXIS = 0x01;
     public const Y_AXIS = 0x02;
@@ -62,7 +62,7 @@ class Printer extends Editor {
         switch ($mode) {
             case self::CUBE:
                 foreach (BlockGenerator::generateCuboid($center->subtract($brush, $brush, $brush), $center->add($brush, $brush, $brush)) as [$x, $y, $z]) {
-                    if ($fall) {
+                    if($fall) {
                         $finalPos = $this->throwBlock(new Position($x, $y, $z, $center->getLevel()), $block);
                         $undoList->addBlock($finalPos, $block);
 
@@ -79,7 +79,7 @@ class Printer extends Editor {
                 break;
 
             case self::SPHERE:
-                for ($x = $center->getX()-$brush; $x <= $center->getX()+$brush; $x++) {
+                for($x = $center->getX()-$brush; $x <= $center->getX()+$brush; $x++) {
                     $xsqr = ($center->getX()-$x) * ($center->getX()-$x);
                     for ($y = $center->getY()-$brush; $y <= $center->getY()+$brush; $y++) {
                         $ysqr = ($center->getY()-$y) * ($center->getY()-$y);
@@ -105,6 +105,8 @@ class Printer extends Editor {
                 }
                 break;
         }
+
+        // TODO: save undo
     }
 
     /**
@@ -136,12 +138,12 @@ class Printer extends Editor {
      * @param Player $player
      * @param Position $center
      * @param int $radius
-     * @param $blocks
+     * @param string $blocks
      * @param bool $hollow
      *
      * @return EditorResult
      */
-    public function makeSphere(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
+    public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
         $blockMap = new BlockMap();
         $blockMap->setLevel($center->getLevel());
@@ -206,11 +208,11 @@ class Printer extends Editor {
      * @param Player $player
      * @param Position $center
      * @param int $radius
-     * @param $blocks
+     * @param string $blocks
      *
      * @return EditorResult
      */
-    public function makeHollowSphere(Player $player, Position $center, int $radius, $blocks): EditorResult {
+    public function makeHollowSphere(Player $player, Position $center, int $radius, string $blocks): EditorResult {
         return $this->makeSphere($player, $center, $radius, $blocks, true);
     }
 
@@ -219,12 +221,12 @@ class Printer extends Editor {
      * @param Position $center
      * @param int $radius
      * @param int $height
-     * @param $blocks
+     * @param string $blocks
      * @param bool $hollow
      *
      * @return EditorResult
      */
-    public function makeCylinder(Player $player, Position $center, int $radius, int $height, $blocks, bool $hollow = false): EditorResult {
+    public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
@@ -288,11 +290,11 @@ class Printer extends Editor {
      * @param Position $center
      * @param int $radius
      * @param int $height
-     * @param $blocks
+     * @param string $blocks
      *
      * @return EditorResult
      */
-    public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, $blocks): EditorResult {
+    public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, string $blocks): EditorResult {
         return $this->makeCylinder($player, $center, $radius, $height, $blocks, true);
     }
 
@@ -300,12 +302,12 @@ class Printer extends Editor {
      * @param Player $player
      * @param Position $center
      * @param int $size
-     * @param $blocks
+     * @param string $blocks
      * @param bool $hollow
      *
      * @return EditorResult
      */
-    public function makePyramid(Player $player, Position $center, int $size, $blocks, bool $hollow = false): EditorResult {
+    public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
         $height = $size;
@@ -332,11 +334,11 @@ class Printer extends Editor {
      * @param Player $player
      * @param Position $center
      * @param int $size
-     * @param $blocks
+     * @param string $blocks
      *
      * @return EditorResult
      */
-    public function makeHollowPyramid(Player $player, Position $center, int $size, $blocks): EditorResult {
+    public function makeHollowPyramid(Player $player, Position $center, int $size, string $blocks): EditorResult {
         return $this->makePyramid($player, $center, $size, $blocks, true);
     }
 
@@ -344,12 +346,12 @@ class Printer extends Editor {
      * @param Player $player
      * @param Position $center
      * @param int $radius
-     * @param $blocks
+     * @param string $blocks
      * @param bool $hollow
      *
      * @return EditorResult
      */
-    public function makeCube(Player $player, Position $center, int $radius, $blocks, bool $hollow = false): EditorResult {
+    public function makeCube(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
@@ -374,11 +376,11 @@ class Printer extends Editor {
      * @param Player $player
      * @param Position $center
      * @param int $radius
-     * @param $blocks
+     * @param string $blocks
      *
      * @return EditorResult
      */
-    public function makeHollowCube(Player $player, Position $center, int $radius, $blocks): EditorResult {
+    public function makeHollowCube(Player $player, Position $center, int $radius, string $blocks): EditorResult {
         return $this->makeCube($player, $center, $radius, $blocks, true);
     }
 

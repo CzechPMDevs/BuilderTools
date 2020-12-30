@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 
 /**
@@ -54,9 +53,6 @@ class HelpCommand extends BuilderToolsCommand {
         //sort
         $commands = [];
 
-        /**
-         * @var Command $cmd
-         */
         foreach (BuilderTools::getAllCommands() as $i => $cmd) {
             $commands[$i] = $cmd->getName();
         }
