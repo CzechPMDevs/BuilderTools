@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\math;
 
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\editors\data\RotationHelper;
 use pocketmine\math\Vector3;
 
 /**
@@ -35,7 +36,7 @@ class RotationUtil {
     public const ROTATE_90 = 90;
     public const ROTATE_180 = 180;
     public const ROTATE_270 = 270;
-    public const ROTATE_360 = 0; // yes, it's same as 0
+    public const ROTATE_360 = 0;
 
     public const X_AXIS = 0;
     public const Y_AXIS = 1;
@@ -93,7 +94,7 @@ class RotationUtil {
                 foreach ($list->getAll() as $block) {
                     $x = $metadata->maxZ-$block->getZ();
                     $z = $block->getX();
-                    $newList->addBlock(new Vector3($x, $block->getY(), $z), $block);
+                    $newList->addBlock(new Vector3($x, $block->getY(), $z), RotationHelper::rotate90($block));
                 }
                 return $newList;
 
@@ -145,7 +146,7 @@ class RotationUtil {
                 foreach ($list->getAll() as $block) {
                     $x = $metadata->maxX-$block->getX();
                     $z = $metadata->maxZ-$block->getZ();
-                    $newList->addBlock(new Vector3($x, $block->getY(), $z), $block);
+                    $newList->addBlock(new Vector3($x, $block->getY(), $z), RotationHelper::rotate180($block));
                 }
                 return $newList;
 
@@ -181,8 +182,6 @@ class RotationUtil {
     }
 
     /**
-     * Stairs -> meta =+ 1
-     *
      * @param BlockList $list
      * @param int $axis
      *
@@ -199,7 +198,7 @@ class RotationUtil {
                 foreach ($list->getAll() as $block) {
                     $x = $block->getZ();
                     $z = $metadata->maxX - $block->getX();
-                    $newList->addBlock(new Vector3($x, $block->getY(), $z), $block);
+                    $newList->addBlock(new Vector3($x, $block->getY(), $z), RotationHelper::rotate270($block));
                 }
                 return $newList;
 
@@ -254,7 +253,7 @@ class RotationUtil {
      *
      * @return bool
      */
-    public static function areDegreesValid(int $degrees) {
+    public static function areDegreesValid(int $degrees): bool {
         $degrees = Math::getBasicDegrees($degrees);
 
         return in_array($degrees, self::VALID_DEGREES);
@@ -265,7 +264,7 @@ class RotationUtil {
      *
      * @return int
      */
-    public static function getRotation(int $degrees) {
+    public static function getRotation(int $degrees): int {
         $basic = Math::getBasicDegrees($degrees);
 
         switch ($basic) {
