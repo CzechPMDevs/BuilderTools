@@ -141,7 +141,6 @@ class SchematicsManager {
      * @return Schematic[] $schematics
      */
     public function getLoadedSchematics(): array {
-        /** @var Schematic $value */
         return array_filter($this->getAllSchematics(), function (Schematic $value) {
             return $value->isLoaded;
         }, ARRAY_FILTER_USE_BOTH);

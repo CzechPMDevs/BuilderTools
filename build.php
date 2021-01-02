@@ -16,4 +16,4 @@ $outputPath = $path . "BuilderTools_v{$description["version"]}_dev.phar";
 $phar = new Phar($outputPath);
 $phar->buildFromDirectory($pluginPath);
 
-echo "Plugin build in " . ((string)round(microtime(true)-$startTime, 3)) . " seconds!\n";
+echo "Plugin built in " . ((string)round(microtime(true)-$startTime, 3)) . " seconds! Output path: $outputPath\n";

@@ -54,24 +54,29 @@ abstract class Editor {
 
     /**
      * @param string $string
-     * @param int $id
+     * @param Block $block
      *
      * @return bool
      */
-    public function isBlockInString(string $string, int $id): bool {
+    public function isBlockInString(string $string, Block $block): bool {
         $itemArgs = explode(",", $string);
+        $checkMeta = strpos($string, ":") !== false || Item::fromString($string)->getDamage() !== 0;
 
         $items = [];
         foreach ($itemArgs as $itemString) {
             // Item::fromString() throws exception
             try {
-                 $block = Item::fromString($itemString)->getBlock();
-                 $items[] =  $block->getId();
+                 $blockInString = Item::fromString($itemString)->getBlock();
+                 if($checkMeta) {
+                     $items[] =  (string)$blockInString->getId() . ":" . (string)$blockInString->getDamage();
+                 } else {
+                     $items[] = $blockInString->getId();
+                 }
             }
             catch (Exception $exception) {}
         }
 
-        return (bool)in_array($id, $items);
+        return (bool)in_array($checkMeta ? ((string)$block->getId() . ":" . (string)$block->getDamage()) : $block->getId(), $items);
     }
 
     /**

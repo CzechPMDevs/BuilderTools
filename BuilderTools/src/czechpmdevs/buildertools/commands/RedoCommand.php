@@ -23,7 +23,6 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Canceller;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 

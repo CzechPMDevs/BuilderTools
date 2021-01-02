@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -45,7 +44,7 @@ class HollowCylinderCommand extends BuilderToolsCommand {
      * @param string $commandLabel
      * @param array $args
      *
-     * @return mixed|void
+     * @return void
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;

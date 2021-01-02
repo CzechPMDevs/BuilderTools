@@ -49,7 +49,7 @@ class Replacement extends Editor {
         $blockList->setLevel($level);
 
         foreach (BlockGenerator::generateCuboid($pos1, $pos2) as [$x, $y, $z]) {
-            if($this->isBlockInString($blocks, $level->getBlockAt($x, $y, $z)->getId())) {
+            if($this->isBlockInString($blocks, $level->getBlockAt($x, $y, $z))) {
                 $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($replace));
             }
         }

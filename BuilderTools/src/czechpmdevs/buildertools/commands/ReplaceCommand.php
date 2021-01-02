@@ -55,6 +55,7 @@ class ReplaceCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cUsage: §7//replace <BlocksToReplace - id1:meta1,id2:meta2,...> <Blocks - id1:meta1,id2:meta2,...>");
             return;
         }
+
         if(!Selectors::isSelected(1, $sender)) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
             return;
@@ -63,6 +64,7 @@ class ReplaceCommand extends BuilderToolsCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
+
         $firstPos = Selectors::getPosition($sender, 1);
         $secondPos = Selectors::getPosition($sender, 2);
         if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
