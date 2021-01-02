@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2020  CzechPMDevs
+ * Copyright (C) 2018-2021  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ class SchematicsManager {
      */
     public function getLoadedSchematics(): array {
         /** @var Schematic $value */
-        return array_filter($this->getAllSchematics(), function ($value) {
+        return array_filter($this->getAllSchematics(), function (Schematic $value) {
             return $value->isLoaded;
         }, ARRAY_FILTER_USE_BOTH);
     }

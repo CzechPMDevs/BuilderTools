@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (C) 2018-2020  CzechPMDevs
+ * Copyright (C) 2018-2021  CzechPMDevs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,18 @@ class BlockListMetadata {
     private $blockList;
 
     /**
-     * @var int $maxX
-     * @var int $maxY
-     * @var int $maxZ
+     * @var int|null $maxX
+     * @var int|null $maxY
+     * @var int|null $maxZ
      */
-    public $maxX, $maxY, $maxZ;
+    public $maxX = null, $maxY = null, $maxZ = null;
 
     /**
-     * @var int $minX
-     * @var int $minY
-     * @var int $minZ
+     * @var int|null $minX
+     * @var int|null $minY
+     * @var int|null $minZ
      */
-    public $minX, $minY, $minZ;
+    public $minX = null, $minY = null, $minZ = null;
 
     /**
      * BlockListMetadata constructor.
