@@ -35,13 +35,6 @@ use pocketmine\Player;
  */
 class Naturalizer extends Editor {
 
-    /** @var BlockList $undo */
-    protected $undo;
-
-    public function __construct() {
-        $this->undo = new BlockList();
-    }
-
     /**
      * @param int $x1
      * @param int $y1

@@ -33,10 +33,10 @@ use pocketmine\Player;
 class DrawCommand extends BuilderToolsCommand {
 
     /** @var int $minBrush */
-    private $minBrush = 1;
+    private int $minBrush = 1;
 
     /** @var int $maxBrush */
-    private $maxBrush = 10;
+    private int $maxBrush = 10;
 
     /**
      * DrawCommand constructor.

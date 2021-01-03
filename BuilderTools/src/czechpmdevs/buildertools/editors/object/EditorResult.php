@@ -27,13 +27,13 @@ namespace czechpmdevs\buildertools\editors\object;
 class EditorResult {
 
     /** @var int $countBlocks */
-    public $countBlocks;
+    public int $countBlocks;
 
     /** @var float|int $time */
     public $time;
 
     /** @var bool $error */
-    public $error;
+    public bool $error;
 
     /**
      * EditorResult constructor.

@@ -74,25 +74,25 @@ use pocketmine\plugin\PluginBase;
 class BuilderTools extends PluginBase {
 
     /** @var BuilderTools $instance */
-    private static $instance;
+    private static BuilderTools $instance;
 
     /** @var string $prefix */
-    private static $prefix;
+    private static string $prefix;
 
     /** @var  Editor[] $editors */
-    private static $editors = [];
+    private static array $editors = [];
 
     /** @var EventListener $listener */
-    private static $listener;
+    private static EventListener $listener;
 
     /** @var SchematicsManager $schematicManager */
-    private static $schematicsManager;
+    private static SchematicsManager $schematicsManager;
 
     /** @var Command[] $commands */
-    private static $commands = [];
+    private static array $commands = [];
 
     /** @var array $config */
-    private static $configuration = [];
+    private static array $configuration = [];
 
     public function onEnable() {
         self::$instance = $this;

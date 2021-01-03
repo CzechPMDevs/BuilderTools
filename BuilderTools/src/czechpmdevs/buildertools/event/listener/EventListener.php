@@ -37,10 +37,10 @@ use pocketmine\level\Position;
 class EventListener implements Listener {
 
     /** @var array $wandClicks */
-    private $wandClicks = [];
+    private array $wandClicks = [];
 
     /** @var array $blockInfoClicks */
-    private $blockInfoClicks = [];
+    private array $blockInfoClicks = [];
 
     /**
      * @param PlayerInteractEvent $event

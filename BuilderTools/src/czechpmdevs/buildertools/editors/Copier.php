@@ -41,7 +41,7 @@ class Copier extends Editor {
     public const DIRECTION_DOWN = 2;
 
     /** @var ClipboardData[] $copiedClipboards */
-    public $copiedClipboards = [];
+    public array $copiedClipboards = [];
 
     /**
      * @return string $copier

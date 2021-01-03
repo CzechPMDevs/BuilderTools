@@ -33,12 +33,12 @@ use pocketmine\Player;
 class SchematicsManager {
 
     /** @var BuilderTools $plugin */
-    protected $plugin;
+    protected BuilderTools $plugin;
 
     /** @var Schematic[] $schematics */
-    public $schematics = [];
+    public array $schematics = [];
     /** @var Schematic[] $players */
-    public $players;
+    public array $players;
 
     /**
      * SchematicsManager constructor.
@@ -111,11 +111,10 @@ class SchematicsManager {
             return false;
         }
 
-        $fillList = new BlockList();
-        $fillList->setLevel($player->getLevel());
-        $debugged = false;
-        $fillList->add($player);
+        $blockList->setLevel($player->getLevel());
+        $blockList->add($player);
 
+        $debugged = false;
         foreach ($blockList->getAll() as $block) {
             if($block->getId() != 0 && !$debugged) {
                 var_dump($block);
@@ -124,7 +123,7 @@ class SchematicsManager {
         }
 
         $filler = new Filler;
-        $filler->fill($player, $fillList);
+        $filler->fill($player, $blockList);
         $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
         return true;
     }
@@ -134,7 +133,7 @@ class SchematicsManager {
      * @return Schematic|null
      */
     public function getSchematic(string $name): ?Schematic {
-        return isset($this->schematics[$name]) ? $this->schematics[$name] : null;
+        return $this->schematics[$name] ?? null;
     }
 
     /**

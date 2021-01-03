@@ -34,34 +34,34 @@ abstract class SchematicData {
     public const MATERIALS_ALPHA = "Alpha";
 
     /** @var bool $isLoaded */
-    public $isLoaded = false;
+    public bool $isLoaded = false;
 
     /** @var BlockList|null $blockList */
-    protected $blockList;
+    protected ?BlockList $blockList;
 
     /**
      * @var int $width
      *
      * Size along the x axis
      */
-    protected $width;
+    protected int $width;
 
     /**
      * @var int $height
      *
      * Size along the y axis
      */
-    protected $height;
+    protected int $height;
 
     /**
      * @var int $length
      *
      * Size along the z axis
      */
-    protected $length;
+    protected int $length;
 
     /** @var string $materialType */
-    protected $materialType;
+    protected string $materialType;
 
     /**
      * SchematicData constructor.

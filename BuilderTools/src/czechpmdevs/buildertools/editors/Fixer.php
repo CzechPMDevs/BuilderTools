@@ -18,6 +18,8 @@
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\asyncfill\storage\ThreadSafeBlock;
+use czechpmdevs\asyncfill\storage\ThreadSafeBlockList;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\block\Block;
@@ -39,24 +41,24 @@ class Fixer extends Editor {
     /**
      * @var array $blocks
      */
-    private static $blocks = [
-        158 => [Block::WOODEN_SLAB, 0],
-        125 => [Block::DOUBLE_WOODEN_SLAB, ""],
-        188 => [Block::FENCE, 0],
-        189 => [Block::FENCE, 1],
-        190 => [Block::FENCE, 2],
-        191 => [Block::FENCE, 3],
-        192 => [Block::FENCE, 4],
-        193 => [Block::FENCE, 5],
-        166 => [Block::INVISIBLE_BEDROCK, 0],
-        208 => [Block::GRASS_PATH, 0],
-        198 => [Block::END_ROD, 0],
-        126 => [Block::WOODEN_SLAB, ""],
-        95 => [Block::STAINED_GLASS, ""],
-        199 => [Block::CHORUS_PLANT, 0],
-        202 => [Block::PURPUR_BLOCK, 0],
-        251 => [Block::CONCRETE, 0],
-        204 => [Block::PURPUR_BLOCK, 0]
+    private const BLOCK_FIX_DATA = [
+        158 => [BlockIds::WOODEN_SLAB, 0],
+        125 => [BlockIds::DOUBLE_WOODEN_SLAB, ""],
+        188 => [BlockIds::FENCE, 0],
+        189 => [BlockIds::FENCE, 1],
+        190 => [BlockIds::FENCE, 2],
+        191 => [BlockIds::FENCE, 3],
+        192 => [BlockIds::FENCE, 4],
+        193 => [BlockIds::FENCE, 5],
+        166 => [BlockIds::INVISIBLE_BEDROCK, 0],
+        208 => [BlockIds::GRASS_PATH, 0],
+        198 => [BlockIds::END_ROD, 0],
+        126 => [BlockIds::WOODEN_SLAB, ""],
+        95  => [BlockIds::STAINED_GLASS, ""],
+        199 => [BlockIds::CHORUS_PLANT, 0],
+        202 => [BlockIds::PURPUR_BLOCK, 0],
+        251 => [BlockIds::CONCRETE, 0],
+        204 => [BlockIds::PURPUR_BLOCK, 0]
     ];
 
     /**
@@ -68,14 +70,17 @@ class Fixer extends Editor {
         foreach ($blockList->getAll() as $block) {
             $id = $block->getId();
             $damage = $block->getDamage();
-            if(isset(self::$blocks[$id])) {
-                if(is_int(self::$blocks[$id][1])) $damage = self::$blocks[$id][1];
-                $id = self::$blocks[$id][0];
-            }
-            if($id == BlockIds::TRAPDOOR) {
-                $damage = $this->fixTrapdoorDamage($damage);
+            if(isset(self::BLOCK_FIX_DATA[$id])) {
+                if(is_int(self::BLOCK_FIX_DATA[$id][1])) $damage = self::BLOCK_FIX_DATA[$id][1];
+                $id = self::BLOCK_FIX_DATA[$id][0];
             }
 
+            if($block->getId() == BlockIds::TRAPDOOR || $block->getId() == BlockIds::IRON_TRAPDOOR) {
+                $block->setDamage($this->fixTrapdoorMeta($block->getDamage()));
+            }
+            if($block->getId() == BlockIds::STONE_BUTTON || $block->getId() == BlockIds::STONE_BUTTON) {
+                $block->setDamage($this->fixButtonMeta($block->getDamage()));
+            }
 
             $block = Block::get($id, $damage);
             $block->setComponents($block->getX(), $block->getY(), $block->getZ());
@@ -85,17 +90,53 @@ class Fixer extends Editor {
     }
 
     /**
-     * @param int $damage
+     * @param ThreadSafeBlockList $blockList
+     * @return ThreadSafeBlockList
+     */
+    public function fixThreadSafeBlockList(ThreadSafeBlockList $blockList): ThreadSafeBlockList {
+        /** @var ThreadSafeBlock $block */
+        foreach ($blockList as $index => $block) {
+            if(isset(self::BLOCK_FIX_DATA[$block->getId()])) {
+                if(is_int(self::BLOCK_FIX_DATA[$block->getId()][1])) {
+                    $block->setDamage(self::BLOCK_FIX_DATA[$block->getId()][1]);
+                }
+
+                $block->setId(self::BLOCK_FIX_DATA[$block->getId()][0]);
+            }
+
+            if($block->getId() == BlockIds::TRAPDOOR || $block->getId() == BlockIds::IRON_TRAPDOOR) {
+                $block->setDamage($this->fixTrapdoorMeta($block->getDamage()));
+            }
+            if($block->getId() == BlockIds::STONE_BUTTON || $block->getId() == BlockIds::STONE_BUTTON) {
+                $block->setDamage($this->fixButtonMeta($block->getDamage()));
+            }
+
+            $blockList[$index] = $block;
+        }
+
+        return $blockList;
+    }
+
+    /**
+     * @param int $meta
      * @return int
      */
-    private function fixTrapdoorDamage(int $damage): int {
-        $key = $damage >> 2;
+    private function fixButtonMeta(int $meta): int {
+        return (6 - $meta) % 6;
+    }
+
+    /**
+     * @param int $meta
+     * @return int
+     */
+    private function fixTrapdoorMeta(int $meta): int {
+        $key = $meta >> 2;
         if($key == 0) {
-            return 3 - $damage;
+            return 3 - $meta;
         } elseif($key == 3) {
-            return 27 - $damage;
+            return 27 - $meta;
         } else {
-            return 15 - $damage;
+            return 15 - $meta;
         }
     }
 
@@ -112,7 +153,7 @@ class Fixer extends Editor {
      * @param bool $fixTiles
      */
     public function fix(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player, bool $replaceHeads = false, bool $fixTiles = true) {
-        $blocks = self::$blocks;
+        $blocks = self::BLOCK_FIX_DATA;
 
         if($replaceHeads)
             $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];

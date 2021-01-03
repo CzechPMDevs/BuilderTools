@@ -20,13 +20,13 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
 
+use czechpmdevs\asyncfill\storage\ThreadSafeBlock;
+use czechpmdevs\asyncfill\storage\ThreadSafeBlockList;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\Schematic;
 use Error;
 use Exception;
-use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
@@ -40,7 +40,16 @@ use pocketmine\Server;
 class SchematicLoadTask extends AsyncTask {
 
     /** @var string $path */
-    public $path;
+    public string $path;
+
+    /** @var ThreadSafeBlockList $blockList */
+    public ThreadSafeBlockList $blockList;
+    /** @var Vector3 $axisVector */
+    public Vector3 $axisVector;
+    /** @var string $materials */
+    public string $materials;
+
+    public string $error = "";
 
     /**
      * SchematicLoadTask constructor.
@@ -48,6 +57,7 @@ class SchematicLoadTask extends AsyncTask {
      */
     public function __construct(string $path) {
         $this->path = $path;
+        $this->blockList = new ThreadSafeBlockList();
     }
 
     public function onRun() {
@@ -55,32 +65,27 @@ class SchematicLoadTask extends AsyncTask {
             /** @var CompoundTag $data */
             $data = (new BigEndianNBTStream())->readCompressed(file_get_contents($this->path));
             if($data->offsetExists("Blocks") && $data->offsetExists("Data")) {
-                $result = $this->loadMCEditFormat($data);
+                $this->loadMCEditFormat($data);
+            } else {
+                $this->loadSpongeFormat($data);
             }
-            else {
-                $result = $this->loadSpongeFormat($data);
-            }
-
-            $this->setResult($result);
         }
         catch (Exception $exception) {
-            $this->setResult(["error" => $exception->getMessage()]);
+            $this->error = "{$exception->getMessage()} in {$exception->getFile()} at line {$exception->getLine()}";
         }
     }
 
     /**
      * @param CompoundTag $data
-     * @return array
      */
-    public function loadSpongeFormat(CompoundTag $data): array {
-        return ["error" => "Sponge schematics still aren't supported. Try find schematics in MCEdit format."];
+    public function loadSpongeFormat(CompoundTag $data): void {
+        $this->error = "Sponge schematics still aren't supported. Try find schematics in MCEdit format.";
     }
 
     /**
      * @param CompoundTag $data
-     * @return array
      */
-    public function loadMCEditFormat(CompoundTag $data): array {
+    public function loadMCEditFormat(CompoundTag $data): void {
         try {
             $materials = "Classic";
 
@@ -92,8 +97,6 @@ class SchematicLoadTask extends AsyncTask {
                 $materials = $data->getString("Materials");
             }
 
-            $blockList = new BlockList();
-
             if($data->offsetExists("Blocks") && $data->offsetExists("Data")) {
                 $blocks = $data->getByteArray("Blocks");
                 $data = $data->getByteArray("Data");
@@ -102,15 +105,12 @@ class SchematicLoadTask extends AsyncTask {
                 for($y = 0; $y < $height; $y++) {
                     for ($z = 0; $z < $length; $z++) {
                         for($x = 0; $x < $width; $x++) {
-                            $id = ord($blocks{$i});
-                            $damage = ord($data{$i});
-                            if($damage >= 16) $damage = 0; // prevents bug
-                            $blockList->addBlock(new Vector3($x, $y, $z), Block::get($id, $damage));
-                            $i++;
+                            $this->blockList->addBlock(new Vector3($x, $y, $z), new ThreadSafeBlock(ord($blocks[$i]), ord($data[$i++]) % 16));
                         }
                     }
                 }
             }
+
             // WORLDEDIT BY SK89Q and Sponge schematics
             else {
                 $result["error"] = "Could not load schematic {$this->path}: BuilderTools supports only MCEdit schematic format.";
@@ -118,18 +118,14 @@ class SchematicLoadTask extends AsyncTask {
 
             if($materials == "Classic" || $materials == "Alpha") {
                 $materials = "Pocket";
-                $blockList = (new Fixer())->fixBlockList($blockList);
+                (new Fixer())->fixThreadSafeBlockList($this->blockList);
             }
 
-            return [
-                "error" => "",
-                $blockList,
-                new Vector3($width, $height, $length),
-                $materials
-            ];
+            $this->axisVector = new Vector3($width, $height, $length);
+            $this->materials = $materials;
         }
         catch (Error $exception) {
-            return ["error" => $exception->getMessage()];
+            $this->error = "{$exception->getMessage()} in {$exception->getFile()} at line {$exception->getLine()}";
         }
     }
 
@@ -137,15 +133,11 @@ class SchematicLoadTask extends AsyncTask {
      * @param Server $server
      */
     public function onCompletion(Server $server) {
-        $result = $this->getResult();
-        $file = $this->path;
-
-        if(isset($result["error"]) && $result["error"] !== "") {
-            BuilderTools::getInstance()->getLogger()->error("Could not load schematic $file: " . $result["error"]);
+        $schematic = Schematic::loadFromAsync($this);
+        if(!$schematic instanceof Schematic) {
             return;
         }
 
-        BuilderTools::getInstance()->getLogger()->info(basename($file, ".schematic") . " schematic loaded!");
-        BuilderTools::getSchematicsManager()->registerSchematic($file, Schematic::loadFromAsync($result));
+        BuilderTools::getSchematicsManager()->registerSchematic($this->path, $schematic);
     }
 }

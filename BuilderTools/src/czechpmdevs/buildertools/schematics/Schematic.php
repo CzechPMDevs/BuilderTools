@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\schematics;
 
 use czechpmdevs\buildertools\async\SchematicCreateTask;
+use czechpmdevs\buildertools\async\SchematicLoadTask;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use pocketmine\math\Vector3;
@@ -33,7 +34,7 @@ use pocketmine\Server;
 class Schematic extends SchematicData {
 
     /** @var string $file */
-    public $file;
+    public string $file;
 
     /**
      * Schematic constructor.
@@ -54,16 +55,16 @@ class Schematic extends SchematicData {
     }
 
     /**
-     * @param array $result
+     * @param SchematicLoadTask $task
      * @return Schematic|null
      */
-    public static function loadFromAsync(array $result): ?Schematic {
-        if($result["error"] !== "") {
-            BuilderTools::getInstance()->getLogger()->error($result["error"]);
+    public static function loadFromAsync(SchematicLoadTask $task): ?Schematic {
+        if($task->error !== "") {
+            BuilderTools::getInstance()->getLogger()->error($task->error);
             return null;
         }
 
-        unset($result["error"]);
-        return new Schematic(...$result);
+        BuilderTools::getInstance()->getLogger()->info("Schematics " . basename($task->path, ".schematic") . " loaded!");
+        return new Schematic($task->blockList->toBlockList(), $task->axisVector, $task->materials);
     }
 }

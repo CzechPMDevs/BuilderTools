@@ -30,10 +30,10 @@ use pocketmine\Player;
 class ClipboardData extends BlockList {
 
     /** @var Player $player */
-    private $player;
+    private Player $player;
 
     /** @var Vector3 $playerPosition */
-    private $playerPosition;
+    private Vector3 $playerPosition;
 
     /**
      * ClipboardData constructor.

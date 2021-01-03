@@ -33,13 +33,15 @@ interface BlockStorage {
     /**
      * @param Vector3 $position
      * @param Block $block
+     * @return $this
      */
-    public function addBlock(Vector3 $position, Block $block): void ;
+    public function addBlock(Vector3 $position, Block $block): self;
 
     /**
-     * @param Block[] $blocks
+     * @param array $blocks
+     * @return $this
      */
-    public function setAll(array $blocks): void ;
+    public function setAll(array $blocks): self;
 
     /**
      * @return Block[] $blocks
@@ -48,8 +50,9 @@ interface BlockStorage {
 
     /**
      * @param Level|null $level
+     * @return $this
      */
-    public function setLevel(?Level $level): void;
+    public function setLevel(?Level $level): self;
 
     /**
      * @return Level|null

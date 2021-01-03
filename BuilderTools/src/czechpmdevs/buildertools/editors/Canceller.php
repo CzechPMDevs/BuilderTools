@@ -33,10 +33,10 @@ use pocketmine\Player;
 class Canceller extends Editor {
 
     /** @var BlockList[][] $undoData */
-    public $undoData = [];
+    public array $undoData = [];
 
     /** @var BlockList[][] $redoData */
-    public $redoData = [];
+    public array $redoData = [];
 
     /**
      * @return string $name

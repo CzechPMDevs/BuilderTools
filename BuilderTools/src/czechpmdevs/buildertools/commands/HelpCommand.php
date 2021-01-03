@@ -32,7 +32,7 @@ class HelpCommand extends BuilderToolsCommand {
     public const COMMANDS_PER_PAGE = 5;
 
     /** @var string[] $pages */
-    public static $pages = [];
+    public static array $pages = [];
 
     /**
      * HelpCommand constructor.

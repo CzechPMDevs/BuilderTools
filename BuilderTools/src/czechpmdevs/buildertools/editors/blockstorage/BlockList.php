@@ -30,47 +30,40 @@ use pocketmine\math\Vector3;
  */
 class BlockList implements BlockStorage {
 
-    /** @var Block[] $blocks */
-    private $blocks = [];
-    /** @var Level $level */
-    private $level;
-    /** @var BlockListMetadata|null $metadata */
-    private $metadata;
+    public const BUILD_XYZ = 0;
+    public const BUILD_YZX = 1;
 
-    /**
-     * @param Vector3 $position
-     * @param Block $block
-     */
-    public function addBlock(Vector3 $position, Block $block): void {
-        $block = clone $block;
+    /** @var Block[] $blocks */
+    private array $blocks = [];
+    /** @var Level|null $level */
+    private ?Level $level;
+    /** @var BlockListMetadata|null $metadata */
+    private ?BlockListMetadata $metadata;
+
+    public function addBlock(Vector3 $position, Block $block): self {
+        $block = Block::get($block->getId(), $block->getDamage());
         $block->setComponents($position->getX(), $position->getY(), $position->getZ());
         $this->blocks[] = $block;
+
+        return $this;
     }
 
-    /**
-     * @param Block[] $blocks
-     */
-    public function setAll(array $blocks): void {
+    public function setAll(array $blocks): self {
         $this->blocks = $blocks;
+
+        return $this;
     }
 
-    /**
-     * @return Block[] $blocks
-     */
     public function getAll(): array {
         return $this->blocks;
     }
 
-    /**
-     * @param Level|null $level
-     */
-    public function setLevel(?Level $level): void {
+    public function setLevel(?Level $level): self {
         $this->level = $level;
+
+        return $this;
     }
 
-    /**
-     * @return Level|null
-     */
     public function getLevel(): ?Level {
         return $this->level;
     }
@@ -136,20 +129,31 @@ class BlockList implements BlockStorage {
      * @param Level $level
      * @param Vector3 $pos1
      * @param Vector3 $pos2
-     *
+     * @param int $algorithm
      * @return BlockList
      */
-    public static function build(Level $level, Vector3 $pos1, Vector3 $pos2): BlockList {
+    public static function build(Level $level, Vector3 $pos1, Vector3 $pos2, int $algorithm = BlockList::BUILD_XYZ): BlockList {
         $blockList = new BlockList();
         $blockList->setLevel($level);
 
-        for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
+        if($algorithm == BlockList::BUILD_XYZ) {
+            for ($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
+                for ($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
+                    for ($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
+                        $blockList->addBlock($v = new Vector3($x, $y, $z), $level->getBlock($v));
+                    }
+                }
+            }
+        } else if($algorithm == BlockList::BUILD_YZX) {
             for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
-                for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
-                    $blockList->addBlock($v = new Vector3($x, $y, $z), $level->getBlock($v));
+                for ($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
+                    for ($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
+                        $blockList->addBlock($v = new Vector3($x, $y, $z), $level->getBlock($v));
+                    }
                 }
             }
         }
+
 
         return $blockList;
     }

@@ -79,7 +79,7 @@ class SchematicCommand extends BuilderToolsCommand {
                 $fileName = stripos($args[1], ".schematic") === false ? $args[1] . ".schematic" : str_replace(".schematic", "", $args[1]) . ".schematic";
                 $fileName = $this->getPlugin()->getDataFolder() . "schematics/" . $fileName;
 
-                $schematic = new Schematic(BlockList::build($sender->getLevel(), Selectors::getPosition($sender, 1), Selectors::getPosition($sender, 2)), $axisVec);
+                $schematic = new Schematic(BlockList::build($sender->getLevel(), Selectors::getPosition($sender, 1), Selectors::getPosition($sender, 2), BlockList::BUILD_YZX), $axisVec);
                 $schematic->save($fileName);
 
                 BuilderTools::getSchematicsManager()->registerSchematic($fileName, $schematic);

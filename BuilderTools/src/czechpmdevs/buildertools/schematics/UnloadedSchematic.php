@@ -36,7 +36,7 @@ use pocketmine\nbt\tag\CompoundTag;
 class UnloadedSchematic extends SchematicData {
 
     /** @var string $file */
-    public $file;
+    public string $file;
 
     /**
      * UnloadedSchematic constructor.
@@ -93,8 +93,8 @@ class UnloadedSchematic extends SchematicData {
             for($y = 0; $y < $this->height; $y++) {
                 for ($z = 0; $z < $this->length; $z++) {
                     for($x = 0; $x < $this->width; $x++) {
-                        $id = ord($blocks{$i});
-                        $damage = ord($data{$i});
+                        $id = ord($blocks[$i]);
+                        $damage = ord($data[$i]);
                         if($damage >= 16) $damage = 0; // prevents bug
                         $list->addBlock(new Vector3($x, $y, $z), Block::get($id, $damage));
                         $i++;

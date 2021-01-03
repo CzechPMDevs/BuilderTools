@@ -20,6 +20,9 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors\blockstorage;
 
+use czechpmdevs\buildertools\editors\object\BlockMap;
+use pocketmine\math\Vector3;
+
 /**
  * Class BlockListMetadata
  * @package czechpmdevs\buildertools\editors\object
@@ -27,21 +30,21 @@ namespace czechpmdevs\buildertools\editors\blockstorage;
 class BlockListMetadata {
 
     /** @var BlockList $blockList */
-    private $blockList;
+    private BlockList $blockList;
 
     /**
      * @var int|null $maxX
      * @var int|null $maxY
      * @var int|null $maxZ
      */
-    public $maxX = null, $maxY = null, $maxZ = null;
+    public ?int $maxX = null, $maxY = null, $maxZ = null;
 
     /**
      * @var int|null $minX
      * @var int|null $minY
      * @var int|null $minZ
      */
-    public $minX = null, $minY = null, $minZ = null;
+    public ?int $minX = null, $minY = null, $minZ = null;
 
     /**
      * BlockListMetadata constructor.
@@ -49,7 +52,30 @@ class BlockListMetadata {
      */
     public function __construct(BlockList $blockList) {
         $this->blockList = $blockList;
-        $this->calculateMetadata();
+        if($this->blockList instanceof BlockMap) {
+            $this->calculateMapMetadata();
+        } else {
+            $this->calculateMetadata();
+        }
+    }
+
+    private function calculateMapMetadata() {
+        /** @var BlockMap $map */
+        $map = $this->blockList;
+
+        $values = array_keys($map->getBlockMap());
+        $this->minX = min($values);
+        $this->maxX = max($values);
+
+        $values = array_merge(...array_map('array_keys', $map->getBlockMap()));
+        $this->minY = min($values);
+        $this->maxY = max($values);
+
+        $values = array_merge(...array_merge(...array_map(function ($value) {
+            return array_map("array_keys", $value);
+        }, $map->getBlockMap())));
+        $this->minZ = min($values);
+        $this->maxZ = max($values);
     }
 
     private function calculateMetadata() {
@@ -78,5 +104,13 @@ class BlockListMetadata {
 
     public function recalculateMetadata() {
         $this->calculateMetadata();
+    }
+
+    public function getMinimum(): Vector3 {
+        return new Vector3($this->minX, $this->minY, $this->minZ);
+    }
+
+    public function getMaximum(): Vector3 {
+        return new Vector3($this->maxX, $this->maxY, $this->maxZ);
     }
 }

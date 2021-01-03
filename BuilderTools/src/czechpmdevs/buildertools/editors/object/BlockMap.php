@@ -33,14 +33,12 @@ use pocketmine\math\Vector3;
 class BlockMap extends BlockList {
 
     /** @var Block[][][] $blockMap */
-    protected $blockMap = [];
+    protected array $blockMap = [];
 
-    /**
-     * @param Vector3 $position
-     * @param Block $block
-     */
-    public function addBlock(Vector3 $position, Block $block): void {
+    public function addBlock(Vector3 $position, Block $block): self {
         $this->blockMap[$position->getX()][$position->getY()][$position->getZ()] = $block;
+
+        return $this;
     }
 
     /**
@@ -60,13 +58,12 @@ class BlockMap extends BlockList {
         else return null;
     }
 
-    /**
-     * @param Block[] $blocks
-     */
-    public function setAll(array $blocks): void {
+    public function setAll(array $blocks): self {
         foreach ($blocks as $block) {
             $this->blockMap[$block->getX()][$block->getY()][$block->getZ()] = $block;
         }
+
+        return $this;
     }
 
     /**
