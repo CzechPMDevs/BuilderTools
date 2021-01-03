@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\math;
 
-use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\data\RotationHelper;
 use pocketmine\math\Vector3;
 

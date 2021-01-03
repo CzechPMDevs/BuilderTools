@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
 
-use czechpmdevs\asyncfill\storage\ThreadSafeBlock;
-use czechpmdevs\asyncfill\storage\ThreadSafeBlockList;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlock;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlockList;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\Schematic;

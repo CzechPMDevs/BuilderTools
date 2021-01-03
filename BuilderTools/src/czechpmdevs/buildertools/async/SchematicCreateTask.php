@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
 
-use czechpmdevs\asyncfill\storage\ThreadSafeBlockList;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlockList;
 use Exception;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;

@@ -18,10 +18,10 @@
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\asyncfill\storage\ThreadSafeBlock;
-use czechpmdevs\asyncfill\storage\ThreadSafeBlockList;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlock;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlockList;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\blockstorage\BlockList;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\level\Level;

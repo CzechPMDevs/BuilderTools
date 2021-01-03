@@ -18,9 +18,8 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\blockstorage;
+namespace czechpmdevs\buildertools\blockstorage;
 
-use czechpmdevs\buildertools\editors\object\BlockMap;
 use pocketmine\math\Vector3;
 
 /**

@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\blockstorage;
+namespace czechpmdevs\buildertools\blockstorage;
 
 use pocketmine\math\Vector3;
 use pocketmine\Player;

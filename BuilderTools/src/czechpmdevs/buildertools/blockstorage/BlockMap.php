@@ -18,9 +18,8 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\object;
+namespace czechpmdevs\buildertools\blockstorage;
 
-use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use Exception;
 use pocketmine\block\Block;
 use pocketmine\level\Level;

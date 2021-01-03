@@ -18,10 +18,10 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\blockstorage;
+namespace czechpmdevs\buildertools\blockstorage;
 
-use czechpmdevs\asyncfill\storage\ThreadSafeBlock;
-use czechpmdevs\asyncfill\storage\ThreadSafeBlockList;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlock;
+use czechpmdevs\asyncfill\ThreadSafeBlockList;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;

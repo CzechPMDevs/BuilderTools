@@ -18,9 +18,9 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\asyncfill\storage;
+namespace czechpmdevs\buildertools\blockstorage\async;
 
-use czechpmdevs\buildertools\editors\blockstorage\BlockList;
+use czechpmdevs\buildertools\blockstorage\BlockList;
 use Generator;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
@@ -28,7 +28,7 @@ use Volatile;
 
 /**
  * Class BlockVolatile
- * @package czechpmdevs\asyncfill\storage
+ * @package czechpmdevs\buildertools\blockstorage\async
  */
 class ThreadSafeBlockList extends Volatile {
 

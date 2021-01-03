@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\asyncfill\storage;
+namespace czechpmdevs\buildertools\blockstorage\async;
 
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
@@ -26,7 +26,7 @@ use pocketmine\math\Vector3;
 
 /**
  * Class Block
- * @package czechpmdevs\asyncfill\storage
+ * @package czechpmdevs\buildertools\blockstorage\async
  */
 class ThreadSafeBlock {
 
