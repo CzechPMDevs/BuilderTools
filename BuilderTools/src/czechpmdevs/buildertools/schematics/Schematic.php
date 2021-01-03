@@ -51,7 +51,7 @@ class Schematic extends SchematicData {
      * @param string $file
      */
     public function save(string $file) {
-        Server::getInstance()->getAsyncPool()->submitTask(new SchematicCreateTask($file, $this->getBlockList(), $this->getAxisVector(), $this->materialType));
+        Server::getInstance()->getAsyncPool()->submitTask(new SchematicCreateTask($file, $this->getBlockList()->toThreadSafe(), $this->getAxisVector(), $this->materialType));
     }
 
     /**

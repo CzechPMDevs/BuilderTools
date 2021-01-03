@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors\blockstorage;
 
+use czechpmdevs\asyncfill\storage\ThreadSafeBlock;
+use czechpmdevs\asyncfill\storage\ThreadSafeBlockList;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
@@ -154,6 +156,19 @@ class BlockList implements BlockStorage {
             }
         }
 
+
+        return $blockList;
+    }
+
+    /**
+     * @return ThreadSafeBlockList
+     */
+    public function toThreadSafe(): ThreadSafeBlockList {
+        $blockList = new ThreadSafeBlockList();
+        while ($block = array_shift($this->blocks)) {
+            /** @var Block $block */
+            $blockList->addBlock($block->asVector3(), new ThreadSafeBlock($block->getId(), $block->getDamage()));
+        }
 
         return $blockList;
     }

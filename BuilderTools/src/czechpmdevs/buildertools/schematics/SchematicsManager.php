@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\schematics;
 
 use czechpmdevs\buildertools\async\SchematicLoadTask;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\blockstorage\BlockList;
 use czechpmdevs\buildertools\editors\Filler;
 use pocketmine\Player;
 
@@ -112,15 +111,7 @@ class SchematicsManager {
         }
 
         $blockList->setLevel($player->getLevel());
-        $blockList->add($player);
-
-        $debugged = false;
-        foreach ($blockList->getAll() as $block) {
-            if($block->getId() != 0 && !$debugged) {
-                var_dump($block);
-                $debugged = true;
-            }
-        }
+        $blockList = $blockList->add($player);
 
         $filler = new Filler;
         $filler->fill($player, $blockList);

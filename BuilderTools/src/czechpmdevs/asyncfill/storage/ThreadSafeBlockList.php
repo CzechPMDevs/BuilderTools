@@ -56,8 +56,8 @@ class ThreadSafeBlockList extends Volatile {
      */
     public function toBlockList(): BlockList {
         $blockList = new BlockList();
-        /** @var ThreadSafeBlock $block */
         while ($block = $this->pop()) {
+            /** @var ThreadSafeBlock $block */
             $blockList->addBlock($block->asVector3(), Block::get($block->getId(), $block->getDamage()));
         }
 
