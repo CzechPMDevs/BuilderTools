@@ -40,17 +40,17 @@ use pocketmine\Server;
 class SchematicLoadTask extends AsyncTask {
 
     /** @var string $path */
-    public string $path;
+    public $path;
 
     /** @var ThreadSafeBlockList $blockList */
-    public ThreadSafeBlockList $blockList;
+    public $blockList;
     /** @var Vector3 $axisVector */
-    public Vector3 $axisVector;
+    public $axisVector;
     /** @var string $materials */
-    public string $materials;
+    public $materials;
 
     /** @var string $error */
-    public string $error = "";
+    public $error = "";
 
     /**
      * SchematicLoadTask constructor.

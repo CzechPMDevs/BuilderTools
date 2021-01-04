@@ -1,0 +1,129 @@
+name: BuilderTools
+api: 3.0.0
+author: CzechPMDevs
+authors: [VixikCZ]
+version: 1.2.0-beta3
+main: czechpmdevs\buildertools\BuilderTools
+website: https://github.com/CzechPMDevs/BuilderTools
+
+permissions:
+  bt.cmd:
+    default: op
+    description: Permissions for all BuilderTools commands
+    children:
+      bt.cmd.blockinfo:
+        description: Permissions for //blockinfo
+        default: op
+      bt.cmd.clearinventory:
+        description: Permissions for //clearinventory
+        default: op
+      bt.cmd.copy:
+        description: Permissions for //copy
+        default: op
+      bt.cmd.cube:
+        description: Permissions for //cube
+        default: op
+      bt.cmd.cut:
+        description: Permissions for //cut
+        default: op
+      bt.cmd.cylinder:
+        description: Permission for //cylinder
+        default: op
+      bt.cmd.decoration:
+        description: Permission for //decoration
+        default: op
+      bt.cmd.draw:
+        description: Permission for //draw
+        default: op
+      bt.cmd.fill:
+        descripion: Permissions for //fill
+        default: op
+      bt.cmd.pos1:
+        description: Permissions for //pos1
+        default: op
+      bt.cmd.fix:
+        descripion: Permissions for //fix
+        default: op
+      bt.cmd.help:
+        description: Permissions for //commands
+        default: op
+      bt.cmd.hcube:
+        description: Permission for //hcube
+        default: op
+      bt.cmd.hcylinder:
+        description: Permission for //hcylinder
+        default: op
+      bt.cmd.hpyrdamid:
+        description: Permission for //hpyramid
+        default: op
+      bt.cmd.hsphere:
+        descripton: Permissions for //hsphere
+        default: op
+      bt.cmd.id:
+        description: Permissions for //id
+        default: op
+      bt.cmd.merge:
+        description: Permissions for //merge
+        default: op
+      bt.cmd.move:
+        description: Permission for //move
+        default: op
+      bt.cmd.naturalize:
+        description: Permissions for //naturalize
+        default: op
+      bt.cmd.outline:
+        description: Permission for //outline
+        default: op
+      bt.cmd.paste:
+        description: Permissions for //paste
+        default: op
+      bt.cmd.pyrdamid:
+        description: Permission for //pyramid
+        default: op
+      bt.cmd.redo:
+        description: Permission for //redo
+        default: op
+      bt.cmd.replace:
+        description: Permission for //replace
+        default: op
+      bt.cmd.rotate:
+        description: Permission for //rotate
+        default: op
+      bt.cmd.schematic:
+        description: Permission for //schematics
+        default: op
+      bt.cmd.pos2:
+        description: Permissions for //pos2
+        default: op
+      bt.cmd.sphere:
+        description: Permissions for //sphere
+        default: op
+      bt.cmd.stack:
+        description: Permission for //stack
+        default: op
+      bt.cmd.tree:
+        description: Permission for //tree
+        default: op
+      bt.cmd.undo:
+        description: Permission for //undo
+        default: op
+      bt.cmd.wand:
+        description: Permissions for //wand
+        default: op
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

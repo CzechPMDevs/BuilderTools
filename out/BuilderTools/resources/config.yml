@@ -1,0 +1,22 @@
+---
+# \
+## > BuilderTools configuration file
+# /
+
+# Do not change this!
+config-version: 1.2.0
+
+schematics:
+  # Available modes: startup, oncommand
+  #  - startup - when plugin starts, all schematics will loaded using async task
+  #  - oncommand - schematics will been loaded when player use '//schem load' command without async
+  load: startup
+
+items:
+  wand-axe:
+    enabled: true
+    name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"
+  blockinfo-stick:
+    enabled: false
+    name: "§r§fDebug Stick\n§7§oTouch block for info"
+...

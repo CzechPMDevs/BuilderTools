@@ -7,7 +7,7 @@ $startTime = microtime(true);
 $path = getcwd() . DIRECTORY_SEPARATOR . "out" . DIRECTORY_SEPARATOR;
 @mkdir($path);
 
-$pluginPath = getcwd() . DIRECTORY_SEPARATOR . "BuilderTools" . DIRECTORY_SEPARATOR;
+$pluginPath = $path . "BuilderTools" . DIRECTORY_SEPARATOR;
 $description = (array)yaml_parse_file($pluginPath . "plugin.yml");
 
 $outputPath = $path . "BuilderTools_v{$description["version"]}_dev.phar";
