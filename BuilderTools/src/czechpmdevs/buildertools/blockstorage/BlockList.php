@@ -70,6 +70,14 @@ class BlockList implements BlockStorage {
         return $this->level;
     }
 
+    public function getFirst(): ?Block{
+        return array_shift($this->blocks);
+    }
+
+    public function getLast(): ?Block {
+        return array_pop($this->blocks);
+    }
+
     /**
      * @param bool $build
      *

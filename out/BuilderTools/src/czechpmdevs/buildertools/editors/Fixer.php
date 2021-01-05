@@ -20,17 +20,7 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlock;
 use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlockList;
-use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\blockstorage\BlockList;
-use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\math\Vector3;
-use pocketmine\Player;
-use pocketmine\tile\Banner;
-use pocketmine\tile\Bed;
-use pocketmine\tile\Chest;
-use pocketmine\tile\Sign;
 
 /**
  * Class Fixer
@@ -62,59 +52,41 @@ class Fixer extends Editor {
     ];
 
     /**
-     * @param BlockList $blockList
-     * @return BlockList
-     */
-    public function fixBlockList(BlockList $blockList): BlockList {
-        $newList = new BlockList();
-        foreach ($blockList->getAll() as $block) {
-            $id = $block->getId();
-            $damage = $block->getDamage();
-            if(isset(self::BLOCK_FIX_DATA[$id])) {
-                if(is_int(self::BLOCK_FIX_DATA[$id][1])) $damage = self::BLOCK_FIX_DATA[$id][1];
-                $id = self::BLOCK_FIX_DATA[$id][0];
-            }
-
-            if($block->getId() == BlockIds::TRAPDOOR || $block->getId() == BlockIds::IRON_TRAPDOOR) {
-                $block->setDamage($this->fixTrapdoorMeta($block->getDamage()));
-            }
-            if($block->getId() == BlockIds::STONE_BUTTON || $block->getId() == BlockIds::STONE_BUTTON) {
-                $block->setDamage($this->fixButtonMeta($block->getDamage()));
-            }
-
-            $block = Block::get($id, $damage);
-            $block->setComponents($block->getX(), $block->getY(), $block->getZ());
-            $newList->addBlock($block->asVector3(), $block);
-        }
-        return $newList;
-    }
-
-    /**
      * @param ThreadSafeBlockList $blockList
      * @return ThreadSafeBlockList
      */
     public function fixThreadSafeBlockList(ThreadSafeBlockList $blockList): ThreadSafeBlockList {
         /** @var ThreadSafeBlock $block */
         foreach ($blockList as $index => $block) {
-            if(isset(self::BLOCK_FIX_DATA[$block->getId()])) {
-                if(is_int(self::BLOCK_FIX_DATA[$block->getId()][1])) {
-                    $block->setDamage(self::BLOCK_FIX_DATA[$block->getId()][1]);
-                }
+            $id = $block->getId();
+            $damage = $block->getDamage();
 
-                $block->setId(self::BLOCK_FIX_DATA[$block->getId()][0]);
-            }
-
-            if($block->getId() == BlockIds::TRAPDOOR || $block->getId() == BlockIds::IRON_TRAPDOOR) {
-                $block->setDamage($this->fixTrapdoorMeta($block->getDamage()));
-            }
-            if($block->getId() == BlockIds::STONE_BUTTON || $block->getId() == BlockIds::STONE_BUTTON) {
-                $block->setDamage($this->fixButtonMeta($block->getDamage()));
-            }
-
-            $blockList[$index] = $block;
+            $this->fixBlock($id, $damage);
+            $blockList[$index] = $block->setId($id)->setDamage($damage);
         }
 
         return $blockList;
+    }
+
+    /**
+     * @param int $id
+     * @param int $damage
+     */
+    public function fixBlock(int &$id, int &$damage) {
+        if(isset(self::BLOCK_FIX_DATA[$id])) {
+            if(is_int(self::BLOCK_FIX_DATA[$id][1])) {
+                $damage = self::BLOCK_FIX_DATA[$id][1];
+            }
+            $id = self::BLOCK_FIX_DATA[$id][0];
+        }
+
+        if($id == BlockIds::TRAPDOOR || $id == BlockIds::IRON_TRAPDOOR) {
+            $damage = $this->fixTrapdoorMeta($damage);
+        }
+
+        if($id == BlockIds::WOODEN_BUTTON || $id == BlockIds::STONE_BUTTON) {
+            $damage = $this->fixButtonMeta($damage);
+        }
     }
 
     /**
@@ -138,69 +110,6 @@ class Fixer extends Editor {
         } else {
             return 15 - $meta;
         }
-    }
-
-    /**
-     * @param int $x1
-     * @param int $y1
-     * @param int $z1
-     * @param int $x2
-     * @param int $y2
-     * @param int $z2
-     * @param Level $level
-     * @param Player $player
-     * @param bool $replaceHeads
-     * @param bool $fixTiles
-     */
-    public function fix(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player, bool $replaceHeads = false, bool $fixTiles = true) {
-        $blocks = self::BLOCK_FIX_DATA;
-
-        if($replaceHeads)
-            $blocks[Block::MOB_HEAD_BLOCK] = [Block::AIR, 0];
-
-        $blockList = new BlockList();
-        $blockList->setLevel($level);
-
-        for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
-            for ($y = min($y1, $y2); $y <= max($y1, $y2); $y++) {
-                for ($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
-                    #$id = $level->getBlockIdAt($x, $y, $z);
-                    $id = $level->getBlockAt($x, $y, $z)->getId();
-
-                    if($fixTiles) {
-                        switch ($id) {
-                            case Block::CHEST:
-                                if($level->getTile(new Vector3($x, $y, $z)) === null)
-                                    $level->addTile(new Chest($level, Chest::createNBT(new Vector3($x, $y, $z))));
-                                break;
-                            case Block::SIGN_POST:
-                            case Block::WALL_SIGN:
-                                if($level->getTile(new Vector3($x, $y, $z)) === null)
-                                    $level->addTile(new Sign($level, Sign::createNBT(new Vector3($x, $y, $z))));
-                                break;
-                            case Block::BED_BLOCK:
-                                if($level->getTile(new Vector3($x, $y, $z)) === null)
-                                    $level->addTile(new Bed($level, Bed::createNBT(new Vector3($x, $y, $z))));
-                                break;
-                            case Block::STANDING_BANNER:
-                            case Block::WALL_BANNER:
-                                if($level->getTile(new Vector3($x, $y, $z)) === null)
-                                    $level->addTile(new Banner($level, Banner::createNBT(new Vector3($x, $y, $z))));
-                                break;
-                        }
-                    }
-
-
-                    if(isset($blocks[$id])) $blockList->addBlock(new Vector3($x, $y, $z), Block::get($blocks[$id][0], (is_int($blocks[$id][1]) ? $blocks[$id][1] : $level->getBlockAt($x, $y, $z)->getDamage())));
-                }
-            }
-        }
-
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
-        $result = $filler->fill($player, $blockList);
-
-        $player->sendMessage(BuilderTools::getPrefix()."Selected area successfully fixed! (".(string)($result->countBlocks)." blocks changed!)");
     }
 
     /**

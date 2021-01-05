@@ -20,12 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
-use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\Fixer;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 
 /**
  * Class FixCommand
@@ -37,7 +33,7 @@ class FixCommand extends BuilderToolsCommand {
      * FixCommand constructor.
      */
     public function __construct() {
-        parent::__construct("/fix", "Fix selected area");
+        parent::__construct("/fix", "Fixes world");
     }
 
     /**
@@ -48,31 +44,12 @@ class FixCommand extends BuilderToolsCommand {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
+
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//fix <world>");
             return;
         }
 
-        if(!Selectors::isSelected(1, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
-            return;
-        }
-
-        if(!Selectors::isSelected(2, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
-            return;
-        }
-
-        $firstPos = Selectors::getPosition($sender, 1);
-        $secondPos = Selectors::getPosition($sender, 2);
-        
-        if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
-            return;
-        }
-
-        /** @var Fixer $fixer */
-        $fixer = BuilderTools::getEditor(Editor::FIXER);
-        $fixer->fix($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
+        WorldFixUtil::fixWorld($sender, $args[0]);
     }
 }

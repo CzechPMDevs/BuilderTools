@@ -54,9 +54,11 @@ class ThreadSafeBlock {
 
     /**
      * @param int $id
+     * @return $this
      */
-    public function setId(int $id): void {
+    public function setId(int $id) {
         $this->id = $id;
+        return $this;
     }
 
     /**
@@ -68,9 +70,11 @@ class ThreadSafeBlock {
 
     /**
      * @param int $damage
+     * @return $this
      */
-    public function setDamage(int $damage): void {
+    public function setDamage(int $damage) {
         $this->damage = $damage;
+        return $this;
     }
 
     /**

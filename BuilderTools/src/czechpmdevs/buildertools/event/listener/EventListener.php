@@ -24,7 +24,9 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
@@ -38,7 +40,6 @@ class EventListener implements Listener {
 
     /** @var array $wandClicks */
     private array $wandClicks = [];
-
     /** @var array $blockInfoClicks */
     private array $blockInfoClicks = [];
 
@@ -88,6 +89,15 @@ class EventListener implements Listener {
             "§aName: §7" . (string)$block->getName() . "\n" .
             "§aPosition: §7" . (string)$block->getX() . ", " . (string)$block->getY() . ", " . (string)$block->getZ() . "\n" .
             "§aLevel: §7" . $block->getLevel()->getName());
+        }
+    }
+
+    /**
+     * @param LevelLoadEvent $event
+     */
+    public function onLevelLoad(LevelLoadEvent $event) {
+        if(WorldFixUtil::isInWorldFixQueue($event->getLevel()->getName())) {
+            $this->getPlugin()->getServer()->unloadLevel($event->getLevel(), true);
         }
     }
 

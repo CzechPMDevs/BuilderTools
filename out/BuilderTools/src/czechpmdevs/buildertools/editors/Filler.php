@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\blockstorage\BlockList;
+use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use pocketmine\block\Block;
@@ -78,7 +78,7 @@ class Filler extends Editor {
      */
     public function fill(Player $player, BlockList $blockList, array $settings = []): EditorResult {
         $startTime = microtime(true);
-        $blocks = $blockList->getAll();
+        $count = count($blockList->getAll());
 
         $saveUndo = true;
         $saveRedo = false;
@@ -135,7 +135,7 @@ class Filler extends Editor {
             }
         };
 
-        foreach ($blocks as $block) {
+        while (($block = $blockList->getLast()) !== null) {
             // min and max positions
             if($minX === null || $block->getX() < $minX) $minX = $block->getX();
             if($minZ === null || $block->getZ() < $minZ) $minZ = $block->getZ();
@@ -169,7 +169,7 @@ class Filler extends Editor {
         }
 
 
-        return new EditorResult(count($blocks), microtime(true)-$startTime);
+        return new EditorResult($count, microtime(true)-$startTime);
     }
 
     /**

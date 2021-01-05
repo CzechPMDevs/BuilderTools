@@ -20,11 +20,12 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
-use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlock;
+use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlockList;
 use czechpmdevs\buildertools\blockstorage\BlockList;
+use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Fixer;
-use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
@@ -83,7 +84,7 @@ class UnloadedSchematic extends SchematicData {
         /** @var CompoundTag $data */
         $data = $nbt->readCompressed(file_get_contents($this->file));
 
-        $list = new BlockList();
+        $list = new ThreadSafeBlockList();
 
         if($data->offsetExists("Blocks") && $data->offsetExists("Data")) {
             $blocks = $data->getByteArray("Blocks");
@@ -96,7 +97,7 @@ class UnloadedSchematic extends SchematicData {
                         $id = ord($blocks[$i]);
                         $damage = ord($data[$i]);
                         if($damage >= 16) $damage = 0; // prevents bug
-                        $list->addBlock(new Vector3($x, $y, $z), Block::get($id, $damage));
+                        $list->addBlock(new Vector3($x, $y, $z), new ThreadSafeBlock($id, $damage));
                         $i++;
                     }
                 }
@@ -112,10 +113,10 @@ class UnloadedSchematic extends SchematicData {
             $this->materialType = "Pocket";
             /** @var Fixer $fixer */
             $fixer = BuilderTools::getEditor(Editor::FIXER);
-            $list = $fixer->fixBlockList($list);
+            $list = $fixer->fixThreadSafeBlockList($list);
         }
 
-        return $list;
+        return $list->toBlockList();
     }
 
 
