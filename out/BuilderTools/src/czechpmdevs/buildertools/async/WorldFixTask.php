@@ -76,7 +76,7 @@ class WorldFixTask extends AsyncTask {
         }
 
         try {
-            /** @var BaseLevelProvider $provider */
+            /** @var BaseLevelProvider|Anvil|PMAnvil $provider */
             $provider = new $providerClass($this->worldPath . DIRECTORY_SEPARATOR);
         }
         catch (Error $error) {

@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\async\WorldFixTask;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 
@@ -49,6 +50,10 @@ class WorldFixUtil {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix more than one world at the same time!");
             return;
         }
+        if(Server::getInstance()->getDefaultLevel()->getFolderName() == $worldName) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
+            return;
+        }
 
         $path = Server::getInstance()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $worldName;
         if(!is_dir($path)) {
@@ -63,7 +68,9 @@ class WorldFixUtil {
         }
 
         $asyncTask = new WorldFixTask($path);
-        Server::getInstance()->getAsyncPool()->submitTask($asyncTask);
+        BuilderTools::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function (int $currentTick) use ($asyncTask): void { // Delay until the world will be fully saved
+            Server::getInstance()->getAsyncPool()->submitTask($asyncTask);
+        }), 60);
 
         BuilderTools::getInstance()->getScheduler()->scheduleRepeatingTask(new class($asyncTask, $sender) extends Task {
             /** @var WorldFixTask  */
@@ -99,7 +106,7 @@ class WorldFixUtil {
                 }
 
                 if($this->task->percentage == -1) {
-                    $this->sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task successfully completed!");
+                    $this->sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in {$this->task->time} ({$this->task->chunkCount} chunks updated)!");
                     goto finish;
                 }
 
