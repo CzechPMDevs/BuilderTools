@@ -30,11 +30,13 @@ use pocketmine\math\Vector3;
 class Math {
 
     /**
+     * @deprecated
+     *
      * @param Vector3 $vector3
      * @return Vector3 $vector3
      */
     public static function roundVector3(Vector3 $vector3): Vector3 {
-        return new Vector3((int)ceil($vector3->getX()), (int)ceil($vector3->getY()), (int)ceil($vector3->getZ()));
+        return new Vector3((int)$vector3->getX(), (int)$vector3->getY(), (int)$vector3->getZ());
     }
 
     /**
@@ -42,7 +44,7 @@ class Math {
      * @return Position $position
      */
     public static function roundPosition(Position $position): Position {
-        return Position::fromObject(self::roundVector3($position), $position->getLevel());
+        return Position::fromObject($position->ceil(), $position->getLevel());
     }
 
     /**
@@ -67,14 +69,40 @@ class Math {
     }
 
     /**
+     * Use Math::lengthSquared2d() or Math::lengthSquared3d() instead
+     *
+     * @deprecated
+     *
      * @param float|int $x
      * @param float|int $y
      * @param float|int $z
+     *
      * @return float|int
      */
     public static function lengthSq($x, $y, $z = null) {
         if($z === null) return ($x * $x) + ($y * $y);
         return ($x * $x) + ($y * $y) + ($z * $z);
+    }
+
+    /**
+     * @param float|int $x
+     * @param float|int $y
+     *
+     * @return float|int
+     */
+    public static function lengthSquared2d($x, $y) {
+        return ($x ** 2) + ($y ** 2);
+    }
+
+    /**
+     * @param float|int $x
+     * @param float|int $y
+     * @param float|int $z
+     *
+     * @return float|int
+     */
+    public static function lengthSquared3d($x, $y, $z) {
+        return ($x ** 2) + ($y ** 2) + ($z ** 2);
     }
 
     /**

@@ -227,51 +227,45 @@ class Printer extends Editor {
      * @return EditorResult
      */
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
-        $center = Math::roundPosition($center);
+        $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
+
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
 
         if ($height == 0) {
             return new EditorResult(0, 0, true);
-        } elseif ($height < 0) {
+        }
+
+        if($height < 0) {
+            $center->setComponents($center->getX(), $center->getY() + $height, $center->getZ());
             $height = -$height;
-            $center = $center->setComponents($center->getY(), $height, $center->getZ());
         }
 
         if ($center->getFloorY() < 0) {
             return new EditorResult(0,0, true);
         }
 
-        $invRadiusX = 1 / $radius;
-        $invRadiusZ = 1 / $radius;
+        $center = $center->add(1, 0, 1);
 
+        $incDivX = 0;
+        for($x = 0; $x <= $radius; $x++) {
+            $divX = $incDivX;
+            $incDivX = ($x + 1) / $radius;
+            $incDivZ = 0;
+            for($z = 0; $z <= $radius; $z++) {
+                $divZ = $incDivZ;
+                $incDivZ = ($z + 1) / $radius;
 
-        $nextXn = 0;
-        $breakX = false;
-        for ($x = 0; $x <= $radius && $breakX === false; ++$x) {
-            $xn = $nextXn;
-            $nextXn = ($x + 1) * $invRadiusX;
-            $nextZn = 0;
-            $breakZ = false;
-            for ($z = 0; $z <= $radius && $breakZ === false; ++$z) {
-                $zn = $nextZn;
-                $nextZn = ($z + 1) * $invRadiusZ;
-
-                $distanceSq = Math::lengthSq($xn, $zn);
-                if ($distanceSq > 1) {
-                    if ($z == 0) {
-                        $breakX = true;
-                    }
-                    $breakZ = true;
+                $lengthSquared = Math::lengthSquared2d($divX, $divZ);
+                if($lengthSquared > 1) { // x**2 + z**2 < r**2
+                    continue;
                 }
 
-                if ($hollow) {
-                    if (Math::lengthSq($nextXn, $zn) <= 1 && Math::lengthSq($xn, $nextZn) <= 1) {
-                        continue;
-                    }
+                if($hollow && Math::lengthSquared2d($divX, $incDivZ) <= 1 && Math::lengthSquared2d($incDivX, $divZ) <= 1) {
+                    continue;
                 }
 
-                for ($y = 0; $y < $height; ++$y) {
+                for($y = 0; $y < $height; $y++) {
                     $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
                     $blockList->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
                     $blockList->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
