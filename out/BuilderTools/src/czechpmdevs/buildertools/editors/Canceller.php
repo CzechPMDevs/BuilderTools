@@ -34,7 +34,6 @@ class Canceller extends Editor {
 
     /** @var BlockList[][] $undoData */
     public $undoData = [];
-
     /** @var BlockList[][] $redoData */
     public $redoData = [];
 

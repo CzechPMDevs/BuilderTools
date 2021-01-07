@@ -54,59 +54,54 @@ class Printer extends Editor {
      * @param Block $block
      * @param int $brush
      * @param int $mode
-     * @param bool $fall
+     * @param bool $throwBlock
      */
-    public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $fall = false) {
+    public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false) {
         $undoList = new BlockList();
         $center = Math::roundPosition($center);
-        switch ($mode) {
-            case self::CUBE:
-                foreach (BlockGenerator::generateCuboid($center->subtract($brush, $brush, $brush), $center->add($brush, $brush, $brush)) as [$x, $y, $z]) {
-                    if($fall) {
-                        $finalPos = $this->throwBlock(new Position($x, $y, $z, $center->getLevel()), $block);
-                        $undoList->addBlock($finalPos, $block);
 
-                    } else {
-                        if ($y > 0) {
-                            $level = $center->getLevel();
-                            $level->setBlockIdAt($x, $y, $z, $block->getId());
-                            $level->setBlockDataAt($x, $y, $z, $block->getDamage());
+        $placeBlock = function (Vector3 $vector3) use ($undoList, $block, $center, $throwBlock) {
+            if($throwBlock) {
+                $vector3 = $this->throwBlock(Position::fromObject($vector3, $center->getLevel()), $block);
+            }
+            if($vector3->getY() < 0) {
+                return;
+            }
 
-                            $undoList->addBlock(new Vector3($x, $y, $z), $block);
-                        }
-                    }
-                }
-                break;
+            $undoList->addBlock($vector3, $center->getLevel()->getBlock($vector3));
+            $center->getLevel()->setBlockIdAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getId());
+            $center->getLevel()->setBlockDataAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getDamage());
+        };
 
-            case self::SPHERE:
-                for($x = $center->getX()-$brush; $x <= $center->getX()+$brush; $x++) {
-                    $xsqr = ($center->getX()-$x) * ($center->getX()-$x);
-                    for ($y = $center->getY()-$brush; $y <= $center->getY()+$brush; $y++) {
-                        $ysqr = ($center->getY()-$y) * ($center->getY()-$y);
-                        for ($z = $center->getZ()-$brush; $z <= $center->getZ()+$brush; $z++) {
-                            $zsqr = ($center->getZ()-$z) * ($center->getZ()-$z);
-                            if(($xsqr + $ysqr + $zsqr) <= ($brush*$brush)) {
-                                if($fall) {
-                                    $finalPos = $this->throwBlock(new Position($x, $y, $z, $center->getLevel()), $block);
-                                    $undoList->addBlock($finalPos, $block);
-                                }
-                                else {
-                                    if($y > 0) {
-                                        $level = $center->getLevel();
-                                        $level->setBlockIdAt($x, $y, $z, $block->getId());
-                                        $level->setBlockDataAt($x, $y, $z, $block->getDamage());
-
-                                        $undoList->addBlock(new Vector3($x, $y, $z), $block);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                break;
+        if($mode == self::CUBE) {
+            foreach (BlockGenerator::generateCube($brush) as $vector3) {
+                $placeBlock($center->add($vector3));
+            }
+        } elseif($mode == self::SPHERE) {
+            foreach (BlockGenerator::generateSphere($brush) as $vector3) {
+                $placeBlock($center->add($vector3));
+            }
+        } elseif($mode == self::CYLINDER) {
+            foreach (BlockGenerator::generateCylinder($brush, $brush) as $vector3) {
+                $placeBlock($center->add($vector3));
+            }
+        } elseif($mode == self::HOLLOW_CUBE) {
+            foreach (BlockGenerator::generateCube($brush, true) as $vector3) {
+                $placeBlock($center->add($vector3));
+            }
+        } elseif($mode == self::HOLLOW_SPHERE) {
+            foreach (BlockGenerator::generateSphere($brush, true) as $vector3) {
+                $placeBlock($center->add($vector3));
+            }
+        } elseif($mode == self::HOLLOW_CYLINDER) {
+            foreach (BlockGenerator::generateCylinder($brush, $brush,true) as $vector3) {
+                $placeBlock($center->add($vector3));
+            }
         }
 
-        // TODO: save undo
+        /** @var Canceller $canceller */
+        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
+        $canceller->addStep($player, $undoList);
     }
 
     /**
@@ -144,59 +139,15 @@ class Printer extends Editor {
      * @return EditorResult
      */
     public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
-        $center = Math::roundPosition($center);
+        $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
+
         $blockMap = new BlockMap();
         $blockMap->setLevel($center->getLevel());
 
-        $invRadiusX = 1 / $radius;
-        $invRadiusY = 1 / $radius;
-        $invRadiusZ = 1 / $radius;
+        $radius = abs($radius);
 
-        $nextXn = 0;
-        $breakX = false;
-        for($x = 0; $x <= $radius and $breakX === false; ++$x){
-            $xn = $nextXn;
-            $nextXn = ($x + 1) * $invRadiusX;
-            $nextYn = 0;
-            $breakY = false;
-            for($y = 0; $y <= $radius and $breakY === false; ++$y){
-                $yn = $nextYn;
-                $nextYn = ($y + 1) * $invRadiusY;
-                $nextZn = 0;
-                for($z = 0; $z <= $radius; ++$z){
-                    $zn = $nextZn;
-                    $nextZn = ($z + 1) * $invRadiusZ;
-                    $distanceSq = Math::lengthSq($xn, $yn, $zn);
-                    if($distanceSq > 1){
-                        if($z === 0){
-                            if($y === 0){
-                                $breakX = true;
-                                $breakY = true;
-                                break;
-                            }
-                            $breakY = true;
-                            break;
-                        }
-                        break;
-                    }
-
-                    if($hollow) {
-                        if(Math::lengthSq($nextXn, $yn, $zn) <= 1 and Math::lengthSq($xn, $nextYn, $zn) <= 1 and Math::lengthSq($xn, $yn, $nextZn) <= 1){
-                            continue;
-                        }
-                    }
-
-
-                    $blockMap->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
-                    $blockMap->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
-                    $blockMap->addBlock($center->add($x, -$y, $z), $this->getBlockFromString($blocks));
-                    $blockMap->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
-                    $blockMap->addBlock($center->add(-$x, -$y, $z), $this->getBlockFromString($blocks));
-                    $blockMap->addBlock($center->add($x, -$y, -$z), $this->getBlockFromString($blocks));
-                    $blockMap->addBlock($center->add(-$x, $y, -$z), $this->getBlockFromString($blocks));
-                    $blockMap->addBlock($center->add(-$x, -$y, -$z), $this->getBlockFromString($blocks));
-                }
-            }
+        foreach (BlockGenerator::generateSphere($radius, $hollow) as $vector3) {
+            $blockMap->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
         }
 
         /** @var Filler $filler */
@@ -232,7 +183,7 @@ class Printer extends Editor {
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
 
-        if ($height == 0) {
+        if($height == 0) {
             return new EditorResult(0, 0, true);
         }
 
@@ -241,37 +192,9 @@ class Printer extends Editor {
             $height = -$height;
         }
 
-        if ($center->getFloorY() < 0) {
-            return new EditorResult(0,0, true);
-        }
-
-        $center = $center->add(1, 0, 1);
-
-        $incDivX = 0;
-        for($x = 0; $x <= $radius; $x++) {
-            $divX = $incDivX;
-            $incDivX = ($x + 1) / $radius;
-            $incDivZ = 0;
-            for($z = 0; $z <= $radius; $z++) {
-                $divZ = $incDivZ;
-                $incDivZ = ($z + 1) / $radius;
-
-                $lengthSquared = Math::lengthSquared2d($divX, $divZ);
-                if($lengthSquared > 1) { // x**2 + z**2 < r**2
-                    continue;
-                }
-
-                if($hollow && Math::lengthSquared2d($divX, $incDivZ) <= 1 && Math::lengthSquared2d($incDivX, $divZ) <= 1) {
-                    continue;
-                }
-
-                for($y = 0; $y < $height; $y++) {
-                    $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
-                    $blockList->addBlock($center->add(-$x, $y, -$z), $this->getBlockFromString($blocks));
-                }
-            }
+        $radius = abs($radius);
+        foreach (BlockGenerator::generateCylinder($radius, $height, $hollow) as $vector3) {
+            $blockList->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
         }
 
         /** @var Filler $filler */
@@ -304,20 +227,24 @@ class Printer extends Editor {
     public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
-        $height = $size;
-        for ($y = 0; $y <= $height; ++$y) {
-            $size--;
-            for ($x = 0; $x <= $size; ++$x) {
-                for ($z = 0; $z <= $size; ++$z) {
-                    if ((!$hollow && $z <= $size && $x <= $size) || $z == $size || $x == $size) {
-                        $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
-                        $blockList->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
-                        $blockList->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
-                        $blockList->addBlock($center->add(-$x, $y, -$z), $this->getBlockFromString($blocks));
-                    }
-                }
-            }
+
+        foreach (BlockGenerator::generatePyramid($size, $hollow) as $vector3) {
+            $blockList->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
         }
+//        $height = $size;
+//        for ($y = 0; $y <= $height; ++$y) {
+//            $size--;
+//            for ($x = 0; $x <= $size; ++$x) {
+//                for ($z = 0; $z <= $size; ++$z) {
+//                    if ((!$hollow && $z <= $size && $x <= $size) || $z == $size || $x == $size) {
+//                        $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
+//                        $blockList->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
+//                        $blockList->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
+//                        $blockList->addBlock($center->add(-$x, $y, -$z), $this->getBlockFromString($blocks));
+//                    }
+//                }
+//            }
+//        }
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
@@ -349,16 +276,9 @@ class Printer extends Editor {
         $center = Math::roundPosition($center);
         $blockList = new BlockList();
         $blockList->setLevel($center->getLevel());
-        for($x = -$radius; $x <= $radius; $x++) {
-            for($y = -$radius; $y <= $radius; $y++) {
-                for($z = -$radius; $z <= $radius; $z++) {
-                    if($hollow) {
-                        if(in_array($radius, [$x, $y, $z, -$x, -$y, -$z])) $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
-                    } else {
-                        $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
-                    }
-                }
-            }
+
+        foreach (BlockGenerator::generateCube($radius, $hollow) as $vector3) {
+            $blockList->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
         }
 
         /** @var Filler $filler */
@@ -377,8 +297,6 @@ class Printer extends Editor {
     public function makeHollowCube(Player $player, Position $center, int $radius, string $blocks): EditorResult {
         return $this->makeCube($player, $center, $radius, $blocks, true);
     }
-
-
 
     /**
      * @return string

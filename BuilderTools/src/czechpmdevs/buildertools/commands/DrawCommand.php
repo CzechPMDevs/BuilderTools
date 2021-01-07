@@ -61,8 +61,8 @@ class DrawCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cUsage: §7//draw <cube|sphere|off> [brush: {$this->minBrush}-{$this->maxBrush} | on | off]  [fall = false]");
             return;
         }
-        if(!in_array(strval($args[0]), ["on", "off", "cube", "sphere", "custom"])) {
-            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|off> [brush: {$this->minBrush}-{$this->maxBrush}]  [fall = false]");
+        if(!in_array(strval($args[0]), ["on", "off", "cube", "sphere", "cylinder", "hcube", "hsphere", "hcylinder"])) {
+            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|cylinder|hcube|hsphere|hcylinder|off> [brush: {$this->minBrush}-{$this->maxBrush}]  [fall = false]");
             return;
         }
         if(isset($args[1]) && (!is_numeric($args[1]) || ((int)($args[1]) > $this->maxBrush || (int)($args[1]) < $this->minBrush))) {
@@ -77,17 +77,33 @@ class DrawCommand extends BuilderToolsCommand {
 
         $mode = 0;
 
-        if($args[0] == "cube") $mode = Printer::CUBE;
-        if($args[0] == "sphere") $mode = Printer::SPHERE;
+        switch ($args[0]) {
+            case "cube":
+                $mode = Printer::CUBE;
+                break;
+            case "sphere":
+                $mode = Printer::SPHERE;
+                break;
+            case "cylinder":
+                $mode = Printer::CYLINDER;
+                break;
+            case "hcube":
+                $mode = Printer::HOLLOW_CUBE;
+                break;
+            case "hsphere":
+                $mode = Printer::HOLLOW_SPHERE;
+                break;
+            case "hcylinder":
+                $mode = Printer::HOLLOW_CYLINDER;
+                break;
+        }
 
         $brush = 1;
-
         if(isset($args[1]) && is_numeric($args[1])) {
             $brush = (int)($args[1]);
         }
 
         $fall = false;
-
         if(isset($args[2]) && $args[2] == "true") {
             $fall = true;
         }
@@ -95,7 +111,6 @@ class DrawCommand extends BuilderToolsCommand {
         Selectors::addDrawingPlayer($sender, $brush, $mode, $fall);
 
         $fall = $fall ? "§2true§a" : "§cfalse§a";
-
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(§7shape: §a{$args[0]} §7Fall:$fall)!");
     }
 }

@@ -89,13 +89,39 @@ abstract class Editor {
         /** @var Item $item */
         $item = null;
         try {
-            $item = Item::fromString($itemArgs[array_rand($itemArgs, 1)]);
+            if(strpos($string, "%") === false) {
+                $item = Item::fromString($itemArgs[array_rand($itemArgs, 1)]);
+            } else {
+                $percentageData = [];
+                foreach ($itemArgs as $itemName) {
+                    if(($i = strpos($itemName, "%")) === false) {
+                        $percentageData[$itemName] = 100;
+                    } else {
+                        $percentageData[substr($itemName, $i + 1)] = (int)substr($itemName, 0, $i);
+                    }
+                }
+
+                shuffle($percentageData);
+
+                do {
+                    if(count($percentageData) == 0) {
+                        $item = Item::fromString(array_key_last($percentageData));
+                    } else {
+                        $name = array_key_first($percentageData);
+                        if(mt_rand(0, 100) < array_shift($percentageData)) {
+                            $item = Item::fromString($name);
+                        }
+                    }
+                }
+                while($item === null);
+            }
         }
         catch (Exception $exception) {
             $item = Item::get(Item::AIR);
         }
 
-        if(!$item instanceof Item) return Block::get(Block::AIR);
+        if(!$item instanceof Item)
+            return Block::get(Block::AIR);
 
         /** @var Block $block */
         $block = null;

@@ -78,7 +78,50 @@ class BlockMap extends BlockList {
                 }
             }
         }
+
         return $blocks;
+    }
+
+    public function getFirst(): ?Block{
+        /** @var Block|null $block */
+        $block = null;
+        if(($x = array_key_first($this->blockMap)) !== null) {
+            if(($y = array_key_first($this->blockMap[$x])) !== null) {
+                if(($z = array_key_first($this->blockMap[$x][$y])) !== null) {
+                    $block = array_shift($this->blockMap[$x][$y]);
+                    $block->setComponents($x, $y, $z);
+                }
+                if(empty($this->blockMap[$x][$y])) {
+                    unset($this->blockMap[$x][$y]);
+                }
+            }
+            if(empty($this->blockMap[$x])) {
+                unset($this->blockMap[$x]);
+            }
+        }
+
+        return $block;
+    }
+
+    public function getLast(): ?Block {
+        /** @var Block|null $block */
+        $block = null;
+        if(($x = array_key_last($this->blockMap)) !== null) {
+            if(($y = array_key_last($this->blockMap[$x])) !== null) {
+                if(($z = array_key_last($this->blockMap[$x][$y])) !== null) {
+                    $block = array_pop($this->blockMap[$x][$y]);
+                    $block->setComponents($x, $y, $z);
+                }
+                if(empty($this->blockMap[$x][$y])) {
+                    unset($this->blockMap[$x][$y]);
+                }
+            }
+            if(empty($this->blockMap[$x])) {
+                unset($this->blockMap[$x]);
+            }
+        }
+
+        return $block;
     }
 
     /**

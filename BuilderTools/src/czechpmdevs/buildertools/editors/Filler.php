@@ -51,7 +51,7 @@ class Filler extends Editor {
         $blockList = new BlockList;
         $blockList->setLevel($level);
 
-        foreach (BlockGenerator::generateCuboid($pos1, $pos2) as [$x, $y, $z]) {
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
             if(!$filled) {
                 if($x != min($pos1->getX(), $pos2->getX()) && $x != max($pos1->getX(), $pos2->getX())) {
                     if($y != min($pos1->getY(), $pos2->getY()) && $y != max($pos1->getY(), $pos2->getY())) {

@@ -25,8 +25,7 @@ use czechpmdevs\buildertools\blockstorage\ClipboardData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
-use czechpmdevs\buildertools\math\Math;
-use czechpmdevs\buildertools\math\RotationUtil;
+use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -61,14 +60,14 @@ class Copier extends Editor {
         $startTime = microtime(true);
 
         $clipboard = $this->copiedClipboards[$player->getName()] = new ClipboardData($player);
-        $clipboard->setPlayerPosition(Math::roundVector3($player->asVector3()));
+        $clipboard->setPlayerPosition($player->ceil());
 
         $i = 0;
-        foreach (BlockGenerator::generateCuboid($pos1, $pos2) as [$x, $y, $z]) {
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
             $blockPos = new Vector3($x, $y, $z);
 
             $block = $player->getLevel()->getBlock($blockPos);
-            $clipboard->addBlock(Math::roundVector3($blockPos->subtract($clipboard->getPlayerPosition())), $block);
+            $clipboard->addBlock($blockPos->subtract($clipboard->getPlayerPosition())->ceil(), $block);
 
             $i++;
         }
@@ -85,7 +84,7 @@ class Copier extends Editor {
             return;
         }
 
-        $center = Math::roundVector3($player->asVector3());
+        $center = $player->ceil();
         $blocks = [];
 
         foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {
@@ -115,7 +114,7 @@ class Copier extends Editor {
             return;
         }
 
-        $center = Math::roundVector3($player->asVector3());
+        $center = $player->ceil();
         $blocks = [];
 
         foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {
@@ -165,7 +164,7 @@ class Copier extends Editor {
         $list = new BlockList();
         $list->setLevel($player->getLevel());
 
-        $center = Math::roundVector3($clipboard->getPlayerPosition()->add(1, 0, 1)); // why add???
+        $center = $clipboard->getPlayerPosition()->ceil(); // Why there were + vec(1,0,1)
 
         switch ($mode) {
             case self::DIRECTION_PLAYER:

@@ -18,10 +18,9 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\math;
+namespace czechpmdevs\buildertools\utils;
 
 use czechpmdevs\buildertools\blockstorage\BlockList;
-use czechpmdevs\buildertools\editors\data\RotationHelper;
 use pocketmine\math\Vector3;
 
 /**

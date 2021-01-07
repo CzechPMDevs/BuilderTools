@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\math\RotationUtil;
+use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 

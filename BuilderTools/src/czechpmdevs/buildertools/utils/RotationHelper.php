@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\data;
+namespace czechpmdevs\buildertools\utils;
 
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;

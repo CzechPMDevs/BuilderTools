@@ -48,7 +48,7 @@ class Replacement extends Editor {
         $blockList = new BlockList;
         $blockList->setLevel($level);
 
-        foreach (BlockGenerator::generateCuboid($pos1, $pos2) as [$x, $y, $z]) {
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
             if($this->isBlockInString($blocks, $level->getBlockAt($x, $y, $z))) {
                 $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($replace));
             }
