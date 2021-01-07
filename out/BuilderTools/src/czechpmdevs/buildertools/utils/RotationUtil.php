@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\utils;
 
 use czechpmdevs\buildertools\blockstorage\BlockList;
+use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
 
 /**
