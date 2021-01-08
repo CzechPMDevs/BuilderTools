@@ -27,6 +27,8 @@ use pocketmine\math\Vector3;
 /**
  * Class Block
  * @package czechpmdevs\buildertools\blockstorage\async
+ *
+ * @deprecated
  */
 class ThreadSafeBlock {
 

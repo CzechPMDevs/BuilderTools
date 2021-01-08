@@ -25,6 +25,8 @@ use pocketmine\math\Vector3;
 /**
  * Class BlockListMetadata
  * @package czechpmdevs\buildertools\editors\object
+ *
+ * @deprecated
  */
 class BlockListMetadata {
 

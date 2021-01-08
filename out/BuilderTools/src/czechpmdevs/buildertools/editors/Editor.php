@@ -80,13 +80,15 @@ abstract class Editor {
     }
 
     /**
+     * TODO - Create class for that so it will have pre-generated map
+     *
      * @param string $string
      * @return Block $block
      */
     public function getBlockFromString(string $string): Block {
         $itemArgs = explode(",", $string);
 
-        /** @var Item $item */
+        /** @var Item|null $item */
         $item = null;
         try {
             if(strpos($string, "%") === false) {
@@ -137,5 +139,14 @@ abstract class Editor {
         }
 
         return $block;
+    }
+
+    /**
+     * @param string $string
+     * @return array
+     */
+    public function getBlockArgsFromString(string $string): array {
+        $block = $this->getBlockFromString($string);
+        return [$block->getId(), $block->getDamage()];
     }
 }

@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
-use czechpmdevs\buildertools\blockstorage\ClipboardData;
+use czechpmdevs\buildertools\blockstorage\SelectionData;
+use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
@@ -39,7 +39,7 @@ class Copier extends Editor {
     public const DIRECTION_UP = 1;
     public const DIRECTION_DOWN = 2;
 
-    /** @var ClipboardData[] $copiedClipboards */
+    /** @var SelectionData[] $copiedClipboards */
     public array $copiedClipboards = [];
 
     /**
@@ -59,7 +59,7 @@ class Copier extends Editor {
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = $this->copiedClipboards[$player->getName()] = new ClipboardData($player);
+        $clipboard = $this->copiedClipboards[$player->getName()] = new SelectionData();
         $clipboard->setPlayerPosition($player->ceil());
 
         $i = 0;
@@ -67,7 +67,7 @@ class Copier extends Editor {
             $blockPos = new Vector3($x, $y, $z);
 
             $block = $player->getLevel()->getBlock($blockPos);
-            $clipboard->addBlock($blockPos->subtract($clipboard->getPlayerPosition())->ceil(), $block);
+            $clipboard->addBlock($blockPos->subtract($clipboard->getPlayerPosition())->ceil(), $block->getId(), $block->getDamage());
 
             $i++;
         }
@@ -84,25 +84,9 @@ class Copier extends Editor {
             return;
         }
 
-        $center = $player->ceil();
-        $blocks = [];
-
-        foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {
-            if($blockInClipboard->getId() !== 0) {
-                $block = clone $blockInClipboard;
-                $pos = $block->add($center);
-                $block->setComponents($pos->getX(), $pos->getY(), $pos->getZ());
-                $blocks[] = $block;
-            }
-        }
-
-        $list = new BlockList();
-        $list->setLevel($player->getLevel());
-        $list->setAll($blocks);
-
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $list);
+        $filler->merge($player, UpdateLevelData::fromBlockArray($this->copiedClipboards[$player->getName()]->addVector3($player->ceil())));
     }
 
     /**
@@ -114,23 +98,9 @@ class Copier extends Editor {
             return;
         }
 
-        $center = $player->ceil();
-        $blocks = [];
-
-        foreach ($this->copiedClipboards[$player->getName()]->getAll() as $blockInClipboard) {
-            $block = clone $blockInClipboard;
-            $pos = $block->add($center);
-            $block->setComponents($pos->getX(), $pos->getY(), $pos->getZ());
-            $blocks[] = $block;
-        }
-
-        $list = new BlockList();
-        $list->setLevel($player->getLevel());
-        $list->setAll($blocks);
-
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $list);
+        $filler->fill($player, UpdateLevelData::fromBlockArray($this->copiedClipboards[$player->getName()]->addVector3($player->ceil())));
     }
 
     /**
@@ -144,8 +114,7 @@ class Copier extends Editor {
             return;
         }
 
-        $list = RotationUtil::rotate($this->copiedClipboards[$player->getName()], $axis, $rotation);
-        $this->copiedClipboards[$player->getName()]->setAll($list->getAll());
+        $this->copiedClipboards[$player->getName()] = RotationUtil::rotate($this->copiedClipboards[$player->getName()], $axis, $rotation);
     }
 
     /**
@@ -161,21 +130,17 @@ class Copier extends Editor {
 
         $clipboard = $this->copiedClipboards[$player->getName()];
 
-        $list = new BlockList();
-        $list->setLevel($player->getLevel());
+        $updateData = new UpdateLevelData();
+        $updateData->setLevel($clipboard->getLevel());
 
-        $center = $clipboard->getPlayerPosition()->ceil(); // Why there were + vec(1,0,1)
-
+        $center = $clipboard->getPlayerPosition()->ceil(); // Why there were + vec(1, 0, 1)
         switch ($mode) {
             case self::DIRECTION_PLAYER:
                 $d = $player->getDirection();
                 switch ($d) {
                     case 0:
                     case 2:
-                        $minX = null;
-                        $maxX = null;
-
-                        $metadata = $clipboard->getMetadata();
+                        $metadata = $clipboard->getSizeData();
                         $minX = $metadata->minX;
                         $maxX = $metadata->maxX;
 
@@ -184,17 +149,14 @@ class Copier extends Editor {
 
                         for ($pasted = 0; $pasted < $pasteCount; ++$pasted) {
                             $addX = $length * $pasted;
-                            foreach ($clipboard->getAll() as $block) {
-                                $list->addBlock($center->add($block->add($addX)), $block);
+                            foreach ($clipboard->read(false) as [$x, $y, $z, $id, $meta]) {
+                                $updateData->addBlock($center->add($x + $addX, $y, $z), $id, $meta);
                             }
                         }
                         break;
                     case 1:
                     case 3:
-                        $minZ = null;
-                        $maxZ = null;
-
-                        $metadata = $clipboard->getMetadata();
+                        $metadata = $clipboard->getSizeData();
                         $minZ = $metadata->minZ;
                         $maxZ = $metadata->maxZ;
 
@@ -203,8 +165,8 @@ class Copier extends Editor {
 
                         for ($pasted = 0; $pasted < $pasteCount; ++$pasted) {
                             $addZ = $length * $pasted;
-                            foreach ($clipboard->getAll() as $block) {
-                                $list->addBlock($center->add($block->add(0, 0, $addZ)), $block);
+                            foreach ($clipboard->read(false) as [$x, $y, $z, $id, $meta]) {
+                                $updateData->addBlock($center->add($x, $y, $z + $addZ), $id, $meta);
                             }
                         }
                         break;
@@ -212,10 +174,7 @@ class Copier extends Editor {
                 break;
             case self::DIRECTION_UP:
             case self::DIRECTION_DOWN:
-                $minY = null;
-                $maxY = null;
-
-                $metadata = $clipboard->getMetadata();
+                $metadata = $clipboard->getSizeData();
                 $minY = $metadata->minY;
                 $maxY = $metadata->maxY;
 
@@ -224,8 +183,8 @@ class Copier extends Editor {
 
                 for ($pasted = 0; $pasted <= $pasteCount; ++$pasted) {
                     $addY = $length * $pasted;
-                    foreach ($clipboard->getAll() as $block) {
-                        $list->addBlock($center->add($block->add(0, $addY)), $block);
+                    foreach ($clipboard->read() as [$x, $y, $z, $id, $meta]) {
+                        $updateData->addBlock($center->add($x, $y + $addY, $z), $id, $meta);
                     }
                 }
                 break;
@@ -233,7 +192,7 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(self::FILLER);
-        $filler->fill($player, $list);
+        $filler->fill($player, $updateData);
         $player->sendMessage(BuilderTools::getPrefix()."§aCopied area stacked!");
     }
 }

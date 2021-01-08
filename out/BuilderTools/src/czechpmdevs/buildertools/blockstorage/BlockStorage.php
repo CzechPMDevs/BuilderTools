@@ -27,6 +27,8 @@ use pocketmine\math\Vector3;
 /**
  * Interface BlockStorage
  * @package czechpmdevs\buildertools\editors\blockstorage
+ *
+ * @deprecated
  */
 interface BlockStorage {
 

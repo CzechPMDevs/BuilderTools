@@ -48,10 +48,10 @@ class Math {
     }
 
     /**
-     * @param int $degrees
-     * @return int
+     * @param int|float $degrees
+     * @return int|float
      */
-    public static function getBasicDegrees(int $degrees): int {
+    public static function getBasicDegrees($degrees) {
         fixDegrees:
         if($degrees < 0) {
             $degrees += 360;

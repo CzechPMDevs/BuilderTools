@@ -29,6 +29,8 @@ use Volatile;
 /**
  * Class BlockVolatile
  * @package czechpmdevs\buildertools\blockstorage\async
+ *
+ * @deprecated
  */
 class ThreadSafeBlockList extends Volatile {
 

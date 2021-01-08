@@ -76,7 +76,7 @@ class WorldFixTask extends AsyncTask {
         }
 
         try {
-            /** @var BaseLevelProvider|Anvil|PMAnvil $provider */
+            /** @var BaseLevelProvider|Anvil|PMAnvil|null $provider */
             $provider = new $providerClass($this->worldPath . DIRECTORY_SEPARATOR);
         }
         catch (Error $error) {
@@ -153,20 +153,6 @@ class WorldFixTask extends AsyncTask {
                     }
                 }
             }
-
-//            $regionFile = fopen($regionFilePath, "r+b");
-//            $headerRaw = fread($regionFile, RegionLoader::REGION_HEADER_LENGTH);
-//            if($headerRaw === false or strlen($headerRaw) !== RegionLoader::REGION_HEADER_LENGTH){
-//                continue;
-//            }
-//
-//            /** @var int[] $data */
-//            $data = unpack("N*", $headerRaw);
-//            for($i = 0; $i < 1024; $i++) {
-//                if($data[$i + 1] >> 8 !== 0 && $data[$i + 1] & 0xff !== 0) {
-//                    $chunks[] = [$regionX + ($i & 0x1f), $regionZ + (($i >> 5) & 0x1f)];
-//                }
-//            }
         }
 
         return $chunks;

@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\utils;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
 
@@ -43,209 +43,47 @@ class RotationUtil {
     public const Z_AXIS = 2;
 
     /**
-     * @param BlockList $list
+     * @param BlockArray $blockArray
      * @param int $axis
-     * @param int $rotation
+     * @param int $degrees
      *
-     * @return BlockList
+     * @return BlockArray
      */
-    public static function rotate(BlockList $list, int $axis, int $rotation = RotationUtil::ROTATE_0): BlockList {
-        if($rotation === self::ROTATE_0) {
-            return $list;
+    public static function rotate(BlockArray $blockArray, int $axis, int $degrees): BlockArray {
+        $degrees = Math::getBasicDegrees(360 - $degrees);
+        if($degrees == 0) {
+            return $blockArray;
         }
 
-        $blockList = new BlockList();
-        $blockList->setLevel($list->getLevel());
-
-        $backwardsVector = self::moveBlocksToCoordinatesAxisOrigin($blockList);
-
-        switch ($rotation) {
-            case self::ROTATE_90:
-                $blockList = self::rotate90($list, $axis);
-                break;
-            case self::ROTATE_180:
-                $blockList = self::rotate180($list, $axis);
-                break;
-            case self::ROTATE_270:
-                $blockList = self::rotate270($list, $axis);
-                break;
-        }
-
-        $blockList->getMetadata()->recalculateMetadata();
-        $blockList->add($backwardsVector);
-
-        return $blockList;
-    }
-
-    /**
-     * @param BlockList $list
-     * @param int $axis
-     *
-     * @return BlockList
-     */
-    private static function rotate90(BlockList $list, int $axis): BlockList {
+        $modifiedBlockArray = new BlockArray();
         switch ($axis) {
             case self::Y_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $x = $metadata->maxZ-$block->getZ();
-                    $z = $block->getX();
-                    $newList->addBlock(new Vector3($x, $block->getY(), $z), RotationHelper::rotate90($block));
+                foreach ($blockArray->read() as [$x, $y, $z, $id, $meta]) {
+                    $dist = sqrt(Math::lengthSquared2d($x, $z));
+                    $alfa = Math::getBasicDegrees(atan2($y, $x) + $degrees);
+                    $modifiedBlockArray->addBlock(new Vector3($dist * cos($alfa), $y, $dist * sin($alfa)), $id, $meta);
                 }
-                return $newList;
-
+                $blockArray->buffer = $modifiedBlockArray->buffer;
+                return $blockArray;
             case self::X_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $y = $metadata->maxY-$block->getZ();
-                    $z = $block->getY();
-                    $newList->addBlock(new Vector3($block->getX(), $y, $z), $block);
+                foreach ($blockArray->read() as [$x, $y, $z, $id, $meta]) {
+                    $dist = sqrt(Math::lengthSquared2d($y, $z));
+                    $alfa = Math::getBasicDegrees(atan2($y, $z) + $degrees);
+                    $modifiedBlockArray->addBlock(new Vector3($x, $dist * cos($alfa), $dist * sin($alfa)), $id, $meta);
                 }
-                return $newList;
-
+                $blockArray->buffer = $modifiedBlockArray->buffer;
+                return $blockArray;
             case self::Z_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $x = $metadata->maxX-$block->getY();
-                    $y = $block->getX();
-                    $newList->addBlock(new Vector3($x, $y, $block->getZ()), $block);
+                foreach ($blockArray->read() as [$x, $y, $z, $id, $meta]) {
+                    $dist = sqrt(Math::lengthSquared2d($x, $y));
+                    $alfa = Math::getBasicDegrees(atan2($x, $y) + $degrees);
+                    $modifiedBlockArray->addBlock(new Vector3($dist * cos($alfa), $dist * sin($alfa), $z), $id, $meta);
                 }
-                return $newList;
-
+                $blockArray->buffer = $modifiedBlockArray->buffer;
+                return $blockArray;
             default:
-                return $list;
+                return $blockArray;
         }
-    }
-
-    /**
-     * @param BlockList $list
-     * @param int $axis
-     *
-     * @return BlockList
-     */
-    private static function rotate180(BlockList $list, int $axis): BlockList {
-        switch ($axis) {
-            case self::Y_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $x = $metadata->maxX-$block->getX();
-                    $z = $metadata->maxZ-$block->getZ();
-                    $newList->addBlock(new Vector3($x, $block->getY(), $z), RotationHelper::rotate180($block));
-                }
-                return $newList;
-
-            case self::X_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $y = $metadata->maxY-$block->getY();
-                    $z = $metadata->maxZ-$block->getZ();
-                    $newList->addBlock(new Vector3($block->getX(), $y, $z), $block);
-                }
-                return $newList;
-
-            case self::Z_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $x = $metadata->maxX-$block->getX();
-                    $y = $metadata->maxY-$block->getY();
-                    $newList->addBlock(new Vector3($x, $y, $block->getZ()), $block);
-                }
-                return $newList;
-
-            default:
-                return $list;
-        }
-    }
-
-    /**
-     * @param BlockList $list
-     * @param int $axis
-     *
-     * @return BlockList
-     */
-    private static function rotate270(BlockList $list, int $axis): BlockList {
-        switch ($axis) {
-            case self::Y_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $x = $block->getZ();
-                    $z = $metadata->maxX - $block->getX();
-                    $newList->addBlock(new Vector3($x, $block->getY(), $z), RotationHelper::rotate270($block));
-                }
-                return $newList;
-
-            case self::X_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $y = $block->getZ();
-                    $z = $metadata->maxZ - $block->getY();
-                    $newList->addBlock(new Vector3($block->getX(), $y, $z), $block);
-                }
-                return $newList;
-
-            case self::Z_AXIS:
-                $newList = new BlockList();
-                $newList->setLevel($list->getLevel());
-
-                $metadata = $list->getMetadata();
-
-                foreach ($list->getAll() as $block) {
-                    $x = $block->getY();
-                    $y = $metadata->maxY - $block->getX();
-                    $newList->addBlock(new Vector3($x, $y, $block->getZ()), $block);
-                }
-                return $newList;
-
-            default:
-                return $list;
-        }
-    }
-
-    /**
-     * @param BlockList $list
-     * @return Vector3
-     */
-    private static function moveBlocksToCoordinatesAxisOrigin(BlockList $list): Vector3 {
-        $metadata = $list->getMetadata();
-
-        $toAdd = new Vector3(-$metadata->minX, -$metadata->minY, -$metadata->minZ);
-        $list->add($toAdd);
-
-        $metadata->recalculateMetadata();
-
-        return (new Vector3())->subtract($toAdd);
     }
 
     /**

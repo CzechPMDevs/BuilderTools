@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
+use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\Player;
@@ -32,9 +32,9 @@ use pocketmine\Player;
  */
 class Canceller extends Editor {
 
-    /** @var BlockList[][] $undoData */
+    /** @var UpdateLevelData[][] $undoData */
     public $undoData = [];
-    /** @var BlockList[][] $redoData */
+    /** @var UpdateLevelData[][] $redoData */
     public $redoData = [];
 
     /**
@@ -46,9 +46,9 @@ class Canceller extends Editor {
 
     /**
      * @param Player $player
-     * @param BlockList $blocks
+     * @param UpdateLevelData $blocks
      */
-    public function addStep(Player $player, BlockList $blocks) {
+    public function addStep(Player $player, UpdateLevelData $blocks) {
         $this->undoData[$player->getName()][] = $blocks;
     }
 
@@ -58,26 +58,22 @@ class Canceller extends Editor {
      */
     public function undo(Player $player): EditorResult {
         if(!isset($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
-            $player->sendMessage(BuilderTools::getPrefix()."§cThere are not actions to undo!");
+            $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to undo!");
             return new EditorResult(0, 0, true);
         }
 
         $blockList = array_pop($this->undoData[$player->getName()]);
 
         /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(static::FILLER);
-
-        return $filler->fill($player, $blockList, [
-            "saveUndo" => false,
-            "saveRedo" => true
-        ]);
+        $filler = BuilderTools::getEditor(self::FILLER);
+        return $filler->fill($player, $blockList, false, true);
     }
 
     /**
      * @param Player $player
-     * @param BlockList $blocks
+     * @param UpdateLevelData $blocks
      */
-    public function addRedo(Player $player, BlockList $blocks) {
+    public function addRedo(Player $player, UpdateLevelData $blocks) {
         $this->redoData[$player->getName()][] = $blocks;
     }
 
@@ -87,14 +83,14 @@ class Canceller extends Editor {
      */
     public function redo(Player $player): EditorResult {
         if(!isset($this->redoData[$player->getName()]) || count($this->redoData[$player->getName()]) == 0) {
-            $player->sendMessage(BuilderTools::getPrefix()."§cThere are not actions to redo!");
+            $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to redo!");
             return new EditorResult(0, 0, true);
         }
 
         $blockList = array_pop($this->redoData[$player->getName()]);
 
         /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(static::FILLER);
+        $filler = BuilderTools::getEditor(self::FILLER);
         return $filler->fill($player, $blockList);
     }
 }

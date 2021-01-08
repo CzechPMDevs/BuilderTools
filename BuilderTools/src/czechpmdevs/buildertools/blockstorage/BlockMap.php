@@ -28,6 +28,8 @@ use pocketmine\math\Vector3;
 /**
  * Class BlockMap
  * @package czechpmdevs\buildertools\editors\object
+ *
+ * @deprecated
  */
 class BlockMap extends BlockList {
 

@@ -20,11 +20,11 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
+use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
-use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
@@ -45,54 +45,37 @@ class Filler extends Editor {
      * @param string $blockArgs
      * @param bool $filled
      *
-     * @return BlockList
+     * @return UpdateLevelData
      */
-    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, $filled = true): BlockList {
-        $blockList = new BlockList;
-        $blockList->setLevel($level);
+    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, $filled = true): UpdateLevelData {
+        $updates = new UpdateLevelData();
+        $updates->setLevel($level);
 
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
-            if(!$filled) {
-                if($x != min($pos1->getX(), $pos2->getX()) && $x != max($pos1->getX(), $pos2->getX())) {
-                    if($y != min($pos1->getY(), $pos2->getY()) && $y != max($pos1->getY(), $pos2->getY())) {
-                        if($z != min($pos1->getZ(), $pos2->getZ()) && $z != max($pos1->getZ(), $pos2->getZ())) {
-                            continue;
-                        }
-                    }
-                }
-            }
-
-            $blockList->addBlock(new Vector3($x, $y, $z), $this->getBlockFromString($blockArgs));
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2, !$filled) as $vector3) {
+            $updates->addBlock($vector3, ...$this->getBlockArgsFromString($blockArgs));
         }
 
-        return $blockList;
+        return $updates;
     }
 
 
     /**
      * @param Player $player
-     * @param BlockList $blockList
-     * @param bool[] $settings
+     * @param UpdateLevelData $updateData
+     * @param bool $saveUndo
+     * @param bool $saveRedo
+     * @param bool $replaceOnlyAir
      *
      * @return EditorResult
      */
-    public function fill(Player $player, BlockList $blockList, array $settings = []): EditorResult {
+    public function fill(Player $player, UpdateLevelData $updateData, bool $saveUndo = true, bool $saveRedo = false, bool $replaceOnlyAir = false): EditorResult {
         $startTime = microtime(true);
-        $count = count($blockList->getAll());
+        $count = $updateData->size();
 
-        $saveUndo = true;
-        $saveRedo = false;
+        $undoArray = $saveUndo ? (new UpdateLevelData())->setLevel($updateData->getLevel()) : null;
+        $redoArray = $saveRedo ? (new UpdateLevelData())->setLevel($updateData->getLevel()) : null;
 
-        if(isset($settings["saveUndo"]) && is_bool($settings["saveUndo"])) $saveUndo = $settings["saveUndo"];
-        if(isset($settings["saveRedo"]) && is_bool($settings["saveRedo"])) $saveRedo = $settings["saveRedo"];
-
-        $undoList = new BlockList;
-        $redoList = new BlockList;
-
-        if($saveUndo) $undoList->setLevel($blockList->getLevel());
-        if($saveRedo) $redoList->setLevel($blockList->getLevel());
-
-        $iterator = new SubChunkIteratorManager($blockList->getLevel());
+        $iterator = new SubChunkIteratorManager($updateData->getLevel());
 
         /** @var int|null $minX */
         $minX = null;
@@ -103,73 +86,100 @@ class Filler extends Editor {
         /** @var int|null $maxZ */
         $maxZ = null;
 
-        $reloadChunks = function (Level $level, int $x1, int $z1, int $x2, int $z2) {
-            for($x = $x1 >> 4; $x <= $x2 >> 4; $x++) {
-                for($z = $z1 >> 4; $z <= $z2 >> 4; $z++) {
-                    $tiles = $level->getChunkTiles($x, $z);
-                    $chunk = $level->getChunk($x, $z);
-                    $level->setChunk($x, $z, $chunk);
-
-                    foreach ($tiles as $tile) {
-                        $tile->closed = false;
-                        $tile->setLevel($level);
-                        $level->addTile($tile);
-                    }
-
-
-                    foreach ($level->getChunkLoaders($x, $z) as $chunkLoader) {
-                        if($chunkLoader instanceof Player) {
-                            if(class_exists(FullChunkDataPacket::class)) {
-                                $pk = new FullChunkDataPacket();
-                                $pk->chunkX = $x;
-                                $pk->chunkZ = $z;
-                                $pk->data = $chunk->networkSerialize();
-                            }
-                            else {
-                                $pk = LevelChunkPacket::withoutCache($x, $z, $chunk->getSubChunkSendCount(), $chunk->networkSerialize());
-                            }
-                            $chunkLoader->dataPacket($pk);
-                        }
-                    }
-                }
-            }
-        };
-
-        while (($block = $blockList->getLast()) !== null) {
+        /**
+         * @var
+         */
+        foreach ($updateData->read() as [$x, $y, $z, $id, $meta]) {
             // min and max positions
-            if($minX === null || $block->getX() < $minX) $minX = $block->getX();
-            if($minZ === null || $block->getZ() < $minZ) $minZ = $block->getZ();
-            if($maxX === null || $block->getX() > $maxX) $maxX = $block->getX();
-            if($maxZ === null || $block->getZ() > $maxZ) $maxZ = $block->getZ();
+            if($minX === null || $x < $minX) $minX = $x;
+            if($minZ === null || $z < $minZ) $minZ = $z;
+            if($maxX === null || $x > $maxX) $maxX = $x;
+            if($maxZ === null || $z > $maxZ) $maxZ = $z;
 
-            $iterator->moveTo((int)$block->getX(), (int)$block->getY(), (int)$block->getZ());
+            $iterator->moveTo((int)$x, (int)$y, (int)$z);
 
             if($iterator->currentSubChunk === null) {
-                $this->getPlugin()->getLogger()->error("Error while filling: Could not found sub chunk at {$block->getX()}:{$block->getY()}:{$block->getZ()}");
+                $this->getPlugin()->getLogger()->error("Error while filling: Could not found sub chunk at {$x}:{$y}:{$z}");
                 continue;
             }
 
-            if($saveUndo) $undoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
-            if($saveRedo) $redoList->addBlock($block->asVector3(), Block::get($iterator->currentSubChunk->getBlockId($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f), $iterator->currentSubChunk->getBlockData($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f)));
-            $iterator->currentSubChunk->setBlock($block->getX() & 0x0f, $block->getY() & 0x0f, $block->getZ() & 0x0f, $block->getId(), $block->getDamage());
+            if($replaceOnlyAir) {
+                if($iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f) != BlockIds::AIR) {
+                    continue;
+                }
+            }
+
+            if($saveUndo)
+                $undoArray->addBlock(new Vector3($x, $y, $z), $iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f), $iterator->currentSubChunk->getBlockData($x & 0x0f, $y & 0x0f, $z & 0x0f));
+            if($saveRedo)
+                $redoArray->addBlock(new Vector3($x, $y, $z), $iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f), $iterator->currentSubChunk->getBlockData($x & 0x0f, $y & 0x0f, $z & 0x0f));
+
+            $iterator->currentSubChunk->setBlock($x & 0x0f, $y & 0x0f, $z & 0x0f, $id, $meta);
         }
 
-        $reloadChunks($blockList->getLevel(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
+        $this->reloadChunks($player->getLevel(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
 
         if($saveUndo) {
             /** @var Canceller $canceller */
             $canceller = BuilderTools::getEditor(static::CANCELLER);
-            $canceller->addStep($player, $undoList);
+            $canceller->addStep($player, $undoArray);
         }
-
         if($saveRedo) {
             /** @var Canceller $canceller */
             $canceller = BuilderTools::getEditor(static::CANCELLER);
-            $canceller->addRedo($player, $redoList);
+            $canceller->addRedo($player, $redoArray);
         }
 
-
         return new EditorResult($count, microtime(true)-$startTime);
+    }
+
+    /**
+     * @param Player $player
+     * @param UpdateLevelData $updateData
+     * @param bool $saveUndo
+     * @param bool $saveRedo
+     *
+     * @return EditorResult
+     */
+    public function merge(Player $player, UpdateLevelData $updateData, bool $saveUndo = true, bool $saveRedo = false): EditorResult {
+        return $this->fill($player, $updateData, $saveUndo, $saveRedo, true);
+    }
+
+    /**
+     * @param Level $level
+     * @param int $minX
+     * @param int $minZ
+     * @param int $maxX
+     * @param int $maxZ
+     */
+    private function reloadChunks(Level $level, int $minX, int $minZ, int $maxX, int $maxZ): void {
+        for($x = $minX >> 4; $x <= $maxX >> 4; $x++) {
+            for ($z = $minZ >> 4; $z <= $maxZ >> 4; $z++) {
+                $tiles = $level->getChunkTiles($x, $z);
+                $chunk = $level->getChunk($x, $z);
+                $level->setChunk($x, $z, $chunk);
+
+                foreach ($tiles as $tile) {
+                    $tile->closed = false;
+                    $tile->setLevel($level);
+                    $level->addTile($tile);
+                }
+
+                foreach ($level->getChunkLoaders($x, $z) as $chunkLoader) {
+                    if ($chunkLoader instanceof Player) {
+                        if (!class_exists(LevelChunkPacket::class)) {
+                            $pk = new FullChunkDataPacket();
+                            $pk->chunkX = $x;
+                            $pk->chunkZ = $z;
+                            $pk->data = $chunk->networkSerialize();
+                        } else {
+                            $pk = LevelChunkPacket::withoutCache($x, $z, $chunk->getSubChunkSendCount(), $chunk->networkSerialize());
+                        }
+                        $chunkLoader->dataPacket($pk);
+                    }
+                }
+            }
+        }
     }
 
     /**

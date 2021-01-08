@@ -20,8 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
-use czechpmdevs\buildertools\blockstorage\BlockMap;
+use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
@@ -44,10 +43,6 @@ class Printer extends Editor {
     public const HOLLOW_SPHERE = 0x04;
     public const HOLLOW_CYLINDER = 0x05;
 
-    public const X_AXIS = 0x01;
-    public const Y_AXIS = 0x02;
-    public const Z_AXIS = 0x03;
-
     /**
      * @param Player $player
      * @param Position $center
@@ -57,7 +52,8 @@ class Printer extends Editor {
      * @param bool $throwBlock
      */
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false) {
-        $undoList = new BlockList();
+        $undoList = new UpdateLevelData();
+        $undoList->setLevel($center->getLevel());
         $center = Math::roundPosition($center);
 
         $placeBlock = function (Vector3 $vector3) use ($undoList, $block, $center, $throwBlock) {
@@ -68,7 +64,8 @@ class Printer extends Editor {
                 return;
             }
 
-            $undoList->addBlock($vector3, $center->getLevel()->getBlock($vector3));
+            $fullBlock = $center->getLevel()->getBlock($vector3);
+            $undoList->addBlock($vector3, $fullBlock->getId(), $fullBlock->getDamage());
             $center->getLevel()->setBlockIdAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getId());
             $center->getLevel()->setBlockDataAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getDamage());
         };
@@ -141,18 +138,17 @@ class Printer extends Editor {
     public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
 
-        $blockMap = new BlockMap();
-        $blockMap->setLevel($center->getLevel());
+        $updateLevelData = new UpdateLevelData(true);
+        $updateLevelData->setLevel($center->getLevel());
 
         $radius = abs($radius);
-
         foreach (BlockGenerator::generateSphere($radius, $hollow) as $vector3) {
-            $blockMap->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
+            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
         }
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->fill($player, $blockMap);
+        return $filler->fill($player, $updateLevelData);
     }
 
     /**
@@ -180,8 +176,8 @@ class Printer extends Editor {
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
         $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
 
-        $blockList = new BlockList();
-        $blockList->setLevel($center->getLevel());
+        $updateLevelData = new UpdateLevelData();
+        $updateLevelData->setLevel($center->getLevel());
 
         if($height == 0) {
             return new EditorResult(0, 0, true);
@@ -194,12 +190,12 @@ class Printer extends Editor {
 
         $radius = abs($radius);
         foreach (BlockGenerator::generateCylinder($radius, $height, $hollow) as $vector3) {
-            $blockList->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
+            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
         }
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->fill($player, $blockList);
+        return $filler->fill($player, $updateLevelData);
     }
 
     /**
@@ -225,30 +221,16 @@ class Printer extends Editor {
      * @return EditorResult
      */
     public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
-        $blockList = new BlockList();
-        $blockList->setLevel($center->getLevel());
+        $updateLevelData = new UpdateLevelData();
+        $updateLevelData->setLevel($center->getLevel());
 
         foreach (BlockGenerator::generatePyramid($size, $hollow) as $vector3) {
-            $blockList->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
+            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
         }
-//        $height = $size;
-//        for ($y = 0; $y <= $height; ++$y) {
-//            $size--;
-//            for ($x = 0; $x <= $size; ++$x) {
-//                for ($z = 0; $z <= $size; ++$z) {
-//                    if ((!$hollow && $z <= $size && $x <= $size) || $z == $size || $x == $size) {
-//                        $blockList->addBlock($center->add($x, $y, $z), $this->getBlockFromString($blocks));
-//                        $blockList->addBlock($center->add(-$x, $y, $z), $this->getBlockFromString($blocks));
-//                        $blockList->addBlock($center->add($x, $y, -$z), $this->getBlockFromString($blocks));
-//                        $blockList->addBlock($center->add(-$x, $y, -$z), $this->getBlockFromString($blocks));
-//                    }
-//                }
-//            }
-//        }
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->fill($player, $blockList);
+        return $filler->fill($player, $updateLevelData);
     }
 
     /**
@@ -274,16 +256,16 @@ class Printer extends Editor {
      */
     public function makeCube(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $blockList = new BlockList();
-        $blockList->setLevel($center->getLevel());
+        $updateLevelData = new UpdateLevelData();
+        $updateLevelData->setLevel($center->getLevel());
 
         foreach (BlockGenerator::generateCube($radius, $hollow) as $vector3) {
-            $blockList->addBlock($center->add($vector3), $this->getBlockFromString($blocks));
+            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
         }
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->fill($player, $blockList);
+        return $filler->fill($player, $updateLevelData);
     }
 
     /**

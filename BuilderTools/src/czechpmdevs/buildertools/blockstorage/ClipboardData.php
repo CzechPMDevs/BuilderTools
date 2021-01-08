@@ -26,12 +26,13 @@ use pocketmine\Player;
 /**
  * Class ClipboardData
  * @package czechpmdevs\buildertools\editors\blockstorage
+ *
+ * @deprecated
  */
 class ClipboardData extends BlockList {
 
     /** @var Player $player */
     private Player $player;
-
     /** @var Vector3 $playerPosition */
     private Vector3 $playerPosition;
 

@@ -29,6 +29,8 @@ use pocketmine\math\Vector3;
 /**
  * Class BlockList
  * @package buildertools\editors\object
+ *
+ * @deprecated
  */
 class BlockList implements BlockStorage {
 
