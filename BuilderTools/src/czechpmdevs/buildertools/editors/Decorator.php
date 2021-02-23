@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
@@ -47,7 +47,7 @@ class Decorator extends Editor {
      * @param null $player
      */
     public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, $player = null) {
-        $undo = new UpdateLevelData();
+        $undo = new BlockArray();
         for ($x = $center->getX()-$radius; $x <= $center->getX()+$radius; $x++) {
             for ($z = $center->getZ()-$radius; $z <= $center->getZ()+$radius; $z++) {
                 if(rand(1, 100) <= $percentage) {

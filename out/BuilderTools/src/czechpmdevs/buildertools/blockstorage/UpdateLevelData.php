@@ -4,46 +4,40 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
+use Generator;
 use pocketmine\level\Level;
 
 /**
- * Class UpdateLevelData
+ * Interface UpdateLevelData
  * @package czechpmdevs\buildertools\blockstorage
  */
-class UpdateLevelData extends BlockArray {
-
-    /** @var Level|null $level */
-    protected $level = null;
+interface UpdateLevelData {
 
     /**
-     * @return Level|null
-     */
-    public function getLevel(): ?Level {
-        return $this->level;
-    }
-
-    /**
-     * @param Level|null $level
+     * @deprecated
      *
-     * @return $this
+     * @return Generator<int, int, int, int, int>
      */
-    public function setLevel(?Level $level) {
-        $this->level = $level;
-
-        return $this;
-    }
+    public function read(): Generator;
 
     /**
-     * @param BlockArray $blockArray
-     * @param Level|null $level
-     *
-     * @return UpdateLevelData
+     * Returns if it is possible read next blocks
      */
-    public static function fromBlockArray(BlockArray $blockArray, ?Level $level = null): UpdateLevelData {
-        $data = new UpdateLevelData($blockArray->detectingDuplicates());
-        $data->buffer = $blockArray->buffer;
-        $data->offset = $blockArray->offset;
+    public function hasNext(): bool;
 
-        return $data->setLevel($level);
-    }
+    /**
+     * Reads next block from the array
+     */
+    public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
+
+    /**
+     * Returns how many blocks should have been
+     * updated
+     */
+    public function size(): int;
+
+    /**
+     * Should not be null when used in filler
+     */
+    public function getLevel(): ?Level;
 }

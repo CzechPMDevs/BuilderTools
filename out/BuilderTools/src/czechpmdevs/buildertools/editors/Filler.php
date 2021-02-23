@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
@@ -45,10 +46,10 @@ class Filler extends Editor {
      * @param string $blockArgs
      * @param bool $filled
      *
-     * @return UpdateLevelData
+     * @return BlockArray
      */
-    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, $filled = true): UpdateLevelData {
-        $updates = new UpdateLevelData();
+    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, $filled = true): BlockArray {
+        $updates = new BlockArray();
         $updates->setLevel($level);
 
         foreach (BlockGenerator::fillCuboid($pos1, $pos2, !$filled) as $vector3) {
@@ -72,8 +73,8 @@ class Filler extends Editor {
         $startTime = microtime(true);
         $count = $updateData->size();
 
-        $undoArray = $saveUndo ? (new UpdateLevelData())->setLevel($updateData->getLevel()) : null;
-        $redoArray = $saveRedo ? (new UpdateLevelData())->setLevel($updateData->getLevel()) : null;
+        $undoArray = $saveUndo ? (new BlockArray())->setLevel($updateData->getLevel()) : null;
+        $redoArray = $saveRedo ? (new BlockArray())->setLevel($updateData->getLevel()) : null;
 
         $iterator = new SubChunkIteratorManager($updateData->getLevel());
 
@@ -86,10 +87,10 @@ class Filler extends Editor {
         /** @var int|null $maxZ */
         $maxZ = null;
 
-        /**
-         * @var
-         */
-        foreach ($updateData->read() as [$x, $y, $z, $id, $meta]) {
+        $x = $y = $z = $id = $meta = null;
+        while ($updateData->hasNext()) {
+            $updateData->readNext($x, $y, $z, $id, $meta);
+
             // min and max positions
             if($minX === null || $x < $minX) $minX = $x;
             if($minZ === null || $z < $minZ) $minZ = $z;
@@ -99,7 +100,8 @@ class Filler extends Editor {
             $iterator->moveTo((int)$x, (int)$y, (int)$z);
 
             if($iterator->currentSubChunk === null) {
-                $this->getPlugin()->getLogger()->error("Error while filling: Could not found sub chunk at {$x}:{$y}:{$z}");
+                $iterator->currentSubChunk = $iterator->level->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4, true);
+                $this->getPlugin()->getLogger()->error("Error while filling: Could not find sub chunk at {$x}:{$y}:{$z}");
                 continue;
             }
 

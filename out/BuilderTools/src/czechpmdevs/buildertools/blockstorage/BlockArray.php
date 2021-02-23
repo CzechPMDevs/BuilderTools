@@ -32,20 +32,19 @@ use pocketmine\math\Vector3;
  * Class BlockArray
  * @package czechpmdevs\buildertools\blockstorage
  */
-class BlockArray {
+class BlockArray implements UpdateLevelData {
+    use DuplicateBlockDetector;
 
     /** @var string $buffer */
     public $buffer = "";
     /** @var int $offset */
     public $offset = 0;
 
-    /** @var bool $detectDuplicates */
-    protected $detectDuplicates = false;
-    /** @var string $duplicateCache */
-    protected $duplicateCache = "";
-
     /** @var BlockArraySizeData|null $sizeData */
     protected $sizeData = null;
+
+    /** @var Level|null $level */
+    protected $level = null;
 
     /**
      * BlockArray constructor.
@@ -64,7 +63,7 @@ class BlockArray {
      */
     public function addBlock(Vector3 $vector3, int $id, int $meta) {
         $binHash = pack("q", Level::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ()));
-        if($this->detectDuplicates) {
+        if($this->detectingDuplicates()) {
             if($this->isDuplicate($binHash)) {
                 return $this;
             }
@@ -80,49 +79,38 @@ class BlockArray {
     }
 
     /**
-     * Check if vector is already used
-     *
-     * @param string $binHash
-     * @return bool
+     * Returns if it is possible read next block from the array
      */
-    protected function isDuplicate(string $binHash): bool {
-        for($i = 0; ($j = (strpos($this->duplicateCache, $binHash, $i))) !== false; $i++) {
-            if($j % 8 == 0) {
-                return true;
-            }
-        }
-
-        return false;
+    public function hasNext(): bool {
+        return $this->offset + 10 <= strlen($this->buffer);
     }
 
     /**
-     * @param Vector3|null $vector3
-     * @param int|null $id
-     * @param int|null $meta
+     * Reads next block in the array
      */
-    public function nextBlock(?Vector3 &$vector3, ?int &$id, ?int &$meta): void {
+    public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void {
         $id = ord($this->buffer[$this->offset++]);
         $meta = ord($this->buffer[$this->offset++]);
 
         $hash = unpack("q", substr($this->buffer, $this->offset, 8))[1] ?? 0;
         Level::getBlockXYZ($hash, $x, $y, $z);
-
-        $vector3 = new Vector3($x, $y, $z);
         $this->offset += 8;
     }
 
     /**
-     * Returns Generator<Vector3, id, meta>
+     * @deprecated
+     *
+     * Returns Generator[x, y, z, id, meta]
      * cleanGarbage removes blocks from BlockArray
      * after yield
      *
      * @param bool $cleanGarbage
-     * @return Generator<Vector3, int, int>
+     * @return Generator<int, int, int, int, int>
      */
     public function read(bool $cleanGarbage = true): Generator {
         while ($this->offset < strlen($this->buffer)) {
-            $this->nextBlock($vector, $id, $meta);
-            yield [$vector->getX(), $vector->getY(), $vector->getZ(), $id, $meta];
+            $this->readNext($x, $y, $z, $id, $meta);
+            yield [$x, $y, $z, $id, $meta];
 
             if($cleanGarbage) {
                 $this->cleanGarbage();
@@ -142,11 +130,12 @@ class BlockArray {
     }
 
     /**
-     * @param Vector3 $vector3
+     * Adds Vector3 to all the blocks in BlockArray
      *
-     * @return BlockArray
+     * @return self for chaining
      */
     public function addVector3(Vector3 $vector3): BlockArray {
+        $vector3 = $vector3->ceil();
         $blockArray = new BlockArray();
 
         $len = strlen($this->buffer);
@@ -158,31 +147,43 @@ class BlockArray {
             Level::getBlockXYZ($hash, $x, $y, $z);
 
             $blockArray->buffer .= pack("q", Level::blockHash($x + $vector3->getX(), $y + $vector3->getY(), $z + $vector3->getZ()));
+
+            $this->offset += 8;
         }
 
         $this->offset = 0;
 
-        return $this;
+        return $blockArray;
     }
 
     /**
-     * @param Vector3 $vector3
+     * Subtracts Vector3 from all the blocks in BlockArray
      *
-     * @return BlockArray
+     * @return self for chaining
      */
     public function subtractVector3(Vector3 $vector3): BlockArray {
         return $this->addVector3($vector3->multiply(-1));
     }
 
     /**
-     * @return BlockArraySizeData|null
+     * @return BlockArraySizeData is used for calculating dimensions
      */
-    public function getSizeData(): ?BlockArraySizeData {
+    public function getSizeData(): BlockArraySizeData {
         if($this->sizeData === null) {
             $this->sizeData = new BlockArraySizeData($this);
         }
 
         return $this->sizeData;
+    }
+
+    public function setLevel(?Level $level) {
+        $this->level = $level;
+
+        return $this;
+    }
+
+    public function getLevel(): ?Level {
+        return $this->level;
     }
 
     /**
@@ -193,17 +194,32 @@ class BlockArray {
         $this->buffer = substr($this->buffer, $this->offset);
         $this->offset = 0;
     }
+}
+
+trait DuplicateBlockDetector {
+
+    /** @var bool */
+    protected $detectDuplicates = false;
+    /** @var string */
+    protected $duplicateCache = "";
 
     /**
-     * @return bool
+     * Check if vector is already used in the array
      */
+    protected function isDuplicate(string $binHash): bool {
+        for($i = 0; ($j = (strpos($this->duplicateCache, $binHash, $i))) !== false; $i++) {
+            if($j % 8 == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function detectingDuplicates(): bool {
         return $this->detectDuplicates;
     }
 
-    /**
-     * Cancels duplicate vector detection and removes cache
-     */
     public function cancelDuplicateDetection(): void {
         $this->detectDuplicates = false;
         $this->duplicateCache = "";

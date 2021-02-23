@@ -95,12 +95,14 @@ class BuilderTools extends PluginBase {
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
+
         $this->initConfig();
         $this->registerCommands();
         $this->initListener();
         $this->registerEditors();
         $this->registerEnchantment();
         $this->sendWarnings();
+
         self::$schematicsManager = new SchematicsManager($this);
     }
 
@@ -166,9 +168,11 @@ class BuilderTools extends PluginBase {
             new MoveCommand,
             new CutCommand
         ];
+
         foreach (self::$commands as $command) {
             $map->register("BuilderTools", $command);
         }
+
         HelpCommand::buildPages();
     }
 

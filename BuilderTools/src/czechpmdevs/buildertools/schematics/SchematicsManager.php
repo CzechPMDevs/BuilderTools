@@ -20,9 +20,17 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
-use czechpmdevs\buildertools\async\SchematicLoadTask;
+use czechpmdevs\buildertools\async\schematics\MCEditLoadTask;
+use czechpmdevs\buildertools\async\schematics\MCEditSaveTask;
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
+use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\schematics\format\MCEditSchematics;
+use czechpmdevs\buildertools\Selectors;
+use Exception;
+use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Player;
 
 /**
@@ -31,12 +39,15 @@ use pocketmine\Player;
  */
 class SchematicsManager {
 
+    public const SCHEMATIC_MCEDIT_FORMAT = 0x00;
+    public const SCHEMATIC_UNKNOWN_FORMAT = 0x01;
+
     /** @var BuilderTools $plugin */
     protected BuilderTools $plugin;
 
-    /** @var Schematic[] $schematics */
+    /** @var SchematicData[] $schematics */
     public array $schematics = [];
-    /** @var Schematic[] $players */
+    /** @var SchematicData[] $players */
     public array $players;
 
     /**
@@ -53,25 +64,23 @@ class SchematicsManager {
         if(!file_exists($this->getPlugin()->getDataFolder() . "schematics")) {
             @mkdir($this->getPlugin()->getDataFolder() . "schematics");
         }
-        if(!file_exists($this->getPlugin()->getDataFolder() . "schematics")) {
-            @mkdir($this->getPlugin()->getDataFolder() . "schematics");
-        }
     }
 
     public function loadSchematics() {
         $this->schematics = [];
-        //$unloaded = BuilderTools::getConfiguration()["schematics"]["load"] != "startup";
+
+        $count = 0;
         foreach (glob($this->plugin->getDataFolder() . "schematics/*.schematic") as $file) {
             $this->loadSchematic($file);
+            $count++;
         }
     }
 
     /**
      * @param string $file
-     * @param Schematic $schematic
+     * @param SchematicData $schematic
      */
-    public function registerSchematic(string $file, Schematic $schematic) {
-        $schematic->file = $file;
+    public function registerSchematic(string $file, SchematicData $schematic) {
         $this->schematics[basename($file, ".schematic")] = $schematic;
     }
 
@@ -80,14 +89,38 @@ class SchematicsManager {
      */
     public function loadSchematic(string $path) {
         $this->plugin->getLogger()->info("Loading schematic from $path...");
-        $this->plugin->getServer()->getAsyncPool()->submitTask(new SchematicLoadTask($path));
+        switch ($this->getSchematicFormat($path)) {
+            case self::SCHEMATIC_MCEDIT_FORMAT:
+                $this->plugin->getServer()->getAsyncPool()->submitTask(new MCEditLoadTask($path));
+                break;
+            case self::SCHEMATIC_UNKNOWN_FORMAT:
+                $this->plugin->getLogger()->error("Unrecognised schematics format for file $path");
+                break;
+        }
+    }
+
+    /**
+     * @param string $path
+     * @return int
+     */
+    private function getSchematicFormat(string $path): int {
+        try {
+            /** @var CompoundTag $data */
+            $data = (new BigEndianNBTStream())->readCompressed(file_get_contents($path));
+            if($data->offsetExists("Blocks") && $data->offsetExists("Data")) {
+                return self::SCHEMATIC_MCEDIT_FORMAT;
+            }
+        }
+        catch (Exception $ignore) {}
+
+        return self::SCHEMATIC_UNKNOWN_FORMAT;
     }
 
     /**
      * @param Player $player
-     * @param Schematic $schematic
+     * @param SchematicData $schematic
      */
-    public function addToPaste(Player $player, Schematic $schematic) {
+    public function addToPaste(Player $player, SchematicData $schematic) {
         $this->players[$player->getName()] = $schematic;
     }
 
@@ -102,42 +135,35 @@ class SchematicsManager {
             return false;
         }
 
-        $schematic = $this->players[$player->getName()];
-        $blockList = $schematic->getBlockList();
+        $schematic = $this->players[$player->getName()]->addVector3($player);
+        $schematic->setLevel($player->getLevel());
 
-        if($blockList === null) {
-            $player->sendMessage(BuilderTools::getPrefix() . "§cInvalid schematic format (Sponge) isn't supported.");
-            return false;
-        }
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $filler->fill($player, $schematic);
 
-        $blockList->setLevel($player->getLevel());
-        $blockList = $blockList->add($player);
-
-        $filler = new Filler;
-        $filler->fill($player, $blockList);
         $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
         return true;
     }
 
+    public function createSchematic(Player $player, string $file) {
+        $schematic = new MCEditSchematics();
+        $schematic->setFile($file);
+        $schematic->setAxisVector(Math::calculateAxisVec(Selectors::getPosition($player, 1), Selectors::getPosition($player, 2)));
+
+        $this->getPlugin()->getServer()->getAsyncPool()->submitTask(new MCEditSaveTask($schematic));
+    }
+
     /**
      * @param string $name
-     * @return Schematic|null
+     * @return SchematicData|null
      */
-    public function getSchematic(string $name): ?Schematic {
+    public function getSchematic(string $name): ?SchematicData {
         return $this->schematics[$name] ?? null;
     }
 
     /**
-     * @return Schematic[] $schematics
-     */
-    public function getLoadedSchematics(): array {
-        return array_filter($this->getAllSchematics(), function (Schematic $value) {
-            return $value->isLoaded;
-        }, ARRAY_FILTER_USE_BOTH);
-    }
-
-    /**
-     * @return Schematic[] $schematics
+     * @return SchematicData[] $schematics
      */
     public function getAllSchematics(): array {
         return $this->schematics;

@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\Player;
@@ -32,9 +32,9 @@ use pocketmine\Player;
  */
 class Canceller extends Editor {
 
-    /** @var UpdateLevelData[][] $undoData */
+    /** @var BlockArray[][] $undoData */
     public array $undoData = [];
-    /** @var UpdateLevelData[][] $redoData */
+    /** @var BlockArray[][] $redoData */
     public array $redoData = [];
 
     /**
@@ -46,9 +46,9 @@ class Canceller extends Editor {
 
     /**
      * @param Player $player
-     * @param UpdateLevelData $blocks
+     * @param BlockArray $blocks
      */
-    public function addStep(Player $player, UpdateLevelData $blocks) {
+    public function addStep(Player $player, BlockArray $blocks) {
         $this->undoData[$player->getName()][] = $blocks;
     }
 
@@ -71,9 +71,9 @@ class Canceller extends Editor {
 
     /**
      * @param Player $player
-     * @param UpdateLevelData $blocks
+     * @param BlockArray $blocks
      */
-    public function addRedo(Player $player, UpdateLevelData $blocks) {
+    public function addRedo(Player $player, BlockArray $blocks) {
         $this->redoData[$player->getName()][] = $blocks;
     }
 

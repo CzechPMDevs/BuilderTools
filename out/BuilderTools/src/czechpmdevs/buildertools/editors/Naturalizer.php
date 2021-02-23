@@ -20,8 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
-use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\block\Block;
@@ -50,7 +49,7 @@ class Naturalizer extends Editor {
      * @return EditorResult
      */
     public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player): EditorResult {
-        $list = new UpdateLevelData();
+        $list = new BlockArray();
         $list->setLevel($level);
 
         for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
@@ -65,13 +64,13 @@ class Naturalizer extends Editor {
     }
 
     /**
-     * @param UpdateLevelData $list
+     * @param BlockArray $list
      * @param Vector2 $vector2
      * @param int $minY
      * @param int $maxY
      * @param Level $level
      */
-    private function fix(UpdateLevelData $list, Vector2 $vector2, int $minY, int $maxY, Level $level) {
+    private function fix(BlockArray $list, Vector2 $vector2, int $minY, int $maxY, Level $level) {
         $x = (int)$vector2->getX();
         $z = (int)$vector2->getY();
 

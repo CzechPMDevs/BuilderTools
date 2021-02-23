@@ -20,24 +20,21 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use pocketmine\math\Vector3;
 
 /**
  * Class SchematicData
  * @package czechpmdevs\buildertools\schematics
  */
-abstract class SchematicData {
+abstract class SchematicData extends BlockArray {
 
     public const MATERIALS_CLASSIC = "Classic";
     public const MATERIALS_BEDROCK = "Pocket";
     public const MATERIALS_ALPHA = "Alpha";
 
-    /** @var bool $isLoaded */
-    public $isLoaded = false;
-
-    /** @var BlockList|null $blockList */
-    protected $blockList;
+    /** @var string $file */
+    private $file;
 
     /**
      * @var int $width
@@ -61,27 +58,32 @@ abstract class SchematicData {
     protected $length;
 
     /** @var string $materialType */
-    protected $materialType;
+    protected $materialType = SchematicData::MATERIALS_BEDROCK;
 
     /**
      * SchematicData constructor.
-     * @param BlockList $blockList
-     * @param Vector3 $axisVector
-     * @param string $materialType
      */
-    public function __construct(BlockList $blockList, Vector3 $axisVector, string $materialType = SchematicData::MATERIALS_BEDROCK) {
-        $this->blockList = $blockList;
-        $this->width = $axisVector->getX();
-        $this->height = $axisVector->getY();
-        $this->length = $axisVector->getZ();
-        $this->materialType = $materialType;
+    public function __construct() {
+        parent::__construct(true);
     }
 
     /**
-     * @return BlockList|null
+     * @param string $targetFile
      */
-    public function getBlockList(): ?BlockList {
-        return $this->blockList;
+    abstract public function save(string $targetFile): void;
+
+    /**
+     * @return string
+     */
+    public function getFile(): string {
+        return $this->file;
+    }
+
+    /**
+     * @param string $file
+     */
+    public function setFile(string $file): void {
+        $this->file = $file;
     }
 
     /**
@@ -106,9 +108,32 @@ abstract class SchematicData {
     }
 
     /**
+     * @return string
+     */
+    public function getMaterialType(): string {
+        return $this->materialType;
+    }
+
+    /**
+     * @param string $materialType
+     */
+    public function setMaterialType(string $materialType): void {
+        $this->materialType = $materialType;
+    }
+
+    /**
      * @return Vector3
      */
     public function getAxisVector(): Vector3 {
         return new Vector3($this->getXAxis(), $this->getYAxis(), $this->getZAxis());
+    }
+
+    /**
+     * @param Vector3 $vector3
+     */
+    public function setAxisVector(Vector3 $vector3): void {
+        $this->width = $vector3->getX();
+        $this->height = $vector3->getY();
+        $this->length = $vector3->getZ();
     }
 }

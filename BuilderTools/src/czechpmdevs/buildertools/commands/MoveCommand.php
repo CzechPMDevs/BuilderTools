@@ -20,10 +20,9 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
@@ -77,17 +76,10 @@ class MoveCommand extends BuilderToolsCommand {
             return;
         }
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
+        /** @var Copier $copier */
+        $copier = BuilderTools::getEditor(Editor::COPIER);
+        $copier->move($firstPos, $secondPos, new Vector3((int)$args[0], (int)$args[1], (int)$args[2]), $sender);
 
-        $blocks = BlockList::build($sender->getLevel(), $firstPos, $secondPos);
-        $toFill = $blocks->add(new Vector3((int)$args[0], (int)$args[1], (int)$args[2]));
-
-        $toRemove = $filler->prepareFill($firstPos, $secondPos, $firstPos->getLevel(), "air", true);
-
-        $filler->fill($sender, $toRemove);
-        $filler->fill($sender, $toFill);
-
-        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area were successfully moved.");
+        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area has been successfully moved.");
     }
 }

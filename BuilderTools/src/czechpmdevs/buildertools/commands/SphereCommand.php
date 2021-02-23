@@ -55,6 +55,6 @@ class SphereCommand extends BuilderToolsCommand {
         $printer = BuilderTools::getEditor(Editor::PRINTER);
 
         $result = $printer->makeSphere($sender, $sender, $radius, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aSphere created in " . (string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
     }
 }

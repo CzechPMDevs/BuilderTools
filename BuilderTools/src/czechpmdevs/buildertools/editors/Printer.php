@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
@@ -52,7 +52,7 @@ class Printer extends Editor {
      * @param bool $throwBlock
      */
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false) {
-        $undoList = new UpdateLevelData();
+        $undoList = new BlockArray();
         $undoList->setLevel($center->getLevel());
         $center = Math::roundPosition($center);
 
@@ -138,7 +138,7 @@ class Printer extends Editor {
     public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
 
-        $updateLevelData = new UpdateLevelData(true);
+        $updateLevelData = new BlockArray(true);
         $updateLevelData->setLevel($center->getLevel());
 
         $radius = abs($radius);
@@ -176,7 +176,7 @@ class Printer extends Editor {
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
         $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
 
-        $updateLevelData = new UpdateLevelData();
+        $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($center->getLevel());
 
         if($height == 0) {
@@ -221,7 +221,9 @@ class Printer extends Editor {
      * @return EditorResult
      */
     public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
-        $updateLevelData = new UpdateLevelData();
+        $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
+
+        $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($center->getLevel());
 
         foreach (BlockGenerator::generatePyramid($size, $hollow) as $vector3) {
@@ -256,7 +258,7 @@ class Printer extends Editor {
      */
     public function makeCube(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $center = Math::roundPosition($center);
-        $updateLevelData = new UpdateLevelData();
+        $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($center->getLevel());
 
         foreach (BlockGenerator::generateCube($radius, $hollow) as $vector3) {

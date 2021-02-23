@@ -20,8 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
-use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
@@ -43,15 +42,15 @@ class Replacement extends Editor {
      * Blocks whose will placed
      * @param string $replace
      *
-     * @return UpdateLevelData
+     * @return BlockArray
      */
-    public function prepareReplace(Vector3 $pos1, Vector3 $pos2, Level $level, string $blocks, string $replace): UpdateLevelData {
-        $updateLevelData = new UpdateLevelData();
+    public function prepareReplace(Vector3 $pos1, Vector3 $pos2, Level $level, string $blocks, string $replace): BlockArray {
+        $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($level);
 
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
-            if($this->isBlockInString($blocks, $level->getBlockAt($x, $y, $z))) {
-                $updateLevelData->addBlock(new Vector3($x, $y, $z), ...$this->getBlockArgsFromString($replace));
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $vector3) {
+            if($this->isBlockInString($blocks, $level->getBlock($vector3))) {
+                $updateLevelData->addBlock($vector3, ...$this->getBlockArgsFromString($replace));
             }
         }
 

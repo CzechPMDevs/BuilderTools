@@ -18,11 +18,10 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\async;
+namespace czechpmdevs\buildertools\async\schematics;
 
-use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlockList;
+use czechpmdevs\buildertools\schematics\SchematicData;
 use Exception;
-use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
@@ -34,32 +33,20 @@ use pocketmine\scheduler\AsyncTask;
  * Class SchematicCreateTask
  * @package czechpmdevs\buildertools\async
  */
-class SchematicCreateTask extends AsyncTask {
+class MCEditSaveTask extends AsyncTask {
 
     /** @var string $file */
     public $file;
 
-    /** @var ThreadSafeBlockList $blockList */
-    public $blockList;
-    /** @var Vector3 $axis */
-    public $axis;
-
-    /** @var string $materials */
-    public $materials;
+    /** @var SchematicData $schematic */
+    public $schematic;
 
     /**
-     * SchematicCreateTask constructor.
-     *
-     * @param string $file
-     * @param ThreadSafeBlockList $blockList
-     * @param Vector3 $axis
-     * @param string $materials
+     * MCEditSaveTask constructor.
+     * @param SchematicData $schematic
      */
-    public function __construct(string $file, ThreadSafeBlockList $blockList, Vector3 $axis, string $materials) {
-        $this->file = $file;
-        $this->blockList = $blockList;
-        $this->axis = $axis;
-        $this->materials = $materials;
+    public function __construct(SchematicData $schematic) {
+        $this->schematic = $schematic;
     }
 
     public function onRun() {
@@ -67,26 +54,26 @@ class SchematicCreateTask extends AsyncTask {
             $blocks = "";
             $data = "";
 
-            foreach ($this->blockList->getAll() as $block) {
-                $blocks .= chr($block->getId());
-                $data .= chr($block->getDamage());
+            $x = $y = $z = $id = $meta = null;
+            while ($this->schematic->hasNext()) {
+                $this->schematic->readNext($x, $y, $z, $id, $meta);
+                $blocks .= chr($id);
+                $data .= chr($meta);
             }
 
             $nbt = new BigEndianNBTStream();
             $fileData = $nbt->writeCompressed(new CompoundTag('Schematic', [
                 new ByteArrayTag('Blocks', $blocks),
                 new ByteArrayTag('Data', $data),
-                new ShortTag('Width', $this->axis->getX()),
-                new ShortTag('Height', $this->axis->getY()),
-                new ShortTag('Length', $this->axis->getZ()),
-                new StringTag('Materials', $this->materials)
+                new ShortTag('Width', $this->schematic->getXAxis()),
+                new ShortTag('Height', $this->schematic->getYAxis()),
+                new ShortTag('Length', $this->schematic->getZAxis()),
+                new StringTag('Materials', $this->schematic->getMaterialType())
             ]));
 
             file_put_contents($this->file, $fileData);
         }
-        catch (Exception $e) {
-            var_dump($e->getMessage());
-        }
+        catch (Exception $ignore) {} // TODO - Handle errors
     }
 
 }

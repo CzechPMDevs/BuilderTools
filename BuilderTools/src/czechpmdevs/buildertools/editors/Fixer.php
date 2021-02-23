@@ -18,8 +18,6 @@
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlock;
-use czechpmdevs\buildertools\blockstorage\async\ThreadSafeBlockList;
 use pocketmine\block\BlockIds;
 
 /**
@@ -50,23 +48,6 @@ class Fixer extends Editor {
         251 => [BlockIds::CONCRETE, 0],
         204 => [BlockIds::PURPUR_BLOCK, 0]
     ];
-
-    /**
-     * @param ThreadSafeBlockList $blockList
-     * @return ThreadSafeBlockList
-     */
-    public function fixThreadSafeBlockList(ThreadSafeBlockList $blockList): ThreadSafeBlockList {
-        /** @var ThreadSafeBlock $block */
-        foreach ($blockList as $index => $block) {
-            $id = $block->getId();
-            $damage = $block->getDamage();
-
-            $this->fixBlock($id, $damage);
-            $blockList[$index] = $block->setId($id)->setDamage($damage);
-        }
-
-        return $blockList;
-    }
 
     /**
      * @param int $id

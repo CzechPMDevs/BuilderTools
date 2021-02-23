@@ -20,10 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
-use czechpmdevs\buildertools\blockstorage\BlockList;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\math\Math;
-use czechpmdevs\buildertools\schematics\Schematic;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -74,15 +71,11 @@ class SchematicCommand extends BuilderToolsCommand {
                     return;
                 }
 
-                $axisVec = Math::calculateAxisVec(Selectors::getPosition($sender, 1), Selectors::getPosition($sender, 2));
-
                 $fileName = stripos($args[1], ".schematic") === false ? $args[1] . ".schematic" : str_replace(".schematic", "", $args[1]) . ".schematic";
                 $fileName = $this->getPlugin()->getDataFolder() . "schematics/" . $fileName;
 
-                $schematic = new Schematic(BlockList::build($sender->getLevel(), Selectors::getPosition($sender, 1), Selectors::getPosition($sender, 2), BlockList::BUILD_YZX), $axisVec);
-                $schematic->save($fileName);
+                BuilderTools::getSchematicsManager()->createSchematic($sender, $fileName);
 
-                BuilderTools::getSchematicsManager()->registerSchematic($fileName, $schematic);
                 $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic will be saved as $fileName");
                 break;
             case "load":
@@ -106,7 +99,7 @@ class SchematicCommand extends BuilderToolsCommand {
                 break;
             case "list":
                 $list = [];
-                foreach (BuilderTools::getSchematicsManager()->getLoadedSchematics() as $name => $schematic) {
+                foreach (BuilderTools::getSchematicsManager()->getAllSchematics() as $name => $schematic) {
                     $list[] = $name;
                 }
                 $sender->sendMessage(BuilderTools::getPrefix() . (string)count($list) . " loaded schematics: " . implode(", ", $list));

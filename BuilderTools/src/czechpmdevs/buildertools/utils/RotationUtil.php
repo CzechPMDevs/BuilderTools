@@ -58,7 +58,10 @@ class RotationUtil {
         $modifiedBlockArray = new BlockArray();
         switch ($axis) {
             case self::Y_AXIS:
-                foreach ($blockArray->read() as [$x, $y, $z, $id, $meta]) {
+                $x = $y = $z = $id = $meta = 0;
+                while ($blockArray->hasNext()) {
+                    $blockArray->readNext($x, $y, $z, $id, $meta);
+
                     $dist = sqrt(Math::lengthSquared2d($x, $z));
                     $alfa = Math::getBasicDegrees(atan2($y, $x) + $degrees);
                     $modifiedBlockArray->addBlock(new Vector3($dist * cos($alfa), $y, $dist * sin($alfa)), $id, $meta);
@@ -66,7 +69,10 @@ class RotationUtil {
                 $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             case self::X_AXIS:
-                foreach ($blockArray->read() as [$x, $y, $z, $id, $meta]) {
+                $x = $y = $z = $id = $meta = 0;
+                while ($blockArray->hasNext()) {
+                    $blockArray->readNext($x, $y, $z, $id, $meta);
+
                     $dist = sqrt(Math::lengthSquared2d($y, $z));
                     $alfa = Math::getBasicDegrees(atan2($y, $z) + $degrees);
                     $modifiedBlockArray->addBlock(new Vector3($x, $dist * cos($alfa), $dist * sin($alfa)), $id, $meta);
@@ -74,7 +80,10 @@ class RotationUtil {
                 $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             case self::Z_AXIS:
-                foreach ($blockArray->read() as [$x, $y, $z, $id, $meta]) {
+                $x = $y = $z = $id = $meta = 0;
+                while ($blockArray->hasNext()) {
+                    $blockArray->readNext($x, $y, $z, $id, $meta);
+
                     $dist = sqrt(Math::lengthSquared2d($x, $y));
                     $alfa = Math::getBasicDegrees(atan2($x, $y) + $degrees);
                     $modifiedBlockArray->addBlock(new Vector3($dist * cos($alfa), $dist * sin($alfa), $z), $id, $meta);

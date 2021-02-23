@@ -149,7 +149,7 @@ class BlockGenerator {
 
                 for($y = 0; $y < $height; $y++) {
                     foreach (self::generateMissingBlocks2d($x, $y, $z) as $vector3) {
-                        yield($vector3);
+                        yield $vector3;
                     }
                 }
             }

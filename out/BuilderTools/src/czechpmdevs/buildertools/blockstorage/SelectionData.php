@@ -11,7 +11,7 @@ use pocketmine\Player;
  * Class SelectionData
  * @package czechpmdevs\buildertools\blockstorage
  */
-class SelectionData extends UpdateLevelData {
+class SelectionData extends BlockArray {
 
     /** @var Player $player */
     protected $player;

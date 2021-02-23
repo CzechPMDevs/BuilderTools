@@ -20,12 +20,13 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
-use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\utils\RotationUtil;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -86,7 +87,7 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->merge($player, UpdateLevelData::fromBlockArray($this->copiedClipboards[$player->getName()]->addVector3($player->ceil())));
+        $filler->merge($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil())->setLevel($player->getLevel()));
     }
 
     /**
@@ -100,7 +101,7 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, UpdateLevelData::fromBlockArray($this->copiedClipboards[$player->getName()]->addVector3($player->ceil())));
+        $filler->fill($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil())->setLevel($player->getLevel()));
     }
 
     /**
@@ -130,10 +131,10 @@ class Copier extends Editor {
 
         $clipboard = $this->copiedClipboards[$player->getName()];
 
-        $updateData = new UpdateLevelData();
+        $updateData = new BlockArray();
         $updateData->setLevel($clipboard->getLevel());
 
-        $center = $clipboard->getPlayerPosition()->ceil(); // Why there were + vec(1, 0, 1)
+        $center = $clipboard->getPlayerPosition()->ceil(); // Why there were +vec(1, 0, 1)?
         switch ($mode) {
             case self::DIRECTION_PLAYER:
                 $d = $player->getDirection();
@@ -149,7 +150,8 @@ class Copier extends Editor {
 
                         for ($pasted = 0; $pasted < $pasteCount; ++$pasted) {
                             $addX = $length * $pasted;
-                            foreach ($clipboard->read(false) as [$x, $y, $z, $id, $meta]) {
+                            while ($clipboard->hasNext()) {
+                                $clipboard->readNext($x, $y, $z, $id, $meta);
                                 $updateData->addBlock($center->add($x + $addX, $y, $z), $id, $meta);
                             }
                         }
@@ -165,7 +167,8 @@ class Copier extends Editor {
 
                         for ($pasted = 0; $pasted < $pasteCount; ++$pasted) {
                             $addZ = $length * $pasted;
-                            foreach ($clipboard->read(false) as [$x, $y, $z, $id, $meta]) {
+                            while ($clipboard->hasNext()) {
+                                $clipboard->readNext($x, $y, $z, $id, $meta);
                                 $updateData->addBlock($center->add($x, $y, $z + $addZ), $id, $meta);
                             }
                         }
@@ -183,7 +186,8 @@ class Copier extends Editor {
 
                 for ($pasted = 0; $pasted <= $pasteCount; ++$pasted) {
                     $addY = $length * $pasted;
-                    foreach ($clipboard->read() as [$x, $y, $z, $id, $meta]) {
+                    while ($clipboard->hasNext()) {
+                        $clipboard->readNext($x, $y, $z, $id, $meta);
                         $updateData->addBlock($center->add($x, $y + $addY, $z), $id, $meta);
                     }
                 }
@@ -193,6 +197,35 @@ class Copier extends Editor {
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(self::FILLER);
         $filler->fill($player, $updateData);
-        $player->sendMessage(BuilderTools::getPrefix()."§aCopied area stacked!");
+        $player->sendMessage(BuilderTools::getPrefix() . "§aCopied area stacked!");
+    }
+
+    public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $add, Player $player) {
+        $blocks = new BlockArray(true);
+        $blocks->setLevel($player->getLevel());
+
+        // Pre-declare x, y, z and id to avoid memory allocation each time
+        $x = $y = $z = $id = 0;
+        // Old blocks (to remove)
+        $blockPositions = [];
+
+        // Add new blocks
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
+            if(($id = $player->getLevel()->getBlockIdAt($x, $y, $z)) != 0) {
+                $blockPositions[] = Level::blockHash($x, $y, $z);
+                $blocks->addBlock($add->add($x, $y, $z), $id, $player->getLevel()->getBlockDataAt($x, $y, $z));
+            }
+        }
+
+        // Remove old blocks
+        foreach ($blockPositions as $hash) {
+            Level::getBlockXYZ($hash, $x, $y, $z);
+
+            $blocks->addBlock(new Vector3($x, $y, $z), 0, 0);
+        }
+
+        /** @var Filler $filler */
+        $filler = BuilderTools::getEditor(self::FILLER);
+        $filler->fill($player, $blocks, true, false, true);
     }
 }

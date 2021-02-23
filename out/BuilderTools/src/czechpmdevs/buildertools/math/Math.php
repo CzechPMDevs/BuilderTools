@@ -111,9 +111,10 @@ class Math {
      * @return Vector3
      */
     public static function calculateAxisVec(Vector3 $pos1, Vector3 $pos2): Vector3 {
-        $width = max($pos1->getX(), $pos2->getX())-min($pos1->getX(), $pos2->getX());
-        $height = max($pos1->getY(), $pos2->getY())-min($pos1->getY(), $pos2->getY());
-        $length = max($pos1->getZ(), $pos2->getZ())-min($pos1->getZ(), $pos2->getZ());
+        $width = max($pos1->getX(), $pos2->getX()) - min($pos1->getX(), $pos2->getX());
+        $height = max($pos1->getY(), $pos2->getY()) - min($pos1->getY(), $pos2->getY());
+        $length = max($pos1->getZ(), $pos2->getZ()) - min($pos1->getZ(), $pos2->getZ());
+
         return (new Vector3($width, $height, $length))->add(1, 1, 1);
     }
 }

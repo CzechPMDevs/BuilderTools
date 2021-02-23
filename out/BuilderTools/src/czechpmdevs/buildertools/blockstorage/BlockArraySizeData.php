@@ -56,7 +56,9 @@ class BlockArraySizeData {
     }
 
     private function calculateSizeData() {
-        foreach ($this->blockArray->read(false) as [$x, $y, $z]) {
+        $x = $y = $z = $id = $meta = null;
+        while ($this->blockArray->hasNext()) {
+            $this->blockArray->readNext($x, $y, $z, $id, $meta);
             if(is_null($this->maxX) || $this->maxX < $x) {
                 $this->maxX = $x;
             }
@@ -79,20 +81,17 @@ class BlockArraySizeData {
         }
     }
 
+    /**
+     * Recalculates dimensions of the BlockArray
+     */
     public function recalculate() {
         $this->calculateSizeData();
     }
 
-    /**
-     * @return Vector3
-     */
     public function getMinimum(): Vector3 {
         return new Vector3($this->minX, $this->minY, $this->minZ);
     }
 
-    /**
-     * @return Vector3
-     */
     public function getMaximum(): Vector3 {
         return new Vector3($this->maxX, $this->maxY, $this->maxZ);
     }
