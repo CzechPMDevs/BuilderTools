@@ -29,6 +29,8 @@ use pocketmine\math\Vector3;
  */
 class Math {
 
+    public const PI_360 = M_PI * 2;
+
     /**
      * @deprecated
      *
@@ -45,43 +47,6 @@ class Math {
      */
     public static function roundPosition(Position $position): Position {
         return Position::fromObject($position->ceil(), $position->getLevel());
-    }
-
-    /**
-     * @param int|float $degrees
-     * @return int|float
-     */
-    public static function getBasicDegrees($degrees) {
-        fixDegrees:
-        if($degrees < 0) {
-            $degrees += 360;
-        }
-
-        if($degrees >= 360) {
-            $degrees -= 360;
-        }
-
-        if(!($degrees >= 0 && $degrees < 360)) {
-            goto fixDegrees;
-        }
-
-        return $degrees;
-    }
-
-    /**
-     * Use Math::lengthSquared2d() or Math::lengthSquared3d() instead
-     *
-     * @deprecated
-     *
-     * @param float|int $x
-     * @param float|int $y
-     * @param float|int $z
-     *
-     * @return float|int
-     */
-    public static function lengthSq($x, $y, $z = null) {
-        if($z === null) return ($x * $x) + ($y * $y);
-        return ($x * $x) + ($y * $y) + ($z * $z);
     }
 
     /**

@@ -60,18 +60,17 @@ class Copier extends Editor {
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = $this->copiedClipboards[$player->getName()] = new SelectionData();
-        $clipboard->setPlayerPosition($player->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
 
         $i = 0;
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
-            $blockPos = new Vector3($x, $y, $z);
-
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $blockPos) {
             $block = $player->getLevel()->getBlock($blockPos);
-            $clipboard->addBlock($blockPos->subtract($clipboard->getPlayerPosition())->ceil(), $block->getId(), $block->getDamage());
+            $clipboard->addBlock($blockPos, $block->getId(), $block->getDamage());
 
             $i++;
         }
+
+        $this->copiedClipboards[$player->getName()] = $clipboard;
 
         return new EditorResult($i, microtime(true)-$startTime, false);
     }
@@ -87,7 +86,7 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->merge($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil())->setLevel($player->getLevel()));
+        $filler->merge($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil()->subtract($this->copiedClipboards[$player->getName()]->getPlayerPosition()))->setLevel($player->getLevel()));
     }
 
     /**
@@ -101,7 +100,7 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil())->setLevel($player->getLevel()));
+        $filler->fill($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil()->subtract($this->copiedClipboards[$player->getName()]->getPlayerPosition()))->setLevel($player->getLevel()));
     }
 
     /**
@@ -132,9 +131,9 @@ class Copier extends Editor {
         $clipboard = $this->copiedClipboards[$player->getName()];
 
         $updateData = new BlockArray();
-        $updateData->setLevel($clipboard->getLevel());
+        $updateData->setLevel($player->getLevel());
 
-        $center = $clipboard->getPlayerPosition()->ceil(); // Why there were +vec(1, 0, 1)?
+        $center = $clipboard->getPlayerPosition()->ceil(); // Why there was +vec(1, 0, 1)?
         switch ($mode) {
             case self::DIRECTION_PLAYER:
                 $d = $player->getDirection();
@@ -204,16 +203,15 @@ class Copier extends Editor {
         $blocks = new BlockArray(true);
         $blocks->setLevel($player->getLevel());
 
-        // Pre-declare x, y, z and id to avoid memory allocation each time
-        $x = $y = $z = $id = 0;
         // Old blocks (to remove)
         $blockPositions = [];
 
         // Add new blocks
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
-            if(($id = $player->getLevel()->getBlockIdAt($x, $y, $z)) != 0) {
-                $blockPositions[] = Level::blockHash($x, $y, $z);
-                $blocks->addBlock($add->add($x, $y, $z), $id, $player->getLevel()->getBlockDataAt($x, $y, $z));
+        /** @var Vector3 $vector3 */
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $vector3) {
+            if(($block = $player->getLevel()->getBlock($vector3))->getId() != 0) {
+                $blockPositions[] = Level::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ());
+                $blocks->addBlock($add->add($vector3), $block->getId(), $block->getDamage());
             }
         }
 

@@ -29,6 +29,8 @@ use pocketmine\math\Vector3;
  */
 class Math {
 
+    public const PI_360 = M_PI * 2;
+
     /**
      * @deprecated
      *
@@ -48,6 +50,9 @@ class Math {
     }
 
     /**
+     * @deprecated
+     * @link fmod()
+     *
      * @param int|float $degrees
      * @return int|float
      */
