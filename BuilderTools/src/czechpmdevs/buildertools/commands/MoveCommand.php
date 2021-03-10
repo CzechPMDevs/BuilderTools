@@ -28,24 +28,12 @@ use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-/**
- * Class MoveCommand
- * @package czechpmdevs\buildertools\commands
- */
 class MoveCommand extends BuilderToolsCommand {
 
-    /**
-     * MoveCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/move", "Move selected area", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

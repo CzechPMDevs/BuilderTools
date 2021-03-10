@@ -26,16 +26,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
-
-/**
- * Class SecondPositionCommand
- * @package buildertools\commands
- */
 class SecondPositionCommand extends BuilderToolsCommand {
 
-    /**
-     * SecondPositionCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/pos2", "Select second position", null, ["/2"]);
     }

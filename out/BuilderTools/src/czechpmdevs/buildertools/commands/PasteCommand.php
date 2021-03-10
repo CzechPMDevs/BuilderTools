@@ -26,31 +26,19 @@ use czechpmdevs\buildertools\editors\Editor;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class CopyCommand
- * @package buildertools\commands
- */
 class PasteCommand extends BuilderToolsCommand {
 
-    /**
-     * PasteCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/paste", "Paste copied area", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
+
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
         $copier->paste($sender);

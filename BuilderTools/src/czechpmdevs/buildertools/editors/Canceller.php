@@ -25,37 +25,21 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\Player;
 
-
-/**
- * Class Canceller
- * @package buildertools\editors
- */
 class Canceller extends Editor {
 
-    /** @var BlockArray[][] $undoData */
+    /** @var BlockArray[][] */
     public array $undoData = [];
-    /** @var BlockArray[][] $redoData */
+    /** @var BlockArray[][] */
     public array $redoData = [];
 
-    /**
-     * @return string $name
-     */
     public function getName(): string {
         return "Canceller";
     }
 
-    /**
-     * @param Player $player
-     * @param BlockArray $blocks
-     */
     public function addStep(Player $player, BlockArray $blocks) {
         $this->undoData[$player->getName()][] = $blocks;
     }
 
-    /**
-     * @param Player $player
-     * @return EditorResult
-     */
     public function undo(Player $player): EditorResult {
         if(!isset($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to undo!");
@@ -69,18 +53,10 @@ class Canceller extends Editor {
         return $filler->fill($player, $blockList, false, true);
     }
 
-    /**
-     * @param Player $player
-     * @param BlockArray $blocks
-     */
     public function addRedo(Player $player, BlockArray $blocks) {
         $this->redoData[$player->getName()][] = $blocks;
     }
 
-    /**
-     * @param Player $player
-     * @return EditorResult
-     */
     public function redo(Player $player): EditorResult {
         if(!isset($this->redoData[$player->getName()]) || count($this->redoData[$player->getName()]) == 0) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to redo!");

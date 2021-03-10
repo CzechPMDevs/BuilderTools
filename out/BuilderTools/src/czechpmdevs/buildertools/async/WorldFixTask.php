@@ -30,32 +30,24 @@ use pocketmine\level\format\io\region\RegionLoader;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\MainLogger;
 
-/**
- * Class WorldFixTask
- * @package czechpmdevs\buildertools\async
- */
 class WorldFixTask extends AsyncTask {
     
-    /** @var string $worldPath */
+    /** @var string */
     public $worldPath;
     
-    /** @var int $percentage */
+    /** @var int */
     public $percentage = 0;
-    /** @var string $error */
+    /** @var string */
     public $error = "";
 
-    /** @var float $time */
+    /** @var float */
     public $time = 0.0;
-    /** @var int $chunkCount */
+    /** @var int */
     public $chunkCount = 0;
 
-    /** @var bool $forceStop */
+    /** @var bool */
     public $forceStop = false;
 
-    /**
-     * FixWorldTask constructor.
-     * @param string $worldPath
-     */
     public function __construct(string $worldPath) {
         $this->worldPath = $worldPath;
     }
@@ -129,10 +121,6 @@ class WorldFixTask extends AsyncTask {
         MainLogger::getLogger()->debug("[BuilderTools] World fixed in " . round(microtime(true)-$startTime) .", affected " .count($chunksToFix). " chunks!");
     }
 
-    /**
-     * @param string $worldPath
-     * @return array
-     */
     private function getListOfChunksToFix(string $worldPath): array {
         $regionPath = $worldPath . DIRECTORY_SEPARATOR . "region" . DIRECTORY_SEPARATOR;
 

@@ -67,29 +67,25 @@ use pocketmine\command\Command;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\plugin\PluginBase;
 
-/**
- * Class BuilderTools
- * @package buildertools
- */
 class BuilderTools extends PluginBase {
 
-    /** @var BuilderTools $instance */
+    /** @var BuilderTools */
     private static $instance;
-    /** @var string $prefix */
+    /** @var string */
     private static $prefix;
 
-    /** @var  Editor[] $editors */
+    /** @var Editor[] */
     private static $editors = [];
 
-    /** @var EventListener $listener */
+    /** @var EventListener */
     private static $listener;
-    /** @var SchematicsManager $schematicManager */
+    /** @var SchematicsManager */
     private static $schematicsManager;
 
-    /** @var Command[] $commands */
+    /** @var Command[] */
     private static $commands = [];
 
-    /** @var array $config */
+    /** @var array */
     private static $configuration = [];
 
     public function onEnable() {
@@ -135,38 +131,38 @@ class BuilderTools extends PluginBase {
     private function registerCommands() {
         $map = $this->getServer()->getCommandMap();
         self::$commands = [
-            new FirstPositionCommand,
-            new SecondPositionCommand,
-            new WandCommand,
-            new FillCommand,
-            new HelpCommand,
-            new DrawCommand,
-            new SphereCommand,
-            new HollowSphereCommand,
-            new ReplaceCommand,
-            new IdCommand,
-            new CubeCommand,
-            new HollowCubeCommand,
-            new CopyCommand,
-            new PasteCommand,
-            new MergeCommand,
-            new RotateCommand,
-            new UndoCommand,
-            new RedoCommand,
-            new TreeCommand,
-            new FixCommand,
             new BlockInfoCommand,
             new ClearInventoryCommand,
-            new NaturalizeCommand,
-            new SchematicCommand,
-            new PyramidCommand,
-            new HollowPyramidCommand,
+            new CopyCommand,
+            new CubeCommand,
+            new CutCommand,
             new CylinderCommand,
+            new DrawCommand,
+            new FillCommand,
+            new FirstPositionCommand,
+            new FixCommand,
+            new HelpCommand,
+            new HollowCubeCommand,
             new HollowCylinderCommand,
-            new StackCommand,
-            new OutlineCommand,
+            new HollowPyramidCommand,
+            new HollowSphereCommand,
+            new IdCommand,
+            new MergeCommand,
             new MoveCommand,
-            new CutCommand
+            new NaturalizeCommand,
+            new OutlineCommand,
+            new PasteCommand,
+            new PyramidCommand,
+            new RedoCommand,
+            new ReplaceCommand,
+            new RotateCommand,
+            new SchematicCommand,
+            new SecondPositionCommand,
+            new SphereCommand,
+            new StackCommand,
+            new TreeCommand,
+            new UndoCommand,
+            new WandCommand
         ];
 
         foreach (self::$commands as $command) {

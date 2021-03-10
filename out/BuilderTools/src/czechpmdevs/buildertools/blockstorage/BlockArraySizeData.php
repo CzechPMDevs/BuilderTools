@@ -22,16 +22,11 @@ namespace czechpmdevs\buildertools\blockstorage;
 
 use pocketmine\math\Vector3;
 
-/**
- * Class BlockArraySizeData
- * @package czechpmdevs\buildertools\blockstorage
- */
 class BlockArraySizeData {
 
-    /** @var BlockArray $blockArray */
+    /** @var BlockArray */
     protected $blockArray;
 
-    /**
     /**
      * @var int|null $maxX
      * @var int|null $maxY
@@ -46,10 +41,6 @@ class BlockArraySizeData {
      */
     public $minX = null, $minY = null, $minZ = null;
 
-    /**
-     * BlockArraySizeData constructor.
-     * @param BlockArray $blockArray
-     */
     public function __construct(BlockArray $blockArray) {
         $this->blockArray = $blockArray;
         $this->calculateSizeData();

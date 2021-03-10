@@ -31,25 +31,17 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 
-/**
- * Class SchematicLoadingTask
- * @package czechpmdevs\buildertools\async
- */
 class MCEditLoadTask extends AsyncTask {
 
-    /** @var string $path */
+    /** @var string */
     public string $path;
 
-    /** @var MCEditSchematics $schematics */
+    /** @var MCEditSchematics */
     public MCEditSchematics $schematics;
 
-    /** @var string $error */
+    /** @var string */
     public string $error = "";
 
-    /**
-     * SchematicLoadTask constructor.
-     * @param string $path
-     */
     public function __construct(string $path) {
         $this->path = $path;
     }
@@ -106,11 +98,7 @@ class MCEditLoadTask extends AsyncTask {
         }
     }
 
-    /**
-     * @param Server $server
-     */
     public function onCompletion(Server $server) {
-        var_dump($this->schematics->size());
         BuilderTools::getSchematicsManager()->registerSchematic($this->path, $this->schematics);
     }
 }

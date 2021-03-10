@@ -24,10 +24,6 @@ use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
 
-/**
- * Class RotationUtil
- * @package czechpmdevs\buildertools\math
- */
 class RotationUtil {
 
     public const VALID_DEGREES = [self::ROTATE_0, self::ROTATE_90, self::ROTATE_180, self::ROTATE_270];
@@ -42,13 +38,6 @@ class RotationUtil {
     public const Y_AXIS = 1;
     public const Z_AXIS = 2;
 
-    /**
-     * @param SelectionData $blockArray
-     * @param int $axis
-     * @param int $degrees
-     *
-     * @return SelectionData
-     */
     public static function rotate(SelectionData $blockArray, int $axis, int $degrees): SelectionData {
         if($degrees == 0) {
             return $blockArray;
@@ -110,22 +99,12 @@ class RotationUtil {
         }
     }
 
-    /**
-     * @param int $degrees
-     *
-     * @return bool
-     */
     public static function areDegreesValid(int $degrees): bool {
         $degrees = fmod($degrees, 360);
 
         return in_array($degrees, self::VALID_DEGREES);
     }
 
-    /**
-     * @param int $degrees
-     *
-     * @return int
-     */
     public static function getRotation(int $degrees): int {
         $basic = fmod($degrees, 360);
 

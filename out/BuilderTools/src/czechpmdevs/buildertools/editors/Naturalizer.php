@@ -30,24 +30,8 @@ use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-/**
- * Class Naturalizer
- * @package buildertools\editors
- */
 class Naturalizer extends Editor {
 
-    /**
-     * @param int $x1
-     * @param int $y1
-     * @param int $z1
-     * @param int $x2
-     * @param int $y2
-     * @param int $z2
-     * @param Level $level
-     * @param Player $player
-     *
-     * @return EditorResult
-     */
     public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player): EditorResult {
         $list = new BlockArray();
         $list->setLevel($level);
@@ -63,13 +47,6 @@ class Naturalizer extends Editor {
         return $filler->fill($player, $list);
     }
 
-    /**
-     * @param BlockArray $list
-     * @param Vector2 $vector2
-     * @param int $minY
-     * @param int $maxY
-     * @param Level $level
-     */
     private function fix(BlockArray $list, Vector2 $vector2, int $minY, int $maxY, Level $level) {
         $x = (int)$vector2->getX();
         $z = (int)$vector2->getY();
@@ -108,10 +85,6 @@ class Naturalizer extends Editor {
         }
     }
 
-
-    /**
-     * @return string
-     */
     public function getName(): string {
         return "Naturalizer";
     }

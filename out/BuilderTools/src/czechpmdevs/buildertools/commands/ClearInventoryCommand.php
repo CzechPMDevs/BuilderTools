@@ -25,15 +25,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-/**
- * Class ClearInventoryCommand
- * @package buildertools\commands
- */
 class ClearInventoryCommand extends BuilderToolsCommand {
 
-    /**
-     * ClearInventoryCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/clearinventory", "Clear inventory", null, ["/ci"]);
     }

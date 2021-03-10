@@ -35,32 +35,21 @@ use pocketmine\math\Vector3;
 class BlockArray implements UpdateLevelData {
     use DuplicateBlockDetector;
 
-    /** @var string $buffer */
+    /** @var string */
     public string $buffer = "";
-    /** @var int $offset */
+    /** @var int */
     public int $offset = 0;
 
-    /** @var BlockArraySizeData|null $sizeData */
+    /** @var BlockArraySizeData|null */
     protected ?BlockArraySizeData $sizeData = null;
 
-    /** @var Level|null $level */
+    /** @var Level|null */
     protected ?Level $level = null;
 
-    /**
-     * BlockArray constructor.
-     * @param bool $detectDuplicates
-     */
     public function __construct(bool $detectDuplicates = false) {
         $this->detectDuplicates = $detectDuplicates;
     }
 
-    /**
-     * @param Vector3 $vector3
-     * @param int $id
-     * @param int $meta
-     *
-     * @return $this
-     */
     public function addBlock(Vector3 $vector3, int $id, int $meta): self {
         $binHash = pack("q", Level::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ()));
         if($this->detectingDuplicates()) {
@@ -98,31 +87,6 @@ class BlockArray implements UpdateLevelData {
     }
 
     /**
-     * @deprecated
-     *
-     * Returns Generator[x, y, z, id, meta]
-     * cleanGarbage removes blocks from BlockArray
-     * after yield
-     *
-     * @param bool $cleanGarbage
-     * @return Generator<int, int, int, int, int>
-     */
-    public function read(bool $cleanGarbage = true): Generator {
-        while ($this->offset < strlen($this->buffer)) {
-            $this->readNext($x, $y, $z, $id, $meta);
-            yield [$x, $y, $z, $id, $meta];
-
-            if($cleanGarbage) {
-                $this->cleanGarbage();
-            }
-        }
-
-        if(!$cleanGarbage) {
-            $this->offset = 0;
-        }
-    }
-
-    /**
      * @return int $size
      */
     public function size(): int {
@@ -132,7 +96,7 @@ class BlockArray implements UpdateLevelData {
     /**
      * Adds Vector3 to all the blocks in BlockArray
      *
-     * @return self for chaining
+     * @return $this for chaining
      */
     public function addVector3(Vector3 $vector3): BlockArray {
         $vector3 = $vector3->ceil();
@@ -159,7 +123,7 @@ class BlockArray implements UpdateLevelData {
     /**
      * Subtracts Vector3 from all the blocks in BlockArray
      *
-     * @return self for chaining
+     * @return $this for chaining
      */
     public function subtractVector3(Vector3 $vector3): BlockArray {
         return $this->addVector3($vector3->multiply(-1));

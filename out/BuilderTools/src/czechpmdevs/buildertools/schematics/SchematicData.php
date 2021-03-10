@@ -23,114 +23,77 @@ namespace czechpmdevs\buildertools\schematics;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use pocketmine\math\Vector3;
 
-/**
- * Class SchematicData
- * @package czechpmdevs\buildertools\schematics
- */
 abstract class SchematicData extends BlockArray {
 
     public const MATERIALS_CLASSIC = "Classic";
     public const MATERIALS_BEDROCK = "Pocket";
     public const MATERIALS_ALPHA = "Alpha";
 
-    /** @var string $file */
+    /** @var string */
     private $file;
 
     /**
-     * @var int $width
+     * @var int
      *
      * Size along the x axis
      */
     protected $width;
 
     /**
-     * @var int $height
+     * @var int
      *
      * Size along the y axis
      */
     protected $height;
 
     /**
-     * @var int $length
+     * @var int
      *
      * Size along the z axis
      */
     protected $length;
 
-    /** @var string $materialType */
+    /** @var string */
     protected $materialType = SchematicData::MATERIALS_BEDROCK;
 
-    /**
-     * SchematicData constructor.
-     */
     public function __construct() {
         parent::__construct(true);
     }
 
-    /**
-     * @param string $targetFile
-     */
     abstract public function save(string $targetFile): void;
 
-    /**
-     * @return string
-     */
     public function getFile(): string {
         return $this->file;
     }
 
-    /**
-     * @param string $file
-     */
     public function setFile(string $file): void {
         $this->file = $file;
     }
 
-    /**
-     * @return int
-     */
     public function getXAxis(): int {
         return $this->width;
     }
 
-    /**
-     * @return int
-     */
     public function getYAxis(): int {
         return $this->height;
     }
 
-    /**
-     * @return int
-     */
     public function getZAxis(): int {
         return $this->length;
     }
 
-    /**
-     * @return string
-     */
     public function getMaterialType(): string {
         return $this->materialType;
     }
 
-    /**
-     * @param string $materialType
-     */
     public function setMaterialType(string $materialType): void {
         $this->materialType = $materialType;
     }
 
-    /**
-     * @return Vector3
-     */
     public function getAxisVector(): Vector3 {
         return new Vector3($this->getXAxis(), $this->getYAxis(), $this->getZAxis());
     }
 
-    /**
-     * @param Vector3 $vector3
-     */
     public function setAxisVector(Vector3 $vector3): void {
         $this->width = $vector3->getX();
         $this->height = $vector3->getY();

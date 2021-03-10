@@ -26,25 +26,12 @@ use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class CubeCommand
- * @package buildertools\commands
- */
 class CubeCommand extends BuilderToolsCommand {
 
-    /**
-     * CubeCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/cube", "Create cube", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

@@ -30,33 +30,19 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-/**
- * Class Copier
- * @package buildertools\editors
- */
 class Copier extends Editor {
 
     public const DIRECTION_PLAYER = 0;
     public const DIRECTION_UP = 1;
     public const DIRECTION_DOWN = 2;
 
-    /** @var SelectionData[] $copiedClipboards */
+    /** @var SelectionData[] */
     public array $copiedClipboards = [];
 
-    /**
-     * @return string $copier
-     */
     public function getName(): string {
         return "Copier";
     }
 
-    /**
-     * @param Vector3 $pos1
-     * @param Vector3 $pos2
-     * @param Player $player
-     *
-     * @return EditorResult
-     */
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
@@ -75,9 +61,6 @@ class Copier extends Editor {
         return new EditorResult($i, microtime(true)-$startTime, false);
     }
 
-    /**
-     * @param Player $player
-     */
     public function merge(Player $player) {
         if(!isset($this->copiedClipboards[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
@@ -89,9 +72,6 @@ class Copier extends Editor {
         $filler->merge($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil()->subtract($this->copiedClipboards[$player->getName()]->getPlayerPosition()))->setLevel($player->getLevel()));
     }
 
-    /**
-     * @param Player $player
-     */
     public function paste(Player $player) {
         if(!isset($this->copiedClipboards[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
@@ -103,11 +83,6 @@ class Copier extends Editor {
         $filler->fill($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil()->subtract($this->copiedClipboards[$player->getName()]->getPlayerPosition()))->setLevel($player->getLevel()));
     }
 
-    /**
-     * @param Player $player
-     * @param int $axis
-     * @param int $rotation
-     */
     public function rotate(Player $player, int $axis, int $rotation) {
         if(!isset($this->copiedClipboards[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
@@ -117,11 +92,6 @@ class Copier extends Editor {
         $this->copiedClipboards[$player->getName()] = RotationUtil::rotate($this->copiedClipboards[$player->getName()], $axis, $rotation);
     }
 
-    /**
-     * @param Player $player
-     * @param int $pasteCount
-     * @param int $mode
-     */
     public function stack(Player $player, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER) {
         if (!isset($this->copiedClipboards[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");

@@ -25,15 +25,12 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-/**
- * Class Printer
- * @package buildertools\editors
- */
 class Printer extends Editor {
 
     public const CUBE = 0x00;
@@ -43,14 +40,6 @@ class Printer extends Editor {
     public const HOLLOW_SPHERE = 0x04;
     public const HOLLOW_CYLINDER = 0x05;
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param Block $block
-     * @param int $brush
-     * @param int $mode
-     * @param bool $throwBlock
-     */
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false) {
         $undoList = new BlockArray();
         $undoList->setLevel($center->getLevel());
@@ -101,12 +90,6 @@ class Printer extends Editor {
         $canceller->addStep($player, $undoList);
     }
 
-    /**
-     * @param Position $position
-     * @param Block $block
-     *
-     * @return Vector3 $pos
-     */
     private function throwBlock(Position $position, Block $block): Vector3 {
         $level = $position->getLevel();
 
@@ -126,24 +109,18 @@ class Printer extends Editor {
         return new Vector3($x, $finalY, $z);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $radius
-     * @param string $blocks
-     * @param bool $hollow
-     *
-     * @return EditorResult
-     */
     public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
+
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
 
         $updateLevelData = new BlockArray(true);
         $updateLevelData->setLevel($center->getLevel());
 
         $radius = abs($radius);
         foreach (BlockGenerator::generateSphere($radius, $hollow) as $vector3) {
-            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
+            $stringToBlockDecoder->nextBlock($id, $meta);
+            $updateLevelData->addBlock($center->add($vector3), $id, $meta);
         }
 
         /** @var Filler $filler */
@@ -151,30 +128,14 @@ class Printer extends Editor {
         return $filler->fill($player, $updateLevelData);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $radius
-     * @param string $blocks
-     *
-     * @return EditorResult
-     */
     public function makeHollowSphere(Player $player, Position $center, int $radius, string $blocks): EditorResult {
         return $this->makeSphere($player, $center, $radius, $blocks, true);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $radius
-     * @param int $height
-     * @param string $blocks
-     * @param bool $hollow
-     *
-     * @return EditorResult
-     */
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
         $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
+
+        $stringToBlocksDecoder = new StringToBlockDecoder($blocks);
 
         $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($center->getLevel());
@@ -190,7 +151,8 @@ class Printer extends Editor {
 
         $radius = abs($radius);
         foreach (BlockGenerator::generateCylinder($radius, $height, $hollow) as $vector3) {
-            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
+            $stringToBlocksDecoder->nextBlock($id, $meta);
+            $updateLevelData->addBlock($center->add($vector3), $id, $meta);
         }
 
         /** @var Filler $filler */
@@ -198,36 +160,21 @@ class Printer extends Editor {
         return $filler->fill($player, $updateLevelData);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $radius
-     * @param int $height
-     * @param string $blocks
-     *
-     * @return EditorResult
-     */
     public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, string $blocks): EditorResult {
         return $this->makeCylinder($player, $center, $radius, $height, $blocks, true);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $size
-     * @param string $blocks
-     * @param bool $hollow
-     *
-     * @return EditorResult
-     */
     public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
         $center = Position::fromObject($center->ceil()->add(-1, 0, -1), $center->getLevel());
+
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
 
         $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($center->getLevel());
 
         foreach (BlockGenerator::generatePyramid($size, $hollow) as $vector3) {
-            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
+            $stringToBlockDecoder->nextBlock($id, $meta);
+            $updateLevelData->addBlock($center->add($vector3), $id, $meta);
         }
 
         /** @var Filler $filler */
@@ -235,34 +182,21 @@ class Printer extends Editor {
         return $filler->fill($player, $updateLevelData);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $size
-     * @param string $blocks
-     *
-     * @return EditorResult
-     */
     public function makeHollowPyramid(Player $player, Position $center, int $size, string $blocks): EditorResult {
         return $this->makePyramid($player, $center, $size, $blocks, true);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $radius
-     * @param string $blocks
-     * @param bool $hollow
-     *
-     * @return EditorResult
-     */
     public function makeCube(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
-        $center = Math::roundPosition($center);
+        $center = Math::ceilPosition($center);
+
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+
         $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($center->getLevel());
 
         foreach (BlockGenerator::generateCube($radius, $hollow) as $vector3) {
-            $updateLevelData->addBlock($center->add($vector3), ...$this->getBlockArgsFromString($blocks));
+            $stringToBlockDecoder->nextBlock($id, $meta);
+            $updateLevelData->addBlock($center->add($vector3), $id, $meta);
         }
 
         /** @var Filler $filler */
@@ -270,21 +204,10 @@ class Printer extends Editor {
         return $filler->fill($player, $updateLevelData);
     }
 
-    /**
-     * @param Player $player
-     * @param Position $center
-     * @param int $radius
-     * @param string $blocks
-     *
-     * @return EditorResult
-     */
     public function makeHollowCube(Player $player, Position $center, int $radius, string $blocks): EditorResult {
         return $this->makeCube($player, $center, $radius, $blocks, true);
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string {
         return "Printer";
     }

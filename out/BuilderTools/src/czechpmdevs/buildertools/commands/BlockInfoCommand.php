@@ -28,25 +28,12 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-/**
- * Class BlockInfoCommand
- * @package czechpmdevs\buildertools\commands
- */
 class BlockInfoCommand extends BuilderToolsCommand {
 
-    /**
-     * ReplaceCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi", "/debug"]);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

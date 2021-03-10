@@ -24,10 +24,6 @@ use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
 
-/**
- * Class RotationUtil
- * @package czechpmdevs\buildertools\math
- */
 class RotationUtil {
 
     public const VALID_DEGREES = [self::ROTATE_0, self::ROTATE_90, self::ROTATE_180, self::ROTATE_270];
@@ -42,18 +38,11 @@ class RotationUtil {
     public const Y_AXIS = 1;
     public const Z_AXIS = 2;
 
-    /**
-     * @param SelectionData $blockArray
-     * @param int $axis
-     * @param int $degrees
-     *
-     * @return SelectionData
-     */
     public static function rotate(SelectionData $blockArray, int $axis, int $degrees): SelectionData {
-        $degrees = deg2rad((360 - $degrees) % 360);
         if($degrees == 0) {
             return $blockArray;
         }
+        $rad = deg2rad((360 - $degrees) % 360);
 
         $modifiedBlockArray = new SelectionData();
         switch ($axis) {
@@ -62,12 +51,11 @@ class RotationUtil {
                 $x = $y = $z = $id = $meta = 0;
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
+                    RotationHelper::rotate($degrees, $id, $meta);
 
                     $dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $z - $diff->getZ()));
-                    $alfa = fmod(atan2($z - $diff->getZ(), $x - $diff->getX()) + $degrees, Math::PI_360);
-                    $modifiedBlockArray->addBlock($pos = new Vector3((int)round($dist * cos($alfa)) + $diff->getX(), $y, (int)round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
-
-                    echo "Transferring Vector3($x:$y:$z) on to Vector3({$pos->getX()}:{$pos->getY()}:{$pos->getZ()})\n";
+                    $alfa = fmod(atan2($z - $diff->getZ(), $x - $diff->getX()) + $rad, Math::PI_360);
+                    $modifiedBlockArray->addBlock(new Vector3((int)round($dist * cos($alfa)) + $diff->getX(), $y, (int)round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
                 }
                 $blockArray->offset = 0;
                 $blockArray->buffer = $modifiedBlockArray->buffer;
@@ -79,13 +67,14 @@ class RotationUtil {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
 
                     $dist = sqrt(Math::lengthSquared2d($y - $diff->getY(), $z - $diff->getZ()));
-                    $alfa = Math::getBasicDegrees(atan2($y - $diff->getY(), $z - $diff->getZ()) + $degrees);
-                    $y = (int)($dist * cos($alfa));
+                    $alfa = fmod(atan2($y - $diff->getY(), $z - $diff->getZ()) + $rad, Math::PI_360);
+                    $y = (int)round($dist * cos($alfa)) + $diff->getX();
                     if($y < 0) {
                         continue;
                     }
-                    $blockArray->addBlock($diff->add($x, $y, (int)($dist * sin($alfa))), $id, $meta);
+                    $blockArray->addBlock(new Vector3($x, $y, (int)round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
                 }
+                $blockArray->offset = 0;
                 $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             case self::Z_AXIS:
@@ -95,13 +84,14 @@ class RotationUtil {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
 
                     $dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $y - $diff->getY()));
-                    $alfa = Math::getBasicDegrees(atan2($x - $diff->getX(), $y - $diff->getY()) + $degrees);
-                    $y = (int)($dist * sin($alfa));
+                    $alfa = fmod(atan2($x - $diff->getX(), $y - $diff->getY()) + $rad, Math::PI_360);
+                    $y = (int)round($dist * sin($alfa));
                     if($y < 0) {
                         continue;
                     }
-                    $modifiedBlockArray->addBlock($diff->add((int)($dist * cos($alfa)), $y, $z), $id, $meta);
+                    $modifiedBlockArray->addBlock(new Vector3((int)round($dist * cos($alfa)), $y, $z), $id, $meta);
                 }
+                $blockArray->offset = 0;
                 $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             default:
@@ -109,24 +99,14 @@ class RotationUtil {
         }
     }
 
-    /**
-     * @param int $degrees
-     *
-     * @return bool
-     */
     public static function areDegreesValid(int $degrees): bool {
-        $degrees = Math::getBasicDegrees($degrees);
+        $degrees = fmod($degrees, 360);
 
         return in_array($degrees, self::VALID_DEGREES);
     }
 
-    /**
-     * @param int $degrees
-     *
-     * @return int
-     */
     public static function getRotation(int $degrees): int {
-        $basic = Math::getBasicDegrees($degrees);
+        $basic = fmod($degrees, 360);
 
         switch ($basic) {
             case 0:

@@ -28,19 +28,11 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 
-/**
- * Class WorldFixUtil
- * @package czechpmdevs\buildertools\utils
- */
 class WorldFixUtil {
 
-    /** @var array $worldFixQueue */
+    /** @var array */
     private static array $worldFixQueue = [];
 
-    /**
-     * @param CommandSender $sender
-     * @param string $worldName
-     */
     public static function fixWorld(CommandSender $sender, string $worldName): void {
         if(self::isInWorldFixQueue($worldName)) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cServer is already fixing this world!");
@@ -120,18 +112,12 @@ class WorldFixUtil {
         $sender->sendMessage(BuilderTools::getPrefix() . "§aFixing the world...");
     }
 
-    /**
-     * @param string $levelName
-     * @return bool
-     */
     public static function isInWorldFixQueue(string $levelName): bool {
         return isset(self::$worldFixQueue[$levelName]);
     }
 
     /**
      * @internal
-     *
-     * @param WorldFixTask $task
      */
     public static function finishWorldFixTask(WorldFixTask $task) {
         unset(self::$worldFixQueue[basename($task->worldPath)]);

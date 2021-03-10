@@ -26,25 +26,12 @@ use czechpmdevs\buildertools\editors\Editor;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class UndoCommand
- * @package buildertools\commands
- */
 class UndoCommand extends BuilderToolsCommand {
 
-    /**
-     * UndoCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/undo", "Undo last BuilderTools actions", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return mixed|void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

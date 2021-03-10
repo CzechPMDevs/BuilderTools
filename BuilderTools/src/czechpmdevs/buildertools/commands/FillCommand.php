@@ -27,25 +27,12 @@ use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class FillCommand
- * @package buildertools\commands
- */
 class FillCommand extends BuilderToolsCommand {
 
-    /**
-     * FillCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

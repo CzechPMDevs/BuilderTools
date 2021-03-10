@@ -21,14 +21,11 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use Exception;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 
-/**
- * Class Editor
- * @package buildertools\editors
- */
 abstract class Editor {
 
     public const CANCELLER = "Canceller";
@@ -40,23 +37,15 @@ abstract class Editor {
     public const PRINTER = "Printer";
     public const REPLACEMENT = "Replacement";
 
-    /**
-     * @return string
-     */
     abstract function getName(): string;
 
-    /**
-     * @return BuilderTools
-     */
     public function getPlugin(): BuilderTools {
         return BuilderTools::getInstance();
     }
 
     /**
-     * @param string $string
-     * @param Block $block
-     *
-     * @return bool
+     * @deprecated
+     * @link StringToBlockDecoder
      */
     public function isBlockInString(string $string, Block $block): bool {
         $itemArgs = explode(",", $string);
@@ -80,10 +69,8 @@ abstract class Editor {
     }
 
     /**
-     * TODO - Create class for that so it will have pre-generated map
-     *
-     * @param string $string
-     * @return Block $block
+     * @deprecated
+     * @link StringToBlockDecoder
      */
     public function getBlockFromString(string $string): Block {
         $itemArgs = explode(",", $string);
@@ -142,8 +129,8 @@ abstract class Editor {
     }
 
     /**
-     * @param string $string
-     * @return array
+     * @deprecated
+     * @link StringToBlockDecoder
      */
     public function getBlockArgsFromString(string $string): array {
         $block = $this->getBlockFromString($string);

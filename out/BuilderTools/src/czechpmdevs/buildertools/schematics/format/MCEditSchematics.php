@@ -12,32 +12,16 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 
-/**
- * Class MCEditSchematics
- * @package czechpmdevs\buildertools\schematics\format
- */
 class MCEditSchematics extends SchematicData {
 
-    /**
-     * MCEditSchematics constructor.
-     */
     public function __construct() {
         parent::__construct();
     }
 
-    /**
-     * @param string $targetFile
-     */
     public function save(string $targetFile): void {
         Server::getInstance()->getAsyncPool()->submitTask(new MCEditSaveTask($this));
     }
 
-    /**
-     * @param Player $player
-     * @param string $file
-     *
-     * @return SchematicData
-     */
     public static function create(Player $player, string $file): SchematicData {
         $schematic = new MCEditSchematics();
         $schematic->setAxisVector(Math::calculateAxisVec(Selectors::getPosition($player, 1), Selectors::getPosition($player, 2)));

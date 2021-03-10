@@ -23,19 +23,8 @@ namespace czechpmdevs\buildertools\math;
 use Generator;
 use pocketmine\math\Vector3;
 
-/**
- * Class BlockGenerator
- * @package czechpmdevs\buildertools\math
- */
 class BlockGenerator {
 
-    /**
-     * @param Vector3 $pos1
-     * @param Vector3 $pos2
-     * @param bool $hollow
-     *
-     * @return Generator<Vector3>
-     */
     public static function fillCuboid(Vector3 $pos1, Vector3 $pos2, bool $hollow = false): Generator {
         for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
             for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
@@ -49,12 +38,6 @@ class BlockGenerator {
         }
     }
 
-    /**
-     * @param int $radius
-     * @param bool $hollow
-     *
-     * @return Generator<Vector3>
-     */
     public static function generateCube(int $radius, bool $hollow = false): Generator {
         for($x = 0; $x <= $radius; $x++) {
             for ($y = 0; $y <= $radius; $y++) {
@@ -71,12 +54,6 @@ class BlockGenerator {
         }
     }
 
-    /**
-     * @param int $radius
-     * @param bool $hollow
-     *
-     * @return Generator<Vector3>
-     */
     public static function generateSphere(int $radius, bool $hollow = false): Generator {
         $incDivX = 0;
         for($x = 0; $x <= $radius; $x++) {
@@ -117,13 +94,6 @@ class BlockGenerator {
         }
     }
 
-    /**
-     * @param int $radius
-     * @param int $height
-     * @param bool $hollow
-     *
-     * @return Generator<Vector3>
-     */
     public static function generateCylinder(int $radius, int $height, bool $hollow = false): Generator {
         $incDivX = 0;
         for($x = 0; $x <= $radius; $x++) {
@@ -156,12 +126,6 @@ class BlockGenerator {
         }
     }
 
-    /**
-     * @param int $size
-     * @param bool $hollow
-     *
-     * @return Generator
-     */
     public static function generatePyramid(int $size, bool $hollow = false): Generator {
         $currentLevelHeight = $size;
         for($y = 0; $y <= $size; $y++) {
@@ -181,12 +145,7 @@ class BlockGenerator {
     }
 
     /**
-     * 2d because of changed will be only $x and $z
-     * $y won't be affected
-     *
-     * @param int $x
-     * @param int $y
-     * @param int $z
+     * Changes only X and Z, Y is not affected
      *
      * @return Generator<Vector3>
      */
@@ -198,10 +157,6 @@ class BlockGenerator {
     }
 
     /**
-     * @param int $x
-     * @param int $y
-     * @param int $z
-     *
      * @return Generator<Vector3>
      */
     public static function generateMissingBlocks3d(int $x, int $y, int $z): Generator {

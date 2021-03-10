@@ -32,20 +32,13 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 
-/**
- * Class EventListener
- * @package buildertools\events\listener
- */
 class EventListener implements Listener {
 
-    /** @var array $wandClicks */
+    /** @var array */
     private $wandClicks = [];
-    /** @var array $blockInfoClicks */
+    /** @var array */
     private $blockInfoClicks = [];
 
-    /**
-     * @param PlayerInteractEvent $event
-     */
     public function onAirClick(PlayerInteractEvent $event) {
         if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) return;
         $position = $player->getTargetBlock(64)->asPosition();
@@ -56,9 +49,6 @@ class EventListener implements Listener {
         $event->setCancelled(true);
     }
 
-    /**
-     * @param BlockBreakEvent $event
-     */
     public function onBlockBreak(BlockBreakEvent $event) {
         if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == Item::WOODEN_AXE && $event->getItem()->hasEnchantment(50))) {
             Selectors::addSelector($player, 1, $position = new Position((int)($event->getBlock()->getX()), (int)($event->getBlock()->getY()), (int)($event->getBlock()->getZ()), $player->getLevel()));
@@ -67,9 +57,6 @@ class EventListener implements Listener {
         }
     }
 
-    /**
-     * @param PlayerInteractEvent $event
-     */
     public function onBlockTouch(PlayerInteractEvent $event) {
         if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
         if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == Item::WOODEN_AXE && $event->getItem()->hasEnchantment(50))) {
@@ -92,18 +79,12 @@ class EventListener implements Listener {
         }
     }
 
-    /**
-     * @param LevelLoadEvent $event
-     */
     public function onLevelLoad(LevelLoadEvent $event) {
         if(WorldFixUtil::isInWorldFixQueue($event->getLevel()->getName())) {
             $this->getPlugin()->getServer()->unloadLevel($event->getLevel(), true);
         }
     }
 
-    /**
-     * @return BuilderTools
-     */
     public function getPlugin(): BuilderTools {
         return BuilderTools::getInstance();
     }

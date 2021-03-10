@@ -29,22 +29,14 @@ use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\scheduler\AsyncTask;
 
-/**
- * Class SchematicCreateTask
- * @package czechpmdevs\buildertools\async
- */
 class MCEditSaveTask extends AsyncTask {
 
-    /** @var string $file */
+    /** @var string */
     public string $file;
 
-    /** @var SchematicData $schematic */
+    /** @var SchematicData */
     public SchematicData $schematic;
 
-    /**
-     * MCEditSaveTask constructor.
-     * @param SchematicData $schematic
-     */
     public function __construct(SchematicData $schematic) {
         $this->schematic = $schematic;
     }

@@ -23,25 +23,12 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\command\CommandSender;
 
-/**
- * Class FixCommand
- * @package buildertools\commands
- */
 class FixCommand extends BuilderToolsCommand {
 
-    /**
-     * FixCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/fix", "Fixes world");
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return mixed|void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
 

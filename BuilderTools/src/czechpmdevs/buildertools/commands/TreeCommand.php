@@ -29,25 +29,12 @@ use pocketmine\level\generator\object\SpruceTree;
 use pocketmine\Player;
 use pocketmine\utils\Random;
 
-/**
- * Class TreeCommand
- * @package buildertools\commands
- */
 class TreeCommand extends BuilderToolsCommand {
 
-    /**
-     * TreeCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/tree", "Place tree object", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return mixed|void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

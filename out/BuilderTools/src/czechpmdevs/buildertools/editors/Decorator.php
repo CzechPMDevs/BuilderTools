@@ -26,26 +26,12 @@ use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 
-/**
- * Class Decorator
- * @package worldfixer\editors
- */
 class Decorator extends Editor {
 
-    /**
-     * @return string
-     */
     public function getName(): string {
         return "Decorator";
     }
 
-    /**
-     * @param Position $center
-     * @param string $blocks
-     * @param int $radius
-     * @param int $percentage
-     * @param null $player
-     */
     public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, $player = null) {
         $undo = new BlockArray();
         for ($x = $center->getX()-$radius; $x <= $center->getX()+$radius; $x++) {

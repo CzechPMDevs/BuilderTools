@@ -20,28 +20,17 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors\object;
 
-/**
- * Class EditorResult
- * @package buildertools\editors\object
- */
 class EditorResult {
 
-    /** @var int $countBlocks */
+    /** @var int */
     public $countBlocks;
 
-    /** @var float|int $time */
+    /** @var float */
     public $time;
 
-    /** @var bool $error */
+    /** @var bool  */
     public $error;
 
-    /**
-     * EditorResult constructor.
-     *
-     * @param int $countBlocks
-     * @param float $time
-     * @param bool $error
-     */
     public function __construct(int $countBlocks, float $time, bool $error = false) {
         $this->countBlocks = $countBlocks;
         $this->time = $time;

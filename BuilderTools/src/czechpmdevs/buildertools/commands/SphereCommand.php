@@ -26,15 +26,8 @@ use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class SphereCommand
- * @package buildertools\commands
- */
 class SphereCommand extends BuilderToolsCommand {
 
-    /**
-     * SphereCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/sphere", "Create sphere", null, []);
     }

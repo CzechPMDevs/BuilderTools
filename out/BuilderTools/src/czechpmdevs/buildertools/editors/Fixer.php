@@ -20,15 +20,8 @@ namespace czechpmdevs\buildertools\editors;
 
 use pocketmine\block\BlockIds;
 
-/**
- * Class Fixer
- * @package buildertools\editors
- */
 class Fixer extends Editor {
 
-    /**
-     * @var array $blocks
-     */
     private const BLOCK_FIX_DATA = [
         158 => [BlockIds::WOODEN_SLAB, 0],
         125 => [BlockIds::DOUBLE_WOODEN_SLAB, ""],
@@ -49,10 +42,6 @@ class Fixer extends Editor {
         204 => [BlockIds::PURPUR_BLOCK, 0]
     ];
 
-    /**
-     * @param int $id
-     * @param int $damage
-     */
     public function fixBlock(int &$id, int &$damage) {
         if(isset(self::BLOCK_FIX_DATA[$id])) {
             if(is_int(self::BLOCK_FIX_DATA[$id][1])) {
@@ -70,18 +59,10 @@ class Fixer extends Editor {
         }
     }
 
-    /**
-     * @param int $meta
-     * @return int
-     */
     private function fixButtonMeta(int $meta): int {
         return (6 - $meta) % 6;
     }
 
-    /**
-     * @param int $meta
-     * @return int
-     */
     private function fixTrapdoorMeta(int $meta): int {
         $key = $meta >> 2;
         if($key == 0) {
@@ -93,9 +74,6 @@ class Fixer extends Editor {
         }
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string {
         return "Fixer";
     }

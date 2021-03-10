@@ -26,10 +26,6 @@ use czechpmdevs\buildertools\editors\Editor;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class DecorationCommand
- * @package czechpmdevs\buildertools\commands
- */
 class DecorationCommand extends BuilderToolsCommand {
 
     public function __construct() {

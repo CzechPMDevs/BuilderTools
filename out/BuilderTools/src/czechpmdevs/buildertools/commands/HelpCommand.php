@@ -23,20 +23,13 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
 
-/**
- * Class HelpCommand
- * @package buildertools\commands
- */
 class HelpCommand extends BuilderToolsCommand {
 
     public const COMMANDS_PER_PAGE = 5;
 
-    /** @var string[] $pages */
+    /** @var string[]  */
     public static $pages = [];
 
-    /**
-     * HelpCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/help", "Displays BuilderTools commands", null, ["/?", "buildertools", "/commands"]);
     }
@@ -76,12 +69,6 @@ class HelpCommand extends BuilderToolsCommand {
         }
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         $page = 1;

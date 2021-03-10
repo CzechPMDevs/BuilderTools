@@ -26,25 +26,12 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
-/**
- * Class FirstPositionCommand
- * @package buildertools\commands
- */
 class FirstPositionCommand extends BuilderToolsCommand {
 
-    /**
-     * FirstPositionCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/pos1", "Select first position", null, ["/1"]);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

@@ -27,25 +27,12 @@ use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class CopyCommand
- * @package buildertools\commands
- */
 class CopyCommand extends BuilderToolsCommand {
 
-    /**
-     * CopyCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/copy", "Copy selected area", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

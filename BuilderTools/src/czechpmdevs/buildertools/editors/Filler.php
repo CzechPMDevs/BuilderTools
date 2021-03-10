@@ -25,6 +25,7 @@ use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
+use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
@@ -33,42 +34,22 @@ use pocketmine\network\mcpe\protocol\FullChunkDataPacket;
 use pocketmine\network\mcpe\protocol\LevelChunkPacket;
 use pocketmine\Player;
 
-/**
- * Class Filler
- * @package buildertools\editors
- */
 class Filler extends Editor {
 
-    /**
-     * @param Vector3 $pos1
-     * @param Vector3 $pos2
-     * @param Level $level
-     * @param string $blockArgs
-     * @param bool $filled
-     *
-     * @return BlockArray
-     */
     public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, $filled = true): BlockArray {
+        $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
+
         $updates = new BlockArray();
         $updates->setLevel($level);
 
         foreach (BlockGenerator::fillCuboid($pos1, $pos2, !$filled) as $vector3) {
-            $updates->addBlock($vector3, ...$this->getBlockArgsFromString($blockArgs));
+            $stringToBlockDecoder->nextBlock($id, $meta);
+            $updates->addBlock($vector3, $id, $meta);
         }
 
         return $updates;
     }
 
-
-    /**
-     * @param Player $player
-     * @param UpdateLevelData $updateData
-     * @param bool $saveUndo
-     * @param bool $saveRedo
-     * @param bool $replaceOnlyAir
-     *
-     * @return EditorResult
-     */
     public function fill(Player $player, UpdateLevelData $updateData, bool $saveUndo = true, bool $saveRedo = false, bool $replaceOnlyAir = false): EditorResult {
         $startTime = microtime(true);
         $count = $updateData->size();
@@ -135,25 +116,10 @@ class Filler extends Editor {
         return new EditorResult($count, microtime(true)-$startTime);
     }
 
-    /**
-     * @param Player $player
-     * @param UpdateLevelData $updateData
-     * @param bool $saveUndo
-     * @param bool $saveRedo
-     *
-     * @return EditorResult
-     */
     public function merge(Player $player, UpdateLevelData $updateData, bool $saveUndo = true, bool $saveRedo = false): EditorResult {
         return $this->fill($player, $updateData, $saveUndo, $saveRedo, true);
     }
 
-    /**
-     * @param Level $level
-     * @param int $minX
-     * @param int $minZ
-     * @param int $maxX
-     * @param int $maxZ
-     */
     private function reloadChunks(Level $level, int $minX, int $minZ, int $maxX, int $maxZ): void {
         for($x = $minX >> 4; $x <= $maxX >> 4; $x++) {
             for ($z = $minZ >> 4; $z <= $maxZ >> 4; $z++) {
@@ -184,9 +150,6 @@ class Filler extends Editor {
         }
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string {
         return "Filler";
     }

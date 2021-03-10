@@ -22,44 +22,30 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\math\BlockGenerator;
+use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 
-/**
- * Class Replacement
- * @package buildertools\editors
- */
 class Replacement extends Editor {
 
-    /**
-     * @param Vector3 $pos1
-     * @param Vector3 $pos2
-     * @param Level $level
-     *
-     * Blocks whose will replaced
-     * @param string $blocks
-     *
-     * Blocks whose will placed
-     * @param string $replace
-     *
-     * @return BlockArray
-     */
     public function prepareReplace(Vector3 $pos1, Vector3 $pos2, Level $level, string $blocks, string $replace): BlockArray {
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+        $anotherStringToBlockDecoder = new StringToBlockDecoder($replace);
+
         $updateLevelData = new BlockArray();
         $updateLevelData->setLevel($level);
 
         foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $vector3) {
-            if($this->isBlockInString($blocks, $level->getBlock($vector3))) {
-                $updateLevelData->addBlock($vector3, ...$this->getBlockArgsFromString($replace));
+            $block = $level->getBlock($vector3);
+            if($stringToBlockDecoder->containsBlock($block->getId(), $block->getDamage())) {
+                $anotherStringToBlockDecoder->nextBlock($id, $meta);
+                $updateLevelData->addBlock($vector3, $id, $meta);
             }
         }
 
         return $updateLevelData;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string {
         return "Replacement";
     }

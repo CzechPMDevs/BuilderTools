@@ -29,17 +29,17 @@ use pocketmine\Player;
  */
 class Selectors {
 
-    /** @var Position[] $pos1 */
+    /** @var Position[] */
     private static $pos1 = [];
-    /** @var Position[] $pos2 */
+    /** @var Position[] */
     private static $pos2 = [];
 
-    /** @var Player[] $wandSelectors */
+    /** @var Player[] */
     private static $wandSelectors = [];
 
-    /** @var array[] $drawingPlayers */
+    /** @var array[] */
     private static $drawingPlayers = [];
-    /** @var Player[] $blockInfoPlayers */
+    /** @var Player[] */
     private static $blockInfoPlayers = [];
 
     /**

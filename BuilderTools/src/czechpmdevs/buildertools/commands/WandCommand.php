@@ -26,25 +26,12 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-/**
- * Class WandCommand
- * @package buildertools\commands
- */
 class WandCommand extends BuilderToolsCommand {
 
-    /**
-     * WandCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/wand", "Switch wand tool", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

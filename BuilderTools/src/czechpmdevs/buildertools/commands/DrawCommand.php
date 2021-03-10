@@ -26,31 +26,18 @@ use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-/**
- * Class DrawCommand
- * @package buildertools\commands
- */
 class DrawCommand extends BuilderToolsCommand {
 
-    /** @var int $minBrush */
+    /** @var int */
     private int $minBrush = 1;
 
-    /** @var int $maxBrush */
+    /** @var int */
     private int $maxBrush = 10;
 
-    /**
-     * DrawCommand constructor.
-     */
     public function __construct() {
         parent::__construct("/draw", "Draw witch blocks", null, []);
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $commandLabel
-     * @param array $args
-     * @return void
-     */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

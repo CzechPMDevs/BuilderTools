@@ -33,27 +33,19 @@ use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Player;
 
-/**
- * Class SchematicsManager
- * @package czechpmdevs\buildertools\schematics
- */
 class SchematicsManager {
 
     public const SCHEMATIC_MCEDIT_FORMAT = 0x00;
     public const SCHEMATIC_UNKNOWN_FORMAT = 0x01;
 
-    /** @var BuilderTools $plugin */
+    /** @var BuilderTools */
     protected BuilderTools $plugin;
 
-    /** @var SchematicData[] $schematics */
+    /** @var SchematicData[] */
     public array $schematics = [];
-    /** @var SchematicData[] $players */
+    /** @var SchematicData[] */
     public array $players;
 
-    /**
-     * SchematicsManager constructor.
-     * @param BuilderTools $plugin
-     */
     public function __construct(BuilderTools $plugin) {
         $this->plugin = $plugin;
         $this->init();
@@ -76,17 +68,10 @@ class SchematicsManager {
         }
     }
 
-    /**
-     * @param string $file
-     * @param SchematicData $schematic
-     */
     public function registerSchematic(string $file, SchematicData $schematic) {
         $this->schematics[basename($file, ".schematic")] = $schematic;
     }
 
-    /**
-     * @param string $path
-     */
     public function loadSchematic(string $path) {
         $this->plugin->getLogger()->info("Loading schematic from $path...");
         switch ($this->getSchematicFormat($path)) {
@@ -99,10 +84,6 @@ class SchematicsManager {
         }
     }
 
-    /**
-     * @param string $path
-     * @return int
-     */
     private function getSchematicFormat(string $path): int {
         try {
             /** @var CompoundTag $data */
@@ -116,19 +97,10 @@ class SchematicsManager {
         return self::SCHEMATIC_UNKNOWN_FORMAT;
     }
 
-    /**
-     * @param Player $player
-     * @param SchematicData $schematic
-     */
     public function addToPaste(Player $player, SchematicData $schematic) {
         $this->players[$player->getName()] = $schematic;
     }
 
-    /**
-     * @param Player $player
-     *
-     * @return bool
-     */
     public function pasteSchematic(Player $player): bool {
         if(!isset($this->players[$player->getName()])) {
             $player->sendMessage(BuilderTools::getPrefix(). "§cType //schem load <filename> to load schematic first!");
@@ -154,24 +126,14 @@ class SchematicsManager {
         $this->getPlugin()->getServer()->getAsyncPool()->submitTask(new MCEditSaveTask($schematic));
     }
 
-    /**
-     * @param string $name
-     * @return SchematicData|null
-     */
     public function getSchematic(string $name): ?SchematicData {
         return $this->schematics[$name] ?? null;
     }
 
-    /**
-     * @return SchematicData[] $schematics
-     */
     public function getAllSchematics(): array {
         return $this->schematics;
     }
 
-    /**
-     * @return BuilderTools
-     */
     public function getPlugin(): BuilderTools {
         return $this->plugin;
     }
