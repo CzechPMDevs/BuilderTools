@@ -25,7 +25,6 @@ use Error;
 use pocketmine\level\format\io\BaseLevelProvider;
 use pocketmine\level\format\io\LevelProviderManager;
 use pocketmine\level\format\io\region\Anvil;
-use pocketmine\level\format\io\region\PMAnvil;
 use pocketmine\level\format\io\region\RegionLoader;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\MainLogger;
@@ -68,7 +67,7 @@ class WorldFixTask extends AsyncTask {
         }
 
         try {
-            /** @var BaseLevelProvider|Anvil|PMAnvil|null $provider */
+            /** @var BaseLevelProvider|Anvil|null $provider */
             $provider = new $providerClass($this->worldPath . DIRECTORY_SEPARATOR);
         }
         catch (Error $error) {
@@ -76,7 +75,7 @@ class WorldFixTask extends AsyncTask {
             return;
         }
 
-        if((!$provider instanceof Anvil) && (!$provider instanceof PMAnvil)) {
+        if(!$provider instanceof Anvil) {
             $this->error = "BuilderTools does not support fixing chunks with {$provider->getName()} provider.";
             return;
         }

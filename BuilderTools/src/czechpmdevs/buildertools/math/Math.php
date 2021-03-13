@@ -27,20 +27,17 @@ class Math {
 
     public const PI_360 = M_PI * 2;
 
-    /**
-     * @deprecated
-     * @link Math::ceilPosition()
-     */
-    public static function roundPosition(Position $position): Position {
-        return self::ceilPosition($position);
-    }
-
     public static function ceilPosition(Position $position): Position {
         return Position::fromObject($position->ceil(), $position->getLevel());
     }
 
     /**
      * Returns distance^2 between (0, 0) and (x, y)
+     *
+     * @param int|float $x
+     * @param int|float $y
+     *
+     * @return int|float
      */
     public static function lengthSquared2d($x, $y) {
         return ($x ** 2) + ($y ** 2);
@@ -48,6 +45,12 @@ class Math {
 
     /**
      * Returns distance^2 between (0, 0, 0) and (x, y, z)
+     *
+     * @param int|float $x
+     * @param int|float $y
+     * @param int|float $z
+     *
+     * @return int|float
      */
     public static function lengthSquared3d($x, $y, $z) {
         return ($x ** 2) + ($y ** 2) + ($z ** 2);

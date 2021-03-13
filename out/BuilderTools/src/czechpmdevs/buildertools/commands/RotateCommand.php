@@ -61,10 +61,6 @@ class RotateCommand extends BuilderToolsCommand {
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        if(!isset($copier->copiedClipboards[$sender->getName()])) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
-            return;
-        }
 
         foreach ($args as $i => $arg) {
             if($i === 0) {

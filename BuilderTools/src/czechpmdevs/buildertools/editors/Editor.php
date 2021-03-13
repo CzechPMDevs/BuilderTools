@@ -21,10 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\utils\StringToBlockDecoder;
-use Exception;
-use pocketmine\block\Block;
-use pocketmine\item\Item;
 
 abstract class Editor {
 
@@ -41,99 +37,5 @@ abstract class Editor {
 
     public function getPlugin(): BuilderTools {
         return BuilderTools::getInstance();
-    }
-
-    /**
-     * @deprecated
-     * @link StringToBlockDecoder
-     */
-    public function isBlockInString(string $string, Block $block): bool {
-        $itemArgs = explode(",", $string);
-        $checkMeta = strpos($string, ":") !== false || Item::fromString($string)->getDamage() !== 0;
-
-        $items = [];
-        foreach ($itemArgs as $itemString) {
-            // Item::fromString() throws exception
-            try {
-                 $blockInString = Item::fromString($itemString)->getBlock();
-                 if($checkMeta) {
-                     $items[] =  (string)$blockInString->getId() . ":" . (string)$blockInString->getDamage();
-                 } else {
-                     $items[] = $blockInString->getId();
-                 }
-            }
-            catch (Exception $exception) {}
-        }
-
-        return (bool)in_array($checkMeta ? ((string)$block->getId() . ":" . (string)$block->getDamage()) : $block->getId(), $items);
-    }
-
-    /**
-     * @deprecated
-     * @link StringToBlockDecoder
-     */
-    public function getBlockFromString(string $string): Block {
-        $itemArgs = explode(",", $string);
-
-        /** @var Item|null $item */
-        $item = null;
-        try {
-            if(strpos($string, "%") === false) {
-                $item = Item::fromString($itemArgs[array_rand($itemArgs, 1)]);
-            } else {
-                $percentageData = [];
-                foreach ($itemArgs as $itemName) {
-                    if(($i = strpos($itemName, "%")) === false) {
-                        $percentageData[$itemName] = 100;
-                    } else {
-                        $percentageData[substr($itemName, $i + 1)] = (int)substr($itemName, 0, $i);
-                    }
-                }
-
-                shuffle($percentageData);
-
-                do {
-                    if(count($percentageData) == 0) {
-                        $item = Item::fromString(array_key_last($percentageData));
-                    } else {
-                        $name = array_key_first($percentageData);
-                        if(mt_rand(0, 100) < array_shift($percentageData)) {
-                            $item = Item::fromString($name);
-                        }
-                    }
-                }
-                while($item === null);
-            }
-        }
-        catch (Exception $exception) {
-            $item = Item::get(Item::AIR);
-        }
-
-        if(!$item instanceof Item)
-            return Block::get(Block::AIR);
-
-        /** @var Block $block */
-        $block = null;
-        try {
-            $block = $item->getBlock();
-        }
-        catch (Exception $exception) {
-            $block = Block::get(Block::AIR);
-        }
-
-        if(!$block instanceof Block) {
-            return Block::get(Block::AIR);
-        }
-
-        return $block;
-    }
-
-    /**
-     * @deprecated
-     * @link StringToBlockDecoder
-     */
-    public function getBlockArgsFromString(string $string): array {
-        $block = $this->getBlockFromString($string);
-        return [$block->getId(), $block->getDamage()];
     }
 }

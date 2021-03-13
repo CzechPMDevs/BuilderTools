@@ -2,7 +2,7 @@
 
 echo "Testing memory usage/speed for saving block lists.\n";
 
-$cubeSize = 200;
+$cubeSize = 100;
 $totalBlocks = pow($cubeSize, 3);
 echo "Working with {$cubeSize}x{$cubeSize}x{$cubeSize} ($totalBlocks blocks) cube with random block ids and metas:\n\n";
 
@@ -14,32 +14,34 @@ for($i = 0; $i < ($cubeSize ** 3); $i++) {
         mt_rand(0, 127),
         mt_rand(0, 15),
         mt_rand(-1000, 1000),
-        mt_rand(-1000, 1000),
+        mt_rand(0, 255),
         mt_rand(-1000, 1000)
     ];
 }
 
+echo "Data pre-generated!\n\n";
+
 // FIRST
-//$currentMemory = memory_get_usage();
-//
-//$firstTestStart = microtime(true);
-//$firstTestArray = [];
-//foreach ($array as [$id, $meta, $x, $y, $z]) {
-//    $firstTestArray[(($x & 0xFFFFFFF) << 36) | (($y & 0xff) << 28) | ($z & 0xFFFFFFF)] = ($id << 4) | $meta;
-//}
-//$firstTestWriteFinish = microtime(true);
-//foreach ($firstTestArray as $hash => $value) {
-//    $id = $value >> 4;
-//    $meta = $value & 0x0f;
-//
-//    $x = $hash >> 36;
-//    $y = ($hash >> 28) & 0xff;
-//    $z = ($hash & 0xFFFFFFF) << 36 >> 36;
-//}
-//$firstTestReadFinish = microtime(true);
-//echo "First test (took " . round($firstTestReadFinish-$firstTestStart, 4) ." seconds): " . round((memory_get_usage() - $currentMemory) / 1000_000, 4) . "Mbit ram used\n";
-//echo "Write time: " . round($firstTestWriteFinish - $firstTestStart, 4) . " sec\n";
-//echo "Read time: " . round($firstTestReadFinish - $firstTestWriteFinish, 4) . " sec\n\n";
+$currentMemory = memory_get_usage();
+
+$firstTestStart = microtime(true);
+$firstTestArray = [];
+foreach ($array as [$id, $meta, $x, $y, $z]) {
+    $firstTestArray[(($x & 0xFFFFFFF) << 36) | (($y & 0xff) << 28) | ($z & 0xFFFFFFF)] = ($id << 4) | $meta;
+}
+$firstTestWriteFinish = microtime(true);
+foreach ($firstTestArray as $hash => $value) {
+    $id = $value >> 4;
+    $meta = $value & 0x0f;
+
+    $x = $hash >> 36;
+    $y = ($hash >> 28) & 0xff;
+    $z = ($hash & 0xFFFFFFF) << 36 >> 36;
+}
+$firstTestReadFinish = microtime(true);
+echo "First test (took " . round($firstTestReadFinish-$firstTestStart, 4) ." seconds): " . round((memory_get_usage() - $currentMemory) / 1000_000, 4) . "Mbit ram used\n";
+echo "Write time: " . round($firstTestWriteFinish - $firstTestStart, 4) . " sec\n";
+echo "Read time: " . round($firstTestReadFinish - $firstTestWriteFinish, 4) . " sec\n\n";
 
 // SECOND
 $currentMemory = memory_get_usage();
@@ -67,7 +69,7 @@ echo "Second test (took " . round($secondTestReadFinish-$secondTestStart, 4) ." 
 echo "Write time: " . round($secondTestWriteFinish - $secondTestStart, 4) . " sec\n";
 echo "Read time: " . round($secondTestReadFinish - $secondTestWriteFinish, 4) . " sec\n\n";
 
-// THIRD (CURRENT)
+// THIRD (LAST BP RELEASE)
 $currentMemory = memory_get_usage();
 
 $thirdTestStart = microtime(true);
@@ -115,27 +117,29 @@ echo "Write time: " . round($fourthTestWriteFinish - $fourthTestStart, 4) . " se
 echo "Read time: " . round($fourthTestReadFinish - $fourthTestWriteFinish, 4) . " sec\n\n";
 
 // FIFTH
-//$currentMemory = memory_get_usage();
-//
-//$fifthTestStart = microtime(true);
-//$fifthTestArray = [];
-//foreach ($array as [$id, $meta, $x, $y, $z]) {
-//    $fifthTestBuffer[(($x & 0xFFFFFFF) << 36) | (($y & 0xff) << 28) | ($z & 0xFFFFFFF)] = chr($id) . chr($meta);
-//}
-//$fifthTestWriteFinish = microtime(true);
-//foreach ($fifthTestArray as $hash => $value) {
-//    $id = ord($value[0]);
-//    $meta = ord($value[1]);
-//
-//    $x = $hash >> 36;
-//    $y = ($hash >> 28) & 0xff;
-//    $z = ($hash & 0xFFFFFFF) << 36 >> 36;
-//}
-//
-//$fifthTestReadFinish = microtime(true);
-//echo "Fifth test (took " . round($fifthTestReadFinish-$fifthTestStart, 4) ." seconds): " . round((memory_get_usage() - $currentMemory) / 1000_000, 4) . "Mbit ram used\n";
-//echo "Write time: " . round($fifthTestWriteFinish - $fifthTestStart, 4) . " sec\n";
-//echo "Read time: " . round($fifthTestReadFinish - $fifthTestWriteFinish, 4) . " sec\n\n";
+$currentMemory = memory_get_usage();
+
+$fifthTestStart = microtime(true);
+$fifthTestArray = [];
+foreach ($array as [$id, $meta, $x, $y, $z]) {
+    $fifthTestBuffer[pack("q", (($x & 0xFFFFFFF) << 36) | (($y & 0xff) << 28) | ($z & 0xFFFFFFF))] = $id << 4 | $meta;
+}
+$fifthTestWriteFinish = microtime(true);
+foreach ($fifthTestArray as $bin => $value) {
+    $id = $value >> 4;
+    $meta = $value & 0x0f;
+
+    $hash = unpack("q", $bin);
+
+    $x = $hash >> 36;
+    $y = ($hash >> 28) & 0xff;
+    $z = ($hash & 0xFFFFFFF) << 36 >> 36;
+}
+
+$fifthTestReadFinish = microtime(true);
+echo "Fifth test (took " . round($fifthTestReadFinish-$fifthTestStart, 4) ." seconds): " . round((memory_get_usage() - $currentMemory) / 1000_000, 4) . "Mbit ram used\n";
+echo "Write time: " . round($fifthTestWriteFinish - $fifthTestStart, 4) . " sec\n";
+echo "Read time: " . round($fifthTestReadFinish - $fifthTestWriteFinish, 4) . " sec\n\n";
 
 class Block {
     

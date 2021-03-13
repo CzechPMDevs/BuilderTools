@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
+use InvalidArgumentException;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -27,24 +28,48 @@ class SelectionData extends BlockArray {
 
     /** @var Player */
     protected $player;
-    /** @var Vector3 */
-    protected $playerPosition;
+    /** @var Vector3|null */
+    protected $playerPosition = null;
+
+    /**
+     * @param bool $modifyBuffer If it's false, only relative position will be changed.
+     */
+    public function addVector3(Vector3 $vector3, bool $modifyBuffer = false): BlockArray {
+        if(!$vector3->ceil()->equals($vector3)) {
+            throw new InvalidArgumentException("Vector3 coordinates must be integer.");
+        }
+
+        if($this->playerPosition instanceof Vector3) {
+            $clipboard = clone $this;
+            $clipboard->playerPosition->add($vector3);
+
+            return $clipboard;
+        }
+
+        return parent::addVector3($vector3);
+    }
 
     public function getPlayer(): Player {
         return $this->player;
     }
 
-    public function setPlayer(Player $player) {
+    /**
+     * @return $this
+     */
+    public function setPlayer(Player $player): SelectionData {
         $this->player = $player;
 
         return $this;
     }
 
-    public function getPlayerPosition(): Vector3 {
+    public function getPlayerPosition(): ?Vector3 {
         return $this->playerPosition;
     }
 
-    public function setPlayerPosition(Vector3 $playerPosition) {
+    /**
+     * @return $this
+     */
+    public function setPlayerPosition(?Vector3 $playerPosition): SelectionData {
         $this->playerPosition = $playerPosition;
 
         return $this;

@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\utils\RotationUtil;
@@ -35,9 +36,6 @@ class Copier extends Editor {
     public const DIRECTION_PLAYER = 0;
     public const DIRECTION_UP = 1;
     public const DIRECTION_DOWN = 2;
-
-    /** @var SelectionData[] */
-    public $copiedClipboards = [];
 
     public function getName(): string {
         return "Copier";
@@ -56,49 +54,55 @@ class Copier extends Editor {
             $i++;
         }
 
-        $this->copiedClipboards[$player->getName()] = $clipboard;
+        ClipboardManager::saveClipboard($player, $clipboard);
 
         return new EditorResult($i, microtime(true)-$startTime, false);
     }
 
     public function merge(Player $player) {
-        if(!isset($this->copiedClipboards[$player->getName()])) {
+        if(!ClipboardManager::hasClipboardCopied($player)) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
 
+        $clipboard = ClipboardManager::getClipboard($player);
+        $clipboard->setLevel($player->getLevel());
+
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->merge($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil()->subtract($this->copiedClipboards[$player->getName()]->getPlayerPosition()))->setLevel($player->getLevel()));
+        $filler->merge($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
     }
 
     public function paste(Player $player) {
-        if(!isset($this->copiedClipboards[$player->getName()])) {
+        if(!ClipboardManager::hasClipboardCopied($player)) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
+
+        $clipboard = ClipboardManager::getClipboard($player);
+        $clipboard->setLevel($player->getLevel());
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $this->copiedClipboards[$player->getName()]->addVector3($player->ceil()->subtract($this->copiedClipboards[$player->getName()]->getPlayerPosition()))->setLevel($player->getLevel()));
+        $filler->fill($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
     }
 
     public function rotate(Player $player, int $axis, int $rotation) {
-        if(!isset($this->copiedClipboards[$player->getName()])) {
+        if(!ClipboardManager::hasClipboardCopied($player)) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
 
-        $this->copiedClipboards[$player->getName()] = RotationUtil::rotate($this->copiedClipboards[$player->getName()], $axis, $rotation);
+        ClipboardManager::saveClipboard($player, RotationUtil::rotate(ClipboardManager::getClipboard($player), $axis, $rotation));
     }
 
     public function stack(Player $player, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER) {
-        if (!isset($this->copiedClipboards[$player->getName()])) {
+        if (!ClipboardManager::hasClipboardCopied($player)) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
 
-        $clipboard = $this->copiedClipboards[$player->getName()];
+        $clipboard = ClipboardManager::getClipboard($player);
 
         $updateData = new BlockArray();
         $updateData->setLevel($player->getLevel());
@@ -194,6 +198,6 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(self::FILLER);
-        $filler->fill($player, $blocks, true, false, true);
+        $filler->fill($player, $blocks, null, true, false, true);
     }
 }

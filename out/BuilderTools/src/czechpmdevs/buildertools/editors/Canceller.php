@@ -50,7 +50,7 @@ class Canceller extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(self::FILLER);
-        return $filler->fill($player, $blockList, false, true);
+        return $filler->fill($player, $blockList, null, false, true);
     }
 
     public function addRedo(Player $player, BlockArray $blocks) {

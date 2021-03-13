@@ -26,6 +26,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
+use http\Exception\InvalidArgumentException;
 use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
@@ -50,7 +51,11 @@ class Filler extends Editor {
         return $updates;
     }
 
-    public function fill(Player $player, UpdateLevelData $updateData, bool $saveUndo = true, bool $saveRedo = false, bool $replaceOnlyAir = false): EditorResult {
+    public function fill(Player $player, UpdateLevelData $updateData, ?Vector3 $relativePosition = null, bool $saveUndo = true, bool $saveRedo = false, bool $replaceOnlyAir = false): EditorResult {
+        if($relativePosition !== null && !$relativePosition->equals($relativePosition->ceil())) {
+            throw new InvalidArgumentException("Vector3 coordinates must be integer.");
+        }
+
         $startTime = microtime(true);
         $count = $updateData->size();
 
@@ -71,6 +76,11 @@ class Filler extends Editor {
         $x = $y = $z = $id = $meta = null;
         while ($updateData->hasNext()) {
             $updateData->readNext($x, $y, $z, $id, $meta);
+            if($relativePosition !== null) {
+                $x += $relativePosition->getX();
+                $y += $relativePosition->getY();
+                $z += $relativePosition->getZ();
+            }
 
             // min and max positions
             if($minX === null || $x < $minX) $minX = $x;
@@ -116,8 +126,8 @@ class Filler extends Editor {
         return new EditorResult($count, microtime(true)-$startTime);
     }
 
-    public function merge(Player $player, UpdateLevelData $updateData, bool $saveUndo = true, bool $saveRedo = false): EditorResult {
-        return $this->fill($player, $updateData, $saveUndo, $saveRedo, true);
+    public function merge(Player $player, UpdateLevelData $updateData, ?Vector3 $relativePosition = null, bool $saveUndo = true, bool $saveRedo = false): EditorResult {
+        return $this->fill($player, $updateData, $relativePosition, $saveUndo, $saveRedo, true);
     }
 
     private function reloadChunks(Level $level, int $minX, int $minZ, int $maxX, int $maxZ): void {

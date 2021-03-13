@@ -20,17 +20,14 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use Generator;
+use InvalidArgumentException;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 
 /**
- * Saves block with it's position as vector3
+ * Saves block with it's position as Vector3
  * Uses 17x less memory than regular array with full block int
  * Uses 62x less memory than regular array with class
- *
- * Class BlockArray
- * @package czechpmdevs\buildertools\blockstorage
  */
 class BlockArray implements UpdateLevelData {
     use DuplicateBlockDetector;
@@ -99,7 +96,10 @@ class BlockArray implements UpdateLevelData {
      * @return $this for chaining
      */
     public function addVector3(Vector3 $vector3): BlockArray {
-        $vector3 = $vector3->ceil();
+        if(!$vector3->ceil()->equals($vector3)) {
+            throw new InvalidArgumentException("Vector3 coordinates must be integer.");
+        }
+
         $blockArray = new BlockArray();
 
         $len = strlen($this->buffer);

@@ -33,17 +33,13 @@ final class StringToBlockDecoder {
     /** @var int[] */
     private $blockMap = [];
 
-    /**
-     * StringToBlockDecoder constructor.
-     * @param string $string
-     */
     public function __construct(string $string) {
         $this->string = $string;
         $this->decode();
     }
 
     /**
-     * @return bool Returns if it is possible string contained
+     * @return bool Returns if the string contains
      * any valid blocks
      */
     public function isValid(): bool {
@@ -90,8 +86,9 @@ final class StringToBlockDecoder {
                 $block = substr($entry, $pos + 1);
             }
 
-            $class = ItemFactory::fromStringSingle($block)->getBlock();
-            if($class->getId() == 0) {
+            $item = ItemFactory::fromStringSingle($block);
+            $class = $item->getBlock();
+            if($class->getId() == 0 && $item->getId() != 0) {
                 continue;
             }
 

@@ -103,8 +103,11 @@ class BuilderTools extends PluginBase {
     }
 
     private function initConfig() {
-        if(!is_dir($this->getDataFolder())) {
-            @mkdir($this->getDataFolder());
+        if(!is_dir($this->getDataFolder() . "schematics")) {
+            @mkdir($this->getDataFolder() . "schematics");
+        }
+        if(!is_dir($this->getDataFolder() . "offline_sessions")) {
+            @mkdir($this->getDataFolder() . "offline_sessions");
         }
         self::$configuration = $this->getConfig()->getAll();
     }
@@ -178,10 +181,6 @@ class BuilderTools extends PluginBase {
         }
     }
 
-    /**
-     * @param string $name
-     * @return Editor $editor
-     */
     public static function getEditor(string $name): Editor {
         return self::$editors[$name];
     }
@@ -193,37 +192,22 @@ class BuilderTools extends PluginBase {
         return self::$commands;
     }
 
-    /**
-     * @return string $prefix
-     */
     public static function getPrefix(): string {
         return self::$prefix;
     }
 
-    /**
-     * @return array
-     */
     public static function getConfiguration(): array {
         return self::$configuration;
     }
 
-    /**
-     * @return EventListener $listener
-     */
     public static function getListener(): EventListener {
         return self::$listener;
     }
 
-    /**
-     * @return SchematicsManager $schematicsManager
-     */
     public static function getSchematicsManager(): SchematicsManager {
         return self::$schematicsManager;
     }
 
-    /**
-     * @return BuilderTools $instance
-     */
     public static function getInstance(): BuilderTools {
         return self::$instance;
     }

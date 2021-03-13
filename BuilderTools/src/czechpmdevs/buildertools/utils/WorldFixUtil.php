@@ -30,7 +30,7 @@ use pocketmine\Server;
 
 class WorldFixUtil {
 
-    /** @var array */
+    /** @var string[] */
     private static array $worldFixQueue = [];
 
     public static function fixWorld(CommandSender $sender, string $worldName): void {
@@ -65,9 +65,9 @@ class WorldFixUtil {
         }), 60);
 
         BuilderTools::getInstance()->getScheduler()->scheduleRepeatingTask(new class($asyncTask, $sender) extends Task {
-            /** @var WorldFixTask  */
+            /** @var WorldFixTask */
             private WorldFixTask $task;
-            /** @var CommandSender $sender */
+            /** @var CommandSender */
             private CommandSender $sender;
 
             /** @var float $lastPercent */
@@ -99,13 +99,12 @@ class WorldFixUtil {
 
                 if($this->task->percentage == -1) {
                     $this->sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in {$this->task->time} ({$this->task->chunkCount} chunks updated)!");
-                    goto finish;
-                }
 
-                return;
-                finish:
-                BuilderTools::getInstance()->getScheduler()->cancelTask($this->getTaskId());
-                WorldFixUtil::finishWorldFixTask($this->task);
+                    finish:
+                    BuilderTools::getInstance()->getScheduler()->cancelTask($this->getTaskId());
+                    WorldFixUtil::finishWorldFixTask($this->task);
+                    return;
+                }
             }
         }, 2);
 

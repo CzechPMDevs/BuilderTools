@@ -43,7 +43,7 @@ class Printer extends Editor {
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false) {
         $undoList = new BlockArray();
         $undoList->setLevel($center->getLevel());
-        $center = Math::roundPosition($center);
+        $center = Math::ceilPosition($center);
 
         $placeBlock = function (Vector3 $vector3) use ($undoList, $block, $center, $throwBlock) {
             if($throwBlock) {

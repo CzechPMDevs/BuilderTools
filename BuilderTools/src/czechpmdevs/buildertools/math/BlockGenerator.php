@@ -26,9 +26,9 @@ use pocketmine\math\Vector3;
 class BlockGenerator {
 
     public static function fillCuboid(Vector3 $pos1, Vector3 $pos2, bool $hollow = false): Generator {
-        for($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
-            for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
-                for($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
+        for($x = min($pos1->getX(), $pos2->getX()), $maxX = max($pos1->getX(), $pos2->getX()); $x <= $maxX; $x++) {
+            for($y = min($pos1->getY(), $pos2->getY()), $maxY = max($pos1->getY(), $pos2->getY()); $y <= $maxY; $y++) {
+                for($z = min($pos1->getZ(), $pos2->getZ()), $maxZ = max($pos1->getZ(), $pos2->getZ()); $z <= $maxZ; $z++) {
                     if($hollow && ($x != min($pos1->getX(), $pos2->getX()) && $x != max($pos1->getX(), $pos2->getX())) && ($y != min($pos1->getY(), $pos2->getY()) && $y != max($pos1->getY(), $pos2->getY())) && ($z != min($pos1->getZ(), $pos2->getZ()) && $z != max($pos1->getZ(), $pos2->getZ()))) {
                         continue;
                     }
