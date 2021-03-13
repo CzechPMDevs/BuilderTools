@@ -50,6 +50,6 @@ class HollowSphereCommand extends BuilderToolsCommand {
         $printer = BuilderTools::getEditor(Editor::PRINTER);
 
         $result = $printer->makeHollowSphere($sender, $sender, $radius, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aHollow sphere created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow sphere created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
     }
 }

@@ -50,6 +50,6 @@ class HollowCubeCommand extends BuilderToolsCommand {
         $printer = BuilderTools::getEditor(Editor::PRINTER);
 
         $result = $printer->makeHollowCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cube created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." block changed)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cube created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
     }
 }

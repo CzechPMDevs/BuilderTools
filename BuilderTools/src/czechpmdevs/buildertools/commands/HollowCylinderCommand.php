@@ -50,6 +50,6 @@ class HollowCylinderCommand extends BuilderToolsCommand {
         $printer = BuilderTools::getEditor(Editor::PRINTER);
 
         $result = $printer->makeHollowCylinder($sender, $sender, $radius, $height, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cylinder created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cylinder created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
     }
 }

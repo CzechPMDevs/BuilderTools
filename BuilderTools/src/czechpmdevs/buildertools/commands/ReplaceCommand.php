@@ -69,7 +69,8 @@ class ReplaceCommand extends BuilderToolsCommand {
         $filler = BuilderTools::getEditor(Editor::FILLER);
         $result = $filler->fill($sender, $list);
 
-        $count = $result->countBlocks;
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in ".round(microtime(true)-$startTime, 2)." ({$count} blocks changed)!");
+        $time = round(microtime(true) - $startTime, 3);
+
+        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->countBlocks} replaced (Took {$time} seconds)!");
     }
 }

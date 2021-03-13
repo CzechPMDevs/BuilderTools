@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools;
 
+use InvalidArgumentException;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
@@ -62,13 +63,40 @@ class Selectors {
         return (bool)isset(self::$drawingPlayers[strtolower($player->getName())]);
     }
 
-    public static function addSelector(Player $player, int $pos, Position $position) {
+    /**
+     * @return int|null If not null, returns count of blocks in selection
+     */
+    public static function addSelector(Player $player, int $pos, Position $position): ?int {
+        if($pos != 1 && $pos != 2) {
+            throw new InvalidArgumentException("Player can select only two positions");
+        }
+        if(!$position->equals($position->ceil())) {
+            throw new InvalidArgumentException("Position coordinates must be integer type.");
+        }
+
         if($pos == 1) {
             self::$pos1[strtolower($player->getName())] = $position;
-        }
-        if($pos == 2) {
+        } else {
             self::$pos2[strtolower($player->getName())] = $position;
         }
+
+        $pos1 = self::$pos1[strtolower($player->getName())] ?? null;
+        $pos2 = self::$pos2[strtolower($player->getName())] ?? null;
+
+        if($pos1 === null || $pos2 === null) {
+            return null;
+        }
+
+        if($pos1->getLevel()->isClosed() || $pos2->getLevel()->isClosed()) {
+            return null;
+        }
+
+        if($pos1->getLevel()->getId() != $pos2->getLevel()->getId()) {
+            return null;
+        }
+
+        $vec = $pos2->subtract($pos1)->abs()->add(1, 1, 1);
+        return $vec->getX() * $vec->getY() * $vec->getZ();
     }
 
     public static function getPosition(Player $player, int $pos): ?Position {

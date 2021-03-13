@@ -119,6 +119,10 @@ class Printer extends Editor {
 
         $radius = abs($radius);
         foreach (BlockGenerator::generateSphere($radius, $hollow) as $vector3) {
+            if($vector3->getY() < 0 || $vector3->getY() > 255) {
+                continue;
+            }
+
             $stringToBlockDecoder->nextBlock($id, $meta);
             $updateLevelData->addBlock($center->add($vector3), $id, $meta);
         }

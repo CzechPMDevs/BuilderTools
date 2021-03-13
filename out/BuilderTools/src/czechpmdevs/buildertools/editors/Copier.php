@@ -59,10 +59,9 @@ class Copier extends Editor {
         return new EditorResult($i, microtime(true)-$startTime, false);
     }
 
-    public function merge(Player $player) {
+    public function merge(Player $player): EditorResult {
         if(!ClipboardManager::hasClipboardCopied($player)) {
-            $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
-            return;
+            return new EditorResult(0, 0, true);
         }
 
         $clipboard = ClipboardManager::getClipboard($player);
@@ -70,13 +69,12 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->merge($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
+        return $filler->merge($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
     }
 
-    public function paste(Player $player) {
+    public function paste(Player $player): EditorResult {
         if(!ClipboardManager::hasClipboardCopied($player)) {
-            $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
-            return;
+            return new EditorResult(0, 0, true);
         }
 
         $clipboard = ClipboardManager::getClipboard($player);
@@ -84,7 +82,7 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
+        return $filler->fill($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
     }
 
     public function rotate(Player $player, int $axis, int $rotation) {
@@ -173,7 +171,9 @@ class Copier extends Editor {
         $player->sendMessage(BuilderTools::getPrefix() . "§aCopied area stacked!");
     }
 
-    public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $add, Player $player) {
+    public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $add, Player $player): EditorResult {
+        $start = microtime(true);
+
         $blocks = new BlockArray(true);
         $blocks->setLevel($player->getLevel());
 
@@ -198,6 +198,8 @@ class Copier extends Editor {
 
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(self::FILLER);
-        $filler->fill($player, $blocks, null, true, false, true);
+        $result = $filler->fill($player, $blocks, null, true, false, true);
+
+        return new EditorResult($result->countBlocks, microtime(true) - $start);
     }
 }

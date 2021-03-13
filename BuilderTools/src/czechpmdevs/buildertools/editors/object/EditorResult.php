@@ -33,7 +33,7 @@ class EditorResult {
 
     public function __construct(int $countBlocks, float $time, bool $error = false) {
         $this->countBlocks = $countBlocks;
-        $this->time = $time;
+        $this->time = round($time, 3);
         $this->error = $error;
     }
 }

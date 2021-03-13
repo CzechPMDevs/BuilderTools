@@ -52,6 +52,8 @@ class CutCommand extends BuilderToolsCommand {
         $pos1 = Selectors::getPosition($sender, 1);
         $pos2 = Selectors::getPosition($sender, 2);
 
+        $startTime = microtime(true);
+
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
         $copier->copy($pos1, $pos2, $sender);
@@ -59,7 +61,10 @@ class CutCommand extends BuilderToolsCommand {
         /** @var Filler $filler */
         $filler = BuilderTools::getEditor(Editor::FILLER);
         $blockList = $filler->prepareFill($pos1, $pos2, $sender->getLevel(), "0");
-        $filler->fill($sender, $blockList);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aThe selected area were cut out!");
+        $result = $filler->fill($sender, $blockList);
+
+        $time = round(microtime(true) - $startTime, 3);
+
+        $sender->sendMessage(BuilderTools::getPrefix()." §a{$result->countBlocks} blocks were cut out (Took $time seconds)!");
     }
 }

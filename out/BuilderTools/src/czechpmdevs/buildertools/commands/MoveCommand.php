@@ -66,8 +66,8 @@ class MoveCommand extends BuilderToolsCommand {
 
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->move($firstPos, $secondPos, new Vector3((int)$args[0], (int)$args[1], (int)$args[2]), $sender);
+        $result = $copier->move($firstPos, $secondPos, new Vector3((int)$args[0], (int)$args[1], (int)$args[2]), $sender);
 
-        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area has been successfully moved.");
+        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area has been successfully moved, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
     }
 }

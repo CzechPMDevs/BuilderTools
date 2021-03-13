@@ -43,6 +43,7 @@ class RedoCommand extends BuilderToolsCommand {
         $canceller = BuilderTools::getEditor(Editor::CANCELLER);
 
         $result = $canceller->redo($sender);
-        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aUndo was cancelled!");
+        if(!$result->error)
+            $sender->sendMessage(BuilderTools::getPrefix() . "§aUndo was cancelled, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
     }
 }

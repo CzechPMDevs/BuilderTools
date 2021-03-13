@@ -38,6 +38,7 @@ class WandCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
+
         if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
             $item = Item::get(Item::WOODEN_AXE);
             $item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);

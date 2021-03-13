@@ -37,7 +37,7 @@ class HelpCommand extends BuilderToolsCommand {
     public static function buildPages() {
         $commandsPerList = self::COMMANDS_PER_PAGE;
 
-        $count = (int)(count(BuilderTools::getAllCommands())/$commandsPerList);
+        $count = (int)(count(BuilderTools::getAllCommands()) / $commandsPerList);
         $list = 1;
         $command = 1;
         $text = "";
@@ -57,13 +57,13 @@ class HelpCommand extends BuilderToolsCommand {
             if($command == 1) {
                 $text = "§2--- Showing help page {$list} of {$count} ---";
             }
+
             $text .= "\n§2/{$name}: §f" . BuilderTools::getAllCommands()[$index]->getDescription();
             if($command == self::COMMANDS_PER_PAGE || (count(BuilderTools::getAllCommands()) == $all)) {
                 $command = 1;
                 self::$pages[$list] = $text;
                 $list++;
-            }
-            else {
+            } else {
                 $command++;
             }
         }

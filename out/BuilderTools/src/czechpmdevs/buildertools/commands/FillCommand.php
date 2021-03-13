@@ -70,6 +70,8 @@ class FillCommand extends BuilderToolsCommand {
         $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevel(), $args[0]);
         $result = $filler->fill($sender, $blocks);
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area filled in " . (string)round(microtime(true)-$startTime, 2) . " (" . (string)$result->countBlocks . " block changed)");
+        $time = round(microtime(true) - $startTime, 3);
+
+        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->countBlocks} blocks changed (Took {$time} seconds)!");
     }
 }

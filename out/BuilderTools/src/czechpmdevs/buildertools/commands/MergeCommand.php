@@ -47,9 +47,16 @@ class MergeCommand extends BuilderToolsCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
+
         /** @var Copier $copier */
         $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->merge($sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCopied area successfully merged!");
+        $result = $copier->merge($sender);
+
+        if($result->error) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cYour clipboard is empty!");
+            return;
+        }
+
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully merged, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
     }
 }

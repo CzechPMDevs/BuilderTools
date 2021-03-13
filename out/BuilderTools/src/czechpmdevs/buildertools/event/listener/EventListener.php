@@ -51,8 +51,8 @@ class EventListener implements Listener {
 
     public function onBlockBreak(BlockBreakEvent $event) {
         if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == Item::WOODEN_AXE && $event->getItem()->hasEnchantment(50))) {
-            Selectors::addSelector($player, 1, $position = new Position((int)($event->getBlock()->getX()), (int)($event->getBlock()->getY()), (int)($event->getBlock()->getZ()), $player->getLevel()));
-            $player->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
+            $size = Selectors::addSelector($player, 1, $position = new Position((int)($event->getBlock()->getX()), (int)($event->getBlock()->getY()), (int)($event->getBlock()->getZ()), $player->getLevel()));
+            $player->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
             $event->setCancelled(true);
         }
     }
@@ -63,10 +63,11 @@ class EventListener implements Listener {
             // antispam ._.
             if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) return;
             $this->wandClicks[$player->getName()] = microtime(true);
-            Selectors::addSelector($player, 2, $position = new Position((int)($event->getBlock()->getX()), (int)($event->getBlock()->getY()), (int)($event->getBlock()->getZ()), $player->getLevel()));
-            $player->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}");
+            $size = Selectors::addSelector($player, 2, $position = new Position((int)($event->getBlock()->getX()), (int)($event->getBlock()->getY()), (int)($event->getBlock()->getZ()), $player->getLevel()));
+            $player->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
             $event->setCancelled(true);
         }
+
         if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == Item::STICK && $event->getItem()->hasEnchantment(50))) {
             // antispam ._.
             if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true)-$this->blockInfoClicks[$player->getName()] < 0.5) return;

@@ -54,7 +54,7 @@ final class StringToBlockDecoder {
         $hash = $this->blockMap[array_rand($this->blockMap, 1)];
 
         $id = $hash >> 4;
-        $meta = $hash | 0x0f;
+        $meta = $hash & 0x0f;
     }
 
     /**

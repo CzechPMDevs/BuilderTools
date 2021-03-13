@@ -54,6 +54,6 @@ class CopyCommand extends BuilderToolsCommand {
         $copier = BuilderTools::getEditor(Editor::COPIER);
         $result = $copier->copy($pos1, $pos2, $sender);
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§a{$result->countBlocks} blocks copied to clipboard! Use //paste to paste");
+        $sender->sendMessage(BuilderTools::getPrefix()."§a{$result->countBlocks} blocks copied to clipboard (Took {$result->time} seconds)! Use //paste to paste");
     }
 }
