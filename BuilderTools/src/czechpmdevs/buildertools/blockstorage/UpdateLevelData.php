@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use pocketmine\level\Level;
+use pocketmine\level\ChunkManager;
 
 interface UpdateLevelData {
 
@@ -43,5 +43,5 @@ interface UpdateLevelData {
     /**
      * Should not be null when used in filler
      */
-    public function getLevel(): ?Level;
+    public function getLevel(): ?ChunkManager;
 }

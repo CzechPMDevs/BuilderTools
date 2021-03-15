@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use InvalidArgumentException;
+use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 
@@ -40,15 +41,29 @@ class BlockArray implements UpdateLevelData {
     /** @var BlockArraySizeData|null */
     protected ?BlockArraySizeData $sizeData = null;
 
-    /** @var Level|null */
-    protected ?Level $level = null;
+    /** @var ChunkManager|null */
+    protected ?ChunkManager $level = null;
 
     public function __construct(bool $detectDuplicates = false) {
         $this->detectDuplicates = $detectDuplicates;
     }
 
-    public function addBlock(Vector3 $vector3, int $id, int $meta): self {
-        $binHash = pack("q", Level::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ()));
+    /**
+     * Adds block to the block array
+     *
+     * @return $this
+     */
+    public function addBlock(Vector3 $vector3, int $id, int $meta): BlockArray {
+        return $this->addBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $id, $meta);
+    }
+
+    /**
+     * Adds block to the block array
+     *
+     * @return $this
+     */
+    public function addBlockAt(int $x, int $y, int $z, int $id, int $meta): BlockArray {
+        $binHash = pack("q", Level::blockHash($x, $y, $z));
         if($this->detectingDuplicates()) {
             if($this->isDuplicate($binHash)) {
                 return $this;
@@ -140,13 +155,13 @@ class BlockArray implements UpdateLevelData {
         return $this->sizeData;
     }
 
-    public function setLevel(?Level $level): self {
+    public function setLevel(?ChunkManager $level): self {
         $this->level = $level;
 
         return $this;
     }
 
-    public function getLevel(): ?Level {
+    public function getLevel(): ?ChunkManager {
         return $this->level;
     }
 

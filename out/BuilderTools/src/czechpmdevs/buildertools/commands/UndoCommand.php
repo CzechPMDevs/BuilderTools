@@ -43,7 +43,7 @@ class UndoCommand extends BuilderToolsCommand {
         $canceller = BuilderTools::getEditor(Editor::CANCELLER);
         $result = $canceller->undo($sender);
 
-        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled!");
+        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
     }
 
 }

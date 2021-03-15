@@ -90,10 +90,13 @@ class Filler extends Editor {
 
             $iterator->moveTo((int)$x, (int)$y, (int)$z);
 
+            if($iterator->currentChunk === null) {
+                $this->getPlugin()->getLogger()->error("Error while filling: Chunk for {$x}:{$y}:{$z} is not generated.");
+                continue;
+            }
+
             if($iterator->currentSubChunk === null) {
                 $iterator->currentSubChunk = $iterator->level->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4, true);
-                $this->getPlugin()->getLogger()->error("Error while filling: Could not find sub chunk at {$x}:{$y}:{$z}");
-                continue;
             }
 
             if($replaceOnlyAir) {
@@ -159,6 +162,8 @@ class Filler extends Editor {
             }
         }
     }
+
+
 
     public function getName(): string {
         return "Filler";

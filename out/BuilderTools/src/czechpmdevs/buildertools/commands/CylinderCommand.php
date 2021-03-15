@@ -50,6 +50,6 @@ class CylinderCommand extends BuilderToolsCommand {
 
         $result = $printer->makeCylinder($sender, $sender, $radius, $height, $args[0]);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aCylinder created in ".(string)round($result->time, 2)." (".(string)$result->countBlocks." changed)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCylinder created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
     }
 }

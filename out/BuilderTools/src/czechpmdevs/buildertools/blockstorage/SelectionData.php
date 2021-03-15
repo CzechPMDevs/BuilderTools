@@ -70,7 +70,7 @@ class SelectionData extends BlockArray {
      * @return $this
      */
     public function setPlayerPosition(?Vector3 $playerPosition): SelectionData {
-        $this->playerPosition = $playerPosition;
+        $this->playerPosition = $playerPosition === null ? null : $playerPosition->ceil();
 
         return $this;
     }
