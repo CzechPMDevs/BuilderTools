@@ -25,7 +25,6 @@ use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
-use pocketmine\scheduler\Task;
 use pocketmine\Server;
 
 class WorldFixUtil {
@@ -66,49 +65,37 @@ class WorldFixUtil {
             Server::getInstance()->getAsyncPool()->submitTask($asyncTask);
         }), 60);
 
-        BuilderTools::getInstance()->getScheduler()->scheduleRepeatingTask(new class($asyncTask, $sender) extends Task {
-            /** @var WorldFixTask */
-            private WorldFixTask $task;
-            /** @var CommandSender */
-            private CommandSender $sender;
+        /** @var ClosureTask $task */
+        $task = null;
 
-            /** @var float $lastPercent */
-            private float $lastPercent = 0;
-
-            public function __construct(WorldFixTask $task, CommandSender $sender) {
-                $this->task = $task;
-                $this->sender = $sender;
+        $lastPercent = 0;
+        BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function (int $currentTick) use (&$lastPercent, $asyncTask, $sender, &$task): void {
+            if($sender instanceof Player && !$sender->isOnline()) {
+                $asyncTask->forceStop = true;
+                goto finish;
             }
 
-            /** @noinspection PhpUnused */
-            public function onRun(int $currentTick) {
-                if($this->sender instanceof Player && !$this->sender->isOnline()) {
-                    $this->task->forceStop = true;
-                    goto finish;
-                }
-
-                if($this->task->error != "") {
-                    $this->sender->sendMessage(BuilderTools::getPrefix() . "§c" . $this->task->error);
-                    goto finish;
-                }
-
-                if($this->task->percentage != $this->lastPercent) {
-                    if($this->sender instanceof Player && $this->task->percentage > 0) {
-                        $this->sender->sendTip(BuilderTools::getPrefix() . "§aWorld is fixed from " . $this->task->percentage . "%%%");
-                    }
-                    $this->lastPercent = $this->task->percentage;
-                    return;
-                }
-
-                if($this->task->percentage == -1) {
-                    $this->sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in {$this->task->time} ({$this->task->chunkCount} chunks updated)!");
-
-                    finish:
-                    BuilderTools::getInstance()->getScheduler()->cancelTask($this->getTaskId());
-                    WorldFixUtil::finishWorldFixTask($this->task);
-                }
+            if($asyncTask->error != "") {
+                $this->sender->sendMessage(BuilderTools::getPrefix() . "§c" . $asyncTask->error);
+                goto finish;
             }
-        }, 2);
+
+            if($asyncTask->percentage != $lastPercent) {
+                if($sender instanceof Player && $asyncTask->percentage > 0) {
+                    $sender->sendTip(BuilderTools::getPrefix() . "§aWorld is fixed from " . $asyncTask->percentage . "%%%");
+                }
+                $lastPercent = $asyncTask->percentage;
+                return;
+            }
+
+            if($asyncTask->percentage == -1) {
+                $sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time ($asyncTask->chunkCount chunks updated)!");
+
+                finish:
+                BuilderTools::getInstance()->getScheduler()->cancelTask($task->getTaskId());
+                WorldFixUtil::finishWorldFixTask($asyncTask);
+            }
+        }), 1, 2);
 
         $sender->sendMessage(BuilderTools::getPrefix() . "§aFixing the world...");
     }
