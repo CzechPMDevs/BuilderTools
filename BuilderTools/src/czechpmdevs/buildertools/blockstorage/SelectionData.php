@@ -39,8 +39,10 @@ class SelectionData extends BlockArray {
             throw new InvalidArgumentException("Vector3 coordinates must be integer.");
         }
 
-        if($this->playerPosition instanceof Vector3) {
+        if($this->playerPosition !== null) {
             $clipboard = clone $this;
+
+            /** @phpstan-ignore-next-line */
             $clipboard->playerPosition->add($vector3);
 
             return $clipboard;

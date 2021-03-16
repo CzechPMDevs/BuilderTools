@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\blockstorage;
 
 use pocketmine\math\Vector3;
 
-class BlockArraySizeData {
+final class BlockArraySizeData {
 
     /** @var BlockArray */
     protected BlockArray $blockArray;
@@ -46,8 +46,7 @@ class BlockArraySizeData {
         $this->calculateSizeData();
     }
 
-    private function calculateSizeData() {
-        $x = $y = $z = $id = $meta = null;
+    private function calculateSizeData(): void {
         while ($this->blockArray->hasNext()) {
             $this->blockArray->readNext($x, $y, $z, $id, $meta);
             if(is_null($this->maxX) || $this->maxX < $x) {
@@ -75,15 +74,17 @@ class BlockArraySizeData {
     /**
      * Recalculates dimensions of the BlockArray
      */
-    public function recalculate() {
+    public function recalculate(): void {
         $this->calculateSizeData();
     }
 
     public function getMinimum(): Vector3 {
+        /** @phpstan-ignore-next-line */
         return new Vector3($this->minX, $this->minY, $this->minZ);
     }
 
     public function getMaximum(): Vector3 {
+        /** @phpstan-ignore-next-line */
         return new Vector3($this->maxX, $this->maxY, $this->maxZ);
     }
 

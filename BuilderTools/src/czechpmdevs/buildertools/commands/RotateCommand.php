@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -33,6 +32,7 @@ class RotateCommand extends BuilderToolsCommand {
         parent::__construct("/rotate", "Rotate selected area", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -45,7 +45,7 @@ class RotateCommand extends BuilderToolsCommand {
             return;
         }
 
-        foreach ($args as $i => $arg) {
+        foreach ($args as $arg) {
             if(!is_numeric($arg)) {
                 $sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
                 return;
@@ -59,8 +59,7 @@ class RotateCommand extends BuilderToolsCommand {
 
         $startTime = microtime(true);
 
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
+        $copier = Copier::getInstance();
 
         foreach ($args as $i => $arg) {
             if($i === 0) {

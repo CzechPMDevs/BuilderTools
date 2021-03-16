@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\BlockGenerator;
@@ -31,8 +30,10 @@ use pocketmine\block\Block;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
+use pocketmine\utils\SingletonTrait;
 
-class Printer extends Editor {
+class Printer {
+    use SingletonTrait;
 
     public const CUBE = 0x00;
     public const SPHERE = 0x01;
@@ -41,12 +42,14 @@ class Printer extends Editor {
     public const HOLLOW_SPHERE = 0x04;
     public const HOLLOW_CYLINDER = 0x05;
 
-    public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false) {
+    public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false): void {
         $undoList = new BlockArray();
         $undoList->setLevel($center->getLevel());
         $center = Math::ceilPosition($center);
 
-        $placeBlock = function (Vector3 $vector3) use ($undoList, $block, $center, $throwBlock) {
+        $level = $center->getLevelNonNull();
+
+        $placeBlock = function (Vector3 $vector3) use ($level, $undoList, $block, $center, $throwBlock) {
             if($throwBlock) {
                 $vector3 = $this->throwBlock(Position::fromObject($vector3, $center->getLevel()), $block);
             }
@@ -54,10 +57,13 @@ class Printer extends Editor {
                 return;
             }
 
-            $fullBlock = $center->getLevel()->getBlock($vector3);
+            $fullBlock = $level->getBlock($vector3);
             $undoList->addBlock($vector3, $fullBlock->getId(), $fullBlock->getDamage());
-            $center->getLevel()->setBlockIdAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getId());
-            $center->getLevel()->setBlockDataAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getDamage());
+
+            /** @phpstan-ignore-next-line */
+            $level->setBlockIdAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getId());
+            /** @phpstan-ignore-next-line */
+            $level->setBlockDataAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getDamage());
         };
 
         if($mode == self::CUBE) {
@@ -86,17 +92,15 @@ class Printer extends Editor {
             }
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $undoList);
+        Canceller::getInstance()->addStep($player, $undoList);
     }
 
     private function throwBlock(Position $position, Block $block): Vector3 {
-        $level = $position->getLevel();
+        $level = $position->getLevelNonNull();
 
-        $x = $position->getX();
-        $y = $position->getY();
-        $z = $position->getZ();
+        $x = $position->getFloorX();
+        $y = $position->getFloorY();
+        $z = $position->getFloorZ();
 
         /** @noinspection PhpStatementHasEmptyBodyInspection */
         for(; $y >= 0 && $level->getBlockAt($x, $y, $z)->getId() == Block::AIR; $y--);
@@ -117,20 +121,24 @@ class Printer extends Editor {
             return new EditorResult(0, 0, true);
         }
 
-        $fillSession = new FillSession($player->getLevel(), false);
-        $fillSession->setDimensions($center->getX() - $radius, $center->getX() + $radius, $center->getZ() - $radius, $center->getZ() + $radius);
+        $x = $center->getFloorX();
+        $y = $center->getFloorY();
+        $z = $center->getFloorZ();
+
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($x - $radius, $x + $radius, $z - $radius, $z + $radius);
 
         foreach (BlockGenerator::generateSphere($radius, $hollow) as $vector3) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($vector3->getX() + $center->getX(), $vector3->getY() + $center->getY(), $vector3->getZ() + $center->getZ(), $id, $meta);
+            /** @phpstan-ignore-next-line */
+            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
         }
+        $fillSession->reloadChunks($player->getLevelNonNull());
 
-        $fillSession->reloadChunks($player->getLevel());
-
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $fillSession->getUndoList());
-
+        /** @var BlockArray $undoList */
+        $undoList = $fillSession->getUndoList();
+        
+        Canceller::getInstance()->addStep($player, $undoList);
         return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
@@ -141,6 +149,7 @@ class Printer extends Editor {
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
         $center = Position::fromObject($center->ceil(), $center->getLevel());
+
         $radius = abs($radius);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
@@ -148,21 +157,25 @@ class Printer extends Editor {
             return new EditorResult(0, 0, true);
         }
 
-        $fillSession = new FillSession($player->getLevel(), false);
-        $fillSession->setDimensions($center->getX() - $radius, $center->getX() + $radius, $center->getZ() - $radius, $center->getZ() + $radius);
+        $x = $center->getFloorX();
+        $y = $center->getFloorY();
+        $z = $center->getFloorZ();
+
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($x - $radius, $x + $radius, $z - $radius, $z + $radius);
 
         foreach (BlockGenerator::generateCylinder($radius, $height, $hollow) as $vector3) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($vector3->getX() + $center->getX(), $vector3->getY() + $center->getY(), $vector3->getZ() + $center->getZ(), $id, $meta);
+            /** @phpstan-ignore-next-line */
+            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
         }
+        $fillSession->reloadChunks($player->getLevelNonNull());
 
-        $fillSession->reloadChunks($player->getLevel());
+        /** @var BlockArray $undoList */
+        $undoList = $fillSession->getUndoList();
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $fillSession->getUndoList());
-
-        return new EditorResult($fillSession->getBlocksChanged(), microtime(true)-$startTime);
+        Canceller::getInstance()->addStep($player, $undoList);
+        return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, string $blocks): EditorResult {
@@ -172,6 +185,7 @@ class Printer extends Editor {
     public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
         $center = Position::fromObject($center->ceil(), $center->getLevel());
+
         $size = abs($size);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
@@ -179,21 +193,25 @@ class Printer extends Editor {
             return new EditorResult(0, 0, true);
         }
 
-        $fillSession = new FillSession($player->getLevel(), false);
-        $fillSession->setDimensions($center->getX() - $size, $center->getX() + $size, $center->getZ() - $size, $center->getZ() + $size);
+        $x = $center->getFloorX();
+        $y = $center->getFloorY();
+        $z = $center->getFloorZ();
+
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($x - $size, $x + $size, $z - $size, $z + $size);
 
         foreach (BlockGenerator::generatePyramid($size, $hollow) as $vector3) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($vector3->getX() + $center->getX(), $vector3->getY() + $center->getY(), $vector3->getZ() + $center->getZ(), $id, $meta);
+            /** @phpstan-ignore-next-line */
+            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
         }
+        $fillSession->reloadChunks($player->getLevelNonNull());
 
-        $fillSession->reloadChunks($player->getLevel());
+        /** @var BlockArray $undoList */
+        $undoList = $fillSession->getUndoList();
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $fillSession->getUndoList());
-
-        return new EditorResult($fillSession->getBlocksChanged(), microtime(true)-$startTime);
+        Canceller::getInstance()->addStep($player, $undoList);
+        return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function makeHollowPyramid(Player $player, Position $center, int $size, string $blocks): EditorResult {
@@ -210,26 +228,28 @@ class Printer extends Editor {
             return new EditorResult(0, 0, true);
         }
 
-        $fillSession = new FillSession($player->getLevel(), false);
-        $fillSession->setDimensions($center->getX() - $radius, $center->getX() + $radius, $center->getZ() - $radius, $center->getZ() + $radius);
+        $x = $center->getFloorX();
+        $y = $center->getFloorY();
+        $z = $center->getFloorZ();
+
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($x - $radius, $x + $radius, $z - $radius, $z + $radius);
 
         foreach (BlockGenerator::generateCube($radius, $hollow) as $vector3) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($vector3->getX() + $center->getX(), $vector3->getY() + $center->getY(), $vector3->getZ() + $center->getZ(), $id, $meta);
+            /** @phpstan-ignore-next-line */
+            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
         }
+        $fillSession->reloadChunks($player->getLevelNonNull());
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $canceller->addStep($player, $fillSession->getUndoList());
+        /** @var BlockArray $undoList */
+        $undoList = $fillSession->getUndoList();
 
-        return new EditorResult($fillSession->getBlocksChanged(), microtime(true)-$startTime);
+        Canceller::getInstance()->addStep($player, $undoList);
+        return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function makeHollowCube(Player $player, Position $center, int $radius, string $blocks): EditorResult {
         return $this->makeCube($player, $center, $radius, $blocks, true);
-    }
-
-    public function getName(): string {
-        return "Printer";
     }
 }

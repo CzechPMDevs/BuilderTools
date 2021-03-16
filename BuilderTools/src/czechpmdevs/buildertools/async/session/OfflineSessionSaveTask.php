@@ -38,6 +38,7 @@ class OfflineSessionSaveTask extends AsyncTask {
         $this->redoData = $redoData;
     }
 
+    /** @noinspection PhpUnused */
     public function onRun() {
         $data = new CompoundTag();
         $save = false;

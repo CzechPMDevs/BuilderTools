@@ -21,43 +21,48 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\item\Item;
+use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
+use pocketmine\utils\SingletonTrait;
 
-class Decorator extends Editor {
+class Decorator {
+    use SingletonTrait;
 
-    public function getName(): string {
-        return "Decorator";
-    }
-
-    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, $player = null) {
+    /**
+     * TODO
+     */
+    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, ?Player $player = null): void {
         $undo = new BlockArray();
-        for ($x = $center->getX()-$radius; $x <= $center->getX()+$radius; $x++) {
-            for ($z = $center->getZ()-$radius; $z <= $center->getZ()+$radius; $z++) {
-                if(rand(1, 100) <= $percentage) {
-                    $y = $center->getY()+$radius;
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+
+        for ($x = $center->getX() - $radius; $x <= $center->getX() + $radius; $x++) {
+            /** @var int $x */
+            for ($z = $center->getZ() - $radius; $z <= $center->getZ() + $radius; $z++) {
+                /** @var int $z */
+                if (rand(1, 100) <= $percentage) {
+                    /** @var int $y */
+                    $y = $center->getY() + $radius;
                     check:
-                    if($y > 0) {
+                    if ($y > 0) {
                         $vec = new Vector3($x, $y, $z);
-                        if($center->getLevel()->getBlock($vec)->getId() == 0) {
+                        if ($center->getLevelNonNull()->getBlock($vec)->getId() == 0) {
                             $y--;
                             goto check;
-                        }
-                        else {
-                            $blockArgs = explode(",", $blocks);
-                            $undo->addBlock($vec, $center->getLevel()->getBlockIdAt($x, $y, $z), $center->getLevel()->getBlockDataAt($x, $y, $z));
-                            $undo[] = $center->getLevel()->getBlock($vec->add(0, 1));
-                            $center->getLevel()->setBlock($vec->add(0, 1), Item::fromString($blockArgs[array_rand($blockArgs,1)])->getBlock());
+                        } else {
+                            $undo->addBlock($vec, $center->getLevelNonNull()->getBlockIdAt($x, $y, $z), $center->getLevelNonNull()->getBlockDataAt($x, $y, $z));
+
+                            $stringToBlockDecoder->nextBlock($id, $meta);
+                            $center->getLevelNonNull()->setBlock($vec->add(0, 1), $id, $meta);
                         }
                     }
                 }
             }
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor("Canceller");
-        $canceller->addStep($player, $undo);
+        if($player !== null) {
+            Canceller::getInstance()->addStep($player, $undo);
+        }
     }
 }

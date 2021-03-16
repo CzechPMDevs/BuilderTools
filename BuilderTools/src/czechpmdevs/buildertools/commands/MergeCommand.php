@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -33,6 +32,7 @@ class MergeCommand extends BuilderToolsCommand {
         parent::__construct("/merge", "Merge copied area", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -48,15 +48,13 @@ class MergeCommand extends BuilderToolsCommand {
             return;
         }
 
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $result = $copier->merge($sender);
+        $result = Copier::getInstance()->merge($sender);
 
         if($result->error) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cYour clipboard is empty!");
             return;
         }
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully merged, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully merged, $result->countBlocks blocks changed (Took $result->time seconds)!");
     }
 }

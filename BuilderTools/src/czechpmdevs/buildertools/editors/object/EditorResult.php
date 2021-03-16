@@ -24,10 +24,8 @@ class EditorResult {
 
     /** @var int */
     public int $countBlocks;
-
     /** @var float */
     public float $time;
-
     /** @var bool  */
     public bool $error;
 

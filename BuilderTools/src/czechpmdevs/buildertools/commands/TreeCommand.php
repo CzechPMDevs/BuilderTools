@@ -35,6 +35,7 @@ class TreeCommand extends BuilderToolsCommand {
         parent::__construct("/tree", "Place tree object", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -70,11 +71,11 @@ class TreeCommand extends BuilderToolsCommand {
         }
 
         if($object === null) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cObject {$args[0]} does not found!");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cObject $args[0] does not found!");
             return;
         }
 
-        $object->placeObject($sender->getLevel(), (int)$sender->getX(), (int)$sender->getY(), (int)$sender->getZ(), new Random($sender->getLevel()->getSeed()));
-        $sender->sendMessage(BuilderTools::getPrefix()."§aObject {$args[0]} placed!");
+        $object->placeObject($sender->getLevelNonNull(), $sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), new Random(time()));
+        $sender->sendMessage(BuilderTools::getPrefix()."§aObject $args[0] placed!");
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\event\listener;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\Selectors;
 use czechpmdevs\buildertools\utils\WorldFixUtil;
@@ -30,26 +29,33 @@ use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 
 class EventListener implements Listener {
 
-    /** @var array */
+    /** @var float[] */
     private array $wandClicks = [];
-    /** @var array */
+    /** @var float[] */
     private array $blockInfoClicks = [];
 
-    public function onAirClick(PlayerInteractEvent $event) {
-        if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) return;
-        $position = $player->getTargetBlock(64)->asPosition();
-        $printer = BuilderTools::getEditor(Editor::PRINTER);
-        if($printer instanceof Printer) {
-            $printer->draw($player, $position, $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerBrush($player), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player));
+    public function onAirClick(PlayerInteractEvent $event): void {
+        if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) {
+            return;
         }
+
+        $targetBlock = $player->getTargetBlock(64);
+        if($targetBlock === null) {
+            return;
+        }
+
+        $position = $targetBlock->asPosition();
+
+        Printer::getInstance()->draw($player, $position, $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerBrush($player), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player));
         $event->setCancelled(true);
     }
 
-    public function onBlockBreak(BlockBreakEvent $event) {
+    public function onBlockBreak(BlockBreakEvent $event): void {
         if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == Item::WOODEN_AXE && $event->getItem()->hasEnchantment(50))) {
             $size = Selectors::addSelector($player, 1, $position = new Position((int)($event->getBlock()->getX()), (int)($event->getBlock()->getY()), (int)($event->getBlock()->getZ()), $player->getLevel()));
             $player->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
@@ -57,11 +63,14 @@ class EventListener implements Listener {
         }
     }
 
-    public function onBlockTouch(PlayerInteractEvent $event) {
+    public function onBlockTouch(PlayerInteractEvent $event): void {
         if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
         if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == Item::WOODEN_AXE && $event->getItem()->hasEnchantment(50))) {
             // antispam ._.
-            if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) return;
+            if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) {
+                return;
+            }
+
             $this->wandClicks[$player->getName()] = microtime(true);
             $size = Selectors::addSelector($player, 2, $position = new Position((int)($event->getBlock()->getX()), (int)($event->getBlock()->getY()), (int)($event->getBlock()->getZ()), $player->getLevel()));
             $player->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
@@ -70,17 +79,24 @@ class EventListener implements Listener {
 
         if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == Item::STICK && $event->getItem()->hasEnchantment(50))) {
             // antispam ._.
-            if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true)-$this->blockInfoClicks[$player->getName()] < 0.5) return;
-            $this->blockInfoClicks[$player->getName()] = microtime(true);
+            if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true)-$this->blockInfoClicks[$player->getName()] < 0.5) {
+                return;
+            }
+
             $block = $event->getBlock();
-            $player->sendTip("§aID: §7" . (string)$block->getId(). ":" . (string)$block->getDamage() . "\n" .
-            "§aName: §7" . (string)$block->getName() . "\n" .
-            "§aPosition: §7" . (string)$block->getX() . ", " . (string)$block->getY() . ", " . (string)$block->getZ() . "\n" .
-            "§aLevel: §7" . $block->getLevel()->getName());
+            $this->blockInfoClicks[$player->getName()] = microtime(true);
+
+            /** @var Level $level */
+            $level = $block->getLevel();
+
+            $player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getDamage() . "\n" .
+            "§aName: §7" . $block->getName() . "\n" .
+            "§aPosition: §7" . $block->getX() . ", " . $block->getY() . ", " . $block->getZ() . "\n" .
+            "§aLevel: §7" . $level->getName());
         }
     }
 
-    public function onLevelLoad(LevelLoadEvent $event) {
+    public function onLevelLoad(LevelLoadEvent $event): void {
         if(WorldFixUtil::isInWorldFixQueue($event->getLevel()->getName())) {
             $this->getPlugin()->getServer()->unloadLevel($event->getLevel(), true);
         }

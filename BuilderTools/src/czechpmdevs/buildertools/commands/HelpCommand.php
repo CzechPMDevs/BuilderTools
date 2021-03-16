@@ -34,7 +34,7 @@ class HelpCommand extends BuilderToolsCommand {
         parent::__construct("/help", "Displays BuilderTools commands", null, ["/?", "buildertools", "/commands"]);
     }
 
-    public static function buildPages() {
+    public static function buildPages(): void {
         $commandsPerList = self::COMMANDS_PER_PAGE;
 
         $count = (int)(count(BuilderTools::getAllCommands()) / $commandsPerList);
@@ -55,10 +55,10 @@ class HelpCommand extends BuilderToolsCommand {
         foreach ($commands as $index => $name) {
             $all++;
             if($command == 1) {
-                $text = "§2--- Showing help page {$list} of {$count} ---";
+                $text = "§2--- Showing help page $list of $count ---";
             }
 
-            $text .= "\n§2/{$name}: §f" . BuilderTools::getAllCommands()[$index]->getDescription();
+            $text .= "\n§2/$name: §f" . BuilderTools::getAllCommands()[$index]->getDescription();
             if($command == self::COMMANDS_PER_PAGE || (count(BuilderTools::getAllCommands()) == $all)) {
                 $command = 1;
                 self::$pages[$list] = $text;
@@ -69,6 +69,7 @@ class HelpCommand extends BuilderToolsCommand {
         }
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         $page = 1;

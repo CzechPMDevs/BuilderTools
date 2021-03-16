@@ -21,10 +21,11 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\level\Position;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class FillCommand extends BuilderToolsCommand {
@@ -33,6 +34,7 @@ class FillCommand extends BuilderToolsCommand {
         parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -54,24 +56,25 @@ class FillCommand extends BuilderToolsCommand {
             return;
         }
 
+        /** @var Position $firstPos */
         $firstPos = Selectors::getPosition($sender, 1);
+        /** @var Position $secondPos */
         $secondPos = Selectors::getPosition($sender, 2);
 
-        if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
+        if($firstPos->getLevelNonNull()->getName() != $secondPos->getLevelNonNull()->getName()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
 
         $startTime = microtime(true);
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
+        $filler = Filler::getInstance();
 
-        $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevel(), $args[0]);
+        $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevelNonNull(), $args[0]);
         $result = $filler->fill($sender, $blocks);
 
         $time = round(microtime(true) - $startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->countBlocks} blocks changed (Took {$time} seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§a$result->countBlocks blocks changed (Took $time seconds)!");
     }
 }

@@ -41,12 +41,12 @@ class MCEditSaveTask extends AsyncTask {
         $this->schematic = $schematic;
     }
 
+    /** @noinspection PhpUnused */
     public function onRun() {
         try {
             $blocks = "";
             $data = "";
 
-            $x = $y = $z = $id = $meta = null;
             while ($this->schematic->hasNext()) {
                 $this->schematic->readNext($x, $y, $z, $id, $meta);
                 $blocks .= chr($id);

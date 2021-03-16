@@ -30,16 +30,14 @@ use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
+use pocketmine\utils\SingletonTrait;
 
-class Copier extends Editor {
+class Copier {
+    use SingletonTrait;
 
     public const DIRECTION_PLAYER = 0;
     public const DIRECTION_UP = 1;
     public const DIRECTION_DOWN = 2;
-
-    public function getName(): string {
-        return "Copier";
-    }
 
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
@@ -48,7 +46,7 @@ class Copier extends Editor {
 
         $i = 0;
         foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $blockPos) {
-            $block = $player->getLevel()->getBlock($blockPos);
+            $block = $player->getLevelNonNull()->getBlock($blockPos);
             $clipboard->addBlock($blockPos, $block->getId(), $block->getDamage());
 
             $i++;
@@ -64,12 +62,14 @@ class Copier extends Editor {
             return new EditorResult(0, 0, true);
         }
 
+        /** @var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
         $clipboard->setLevel($player->getLevel());
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->merge($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
+        /** @var Vector3 $playerPosition */
+        $playerPosition = $clipboard->getPlayerPosition();
+
+        return Filler::getInstance()->merge($player, $clipboard, $player->ceil()->subtract($playerPosition));
     }
 
     public function paste(Player $player): EditorResult {
@@ -77,35 +77,44 @@ class Copier extends Editor {
             return new EditorResult(0, 0, true);
         }
 
+        /** @var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
         $clipboard->setLevel($player->getLevel());
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->fill($player, $clipboard, $player->ceil()->subtract($clipboard->getPlayerPosition()));
+        /** @var Vector3 $playerPosition */
+        $playerPosition = $clipboard->getPlayerPosition();
+
+        return Filler::getInstance()->fill($player, $clipboard, $player->ceil()->subtract($playerPosition));
     }
 
-    public function rotate(Player $player, int $axis, int $rotation) {
+    public function rotate(Player $player, int $axis, int $rotation): void {
         if(!ClipboardManager::hasClipboardCopied($player)) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
 
-        ClipboardManager::saveClipboard($player, RotationUtil::rotate(ClipboardManager::getClipboard($player), $axis, $rotation));
+        /** @var SelectionData $clipboard */
+        $clipboard = ClipboardManager::getClipboard($player);
+
+        ClipboardManager::saveClipboard($player, RotationUtil::rotate($clipboard, $axis, $rotation));
     }
 
-    public function stack(Player $player, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER) {
+    public function stack(Player $player, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER): void {
         if (!ClipboardManager::hasClipboardCopied($player)) {
             $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
             return;
         }
 
+        /** @var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
 
         $updateData = new BlockArray();
         $updateData->setLevel($player->getLevel());
 
-        $center = $clipboard->getPlayerPosition()->ceil(); // Why there was +vec(1, 0, 1)?
+        /** @var Vector3 $playerPosition */
+        $playerPosition = $clipboard->getPlayerPosition();
+
+        $center = $playerPosition->ceil(); // Why there was +vec(1, 0, 1)?
         switch ($mode) {
             case self::DIRECTION_PLAYER:
                 $d = $player->getDirection();
@@ -165,9 +174,7 @@ class Copier extends Editor {
                 break;
         }
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(self::FILLER);
-        $filler->fill($player, $updateData);
+        Filler::getInstance()->fill($player, $updateData);
         $player->sendMessage(BuilderTools::getPrefix() . "§aCopied area stacked!");
     }
 
@@ -183,8 +190,9 @@ class Copier extends Editor {
         // Add new blocks
         /** @var Vector3 $vector3 */
         foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $vector3) {
-            if(($block = $player->getLevel()->getBlock($vector3))->getId() != 0) {
-                $blockPositions[] = Level::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ());
+            if(($block = $player->getLevelNonNull()->getBlock($vector3))->getId() != 0) {
+                /** @phpstan-ignore-next-line */
+                $blockPositions[] = Level::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ()); // BlockGenerator::fillCuboid returns only vectors with int coords
                 $blocks->addBlock($add->add($vector3), $block->getId(), $block->getDamage());
             }
         }
@@ -196,10 +204,7 @@ class Copier extends Editor {
             $blocks->addBlock(new Vector3($x, $y, $z), 0, 0);
         }
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(self::FILLER);
-        $result = $filler->fill($player, $blocks, null, true, false, true);
-
+        $result = Filler::getInstance()->fill($player, $blocks, null, true, false, true);
         return new EditorResult($result->countBlocks, microtime(true) - $start);
     }
 }

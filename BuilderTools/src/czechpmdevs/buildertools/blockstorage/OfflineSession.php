@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\blockstorage;
 use czechpmdevs\buildertools\async\session\OfflineSessionLoadTask;
 use czechpmdevs\buildertools\async\session\OfflineSessionSaveTask;
 use czechpmdevs\buildertools\BuilderTools;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -77,10 +78,16 @@ final class OfflineSession {
      */
     public function setUndoData(array $undoData): OfflineSession {
         $this->undoData = serialize(array_map(function (BlockArray $blockArray) {
+            $level = $blockArray->getLevel();
+            $levelName = null;
+            if($level instanceof Level) {
+                $levelName = $level->getFolderName();
+            }
+
             return [
                 $blockArray->buffer,
                 $blockArray->detectingDuplicates(),
-                $blockArray->getLevel() === null ? null : $blockArray->getLevel()->getFolderName()
+                $levelName
             ];
         }, $undoData));
 
@@ -111,10 +118,16 @@ final class OfflineSession {
      */
     public function setRedoData(array $redoData): OfflineSession {
         $this->redoData = serialize(array_map(function (BlockArray $blockArray) {
+            $level = $blockArray->getLevel();
+            $levelName = null;
+            if($level instanceof Level) {
+                $levelName = $level->getFolderName();
+            }
+
             return [
                 $blockArray->buffer,
                 $blockArray->detectingDuplicates(),
-                $blockArray->getLevel() === null ? null : $blockArray->getLevel()->getFolderName()
+                $levelName
             ];
         }, $redoData));
 

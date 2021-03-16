@@ -21,10 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\level\Position;
 use pocketmine\Player;
 
 class NaturalizeCommand extends BuilderToolsCommand {
@@ -33,6 +33,7 @@ class NaturalizeCommand extends BuilderToolsCommand {
         parent::__construct("/naturalize", "Naturalize selected area.", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -47,16 +48,18 @@ class NaturalizeCommand extends BuilderToolsCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
+
+        /** @var Position $firstPos */
         $firstPos = Selectors::getPosition($sender, 1);
+        /** @var Position $secondPos */
         $secondPos = Selectors::getPosition($sender, 2);
-        if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
+
+        if($firstPos->getLevelNonNull()->getName() != $secondPos->getLevelNonNull()->getName()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
-        /** @var Naturalizer $naturalizer */
-        $naturalizer = BuilderTools::getEditor(Editor::NATURALIZER);
 
-        $result = $naturalizer->naturalize($firstPos->getX(), $firstPos->getY(), $firstPos->getZ(), $secondPos->getX(), $secondPos->getY(), $secondPos->getZ(), $sender->getLevel(), $sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized, $result->countBlocks blocks changed (Took {$result->time} seconds)!");
+        $result = Naturalizer::getInstance()->naturalize($firstPos->getFloorX(), $firstPos->getFloorY(), $firstPos->getFloorY(), $secondPos->getFloorX(), $secondPos->getFloorY(), $secondPos->getFloorZ(), $sender->getLevelNonNull(), $sender);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized, $result->countBlocks blocks changed (Took $result->time seconds)!");
     }
 }

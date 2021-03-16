@@ -23,7 +23,6 @@ namespace czechpmdevs\buildertools\schematics;
 use czechpmdevs\buildertools\async\schematics\MCEditLoadTask;
 use czechpmdevs\buildertools\async\schematics\MCEditSaveTask;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\format\MCEditSchematics;
@@ -110,9 +109,7 @@ class SchematicsManager {
         $schematic = $this->players[$player->getName()]->addVector3($player);
         $schematic->setLevel($player->getLevel());
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
-        $filler->fill($player, $schematic);
+        Filler::getInstance()->fill($player, $schematic);
 
         $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
         return true;

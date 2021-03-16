@@ -19,8 +19,10 @@
 namespace czechpmdevs\buildertools\editors;
 
 use pocketmine\block\BlockIds;
+use pocketmine\utils\SingletonTrait;
 
-class Fixer extends Editor {
+class Fixer {
+    use SingletonTrait;
 
     private const BLOCK_FIX_DATA = [
         158 => [BlockIds::WOODEN_SLAB, 0],
@@ -42,7 +44,7 @@ class Fixer extends Editor {
         204 => [BlockIds::PURPUR_BLOCK, 0]
     ];
 
-    public function fixBlock(int &$id, int &$damage) {
+    public function fixBlock(int &$id, int &$damage): void {
         if(isset(self::BLOCK_FIX_DATA[$id])) {
             if(is_int(self::BLOCK_FIX_DATA[$id][1])) {
                 $damage = self::BLOCK_FIX_DATA[$id][1];
@@ -72,9 +74,5 @@ class Fixer extends Editor {
         } else {
             return 15 - $meta;
         }
-    }
-
-    public function getName(): string {
-        return "Fixer";
     }
 }

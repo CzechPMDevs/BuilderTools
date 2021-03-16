@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -32,6 +31,7 @@ class HollowCubeCommand extends BuilderToolsCommand {
         parent::__construct("/hcube", "Create hollow cube", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -46,10 +46,7 @@ class HollowCubeCommand extends BuilderToolsCommand {
 
         $radius = isset($args[1]) ? (int)$args[1] : 5;
 
-        /** @var Printer $printer */
-        $printer = BuilderTools::getEditor(Editor::PRINTER);
-
-        $result = $printer->makeHollowCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cube created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
+        $result = Printer::getInstance()->makeHollowCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cube created, $result->countBlocks blocks changed (Took $result->time seconds)");
     }
 }

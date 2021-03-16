@@ -24,49 +24,57 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\Player;
+use pocketmine\utils\SingletonTrait;
 
-class Canceller extends Editor {
+class Canceller {
+    use SingletonTrait;
 
     /** @var BlockArray[][] */
     public array $undoData = [];
     /** @var BlockArray[][] */
     public array $redoData = [];
 
-    public function getName(): string {
-        return "Canceller";
-    }
-
-    public function addStep(Player $player, BlockArray $blocks) {
+    public function addStep(Player $player, BlockArray $blocks): void {
         $this->undoData[$player->getName()][] = $blocks;
     }
 
     public function undo(Player $player): EditorResult {
-        if(!isset($this->undoData[$player->getName()]) || count($this->undoData[$player->getName()]) == 0) {
+        $error = function () use ($player): EditorResult {
             $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to undo!");
             return new EditorResult(0, 0, true);
+        };
+
+        if(!isset($this->undoData[$player->getName()])) {
+            return $error();
         }
 
         $blockList = array_pop($this->undoData[$player->getName()]);
+        if($blockList === null) {
+            return $error();
+        }
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(self::FILLER);
-        return $filler->fill($player, $blockList, null, false, true);
+        return Filler::getInstance()->fill($player, $blockList, null, false, true);
     }
 
-    public function addRedo(Player $player, BlockArray $blocks) {
+    public function addRedo(Player $player, BlockArray $blocks): void {
         $this->redoData[$player->getName()][] = $blocks;
     }
 
     public function redo(Player $player): EditorResult {
-        if(!isset($this->redoData[$player->getName()]) || count($this->redoData[$player->getName()]) == 0) {
-            $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to redo!");
+        $error = function () use ($player): EditorResult {
+            $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to undo!");
             return new EditorResult(0, 0, true);
+        };
+
+        if(!isset($this->redoData[$player->getName()])) {
+            return $error();
         }
 
         $blockList = array_pop($this->redoData[$player->getName()]);
+        if($blockList === null) {
+            return $error();
+        }
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(self::FILLER);
-        return $filler->fill($player, $blockList);
+        return Filler::getInstance()->fill($player, $blockList);
     }
 }

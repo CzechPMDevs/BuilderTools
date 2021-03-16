@@ -39,11 +39,11 @@ class Selectors {
     /** @var Player[] */
     private static array $blockInfoPlayers = [];
 
-    public static function addDrawingPlayer(Player $player, int $brush, int $mode, bool $fall) {
+    public static function addDrawingPlayer(Player $player, int $brush, int $mode, bool $fall): void {
         self::$drawingPlayers[strtolower($player->getName())] = [$brush, $mode, $fall];
     }
 
-    public static function removeDrawingPlayer(Player $player) {
+    public static function removeDrawingPlayer(Player $player): void {
         unset(self::$drawingPlayers[strtolower($player->getName())]);
     }
 
@@ -60,7 +60,7 @@ class Selectors {
     }
 
     public static function isDrawingPlayer(Player $player): bool {
-        return (bool)isset(self::$drawingPlayers[strtolower($player->getName())]);
+        return isset(self::$drawingPlayers[strtolower($player->getName())]);
     }
 
     /**
@@ -87,6 +87,10 @@ class Selectors {
             return null;
         }
 
+        if($pos1->getLevel() === null || $pos2->getLevel() === null) {
+            return null;
+        }
+
         if($pos1->getLevel()->isClosed() || $pos2->getLevel()->isClosed()) {
             return null;
         }
@@ -96,7 +100,7 @@ class Selectors {
         }
 
         $vec = $pos2->subtract($pos1)->abs()->add(1, 1, 1);
-        return $vec->getX() * $vec->getY() * $vec->getZ();
+        return (int)($vec->getX() * $vec->getY() * $vec->getZ());
     }
 
     public static function getPosition(Player $player, int $pos): ?Position {
@@ -112,16 +116,16 @@ class Selectors {
 
     public static function isSelected(int $pos, Player $player): bool {
         if($pos == 1) {
-            return (bool)isset(self::$pos1[strtolower($player->getName())]);
+            return isset(self::$pos1[strtolower($player->getName())]);
         }
         if($pos == 2) {
-            return (bool)isset(self::$pos2[strtolower($player->getName())]);
+            return isset(self::$pos2[strtolower($player->getName())]);
         }
 
         return false;
     }
 
-    public static function switchWandSelector(Player $player) {
+    public static function switchWandSelector(Player $player): void {
         if(isset(self::$wandSelectors[strtolower($player->getName())])) {
             unset(self::$wandSelectors[strtolower($player->getName())]);
         }
@@ -130,7 +134,7 @@ class Selectors {
         }
     }
 
-    public static function switchBlockInfoSelector(Player $player) {
+    public static function switchBlockInfoSelector(Player $player): void {
         if(isset(self::$blockInfoPlayers[strtolower($player->getName())])) {
             unset(self::$blockInfoPlayers[strtolower($player->getName())]);
         }
@@ -140,10 +144,10 @@ class Selectors {
     }
 
     public static function isWandSelector(Player $player): bool {
-        return (bool)isset(self::$wandSelectors[strtolower($player->getName())]);
+        return isset(self::$wandSelectors[strtolower($player->getName())]);
     }
 
     public static function isBlockInfoPlayer(Player $player): bool {
-        return (bool)isset(self::$blockInfoPlayers[strtolower($player->getName())]);
+        return isset(self::$blockInfoPlayers[strtolower($player->getName())]);
     }
 }

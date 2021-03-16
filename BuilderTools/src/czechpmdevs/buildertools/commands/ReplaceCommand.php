@@ -19,11 +19,11 @@
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\level\Position;
 use pocketmine\Player;
 
 class ReplaceCommand extends BuilderToolsCommand {
@@ -32,6 +32,7 @@ class ReplaceCommand extends BuilderToolsCommand {
         parent::__construct("/replace", "Replace selected blocks", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -52,25 +53,24 @@ class ReplaceCommand extends BuilderToolsCommand {
             return;
         }
 
+        /** @var Position $firstPos */
         $firstPos = Selectors::getPosition($sender, 1);
+        /** @var Position $secondPos */
         $secondPos = Selectors::getPosition($sender, 2);
-        if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
+
+        if($firstPos->getLevelNonNull()->getName() != $secondPos->getLevelNonNull()->getName()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
 
         $startTime = microtime(true);
 
-        /** @var Replacement $replacement */
-        $replacement = BuilderTools::getEditor(Editor::REPLACEMENT);
-        $list = $replacement->prepareReplace($firstPos, $secondPos, $firstPos->getLevel(), $args[0], $args[1]);
+        $list = Replacement::getInstance()->prepareReplace($firstPos, $secondPos, $firstPos->getLevelNonNull(), $args[0], $args[1]);
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
-        $result = $filler->fill($sender, $list);
+        $result = Filler::getInstance()->fill($sender, $list);
 
         $time = round(microtime(true) - $startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->countBlocks} replaced (Took {$time} seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§a$result->countBlocks replaced (Took $time seconds)!");
     }
 }

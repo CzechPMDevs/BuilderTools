@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -32,6 +31,7 @@ class CylinderCommand extends BuilderToolsCommand {
         parent::__construct("/cylinder", "Create cylinder", null, ["/cyl"]);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -45,11 +45,8 @@ class CylinderCommand extends BuilderToolsCommand {
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
         $height = isset($args[2]) ? (int)($args[2]) : 8;
 
-        /** @var Printer $printer */
-        $printer = BuilderTools::getEditor(Editor::PRINTER);
+        $result = Printer::getInstance()->makeCylinder($sender, $sender, $radius, $height, $args[0]);
 
-        $result = $printer->makeCylinder($sender, $sender, $radius, $height, $args[0]);
-
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCylinder created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCylinder created, $result->countBlocks blocks changed (Took $result->time seconds)");
     }
 }

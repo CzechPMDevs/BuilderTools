@@ -22,9 +22,9 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -34,6 +34,7 @@ class MoveCommand extends BuilderToolsCommand {
         parent::__construct("/move", "Move selected area", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -56,18 +57,18 @@ class MoveCommand extends BuilderToolsCommand {
             return;
         }
 
+        /** @var Position $firstPos */
         $firstPos = Selectors::getPosition($sender, 1);
+        /** @var Position $secondPos */
         $secondPos = Selectors::getPosition($sender, 2);
 
-        if($firstPos->getLevel()->getName() != $secondPos->getLevel()->getName()) {
+        if($firstPos->getLevelNonNull()->getName() != $secondPos->getLevelNonNull()->getName()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }
 
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $result = $copier->move($firstPos, $secondPos, new Vector3((int)$args[0], (int)$args[1], (int)$args[2]), $sender);
+        $result = Copier::getInstance()->move($firstPos, $secondPos, new Vector3((int)$args[0], (int)$args[1], (int)$args[2]), $sender);
 
-        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area has been successfully moved, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() ."§aSelected area has been successfully moved, $result->countBlocks blocks changed (Took $result->time seconds)!");
     }
 }

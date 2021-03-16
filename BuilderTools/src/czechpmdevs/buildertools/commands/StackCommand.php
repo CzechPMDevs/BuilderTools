@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -32,6 +31,7 @@ class StackCommand extends BuilderToolsCommand {
         parent::__construct("/stack", "Stack copied area", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -60,8 +60,7 @@ class StackCommand extends BuilderToolsCommand {
             }
         }
 
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
+        $copier = Copier::getInstance();
         $copier->stack($sender, $count, $mode);
     }
 }

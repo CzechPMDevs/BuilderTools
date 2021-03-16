@@ -43,15 +43,22 @@ class ClipboardManager {
         return isset(self::$clipboards[$player->getName()]);
     }
 
-    public static function saveClipboard(Player $player, SelectionData $data) {
+    public static function saveClipboard(Player $player, SelectionData $data): void {
         self::$clipboards[$player->getName()] = $data;
     }
 
-
+    /**
+     * TODO
+     * @noinspection PhpUnused
+     */
     public static function loadPlayerSession(Player $player) {
-        $offlineSession = OfflineSession::saveData($player);
+
     }
 
+    /**
+     * TODO
+     * @noinspection PhpUnused
+     */
     public static function unloadPlayerSession(Player $player) {
         $offlineSession = OfflineSession::create($player);
         if(self::hasClipboardCopied($player)) {
@@ -63,12 +70,12 @@ class ClipboardManager {
     }
 
     /**
+     * TODO
      * @internal
      */
     public static function finishLoad(string $playerId, OfflineSession $session) {
         if(Server::getInstance()->getPlayerExact($playerId) === null) {
             $session->save();
-            return;
         }
 
 

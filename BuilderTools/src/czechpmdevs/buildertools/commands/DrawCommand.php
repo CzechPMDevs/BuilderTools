@@ -38,6 +38,7 @@ class DrawCommand extends BuilderToolsCommand {
         parent::__construct("/draw", "Draw witch blocks", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -45,15 +46,15 @@ class DrawCommand extends BuilderToolsCommand {
             return;
         }
         if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|off> [brush: {$this->minBrush}-{$this->maxBrush} | on | off]  [fall = false]");
+            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|off> [brush: $this->minBrush-$this->maxBrush | on | off]  [fall = false]");
             return;
         }
         if(!in_array(strval($args[0]), ["on", "off", "cube", "sphere", "cylinder", "hcube", "hsphere", "hcylinder"])) {
-            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|cylinder|hcube|hsphere|hcylinder|off> [brush: {$this->minBrush}-{$this->maxBrush}]  [fall = false]");
+            $sender->sendMessage("§cUsage: §7//draw <cube|sphere|cylinder|hcube|hsphere|hcylinder|off> [brush: $this->minBrush-$this->maxBrush]  [fall = false]");
             return;
         }
         if(isset($args[1]) && (!is_numeric($args[1]) || ((int)($args[1]) > $this->maxBrush || (int)($args[1]) < $this->minBrush))) {
-            $sender->sendMessage("§cBrush #{$args[1]} wasn't found!");
+            $sender->sendMessage("§cBrush #$args[1] wasn't found!");
             return;
         }
         if($args[0] == "off") {
@@ -98,6 +99,6 @@ class DrawCommand extends BuilderToolsCommand {
         Selectors::addDrawingPlayer($sender, $brush, $mode, $fall);
 
         $fall = $fall ? "§2true§a" : "§cfalse§a";
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#{$brush} §a(§7shape: §a{$args[0]} §7Fall:$fall)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected brush §7#$brush §a(§7shape: §a$args[0] §7Fall:$fall)!");
     }
 }

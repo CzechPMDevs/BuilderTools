@@ -31,6 +31,7 @@ class ClearInventoryCommand extends BuilderToolsCommand {
         parent::__construct("/clearinventory", "Clear inventory", null, ["/ci"]);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

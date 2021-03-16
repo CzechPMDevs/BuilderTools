@@ -26,18 +26,19 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
-use http\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\protocol\FullChunkDataPacket;
 use pocketmine\network\mcpe\protocol\LevelChunkPacket;
 use pocketmine\Player;
+use pocketmine\utils\SingletonTrait;
 
-class Filler extends Editor {
+class Filler {
+    use SingletonTrait;
 
-    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, $filled = true): BlockArray {
+    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, bool $filled = true): BlockArray {
         $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
 
         $updates = new BlockArray();
@@ -62,7 +63,12 @@ class Filler extends Editor {
         $undoArray = $saveUndo ? (new BlockArray())->setLevel($updateData->getLevel()) : null;
         $redoArray = $saveRedo ? (new BlockArray())->setLevel($updateData->getLevel()) : null;
 
-        $iterator = new SubChunkIteratorManager($updateData->getLevel());
+        $level = $updateData->getLevel();
+        if($level === null) {
+            throw new InvalidArgumentException("Level is not specified in update level data.");
+        }
+
+        $iterator = new SubChunkIteratorManager($level);
 
         /** @var int|null $minX */
         $minX = null;
@@ -91,12 +97,13 @@ class Filler extends Editor {
             $iterator->moveTo((int)$x, (int)$y, (int)$z);
 
             if($iterator->currentChunk === null) {
-                $this->getPlugin()->getLogger()->error("Error while filling: Chunk for {$x}:{$y}:{$z} is not generated.");
+                BuilderTools::getInstance()->getLogger()->error("Error while filling: Chunk for $x:$y:$z is not generated.");
                 continue;
             }
 
             if($iterator->currentSubChunk === null) {
-                $iterator->currentSubChunk = $iterator->level->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4, true);
+                /** @phpstan-ignore-next-line */
+                $iterator->currentSubChunk = $iterator->level->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4, true); // It is checked above
             }
 
             if($replaceOnlyAir) {
@@ -106,24 +113,24 @@ class Filler extends Editor {
             }
 
             if($saveUndo)
+                /** @var BlockArray $undoArray */
                 $undoArray->addBlock(new Vector3($x, $y, $z), $iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f), $iterator->currentSubChunk->getBlockData($x & 0x0f, $y & 0x0f, $z & 0x0f));
             if($saveRedo)
+                /** @var BlockArray $redoArray */
                 $redoArray->addBlock(new Vector3($x, $y, $z), $iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f), $iterator->currentSubChunk->getBlockData($x & 0x0f, $y & 0x0f, $z & 0x0f));
 
             $iterator->currentSubChunk->setBlock($x & 0x0f, $y & 0x0f, $z & 0x0f, $id, $meta);
         }
 
-        $this->reloadChunks($player->getLevel(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
+        $this->reloadChunks($player->getLevelNonNull(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
 
         if($saveUndo) {
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(static::CANCELLER);
-            $canceller->addStep($player, $undoArray);
+            /** @var BlockArray $undoArray */
+            Canceller::getInstance()->addStep($player, $undoArray);
         }
         if($saveRedo) {
-            /** @var Canceller $canceller */
-            $canceller = BuilderTools::getEditor(static::CANCELLER);
-            $canceller->addRedo($player, $redoArray);
+            /** @var BlockArray $redoArray */
+            Canceller::getInstance()->addRedo($player, $redoArray);
         }
 
         return new EditorResult($count, microtime(true)-$startTime);
@@ -147,25 +154,11 @@ class Filler extends Editor {
                 }
 
                 foreach ($level->getChunkLoaders($x, $z) as $chunkLoader) {
-                    if ($chunkLoader instanceof Player) {
-                        if (!class_exists(LevelChunkPacket::class)) {
-                            $pk = new FullChunkDataPacket();
-                            $pk->chunkX = $x;
-                            $pk->chunkZ = $z;
-                            $pk->data = $chunk->networkSerialize();
-                        } else {
-                            $pk = LevelChunkPacket::withoutCache($x, $z, $chunk->getSubChunkSendCount(), $chunk->networkSerialize());
-                        }
-                        $chunkLoader->dataPacket($pk);
+                    if ($chunkLoader instanceof Player && $chunk !== null) {
+                        $chunkLoader->dataPacket(LevelChunkPacket::withoutCache($x, $z, $chunk->getSubChunkSendCount(), $chunk->networkSerialize()));
                     }
                 }
             }
         }
-    }
-
-
-
-    public function getName(): string {
-        return "Filler";
     }
 }

@@ -42,13 +42,15 @@ class RotationUtil {
         if($degrees == 0) {
             return $blockArray;
         }
+
         $rad = deg2rad((360 - $degrees) % 360);
+
+        /** @var Vector3 $diff */
+        $diff = $blockArray->getPlayerPosition();
 
         $modifiedBlockArray = new SelectionData();
         switch ($axis) {
             case self::Y_AXIS:
-                $diff = $blockArray->getPlayerPosition();
-                $x = $y = $z = $id = $meta = 0;
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
                     RotationHelper::rotate($degrees, $id, $meta);
@@ -61,8 +63,6 @@ class RotationUtil {
                 $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             case self::X_AXIS:
-                $diff = $blockArray->getPlayerPosition();
-                $x = $y = $z = $id = $meta = 0;
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
 
@@ -78,8 +78,6 @@ class RotationUtil {
                 $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             case self::Z_AXIS:
-                $diff = $blockArray->getPlayerPosition();
-                $x = $y = $z = $id = $meta = 0;
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
 

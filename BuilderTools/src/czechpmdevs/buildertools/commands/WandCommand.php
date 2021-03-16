@@ -32,6 +32,7 @@ class WandCommand extends BuilderToolsCommand {
         parent::__construct("/wand", "Switch wand tool", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -42,6 +43,7 @@ class WandCommand extends BuilderToolsCommand {
         if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
             $item = Item::get(Item::WOODEN_AXE);
             $item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
+            /** @phpstan-ignore-next-line */
             $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(50), 1));
             $sender->getInventory()->addItem($item);
             $sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
@@ -50,6 +52,6 @@ class WandCommand extends BuilderToolsCommand {
 
         Selectors::switchWandSelector($sender);
         $switch = Selectors::isWandSelector($sender) ? "ON" : "OFF";
-        $sender->sendMessage(BuilderTools::getPrefix()."§aWand tool turned {$switch}!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aWand tool turned $switch!");
     }
 }

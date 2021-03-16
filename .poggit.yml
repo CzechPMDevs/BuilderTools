@@ -4,6 +4,6 @@ branches:
 - 1.2.0
 projects:
   BuilderTools:
-    path: out/BuilderTools
+    path: BuilderTools
     icon: "icon.png"
 ...

@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Decorator;
-use czechpmdevs\buildertools\editors\Editor;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -32,6 +31,7 @@ class DecorationCommand extends BuilderToolsCommand {
         parent::__construct("/decoration", "Decoration commands", null, ["/d"]);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -49,10 +49,7 @@ class DecorationCommand extends BuilderToolsCommand {
             $percentage = intval($args[2]);
         }
 
-        /** @var Decorator $decorator */
-        $decorator = BuilderTools::getEditor(Editor::DECORATOR);
-
-        $decorator->addDecoration($sender, $args[0], (int)round($args[1]), $percentage);
+        Decorator::getInstance()->addDecoration($sender, $args[0], (int)$args[1], $percentage);
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aDecoration placed!");
     }

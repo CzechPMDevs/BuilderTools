@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs

@@ -51,8 +51,9 @@ class WorldFixTask extends AsyncTask {
         $this->worldPath = $worldPath;
     }
 
+    /** @noinspection PhpUnused */
     public function onRun() {
-        MainLogger::getLogger()->debug("[BuilderTools] Fixing world {$this->worldPath}...");
+        MainLogger::getLogger()->debug("[BuilderTools] Fixing world $this->worldPath...");
 
         if(!is_dir($this->worldPath)) {
             $this->error = "File not found";
@@ -124,7 +125,6 @@ class WorldFixTask extends AsyncTask {
         $regionPath = $worldPath . DIRECTORY_SEPARATOR . "region" . DIRECTORY_SEPARATOR;
 
         $chunks = [];
-        $regionLoader = null;
         foreach (glob($regionPath . "*.mca*") as $regionFilePath) {
             $split = explode(".", basename($regionFilePath));
             $regionX = (int)$split[1];

@@ -27,12 +27,12 @@ $currentMemory = memory_get_usage();
 $firstTestStart = microtime(true);
 $firstTestArray = [];
 foreach ($array as [$id, $meta, $x, $y, $z]) {
-    $firstTestArray[(($x & 0xFFFFFFF) << 36) | (($y & 0xff) << 28) | ($z & 0xFFFFFFF)] = ($id << 4) | $meta;
+    $firstTestArray[(($x & 0xFFFFFFF) << 36) | (($y & 0xff) << 28) | ($z & 0xFFFFFFF)] = new Block($id, $meta);
 }
 $firstTestWriteFinish = microtime(true);
 foreach ($firstTestArray as $hash => $value) {
-    $id = $value >> 4;
-    $meta = $value & 0x0f;
+    $id = $value->getId();
+    $meta = $value->getMeta();
 
     $x = $hash >> 36;
     $y = ($hash >> 28) & 0xff;

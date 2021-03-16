@@ -25,8 +25,10 @@ use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\utils\SingletonTrait;
 
-class Replacement extends Editor {
+class Replacement {
+    use SingletonTrait;
 
     public function prepareReplace(Vector3 $pos1, Vector3 $pos2, Level $level, string $blocks, string $replace): BlockArray {
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
@@ -44,9 +46,5 @@ class Replacement extends Editor {
         }
 
         return $updateLevelData;
-    }
-
-    public function getName(): string {
-        return "Replacement";
     }
 }

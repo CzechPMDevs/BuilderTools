@@ -1,5 +1,6 @@
 .idea
-out/BuilderTools_v1.2.0-beta3_dev.phar
 data
-vendor
 build.php
+BuilderTools/composer.lock
+BuilderTools/vendor
+composer.phar

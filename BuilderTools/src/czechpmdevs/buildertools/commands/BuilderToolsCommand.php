@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
+use InvalidStateException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
@@ -33,10 +34,15 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
         parent::__construct($name, $description, $usageMessage, $aliases);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$sender->hasPermission($this->getPermission())) {
+        $permission = $this->getPermission();
+        if($permission === null) {
+            throw new InvalidStateException("Command " . __CLASS__ . " is registered wrong.");
+        }
+
+        if(!$sender->hasPermission($permission)) {
             $sender->sendMessage((string)$this->getPermissionMessage());
-            return;
         }
     }
 

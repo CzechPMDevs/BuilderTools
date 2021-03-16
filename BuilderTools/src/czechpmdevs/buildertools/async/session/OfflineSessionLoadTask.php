@@ -57,6 +57,7 @@ class OfflineSessionLoadTask extends AsyncTask {
         $this->playerId = $playerId;
     }
 
+    /** @noinspection PhpUnused */
     public function onRun() {
         if(!file_exists($path = $this->dataFolder . "offline_sessions" . DIRECTORY_SEPARATOR . $this->playerId . ".btsession")) {
             return;
@@ -88,9 +89,10 @@ class OfflineSessionLoadTask extends AsyncTask {
         unlink($path);
     }
 
+    /** @noinspection PhpUnused */
     public function onCompletion(Server $server) {
         if($this->exists) {
-            ClipboardManager::finishLoad($this->playerId, OfflineSession::saveData($this->playerId, $this->clipboard, $this->clipboardRelativePosition, $this->clipboardDuplicateDetectionEnabled, $this->undoData, $this->redoData));
+            ClipboardManager::finishLoad($this->playerId, OfflineSession::createSession($this->playerId, $this->clipboard, $this->clipboardRelativePosition, $this->clipboardDuplicateDetectionEnabled, $this->undoData, $this->redoData));
         }
     }
 }

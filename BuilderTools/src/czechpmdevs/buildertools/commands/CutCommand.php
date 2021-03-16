@@ -22,10 +22,10 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class CutCommand extends BuilderToolsCommand {
@@ -34,6 +34,7 @@ class CutCommand extends BuilderToolsCommand {
         parent::__construct("/cut", "Cut selected area", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -49,22 +50,21 @@ class CutCommand extends BuilderToolsCommand {
             return;
         }
 
+        /** @var Vector3 $pos1 */
         $pos1 = Selectors::getPosition($sender, 1);
+        /** @var Vector3 $pos2 */
         $pos2 = Selectors::getPosition($sender, 2);
 
         $startTime = microtime(true);
 
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $copier->copy($pos1, $pos2, $sender);
+        Copier::getInstance()->copy($pos1, $pos2, $sender);
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
-        $blockList = $filler->prepareFill($pos1, $pos2, $sender->getLevel(), "0");
+        $filler = Filler::getInstance();
+        $blockList = $filler->prepareFill($pos1, $pos2, $sender->getLevelNonNull(), "0");
         $result = $filler->fill($sender, $blockList);
 
         $time = round(microtime(true) - $startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix()." §a{$result->countBlocks} blocks were cut out (Took $time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix()." §a$result->countBlocks blocks were cut out (Took $time seconds)!");
     }
 }

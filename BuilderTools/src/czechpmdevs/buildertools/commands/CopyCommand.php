@@ -22,9 +22,9 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class CopyCommand extends BuilderToolsCommand {
@@ -33,6 +33,7 @@ class CopyCommand extends BuilderToolsCommand {
         parent::__construct("/copy", "Copy selected area", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -47,13 +48,14 @@ class CopyCommand extends BuilderToolsCommand {
             $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
             return;
         }
+
+        /** @var Vector3 $pos1 */
         $pos1 = Selectors::getPosition($sender, 1);
+        /** @var Vector3 $pos2 */
         $pos2 = Selectors::getPosition($sender, 2);
 
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $result = $copier->copy($pos1, $pos2, $sender);
+        $result = Copier::getInstance()->copy($pos1, $pos2, $sender);
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§a{$result->countBlocks} blocks copied to clipboard (Took {$result->time} seconds)! Use //paste to paste");
+        $sender->sendMessage(BuilderTools::getPrefix()."§a$result->countBlocks blocks copied to clipboard (Took $result->time seconds)! Use //paste to paste");
     }
 }

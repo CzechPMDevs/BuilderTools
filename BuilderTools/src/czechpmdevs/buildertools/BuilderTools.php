@@ -26,6 +26,7 @@ use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
 use czechpmdevs\buildertools\commands\CutCommand;
 use czechpmdevs\buildertools\commands\CylinderCommand;
+use czechpmdevs\buildertools\commands\DecorationCommand;
 use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
@@ -52,15 +53,6 @@ use czechpmdevs\buildertools\commands\StackCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
 use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
-use czechpmdevs\buildertools\editors\Canceller;
-use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Decorator;
-use czechpmdevs\buildertools\editors\Editor;
-use czechpmdevs\buildertools\editors\Filler;
-use czechpmdevs\buildertools\editors\Fixer;
-use czechpmdevs\buildertools\editors\Naturalizer;
-use czechpmdevs\buildertools\editors\Printer;
-use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
@@ -74,9 +66,6 @@ class BuilderTools extends PluginBase {
     /** @var string */
     private static string $prefix;
 
-    /** @var Editor[] */
-    private static array $editors = [];
-
     /** @var EventListener */
     private static EventListener $listener;
     /** @var SchematicsManager */
@@ -88,6 +77,7 @@ class BuilderTools extends PluginBase {
     /** @var array */
     private static array $configuration = [];
 
+    /** @noinspection PhpUnused */
     public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
@@ -95,7 +85,6 @@ class BuilderTools extends PluginBase {
         $this->initConfig();
         $this->registerCommands();
         $this->initListener();
-        $this->registerEditors();
         $this->registerEnchantment();
         $this->sendWarnings();
 
@@ -110,17 +99,6 @@ class BuilderTools extends PluginBase {
             @mkdir($this->getDataFolder() . "offline_sessions");
         }
         self::$configuration = $this->getConfig()->getAll();
-    }
-
-    private function registerEditors() {
-        self::$editors["Filler"] = new Filler;
-        self::$editors["Printer"] = new Printer;
-        self::$editors["Replacement"] = new Replacement;
-        self::$editors["Naturalizer"] = new Naturalizer;
-        self::$editors["Copier"] = new Copier;
-        self::$editors["Canceller"] = new Canceller;
-        self::$editors["Decorator"] = new Decorator;
-        self::$editors["Fixer"] = new Fixer;
     }
 
     private function initListener() {
@@ -140,6 +118,7 @@ class BuilderTools extends PluginBase {
             new CubeCommand,
             new CutCommand,
             new CylinderCommand,
+            new DecorationCommand,
             new DrawCommand,
             new FillCommand,
             new FirstPositionCommand,
@@ -181,10 +160,6 @@ class BuilderTools extends PluginBase {
         }
     }
 
-    public static function getEditor(string $name): Editor {
-        return self::$editors[$name];
-    }
-
     /**
      * @return Command[] $commands
      */
@@ -198,10 +173,6 @@ class BuilderTools extends PluginBase {
 
     public static function getConfiguration(): array {
         return self::$configuration;
-    }
-
-    public static function getListener(): EventListener {
-        return self::$listener;
     }
 
     public static function getSchematicsManager(): SchematicsManager {

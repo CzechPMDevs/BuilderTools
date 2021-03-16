@@ -33,6 +33,7 @@ class WorldFixUtil {
     /** @var string[] */
     private static array $worldFixQueue = [];
 
+    /** @noinspection PhpUnusedParameterInspection */
     public static function fixWorld(CommandSender $sender, string $worldName): void {
         if(self::isInWorldFixQueue($worldName)) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cServer is already fixing this world!");
@@ -60,6 +61,7 @@ class WorldFixUtil {
         }
 
         $asyncTask = new WorldFixTask($path);
+
         BuilderTools::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function (int $currentTick) use ($asyncTask): void { // Delay until the world will be fully saved
             Server::getInstance()->getAsyncPool()->submitTask($asyncTask);
         }), 60);
@@ -78,6 +80,7 @@ class WorldFixUtil {
                 $this->sender = $sender;
             }
 
+            /** @noinspection PhpUnused */
             public function onRun(int $currentTick) {
                 if($this->sender instanceof Player && !$this->sender->isOnline()) {
                     $this->task->forceStop = true;
@@ -103,7 +106,6 @@ class WorldFixUtil {
                     finish:
                     BuilderTools::getInstance()->getScheduler()->cancelTask($this->getTaskId());
                     WorldFixUtil::finishWorldFixTask($this->task);
-                    return;
                 }
             }
         }, 2);

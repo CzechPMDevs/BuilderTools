@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Editor;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -32,6 +31,7 @@ class PasteCommand extends BuilderToolsCommand {
         parent::__construct("/paste", "Paste copied area", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -39,15 +39,13 @@ class PasteCommand extends BuilderToolsCommand {
             return;
         }
 
-        /** @var Copier $copier */
-        $copier = BuilderTools::getEditor(Editor::COPIER);
-        $result = $copier->paste($sender);
+        $result = Copier::getInstance()->paste($sender);
 
         if($result->error) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cCould not paste clipboard: Your clipboard is empty!");
             return;
         }
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully pasted, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully pasted, $result->countBlocks blocks changed (Took $result->time seconds)!");
     }
 }

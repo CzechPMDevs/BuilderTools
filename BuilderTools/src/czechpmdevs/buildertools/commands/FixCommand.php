@@ -29,6 +29,7 @@ class FixCommand extends BuilderToolsCommand {
         parent::__construct("/fix", "Fixes world");
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
 

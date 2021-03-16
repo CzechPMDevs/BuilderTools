@@ -34,6 +34,7 @@ class BlockInfoCommand extends BuilderToolsCommand {
         parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi", "/debug"]);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -43,6 +44,8 @@ class BlockInfoCommand extends BuilderToolsCommand {
         if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
             $item = Item::get(Item::STICK);
             $item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
+
+            /** @phpstan-ignore-next-line */
             $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(50), 1));
             $sender->getInventory()->addItem($item);
             $sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");

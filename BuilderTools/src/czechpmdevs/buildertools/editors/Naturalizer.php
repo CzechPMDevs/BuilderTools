@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
@@ -29,8 +28,10 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
+use pocketmine\utils\SingletonTrait;
 
-class Naturalizer extends Editor {
+class Naturalizer {
+    use SingletonTrait;
 
     public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player): EditorResult {
         $list = new BlockArray();
@@ -42,12 +43,10 @@ class Naturalizer extends Editor {
             }
         }
 
-        /** @var Filler $filler */
-        $filler = BuilderTools::getEditor(Editor::FILLER);
-        return $filler->fill($player, $list);
+        return Filler::getInstance()->fill($player, $list);
     }
 
-    private function fix(BlockArray $list, Vector2 $vector2, int $minY, int $maxY, Level $level) {
+    private function fix(BlockArray $list, Vector2 $vector2, int $minY, int $maxY, Level $level): void {
         $x = (int)$vector2->getX();
         $z = (int)$vector2->getY();
 
@@ -83,9 +82,5 @@ class Naturalizer extends Editor {
                     }
             }
         }
-    }
-
-    public function getName(): string {
-        return "Naturalizer";
     }
 }

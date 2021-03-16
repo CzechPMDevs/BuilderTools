@@ -46,6 +46,7 @@ class MCEditLoadTask extends AsyncTask {
         $this->path = $path;
     }
 
+    /** @noinspection PhpUnused */
     public function onRun() {
         try {
             /** @var CompoundTag $data */
@@ -53,9 +54,9 @@ class MCEditLoadTask extends AsyncTask {
 
             $materials = SchematicData::MATERIALS_CLASSIC;
 
-            $width = (int)$data->getShort("Width");
-            $height = (int)$data->getShort("Height");
-            $length = (int)$data->getShort("Length");
+            $width = $data->getShort("Width");
+            $height = $data->getShort("Height");
+            $length = $data->getShort("Length");
 
             if($data->offsetExists("Materials")) {
                 $materials = $data->getString("Materials");
@@ -98,6 +99,7 @@ class MCEditLoadTask extends AsyncTask {
         }
     }
 
+    /** @noinspection PhpUnused */
     public function onCompletion(Server $server) {
         BuilderTools::getSchematicsManager()->registerSchematic($this->path, $this->schematics);
     }

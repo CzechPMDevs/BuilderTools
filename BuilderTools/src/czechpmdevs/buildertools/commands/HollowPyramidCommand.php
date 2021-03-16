@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -32,6 +31,7 @@ class HollowPyramidCommand extends BuilderToolsCommand {
         parent::__construct("/hpyramid", "Create hollow pyramid", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -45,10 +45,7 @@ class HollowPyramidCommand extends BuilderToolsCommand {
 
         $size = isset($args[1]) ? (int)($args[1]) : 5;
 
-        /** @var Printer $printer */
-        $printer = BuilderTools::getEditor(Editor::PRINTER);
-
-        $result = $printer->makeHollowPyramid($sender, $sender, $size, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow pyramid created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
+        $result = Printer::getInstance()->makeHollowPyramid($sender, $sender, $size, $args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow pyramid created, $result->countBlocks blocks changed (Took $result->time seconds)");
     }
 }

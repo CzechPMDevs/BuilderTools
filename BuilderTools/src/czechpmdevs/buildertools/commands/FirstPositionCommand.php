@@ -32,6 +32,7 @@ class FirstPositionCommand extends BuilderToolsCommand {
         parent::__construct("/pos1", "Select first position", null, ["/1"]);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

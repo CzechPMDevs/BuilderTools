@@ -25,6 +25,9 @@ use pocketmine\math\Vector3;
 
 class BlockGenerator {
 
+    /**
+     * @return Generator<Vector3>
+     */
     public static function fillCuboid(Vector3 $pos1, Vector3 $pos2, bool $hollow = false): Generator {
         for($x = min($pos1->getX(), $pos2->getX()), $maxX = max($pos1->getX(), $pos2->getX()); $x <= $maxX; $x++) {
             for($z = min($pos1->getZ(), $pos2->getZ()), $maxZ = max($pos1->getZ(), $pos2->getZ()); $z <= $maxZ; $z++) {
@@ -39,6 +42,9 @@ class BlockGenerator {
         }
     }
 
+    /**
+     * @return Generator<Vector3>
+     */
     public static function generateCube(int $radius, bool $hollow = false): Generator {
         for($x = 0; $x <= $radius; $x++) {
             for ($y = 0; $y <= $radius; $y++) {
@@ -55,6 +61,9 @@ class BlockGenerator {
         }
     }
 
+    /**
+     * @return Generator<Vector3>
+     */
     public static function generateSphere(int $radius, bool $hollow = false): Generator {
         $incDivX = 0;
         for($x = 0; $x <= $radius; $x++) {
@@ -95,6 +104,9 @@ class BlockGenerator {
         }
     }
 
+    /**
+     * @return Generator<Vector3>
+     */
     public static function generateCylinder(int $radius, int $height, bool $hollow = false): Generator {
         $incDivX = 0;
         for($x = 0; $x <= $radius; $x++) {
@@ -127,6 +139,9 @@ class BlockGenerator {
         }
     }
 
+    /**
+     * @return Generator<Vector3>
+     */
     public static function generatePyramid(int $size, bool $hollow = false): Generator {
         $currentLevelHeight = $size;
         for($y = 0; $y <= $size; $y++) {

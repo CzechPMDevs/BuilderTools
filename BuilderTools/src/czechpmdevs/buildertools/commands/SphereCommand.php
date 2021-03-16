@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -32,6 +31,7 @@ class SphereCommand extends BuilderToolsCommand {
         parent::__construct("/sphere", "Create sphere", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -44,10 +44,7 @@ class SphereCommand extends BuilderToolsCommand {
         }
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
 
-        /** @var Printer $printer */
-        $printer = BuilderTools::getEditor(Editor::PRINTER);
-
-        $result = $printer->makeSphere($sender, $sender, $radius, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere created, {$result->countBlocks} blocks changed (Took {$result->time} seconds)");
+        $result = Printer::getInstance()->makeSphere($sender, $sender, $radius, $args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSphere created, $result->countBlocks blocks changed (Took $result->time seconds)");
     }
 }

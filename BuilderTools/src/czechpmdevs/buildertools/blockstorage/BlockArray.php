@@ -54,7 +54,7 @@ class BlockArray implements UpdateLevelData {
      * @return $this
      */
     public function addBlock(Vector3 $vector3, int $id, int $meta): BlockArray {
-        return $this->addBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $id, $meta);
+        return $this->addBlockAt($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ(), $id, $meta);
     }
 
     /**
@@ -93,6 +93,7 @@ class BlockArray implements UpdateLevelData {
         $id = ord($this->buffer[$this->offset++]);
         $meta = ord($this->buffer[$this->offset++]);
 
+        /** @phpstan-ignore-next-line */
         $hash = unpack("q", substr($this->buffer, $this->offset, 8))[1] ?? 0;
         Level::getBlockXYZ($hash, $x, $y, $z);
         $this->offset += 8;
@@ -107,8 +108,6 @@ class BlockArray implements UpdateLevelData {
 
     /**
      * Adds Vector3 to all the blocks in BlockArray
-     *
-     * @return $this for chaining
      */
     public function addVector3(Vector3 $vector3): BlockArray {
         if(!$vector3->ceil()->equals($vector3)) {
@@ -122,6 +121,7 @@ class BlockArray implements UpdateLevelData {
             $blockArray->buffer .= $this->buffer[$this->offset++];
             $blockArray->buffer .= $this->buffer[$this->offset++];
 
+            /** @phpstan-ignore-next-line */
             $hash = unpack("q", substr($this->buffer, $this->offset, 8))[1] ?? 0;
             Level::getBlockXYZ($hash, $x, $y, $z);
 
@@ -137,8 +137,6 @@ class BlockArray implements UpdateLevelData {
 
     /**
      * Subtracts Vector3 from all the blocks in BlockArray
-     *
-     * @return $this for chaining
      */
     public function subtractVector3(Vector3 $vector3): BlockArray {
         return $this->addVector3($vector3->multiply(-1));
@@ -169,38 +167,8 @@ class BlockArray implements UpdateLevelData {
      * Removes all the blocks whose were checked already
      * For cleaning duplicate cache use cancelDuplicateDetection()
      */
-    public function cleanGarbage() {
+    public function cleanGarbage(): void {
         $this->buffer = substr($this->buffer, $this->offset);
         $this->offset = 0;
-    }
-}
-
-trait DuplicateBlockDetector {
-
-    /** @var bool */
-    protected bool $detectDuplicates = false;
-    /** @var string */
-    protected string $duplicateCache = "";
-
-    /**
-     * Check if vector is already used in the array
-     */
-    protected function isDuplicate(string $binHash): bool {
-        for($i = 0; ($j = (strpos($this->duplicateCache, $binHash, $i))) !== false; $i++) {
-            if($j % 8 == 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function detectingDuplicates(): bool {
-        return $this->detectDuplicates;
-    }
-
-    public function cancelDuplicateDetection(): void {
-        $this->detectDuplicates = false;
-        $this->duplicateCache = "";
     }
 }

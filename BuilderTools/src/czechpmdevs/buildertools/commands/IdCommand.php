@@ -30,6 +30,7 @@ class IdCommand extends BuilderToolsCommand {
         parent::__construct("/id", "Send id of item in your hands", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {

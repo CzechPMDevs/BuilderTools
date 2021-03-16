@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Canceller;
-use czechpmdevs\buildertools\editors\Editor;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -32,6 +31,7 @@ class UndoCommand extends BuilderToolsCommand {
         parent::__construct("/undo", "Undo last BuilderTools actions", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -39,11 +39,10 @@ class UndoCommand extends BuilderToolsCommand {
             return;
         }
 
-        /** @var Canceller $canceller */
-        $canceller = BuilderTools::getEditor(Editor::CANCELLER);
-        $result = $canceller->undo($sender);
+        $result = Canceller::getInstance()->undo($sender);
 
-        if(!$result->error) $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled, {$result->countBlocks} blocks changed (Took {$result->time} seconds)!");
+        if(!$result->error) // TODO
+            $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled, $result->countBlocks blocks changed (Took $result->time seconds)!");
     }
 
 }

@@ -31,6 +31,7 @@ class SchematicCommand extends BuilderToolsCommand {
         parent::__construct("/schematic", "Schematics commands", null, ["/schem", "/schematics"]);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -89,7 +90,7 @@ class SchematicCommand extends BuilderToolsCommand {
                 foreach (BuilderTools::getSchematicsManager()->getAllSchematics() as $name => $schematic) {
                     $list[] = $name;
                 }
-                $sender->sendMessage(BuilderTools::getPrefix() . (string)count($list) . " loaded schematics: " . implode(", ", $list));
+                $sender->sendMessage(BuilderTools::getPrefix() . count($list) . " loaded schematics: " . implode(", ", $list));
                 break;
             case "reload":
                 BuilderTools::getSchematicsManager()->loadSchematics();

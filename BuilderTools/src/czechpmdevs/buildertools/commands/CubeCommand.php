@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Editor;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -32,6 +31,7 @@ class CubeCommand extends BuilderToolsCommand {
         parent::__construct("/cube", "Create cube", null, []);
     }
 
+    /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         if(!$sender instanceof Player) {
@@ -44,10 +44,7 @@ class CubeCommand extends BuilderToolsCommand {
         }
         $radius = isset($args[1]) ? (int)$args[1] : 5;
 
-        /** @var Printer $printer */
-        $printer = BuilderTools::getEditor(Editor::PRINTER);
-
-        $result = $printer->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created, {$result->countBlocks} block changed (Took {$result->time} seconds)!");
+        $result = Printer::getInstance()->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created, $result->countBlocks block changed (Took $result->time seconds)!");
     }
 }

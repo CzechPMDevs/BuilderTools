@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
@@ -50,8 +50,8 @@ final class StringToBlockDecoder {
      * Reads next block from the string,
      * @throws ArrayOutOfBoundsException if string is not valid.
      */
-    public function nextBlock(?int &$id, ?int &$meta) {
-        $hash = $this->blockMap[array_rand($this->blockMap, 1)];
+    public function nextBlock(?int &$id, ?int &$meta): void {
+        $hash = $this->blockMap[array_rand($this->blockMap)];
 
         $id = $hash >> 4;
         $meta = $hash & 0x0f;
@@ -71,7 +71,7 @@ final class StringToBlockDecoder {
         return in_array($id, $this->blockIdMap);
     }
 
-    public function decode() {
+    public function decode(): void {
         $split = explode(",", $this->string);
         foreach ($split as $entry) {
             $count = 1;
