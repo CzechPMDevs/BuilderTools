@@ -31,6 +31,9 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function abs;
+use function microtime;
+use function round;
 
 class Copier {
     use SingletonTrait;
@@ -54,12 +57,12 @@ class Copier {
 
         ClipboardManager::saveClipboard($player, $clipboard);
 
-        return new EditorResult($i, microtime(true)-$startTime, false);
+        return EditorResult::success($i, microtime(true) - $startTime);
     }
 
     public function merge(Player $player): EditorResult {
         if(!ClipboardManager::hasClipboardCopied($player)) {
-            return new EditorResult(0, 0, true);
+            return EditorResult::error("Clipboard is empty");
         }
 
         /** @var SelectionData $clipboard */
@@ -74,7 +77,7 @@ class Copier {
 
     public function paste(Player $player): EditorResult {
         if(!ClipboardManager::hasClipboardCopied($player)) {
-            return new EditorResult(0, 0, true);
+            return EditorResult::error("Clipboard is empty");
         }
 
         /** @var SelectionData $clipboard */
@@ -205,6 +208,6 @@ class Copier {
         }
 
         $result = Filler::getInstance()->fill($player, $blocks, null, true, false, true);
-        return new EditorResult($result->countBlocks, microtime(true) - $start);
+        return EditorResult::success($result->getBlocksChanged(), microtime(true) - $start);
     }
 }

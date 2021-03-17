@@ -1,6 +1,6 @@
 {
   "name": "czechpmdevs/buildertools",
-  "description": "Advanced World-Edit plugin for PocketMine servers",
+  "description": "Advanced WorldEdit plugin for PocketMine servers",
   "minimum-stability": "dev",
   "license": "Apache-2.0",
   "require": {

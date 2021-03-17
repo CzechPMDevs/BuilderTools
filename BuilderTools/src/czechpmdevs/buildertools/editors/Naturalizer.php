@@ -37,8 +37,8 @@ class Naturalizer {
         $list = new BlockArray();
         $list->setLevel($level);
 
-        for($x = min($x1, $x2); $x <= max($x1, $x2); $x++) {
-            for($z = min($z1, $z2); $z <= max($z1, $z2); $z++) {
+        for($x = min($x1, $x2); $x <= max($x1, $x2); ++$x) {
+            for($z = min($z1, $z2); $z <= max($z1, $z2); ++$z) {
                 $this->fix($list, new Vector2($x, $z), (int)min($y1, $y2), (int)max($y1, $y2), $level);
             }
         }
@@ -51,8 +51,8 @@ class Naturalizer {
         $z = (int)$vector2->getY();
 
         $blockY = null;
-        for($y = $minY; $y <= $maxY; $y++) {
-            if($level->getBlockAt($x, $y, $z)->getId() !== Block::AIR && ($blockY === null || $blockY < $y)) {
+        for($y = $minY; $y <= $maxY; ++$y) {
+            if($level->getBlockAt($x, $y, $z, true, false)->getId() !== Block::AIR && ($blockY === null || $blockY < $y)) {
                 $blockY = $y;
             }
         }
@@ -67,17 +67,17 @@ class Naturalizer {
                 case 1:
                 case 2:
                 case 3:
-                    if($level->getBlockAt($x, $y, $z)->getId() != BlockIds::AIR) {
+                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
                         $list->addBlock(new Vector3($x, $y, $z), BlockIds::DIRT, 0);
                     }
                     break;
                 case 4:
-                    if($level->getBlockAt($x, $y, $z)->getId() != BlockIds::AIR) {
+                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
                         $list->addBlock(new Vector3($x, $y, $z), rand(0, 1) ? BlockIds::DIRT : BlockIds::STONE, 0);
                     }
                     break;
                 default:
-                    if($level->getBlockAt($x, $y, $z)->getId() != BlockIds::AIR) {
+                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
                         $list->addBlock(new Vector3($x, $y, $z), BlockIds::STONE, 0);
                     }
             }

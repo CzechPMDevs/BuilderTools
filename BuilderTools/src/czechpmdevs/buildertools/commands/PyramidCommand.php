@@ -46,6 +46,6 @@ class PyramidCommand extends BuilderToolsCommand {
         $size = isset($args[1]) ? (int)($args[1]) : 5;
 
         $result = Printer::getInstance()->makePyramid($sender, $sender, $size, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aPyramid created, $result->countBlocks blocks changed (Took $result->time seconds)");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aPyramid created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
     }
 }

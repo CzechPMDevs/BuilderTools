@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use Exception;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
@@ -34,14 +35,10 @@ class FillSession {
     /** @var bool */
     private bool $calculateDimensions;
     /** @var bool */
-    private bool $saveUndo;
-    /** @var bool */
-    private bool $saveRedo;
+    private bool $saveChanges;
 
     /** @var BlockArray|null */
-    private ?BlockArray $undoList = null;
-    /** @var BlockArray|null */
-    private ?BlockArray $redoList = null;
+    private ?BlockArray $changes = null;
 
     /** @var int */
     private int $minX, $maxX;
@@ -51,18 +48,14 @@ class FillSession {
     /** @var int */
     private int $blocksChanged = 0;
 
-    public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveUndo = true, bool $saveRedo = false) {
+    public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true) {
         $this->iterator = new SubChunkIteratorManager($world);
 
         $this->calculateDimensions = $calculateDimensions;
-        $this->saveUndo = $saveUndo;
-        $this->saveRedo = $saveRedo;
+        $this->saveChanges = $saveChanges;
 
-        if($this->saveUndo) {
-            $this->undoList = (new BlockArray())->setLevel($world);
-        }
-        if($this->saveRedo) {
-            $this->redoList = (new BlockArray())->setLevel($world);
+        if($this->saveChanges) {
+            $this->changes = (new BlockArray())->setLevel($world);
         }
     }
 
@@ -73,6 +66,9 @@ class FillSession {
         $this->maxZ = $maxZ;
     }
 
+    /**
+     * @param int $y 0-255
+     */
     public function setBlockAt(int $x, int $y, int $z, int $id, int $meta) {
         if(!$this->moveTo($x, $y, $z)) {
             return;
@@ -84,6 +80,9 @@ class FillSession {
         $this->blocksChanged++;
     }
 
+    /**
+     * @param int $y 0-255
+     */
     public function setBlockIdAt(int $x, int $y, int $z, int $id) {
         if(!$this->moveTo($x, $y, $z)) {
             return;
@@ -95,12 +94,8 @@ class FillSession {
         $this->blocksChanged++;
     }
 
-    public function getUndoList(): ?BlockArray {
-        return $this->undoList;
-    }
-
-    public function getRedoList(): ?BlockArray {
-        return $this->redoList;
+    public function getChanges(): ?BlockArray {
+        return $this->changes;
     }
 
     /**
@@ -111,20 +106,16 @@ class FillSession {
     }
 
     private function moveTo(int $x, int $y, int $z): bool {
-        if($y < 0 || $y > 255) {
-            return false;
-        }
-
         $this->iterator->moveTo($x, $y, $z);
 
         if($this->iterator->currentSubChunk === null) {
-            $chunk = $this->iterator->level->getChunk($x >> 4, $z >> 4);
-            if($chunk === null) {
+            try {
+                $this->iterator->level->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4, true);
+                MainLogger::getLogger()->debug("[BuilderTools] Generated new sub chunk at $x:$y:$z!");
+            } catch (Exception $exception) {
                 MainLogger::getLogger()->debug("[BuilderTools] Chunk at " . ($x >> 4) . ":" . ($z >> 4) . " does not exist. Skipping the block...");
                 return false;
             }
-
-            $this->iterator->currentSubChunk = $chunk->getSubChunk($y >> 4, true);
         }
 
         if($this->calculateDimensions) {
@@ -138,26 +129,25 @@ class FillSession {
     }
 
     private function saveChanges(int $x, int $y, int $z) {
-        if($this->saveUndo) {
+        if($this->saveChanges) {
             $id = $this->iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f);
             $meta = $this->iterator->currentSubChunk->getBlockData($x & 0x0f, $y & 0x0f, $z & 0x0f);
 
-            $this->undoList->addBlockAt($x, $y, $z, $id, $meta);
-            if($this->saveRedo) {
-                $this->redoList->addBlockAt($x, $y, $z, $id, $meta);
-            }
-        } elseif($this->saveRedo) {
-            $id = $this->iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f);
-            $meta = $this->iterator->currentSubChunk->getBlockData($x & 0x0f, $y & 0x0f, $z & 0x0f);
-
-            $this->undoList->addBlockAt($x, $y, $z, $id, $meta);
+            $this->changes->addBlockAt($x, $y, $z, $id, $meta);
         }
     }
 
     public function reloadChunks(Level $level) {
-        for($x = $this->minX >> 4, $maxX = $this->maxX >> 4; $x <= $maxX; ++$x) {
-            for($z = $this->minZ >> 4, $maxZ = $this->maxZ >> 4; $z <= $maxZ; ++$z) {
+        $minX = $this->minX >> 4;
+        $maxX = $this->maxX >> 4;
+        $minZ = $this->minZ >> 4;
+        $maxZ = $this->maxZ >> 4;
+
+        for($x = $minX; $x <= $maxX; ++$x) {
+            for($z = $minZ; $z <= $maxZ; ++$z) {
                 $level->clearChunkCache($x, $z);
+                $level->getChunk($x, $z)->setChanged();
+
                 foreach ($level->getChunkLoaders($x, $z) as $loader) {
                     $loader->onChunkChanged($level->getChunk($x, $z));
                 }

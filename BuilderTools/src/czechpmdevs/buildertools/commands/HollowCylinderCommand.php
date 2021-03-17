@@ -47,6 +47,11 @@ class HollowCylinderCommand extends BuilderToolsCommand {
         $height = isset($args[2]) ? (int)($args[2]) : 8;
 
         $result = Printer::getInstance()->makeHollowCylinder($sender, $sender, $radius, $height, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cylinder created, $result->countBlocks blocks changed (Took $result->time seconds)");
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow cylinder: {$result->getErrorMessage()}");
+            return;
+        }
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cylinder created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
     }
 }

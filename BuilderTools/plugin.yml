@@ -6,6 +6,9 @@ version: 1.2.0-beta3
 main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
 
+extensions:
+  Core: '>=7.4'
+
 permissions:
   bt.cmd:
     default: op

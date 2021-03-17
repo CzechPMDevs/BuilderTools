@@ -27,6 +27,10 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
+use function array_filter;
+use function array_map;
+use function serialize;
+use function unserialize;
 
 final class OfflineSession {
 

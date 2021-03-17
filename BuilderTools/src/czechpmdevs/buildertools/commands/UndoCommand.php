@@ -41,8 +41,12 @@ class UndoCommand extends BuilderToolsCommand {
 
         $result = Canceller::getInstance()->undo($sender);
 
-        if(!$result->error) // TODO
-            $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled, $result->countBlocks blocks changed (Took $result->time seconds)!");
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst processing the command: {$result->getErrorMessage()}");
+            return;
+        }
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§aStep was cancelled, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
     }
 
 }

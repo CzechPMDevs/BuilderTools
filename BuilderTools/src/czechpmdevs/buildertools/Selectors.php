@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools;
 use InvalidArgumentException;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use function strtolower;
 
 class Selectors {
 

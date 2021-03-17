@@ -25,7 +25,6 @@ use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class FillCommand extends BuilderToolsCommand {
@@ -75,6 +74,6 @@ class FillCommand extends BuilderToolsCommand {
 
         $time = round(microtime(true) - $startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§a$result->countBlocks blocks changed (Took $time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->getBlocksChanged()} blocks changed (Took $time seconds)!");
     }
 }

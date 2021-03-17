@@ -60,6 +60,6 @@ class NaturalizeCommand extends BuilderToolsCommand {
         }
 
         $result = Naturalizer::getInstance()->naturalize($firstPos->getFloorX(), $firstPos->getFloorY(), $firstPos->getFloorY(), $secondPos->getFloorX(), $secondPos->getFloorY(), $secondPos->getFloorZ(), $sender->getLevelNonNull(), $sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized, $result->countBlocks blocks changed (Took $result->time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
     }
 }

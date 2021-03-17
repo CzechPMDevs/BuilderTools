@@ -31,6 +31,7 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
+use function microtime;
 
 class EventListener implements Listener {
 

@@ -20,6 +20,7 @@ namespace czechpmdevs\buildertools\editors;
 
 use pocketmine\block\BlockIds;
 use pocketmine\utils\SingletonTrait;
+use function is_int;
 
 class Fixer {
     use SingletonTrait;

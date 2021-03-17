@@ -34,6 +34,7 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelChunkPacket;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function microtime;
 
 class Filler {
     use SingletonTrait;
@@ -133,7 +134,7 @@ class Filler {
             Canceller::getInstance()->addRedo($player, $redoArray);
         }
 
-        return new EditorResult($count, microtime(true)-$startTime);
+        return EditorResult::success($count, microtime(true) - $startTime);
     }
 
     public function merge(Player $player, UpdateLevelData $updateData, ?Vector3 $relativePosition = null, bool $saveUndo = true, bool $saveRedo = false): EditorResult {
@@ -141,8 +142,8 @@ class Filler {
     }
 
     private function reloadChunks(Level $level, int $minX, int $minZ, int $maxX, int $maxZ): void {
-        for($x = $minX >> 4; $x <= $maxX >> 4; $x++) {
-            for ($z = $minZ >> 4; $z <= $maxZ >> 4; $z++) {
+        for($x = $minX >> 4; $x <= $maxX >> 4; ++$x) {
+            for ($z = $minZ >> 4; $z <= $maxZ >> 4; ++$z) {
                 $tiles = $level->getChunkTiles($x, $z);
                 $chunk = $level->getChunk($x, $z);
                 $level->setChunk($x, $z, $chunk);

@@ -1,6 +1,6 @@
 .idea
 data
 build.php
-BuilderTools/composer.lock
 BuilderTools/vendor
+out
 composer.phar

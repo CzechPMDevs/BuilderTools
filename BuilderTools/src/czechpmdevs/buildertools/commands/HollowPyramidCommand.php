@@ -46,6 +46,11 @@ class HollowPyramidCommand extends BuilderToolsCommand {
         $size = isset($args[1]) ? (int)($args[1]) : 5;
 
         $result = Printer::getInstance()->makeHollowPyramid($sender, $sender, $size, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow pyramid created, $result->countBlocks blocks changed (Took $result->time seconds)");
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow pyramid: {$result->getErrorMessage()}");
+            return;
+        }
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow pyramid created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
     }
 }

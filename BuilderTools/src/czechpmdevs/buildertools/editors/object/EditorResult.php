@@ -20,18 +20,48 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors\object;
 
+use function round;
+
 class EditorResult {
 
-    /** @var int */
-    public int $countBlocks;
-    /** @var float */
-    public float $time;
-    /** @var bool  */
-    public bool $error;
+    /** @var int $blocksChanged */
+    protected int $blocksChanged = 0;
+    /** @var float $processTime */
+    protected float $processTime = 0.0;
 
-    public function __construct(int $countBlocks, float $time, bool $error = false) {
-        $this->countBlocks = $countBlocks;
-        $this->time = round($time, 3);
-        $this->error = $error;
+    /** @var string|null */
+    protected ?string $errorMessage = null;
+
+    protected function __construct() {}
+
+    public function getBlocksChanged(): int {
+        return $this->blocksChanged;
+    }
+
+    public function getProcessTime(): float {
+        return $this->processTime;
+    }
+
+    public function successful(): bool {
+        return $this->errorMessage === null;
+    }
+
+    public function getErrorMessage(): ?string {
+        return $this->errorMessage;
+    }
+
+    public static function success(int $blocksChanged, float $processTime): EditorResult {
+        $result = new EditorResult();
+        $result->blocksChanged = $blocksChanged;
+        $result->processTime = round($processTime, 3);
+
+        return $result;
+    }
+
+    public static function error(string $message): EditorResult {
+        $result = new EditorResult();
+        $result->errorMessage = $message;
+
+        return $result;
     }
 }

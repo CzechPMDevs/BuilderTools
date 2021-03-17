@@ -25,6 +25,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function array_pop;
 
 class Canceller {
     use SingletonTrait;
@@ -40,8 +41,7 @@ class Canceller {
 
     public function undo(Player $player): EditorResult {
         $error = function () use ($player): EditorResult {
-            $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to undo!");
-            return new EditorResult(0, 0, true);
+            return EditorResult::error("There are not any actions to undo");
         };
 
         if(!isset($this->undoData[$player->getName()])) {
@@ -62,8 +62,7 @@ class Canceller {
 
     public function redo(Player $player): EditorResult {
         $error = function () use ($player): EditorResult {
-            $player->sendMessage(BuilderTools::getPrefix() . "§cThere are not actions to undo!");
-            return new EditorResult(0, 0, true);
+            return EditorResult::error("There are not any actions to redo");
         };
 
         if(!isset($this->redoData[$player->getName()])) {

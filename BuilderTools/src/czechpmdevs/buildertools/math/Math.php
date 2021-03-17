@@ -22,6 +22,9 @@ namespace czechpmdevs\buildertools\math;
 
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
+use function max;
+use function min;
+use const M_PI;
 
 class Math {
 

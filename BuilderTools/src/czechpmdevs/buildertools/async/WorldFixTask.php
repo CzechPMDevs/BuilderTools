@@ -28,6 +28,13 @@ use pocketmine\level\format\io\region\Anvil;
 use pocketmine\level\format\io\region\RegionLoader;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\MainLogger;
+use function basename;
+use function count;
+use function explode;
+use function glob;
+use function is_dir;
+use function microtime;
+use function round;
 
 class WorldFixTask extends AsyncTask {
     
@@ -88,9 +95,9 @@ class WorldFixTask extends AsyncTask {
         $chunksToFix = $this->getListOfChunksToFix($this->worldPath);
         foreach ($chunksToFix as $index => [$chunkX, $chunkZ]) {
             $chunk = $provider->loadChunk($chunkX, $chunkZ);
-            for($x = 0; $x < 16; $x++) {
-                for($z = 0; $z < 16; $z++) {
-                    for($y = 0; $y < $provider->getWorldHeight(); $y++) {
+            for($x = 0; $x < 16; ++$x) {
+                for($z = 0; $z < 16; ++$z) {
+                    for($y = 0; $y < $provider->getWorldHeight(); ++$y) {
                         if(($id = $chunk->getBlockId($x, $y, $z)) !== 0) {
                             $data = $chunk->getBlockData($x, $y, $z);
 
@@ -133,8 +140,8 @@ class WorldFixTask extends AsyncTask {
             $region = new RegionLoader($regionFilePath, $regionX, $regionZ);
             $region->open();
 
-            for($x = 0; $x < 32; $x++) {
-                for($z = 0; $z < 32; $z++) {
+            for($x = 0; $x < 32; ++$x) {
+                for($z = 0; $z < 32; ++$z) {
                     if($region->chunkExists($x, $z)) {
                         $chunks[] = [($regionX << 5) + $x, ($regionZ << 5) + $z];
                     }

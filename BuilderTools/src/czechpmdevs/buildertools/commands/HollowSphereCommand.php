@@ -47,6 +47,11 @@ class HollowSphereCommand extends BuilderToolsCommand {
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
 
         $result = Printer::getInstance()->makeHollowSphere($sender, $sender, $radius, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow sphere created, $result->countBlocks blocks changed (Took $result->time seconds)");
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow sphere: {$result->getErrorMessage()}");
+            return;
+        }
+
+        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow sphere created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
     }
 }

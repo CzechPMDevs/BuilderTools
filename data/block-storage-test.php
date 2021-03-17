@@ -2,7 +2,7 @@
 
 echo "Testing memory usage/speed for saving block lists.\n";
 
-$cubeSize = 100;
+$cubeSize = 50;
 $totalBlocks = pow($cubeSize, 3);
 echo "Working with {$cubeSize}x{$cubeSize}x{$cubeSize} ($totalBlocks blocks) cube with random block ids and metas:\n\n";
 

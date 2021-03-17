@@ -71,6 +71,6 @@ class ReplaceCommand extends BuilderToolsCommand {
 
         $time = round(microtime(true) - $startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§a$result->countBlocks replaced (Took $time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->getBlocksChanged()} replaced (Took $time seconds)!");
     }
 }

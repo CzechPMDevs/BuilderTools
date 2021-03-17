@@ -65,6 +65,6 @@ class CutCommand extends BuilderToolsCommand {
 
         $time = round(microtime(true) - $startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix()." §a$result->countBlocks blocks were cut out (Took $time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix()." §a{$result->getBlocksChanged()} blocks were cut out (Took $time seconds)!");
     }
 }

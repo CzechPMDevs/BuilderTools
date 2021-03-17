@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
@@ -24,6 +24,11 @@ use InvalidArgumentException;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use function ord;
+use function pack;
+use function strlen;
+use function substr;
+use function unpack;
 
 /**
  * Saves block with it's position as Vector3

@@ -8,6 +8,7 @@ use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\scheduler\AsyncTask;
+use function file_put_contents;
 
 class OfflineSessionSaveTask extends AsyncTask {
 

@@ -49,12 +49,11 @@ class MergeCommand extends BuilderToolsCommand {
         }
 
         $result = Copier::getInstance()->merge($sender);
-
-        if($result->error) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cYour clipboard is empty!");
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while processing: {$result->getErrorMessage()}");
             return;
         }
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully merged, $result->countBlocks blocks changed (Took $result->time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully merged, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
     }
 }

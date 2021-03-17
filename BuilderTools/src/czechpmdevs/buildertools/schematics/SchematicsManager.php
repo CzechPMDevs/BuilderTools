@@ -31,6 +31,9 @@ use Exception;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Player;
+use function basename;
+use function glob;
+use function mkdir;
 
 class SchematicsManager {
 

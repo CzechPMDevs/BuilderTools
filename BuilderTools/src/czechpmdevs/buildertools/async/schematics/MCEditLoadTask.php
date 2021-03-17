@@ -30,6 +30,8 @@ use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
+use function file_get_contents;
+use function ord;
 
 class MCEditLoadTask extends AsyncTask {
 
@@ -71,9 +73,9 @@ class MCEditLoadTask extends AsyncTask {
             $schematics = new MCEditSchematics();
 
             $i = 0;
-            for($y = 0; $y < $height; $y++) {
-                for ($z = 0; $z < $length; $z++) {
-                    for($x = 0; $x < $width; $x++) {
+            for($y = 0; $y < $height; ++$y) {
+                for ($z = 0; $z < $length; ++$z) {
+                    for($x = 0; $x < $width; ++$x) {
                         $id = ord($blocks[$i]);
                         $meta = ord($data[$i++]);
 

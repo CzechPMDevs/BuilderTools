@@ -22,61 +22,68 @@ namespace czechpmdevs\buildertools\math;
 
 use Generator;
 use pocketmine\math\Vector3;
+use function max;
+use function min;
 
 class BlockGenerator {
 
     /**
-     * @return Generator<Vector3>
+     * @return Generator<int[]>
      */
     public static function fillCuboid(Vector3 $pos1, Vector3 $pos2, bool $hollow = false): Generator {
-        for($x = min($pos1->getX(), $pos2->getX()), $maxX = max($pos1->getX(), $pos2->getX()); $x <= $maxX; $x++) {
-            for($z = min($pos1->getZ(), $pos2->getZ()), $maxZ = max($pos1->getZ(), $pos2->getZ()); $z <= $maxZ; $z++) {
-                for($y = min($pos1->getY(), $pos2->getY()), $maxY = max($pos1->getY(), $pos2->getY()); $y <= $maxY; $y++) {
-                    if($hollow && ($x != min($pos1->getX(), $pos2->getX()) && $x != max($pos1->getX(), $pos2->getX())) && ($y != min($pos1->getY(), $pos2->getY()) && $y != max($pos1->getY(), $pos2->getY())) && ($z != min($pos1->getZ(), $pos2->getZ()) && $z != max($pos1->getZ(), $pos2->getZ()))) {
+        $minX = (int)min($pos1->getX(), $pos2->getX());
+        $maxX = (int)max($pos1->getX(), $pos2->getX());
+        $minZ = (int)min($pos1->getZ(), $pos2->getZ());
+        $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
+        $minY = (int)min($pos1->getY(), $pos2->getY());
+        $maxY = (int)max($pos1->getY(), $pos2->getY());
+
+        for($x = $minX; $x <= $maxX; ++$x) {
+            for($z = $minZ; $z <= $maxZ; ++$z) {
+                for($y = $minY; $y <= $maxY; ++$y) {
+                    if($hollow && ($x != $minX && $x != $maxX) && ($y != $minY && $y != $maxY) && ($z != $minZ && $z != $maxZ)) {
                         continue;
                     }
 
-                    yield new Vector3($x, $y, $z);
+                    yield [$x, $y, $z];
                 }
             }
         }
     }
 
     /**
-     * @return Generator<Vector3>
+     * @return Generator<int[]>
      */
     public static function generateCube(int $radius, bool $hollow = false): Generator {
-        for($x = 0; $x <= $radius; $x++) {
-            for ($y = 0; $y <= $radius; $y++) {
-                for ($z = 0; $z <= $radius; $z++) {
+        for($x = -$radius; $x <= $radius; ++$x) {
+            for ($z = -$radius; $z <= $radius; ++$z) {
+                for ($y = -$radius; $y <= $radius; ++$y) {
                     if($hollow && ($x != $radius && $y != $radius && $z != $radius)) {
                         continue;
                     }
 
-                    foreach (self::generateMissingBlocks3d($x, $y, $z) as $vector3) {
-                        yield $vector3;
-                    }
+                    yield [$x, $y, $z];
                 }
             }
         }
     }
 
     /**
-     * @return Generator<Vector3>
+     * @return Generator<int[]>
      */
     public static function generateSphere(int $radius, bool $hollow = false): Generator {
         $incDivX = 0;
-        for($x = 0; $x <= $radius; $x++) {
+        for($x = 0; $x <= $radius; ++$x) {
             $divX = $incDivX; // divX = dividedX = x / radius
             $incDivX = ($x + 1) / $radius; // incDivX = increasedDividedX = (x + 1) / radius
 
             $incDivY = 0;
-            for($y = 0; $y <= $radius; $y++) {
+            for($y = 0; $y <= $radius; ++$y) {
                 $divY = $incDivY;
                 $incDivY = ($y + 1) / $radius;
 
                 $incDivZ = 0;
-                for($z = 0; $z <= $radius; $z++) {
+                for($z = 0; $z <= $radius; ++$z) {
                     $divZ = $incDivZ;
                     $incDivZ = ($z + 1) / $radius;
 
@@ -88,7 +95,6 @@ class BlockGenerator {
                             }
                             break;
                         }
-
                         continue;
                     }
 
@@ -97,6 +103,7 @@ class BlockGenerator {
                     }
 
                     foreach(self::generateMissingBlocks3d($x, $y, $z) as $vector3) {
+                        /** @phpstan-ignore-next-line */
                         yield $vector3;
                     }
                 }
@@ -105,15 +112,15 @@ class BlockGenerator {
     }
 
     /**
-     * @return Generator<Vector3>
+     * @return Generator<int[]>
      */
     public static function generateCylinder(int $radius, int $height, bool $hollow = false): Generator {
         $incDivX = 0;
-        for($x = 0; $x <= $radius; $x++) {
+        for($x = 0; $x <= $radius; ++$x) {
             $divX = $incDivX;
             $incDivX = ($x + 1) / $radius;
             $incDivZ = 0;
-            for($z = 0; $z <= $radius; $z++) {
+            for($z = 0; $z <= $radius; ++$z) {
                 $divZ = $incDivZ;
                 $incDivZ = ($z + 1) / $radius;
 
@@ -130,8 +137,9 @@ class BlockGenerator {
                     continue;
                 }
 
-                for($y = 0; $y < $height; $y++) {
+                for($y = 0; $y < $height; ++$y) {
                     foreach (self::generateMissingBlocks2d($x, $y, $z) as $vector3) {
+                        /** @phpstan-ignore-next-line */
                         yield $vector3;
                     }
                 }
@@ -140,18 +148,19 @@ class BlockGenerator {
     }
 
     /**
-     * @return Generator<Vector3>
+     * @return Generator<int[]>
      */
     public static function generatePyramid(int $size, bool $hollow = false): Generator {
         $currentLevelHeight = $size;
-        for($y = 0; $y <= $size; $y++) {
-            for($x = 0; $x <= $currentLevelHeight; $x++) {
-                for($z = 0; $z <= $currentLevelHeight; $z++) {
+        for($y = 0; $y <= $size; ++$y) {
+            for($x = 0; $x <= $currentLevelHeight; ++$x) {
+                for($z = 0; $z <= $currentLevelHeight; ++$z) {
                     if($hollow && ($x != $currentLevelHeight && $z != $currentLevelHeight)) {
                         continue;
                     }
 
                     foreach (self::generateMissingBlocks2d($x, $y, $z) as $vector3) {
+                        /** @phpstan-ignore-next-line */
                         yield $vector3;
                     }
                 }
@@ -163,26 +172,26 @@ class BlockGenerator {
     /**
      * Changes only X and Z, Y is not affected
      *
-     * @return Generator<Vector3>
+     * @return Generator<int[]>
      */
     public static function generateMissingBlocks2d(int $x, int $y, int $z): Generator {
-        yield new Vector3($x, $y, $z);
-        yield new Vector3(-$x, $y, $z);
-        yield new Vector3($x, $y, -$z);
-        yield new Vector3(-$x, $y, -$z);
+        yield [$x, $y, $z];
+        yield [-$x, $y, $z];
+        yield [$x, $y, -$z];
+        yield [-$x, $y, -$z];
     }
 
     /**
-     * @return Generator<Vector3>
+     * @return Generator<int[]>
      */
     public static function generateMissingBlocks3d(int $x, int $y, int $z): Generator {
-        yield new Vector3($x, $y, $z);
-        yield new Vector3(-$x, $y, $z);
-        yield new Vector3($x, -$y, $z);
-        yield new Vector3($x, $y, -$z);
-        yield new Vector3(-$x, -$y, $z);
-        yield new Vector3($x, -$y, -$z);
-        yield new Vector3(-$x, $y, -$z);
-        yield new Vector3(-$x, -$y, -$z);
+        yield [$x, $y, $z];
+        yield [-$x, $y, $z];
+        yield [$x, -$y, $z];
+        yield [$x, $y, -$z];
+        yield [-$x, -$y, $z];
+        yield [$x, -$y, -$z];
+        yield [-$x, $y, -$z];
+        yield [-$x, -$y, -$z];
     }
 }

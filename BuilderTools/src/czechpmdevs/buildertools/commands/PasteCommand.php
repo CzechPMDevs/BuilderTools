@@ -41,11 +41,11 @@ class PasteCommand extends BuilderToolsCommand {
 
         $result = Copier::getInstance()->paste($sender);
 
-        if($result->error) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cCould not paste clipboard: Your clipboard is empty!");
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cCould not paste clipboard: {$result->getErrorMessage()}");
             return;
         }
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully pasted, $result->countBlocks blocks changed (Took $result->time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully pasted, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
     }
 }

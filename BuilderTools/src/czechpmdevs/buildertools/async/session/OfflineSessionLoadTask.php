@@ -29,6 +29,8 @@ use pocketmine\nbt\ReaderTracker;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
+use function file_get_contents;
+use function unlink;
 
 class OfflineSessionLoadTask extends AsyncTask {
 

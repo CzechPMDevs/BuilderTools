@@ -51,7 +51,9 @@ function copyDirectory(string $from, string $to): void {
         if($fileInfo->isDir()) {
             mkdir($target, 0777, true);
         } else {
-            copy($fileInfo->getPathname(), $target);
+            $contents = file_get_contents($fileInfo->getPathname());
+            preProcess($contents);
+            file_put_contents($target, $contents);
         }
     }
 }
@@ -66,4 +68,33 @@ function cleanDirectory(string $directory): void {
             unlink($fileInfo->getPathname());
         }
     }
+}
+
+function preProcess(string &$file) {
+    if(!defined("replacements")) {
+        $patterns = [
+            'Math::lengthSquared2d({%1}, {%2})' => '({%1} ** 2) + ({%2} ** 2)',
+            'Math::lengthSquared3d({%1}, {%2}, {%3})' => '({%1} ** 2) + ({%2} ** 2) + ({%3} ** 2)',
+        ];
+
+        $replacements = [];
+
+        foreach ($patterns as $key => $value) {
+            $key = "#" . str_replace(["(", ")"], ["\(", "\)"], $key) . "#";
+
+            /** @noinspection PhpStatementHasEmptyBodyInspection */
+            for($i = 0; strpos($key, "{%" . (++$i) ."}") !== false;);
+
+            for($j = 1; $j < $i; ++$j) {
+                $key = str_replace("{%$j}", "(.*?)", $key);
+                $value = str_replace("{%$j}", "\$$j", $value);
+            }
+
+            $replacements[$key] = $value;
+        }
+
+        define("replacements", $replacements);
+    }
+
+    $file = preg_replace(array_keys(replacements), array_values(replacements), $file);
 }

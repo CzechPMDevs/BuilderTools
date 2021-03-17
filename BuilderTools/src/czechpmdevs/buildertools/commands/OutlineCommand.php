@@ -73,6 +73,6 @@ class OutlineCommand extends BuilderToolsCommand {
 
         $time = round(microtime(true) - $startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix()."Filled, §a$result->countBlocks changed (Took $time seconds)");
+        $sender->sendMessage(BuilderTools::getPrefix()."Filled, §a{$result->getBlocksChanged()} changed (Took $time seconds)");
     }
 }

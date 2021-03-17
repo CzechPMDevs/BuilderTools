@@ -45,6 +45,6 @@ class CubeCommand extends BuilderToolsCommand {
         $radius = isset($args[1]) ? (int)$args[1] : 5;
 
         $result = Printer::getInstance()->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created, $result->countBlocks block changed (Took $result->time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created, {$result->getBlocksChanged()} block changed (Took {$result->getProcessTime()} seconds)!");
     }
 }

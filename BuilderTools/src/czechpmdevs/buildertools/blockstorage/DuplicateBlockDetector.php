@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs

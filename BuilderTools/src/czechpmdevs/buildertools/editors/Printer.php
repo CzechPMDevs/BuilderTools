@@ -21,16 +21,20 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\FastBlockMap;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\block\Block;
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function abs;
+use function microtime;
 
 class Printer {
     use SingletonTrait;
@@ -67,28 +71,28 @@ class Printer {
         };
 
         if($mode == self::CUBE) {
-            foreach (BlockGenerator::generateCube($brush) as $vector3) {
-                $placeBlock($center->add($vector3));
+            foreach (BlockGenerator::generateCube($brush) as [$x, $y, $z]) {
+                $placeBlock($center->add($x, $y, $z));
             }
         } elseif($mode == self::SPHERE) {
-            foreach (BlockGenerator::generateSphere($brush) as $vector3) {
-                $placeBlock($center->add($vector3));
+            foreach (BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
+                $placeBlock($center->add($x, $y, $z));
             }
         } elseif($mode == self::CYLINDER) {
-            foreach (BlockGenerator::generateCylinder($brush, $brush) as $vector3) {
-                $placeBlock($center->add($vector3));
+            foreach (BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
+                $placeBlock($center->add($x, $y, $z));
             }
         } elseif($mode == self::HOLLOW_CUBE) {
-            foreach (BlockGenerator::generateCube($brush, true) as $vector3) {
-                $placeBlock($center->add($vector3));
+            foreach (BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
+                $placeBlock($center->add($x, $y, $z));
             }
         } elseif($mode == self::HOLLOW_SPHERE) {
-            foreach (BlockGenerator::generateSphere($brush, true) as $vector3) {
-                $placeBlock($center->add($vector3));
+            foreach (BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
+                $placeBlock($center->add($x, $y, $z));
             }
         } elseif($mode == self::HOLLOW_CYLINDER) {
-            foreach (BlockGenerator::generateCylinder($brush, $brush,true) as $vector3) {
-                $placeBlock($center->add($vector3));
+            foreach (BlockGenerator::generateCylinder($brush, $brush,true) as [$x, $y, $z]) {
+                $placeBlock($center->add($x, $y, $z));
             }
         }
 
@@ -103,7 +107,7 @@ class Printer {
         $z = $position->getFloorZ();
 
         /** @noinspection PhpStatementHasEmptyBodyInspection */
-        for(; $y >= 0 && $level->getBlockAt($x, $y, $z)->getId() == Block::AIR; $y--);
+        for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() == Block::AIR; $y--);
 
         $level->setBlockIdAt($x, $y, $z, $block->getId());
         $level->setBlockDataAt($x, $y, $z, $block->getDamage());
@@ -116,30 +120,38 @@ class Printer {
         $center = Position::fromObject($center->ceil(), $center->getLevel());
         $radius = abs($radius);
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
-        if(!$stringToBlockDecoder->isValid()) {
-            return new EditorResult(0, 0, true);
+        if($player->getY() - $radius < 0 || $player->getY() + $radius > Level::Y_MAX) {
+            return EditorResult::error("Shape is outside of the map!");
         }
 
-        $x = $center->getFloorX();
-        $y = $center->getFloorY();
-        $z = $center->getFloorZ();
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+        if(!$stringToBlockDecoder->isValid()) {
+            return EditorResult::error("0 blocks found");
+        }
+
+        $floorX = $center->getFloorX();
+        $floorY = $center->getFloorY();
+        $floorZ = $center->getFloorZ();
+
+        $mapper = new FastBlockMap();
+        foreach (BlockGenerator::generateSphere($radius, $hollow) as [$x, $y, $z]) {
+            $mapper->addBlock($floorX + $x, $floorY + $y, $floorZ + $z);
+        }
 
         $fillSession = new FillSession($player->getLevelNonNull(), false);
-        $fillSession->setDimensions($x - $radius, $x + $radius, $z - $radius, $z + $radius);
+        $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 
-        foreach (BlockGenerator::generateSphere($radius, $hollow) as $vector3) {
+        foreach ($mapper->readBlocks() as [$x, $y, $z]) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            /** @phpstan-ignore-next-line */
-            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
+            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
         }
         $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @var BlockArray $undoList */
-        $undoList = $fillSession->getUndoList();
+        $undoList = $fillSession->getChanges();
         
         Canceller::getInstance()->addStep($player, $undoList);
-        return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function makeHollowSphere(Player $player, Position $center, int $radius, string $blocks): EditorResult {
@@ -150,32 +162,40 @@ class Printer {
         $startTime = microtime(true);
         $center = Position::fromObject($center->ceil(), $center->getLevel());
 
+        if($player->getY() < 0 || $player->getY() + $height > Level::Y_MAX) {
+            return EditorResult::error("Shape is outside of the map!");
+        }
+
         $radius = abs($radius);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
         if(!$stringToBlockDecoder->isValid()) {
-            return new EditorResult(0, 0, true);
+            return EditorResult::error("0 blocks found");
         }
 
-        $x = $center->getFloorX();
-        $y = $center->getFloorY();
-        $z = $center->getFloorZ();
+        $floorX = $center->getFloorX();
+        $floorY = $center->getFloorY();
+        $floorZ = $center->getFloorZ();
+
+        $mapper = new FastBlockMap();
+        foreach (BlockGenerator::generateCylinder($radius, $height, $hollow) as [$x, $y, $z]) {
+            $mapper->addBlock($floorX + $x, $floorY + $y, $floorZ + $z);
+        }
 
         $fillSession = new FillSession($player->getLevelNonNull(), false);
-        $fillSession->setDimensions($x - $radius, $x + $radius, $z - $radius, $z + $radius);
+        $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 
-        foreach (BlockGenerator::generateCylinder($radius, $height, $hollow) as $vector3) {
+        foreach ($mapper->readBlocks() as [$x, $y, $z]) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            /** @phpstan-ignore-next-line */
-            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
+            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
         }
         $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @var BlockArray $undoList */
-        $undoList = $fillSession->getUndoList();
+        $undoList = $fillSession->getChanges();
 
         Canceller::getInstance()->addStep($player, $undoList);
-        return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, string $blocks): EditorResult {
@@ -187,31 +207,33 @@ class Printer {
         $center = Position::fromObject($center->ceil(), $center->getLevel());
 
         $size = abs($size);
+        if($player->getY() < 0 || $player->getY() + $size > Level::Y_MAX) {
+            return EditorResult::error("Shape is outside of the map!");
+        }
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
         if(!$stringToBlockDecoder->isValid()) {
-            return new EditorResult(0, 0, true);
+            return EditorResult::error("0 blocks found");
         }
 
-        $x = $center->getFloorX();
-        $y = $center->getFloorY();
-        $z = $center->getFloorZ();
+        $floorX = $center->getFloorX();
+        $floorY = $center->getFloorY();
+        $floorZ = $center->getFloorZ();
 
         $fillSession = new FillSession($player->getLevelNonNull(), false);
-        $fillSession->setDimensions($x - $size, $x + $size, $z - $size, $z + $size);
+        $fillSession->setDimensions($floorX - $size, $floorX + $size, $floorZ - $size, $floorZ + $size);
 
-        foreach (BlockGenerator::generatePyramid($size, $hollow) as $vector3) {
+        foreach (BlockGenerator::generatePyramid($size, $hollow) as [$x, $y, $z]) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            /** @phpstan-ignore-next-line */
-            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
+            $fillSession->setBlockAt($x + $floorX, $y + $floorY, $z + $floorZ, $id, $meta);
         }
         $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @var BlockArray $undoList */
-        $undoList = $fillSession->getUndoList();
+        $undoList = $fillSession->getChanges();
 
         Canceller::getInstance()->addStep($player, $undoList);
-        return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function makeHollowPyramid(Player $player, Position $center, int $size, string $blocks): EditorResult {
@@ -222,31 +244,33 @@ class Printer {
         $startTime = microtime(true);
         $center = Position::fromObject($center->ceil(), $center->getLevel());
         $radius = abs($radius);
+        if($player->getY() - $radius < 0 || $player->getY() + $radius > Level::Y_MAX) {
+            return EditorResult::error("Shape is outside of the map!");
+        }
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
         if(!$stringToBlockDecoder->isValid()) {
-            return new EditorResult(0, 0, true);
+            return EditorResult::error("0 blocks found");
         }
 
-        $x = $center->getFloorX();
-        $y = $center->getFloorY();
-        $z = $center->getFloorZ();
+        $floorX = $center->getFloorX();
+        $floorY = $center->getFloorY();
+        $floorZ = $center->getFloorZ();
 
         $fillSession = new FillSession($player->getLevelNonNull(), false);
-        $fillSession->setDimensions($x - $radius, $x + $radius, $z - $radius, $z + $radius);
+        $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 
-        foreach (BlockGenerator::generateCube($radius, $hollow) as $vector3) {
+        foreach (BlockGenerator::generateCube($radius, $hollow) as [$x, $y, $z]) {
             $stringToBlockDecoder->nextBlock($id, $meta);
-            /** @phpstan-ignore-next-line */
-            $fillSession->setBlockAt($vector3->getX() + $x, $vector3->getY() + $y, $vector3->getZ() + $z, $id, $meta);
+            $fillSession->setBlockAt($x + $floorX, $y + $floorY, $z + $floorZ, $id, $meta);
         }
         $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @var BlockArray $undoList */
-        $undoList = $fillSession->getUndoList();
+        $undoList = $fillSession->getChanges();
 
         Canceller::getInstance()->addStep($player, $undoList);
-        return new EditorResult($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function makeHollowCube(Player $player, Position $center, int $radius, string $blocks): EditorResult {

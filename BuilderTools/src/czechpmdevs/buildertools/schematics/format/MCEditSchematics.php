@@ -11,6 +11,8 @@ use czechpmdevs\buildertools\Selectors;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
+use function max;
+use function min;
 
 class MCEditSchematics extends SchematicData {
 
@@ -29,9 +31,17 @@ class MCEditSchematics extends SchematicData {
 
         $pos1 = Selectors::getPosition($player, 1);
         $pos2 = Selectors::getPosition($player, 2);
-        for($y = min($pos1->getY(), $pos2->getY()); $y <= max($pos1->getY(), $pos2->getY()); $y++) {
-            for ($z = min($pos1->getZ(), $pos2->getZ()); $z <= max($pos1->getZ(), $pos2->getZ()); $z++) {
-                for ($x = min($pos1->getX(), $pos2->getX()); $x <= max($pos1->getX(), $pos2->getX()); $x++) {
+
+        $minY = min($pos1->getY(), $pos2->getY());
+        $maxY = max($pos1->getY(), $pos2->getY());
+        $minZ = min($pos1->getZ(), $pos2->getZ());
+        $maxZ = max($pos1->getZ(), $pos2->getZ());
+        $minX = min($pos1->getX(), $pos2->getX());
+        $maxX = max($pos1->getX(), $pos2->getX());
+
+        for($y = $minY; $y <= $maxY; ++$y) {
+            for ($z = $minZ; $z <= $maxZ; ++$z) {
+                for ($x = $minX; $x <= $maxX; ++$x) {
                     $schematic->addBlock(new Vector3($x, $y, $z), $player->getLevel()->getBlockIdAt($x, $y, $z), $player->getLevel()->getBlockDataAt($x, $y, $z));
                 }
             }

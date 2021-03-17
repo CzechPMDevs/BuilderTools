@@ -28,6 +28,8 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\scheduler\AsyncTask;
+use function chr;
+use function file_put_contents;
 
 class MCEditSaveTask extends AsyncTask {
 

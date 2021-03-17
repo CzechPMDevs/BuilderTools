@@ -26,6 +26,7 @@ use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function mt_rand;
 
 class Decorator {
     use SingletonTrait;
@@ -37,11 +38,11 @@ class Decorator {
         $undo = new BlockArray();
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
 
-        for ($x = $center->getX() - $radius; $x <= $center->getX() + $radius; $x++) {
+        for ($x = $center->getX() - $radius; $x <= $center->getX() + $radius; ++$x) {
             /** @var int $x */
-            for ($z = $center->getZ() - $radius; $z <= $center->getZ() + $radius; $z++) {
+            for ($z = $center->getZ() - $radius; $z <= $center->getZ() + $radius; ++$z) {
                 /** @var int $z */
-                if (rand(1, 100) <= $percentage) {
+                if (mt_rand(1, 100) <= $percentage) {
                     /** @var int $y */
                     $y = $center->getY() + $radius;
                     check:

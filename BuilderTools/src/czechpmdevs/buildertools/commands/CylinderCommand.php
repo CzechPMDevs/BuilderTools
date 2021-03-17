@@ -46,7 +46,11 @@ class CylinderCommand extends BuilderToolsCommand {
         $height = isset($args[2]) ? (int)($args[2]) : 8;
 
         $result = Printer::getInstance()->makeCylinder($sender, $sender, $radius, $height, $args[0]);
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making cylinder: {$result->getErrorMessage()}");
+            return;
+        }
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCylinder created, $result->countBlocks blocks changed (Took $result->time seconds)");
+        $sender->sendMessage(BuilderTools::getPrefix()."§aCylinder created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
     }
 }
