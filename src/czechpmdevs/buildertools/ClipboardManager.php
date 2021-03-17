@@ -51,7 +51,7 @@ class ClipboardManager {
      * TODO
      * @noinspection PhpUnused
      */
-    public static function loadPlayerSession(Player $player) {
+    public static function loadPlayerSession(Player $player): void {
 
     }
 
@@ -59,7 +59,7 @@ class ClipboardManager {
      * TODO
      * @noinspection PhpUnused
      */
-    public static function unloadPlayerSession(Player $player) {
+    public static function unloadPlayerSession(Player $player): void {
         $offlineSession = OfflineSession::create($player);
         if(self::hasClipboardCopied($player)) {
             $offlineSession->setClipboard(self::$clipboards[$player->getName()]);
