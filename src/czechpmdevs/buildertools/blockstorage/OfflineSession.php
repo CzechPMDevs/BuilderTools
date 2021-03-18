@@ -20,178 +20,85 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use czechpmdevs\buildertools\async\session\OfflineSessionLoadTask;
-use czechpmdevs\buildertools\async\session\OfflineSessionSaveTask;
 use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\level\Level;
+use czechpmdevs\buildertools\ClipboardManager;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\Player;
-use pocketmine\Server;
-use function array_filter;
-use function array_map;
-use function serialize;
-use function unserialize;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function memory_get_usage;
+use function microtime;
+use function unlink;
 
 final class OfflineSession {
 
-    /** @var string */
-    private string $playerId;
+    public static function savePlayerSession(Player $player): void {
+        $time = microtime(true);
+        $memory = memory_get_usage();
 
-    /** @var string */
-    private string $clipboard = "";
-    /** @var Vector3|null */
-    private ?Vector3 $clipboardRelativePos = null;
-    /** @var bool */
-    private bool $clipboardDuplicateDetectionEnabled = false;
+        $nbt = new CompoundTag();
 
-    /** @var string */
-    private string $undoData = "";
-    /** @var string */
-    private string $redoData = "";
+        // Clipboard
+        if(ClipboardManager::hasClipboardCopied($player)) {
+            /** @var SelectionData $clipboard */
+            $clipboard = ClipboardManager::getClipboard($player);
+            /** @var Vector3 $playerPosition */
+            $playerPosition = $clipboard->getPlayerPosition();
 
-    private function __construct() {}
+            $nbt->setTag(new CompoundTag("Clipboard", [
+                new IntArrayTag("Blocks", $clipboard->blocks),
+                new IntArrayTag("Coordinates", $clipboard->coords),
+                new IntArrayTag("RelativePosition", [
+                    $playerPosition->getFloorX(),
+                    $playerPosition->getFloorY(),
+                    $playerPosition->getFloorZ()
+                ])
+            ]));
 
-    /**
-     * @return $this
-     */
-    public function setClipboard(SelectionData $data): OfflineSession {
-        if($data->getLevel() === null) {
-            return $this;
+            unset(ClipboardManager::$clipboards[$player->getName()]);
         }
 
-        $this->clipboard = $data->buffer;
-        $this->clipboardRelativePos = $data->getPlayerPosition()->asVector3();
-        $this->clipboardDuplicateDetectionEnabled = $data->detectingDuplicates();
-        return $this;
+        $stream = new BigEndianNBTStream();
+        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $stream->writeCompressed($nbt));
+
+        unset($stream, $nbt);
+
+        BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 * 1024), 3) . "Mb ram)");
     }
 
-    public function getClipboard(): ?SelectionData {
-        if($this->clipboard == "") {
-            return null;
+    public static function loadPlayerSession(Player $player): void {
+        if(!file_exists($path = BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat")) {
+            return;
         }
 
-        $clipboard = new SelectionData($this->clipboardDuplicateDetectionEnabled);
-        $clipboard->setPlayerPosition($this->clipboardRelativePos);
-        $clipboard->buffer = $this->clipboard;
+        $stream = new BigEndianNBTStream();
 
-        return $clipboard;
-    }
+        $buffer = file_get_contents($path);
+        if(!$buffer || !@unlink($path)) {
+            return;
+        }
 
-    /**
-     * @return $this
-     */
-    public function setUndoData(array $undoData): OfflineSession {
-        $this->undoData = serialize(array_map(function (BlockArray $blockArray) {
-            $level = $blockArray->getLevel();
-            $levelName = null;
-            if($level instanceof Level) {
-                $levelName = $level->getFolderName();
-            }
+        /** @var CompoundTag|null $nbt */
+        $nbt = $stream->readCompressed($buffer);
 
-            return [
-                $blockArray->buffer,
-                $blockArray->detectingDuplicates(),
-                $levelName
-            ];
-        }, $undoData));
+        if($nbt === null) {
+            return;
+        }
 
-        return $this;
-    }
+        if($nbt->hasTag("Clipboard")) {
+            /** @var CompoundTag $clipboardTag */
+            $clipboardTag = $nbt->getCompoundTag("Clipboard");
 
-    /**
-     * @return BlockArray[]
-     */
-    public function getUndoData(): array {
-        return array_filter(array_map(function (array $data): ?BlockArray {
-            $blockArray = new BlockArray($data[1]);
-            $blockArray->buffer = $data[0];
+            $clipboard = new SelectionData();
+            $clipboard->coords = $clipboardTag->getIntArray("Coordinates");
+            $clipboard->blocks = $clipboardTag->getIntArray("Blocks");
+            $clipboard->setPlayerPosition(new Vector3(...$clipboardTag->getIntArray("RelativePosition")));
 
-            if($data[2] === null || (!Server::getInstance()->isLevelGenerated($data[2])) || (!Server::getInstance()->isLevelLoaded($data[2]))) {
-                return null;
-            }
-            $blockArray->setLevel(Server::getInstance()->getLevel($data[2]));
-
-            return $blockArray;
-        }, unserialize($this->undoData)), function (?BlockArray $blockArray): bool {
-            return $blockArray !== null;
-        });
-    }
-
-    /**
-     * @return $this
-     */
-    public function setRedoData(array $redoData): OfflineSession {
-        $this->redoData = serialize(array_map(function (BlockArray $blockArray) {
-            $level = $blockArray->getLevel();
-            $levelName = null;
-            if($level instanceof Level) {
-                $levelName = $level->getFolderName();
-            }
-
-            return [
-                $blockArray->buffer,
-                $blockArray->detectingDuplicates(),
-                $levelName
-            ];
-        }, $redoData));
-
-        return $this;
-    }
-
-    /**
-     * @return BlockArray[]
-     */
-    public function getRedoData(): array {
-        return array_filter(array_map(function (array $data): ?BlockArray {
-            $blockArray = new BlockArray($data[1]);
-            $blockArray->buffer = $data[0];
-
-            if($data[2] === null || (!Server::getInstance()->isLevelGenerated($data[2])) || (!Server::getInstance()->isLevelLoaded($data[2]))) {
-                return null;
-            }
-            $blockArray->setLevel(Server::getInstance()->getLevel($data[2]));
-
-            return $blockArray;
-        }, unserialize($this->redoData)), function (?BlockArray $blockArray): bool {
-            return $blockArray !== null;
-        });
-    }
-
-    public function save() {
-        Server::getInstance()->getAsyncPool()->submitTask(new OfflineSessionSaveTask(
-            BuilderTools::getInstance()->getDataFolder(),
-            $this->playerId,
-            $this->clipboard,
-            $this->clipboardRelativePos,
-            $this->clipboardDuplicateDetectionEnabled,
-            $this->undoData,
-            $this->redoData
-        ));
-    }
-
-    /**
-     * @internal
-     */
-    public static function createSession(string $playerId, string $clipboard, ?Vector3 $clipboardRelativePos, bool $clipboardDuplicateDetectionEnabled, string $undoData, string $redoData): OfflineSession {
-        $session = new OfflineSession();
-        $session->playerId = $playerId;
-        $session->clipboard = $clipboard;
-        $session->clipboardRelativePos = $clipboardRelativePos;
-        $session->clipboardDuplicateDetectionEnabled = $clipboardDuplicateDetectionEnabled;
-        $session->undoData = $undoData;
-        $session->redoData = $redoData;
-
-        return $session;
-    }
-
-    public static function load(Player $player) {
-        $player->getServer()->getAsyncPool()->submitTask(new OfflineSessionLoadTask(BuilderTools::getInstance()->getDataFolder(), $player->getName()));
-    }
-
-    public static function create(Player $player): OfflineSession {
-        $session = new OfflineSession();
-        $session->playerId = $player->getName();
-
-        return $session;
+            ClipboardManager::saveClipboard($player, $clipboard);
+        }
     }
 }

@@ -21,34 +21,28 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
-use function array_pop;
 
 class Canceller {
     use SingletonTrait;
 
-    /** @var BlockArray[][] */
-    public array $undoData = [];
-    /** @var BlockArray[][] */
-    public array $redoData = [];
-
     public function addStep(Player $player, BlockArray $blocks): void {
-        $this->undoData[$player->getName()][] = $blocks;
+        ClipboardManager::saveUndo($player, $blocks);
     }
 
     public function undo(Player $player): EditorResult {
-        $error = function () use ($player): EditorResult {
+        $error = function (): EditorResult {
             return EditorResult::error("There are not any actions to undo");
         };
 
-        if(!isset($this->undoData[$player->getName()])) {
+        if(!ClipboardManager::hasActionToUndo($player)) {
             return $error();
         }
 
-        $blockList = array_pop($this->undoData[$player->getName()]);
+        $blockList = ClipboardManager::getNextUndoAction($player);
         if($blockList === null) {
             return $error();
         }
@@ -57,19 +51,19 @@ class Canceller {
     }
 
     public function addRedo(Player $player, BlockArray $blocks): void {
-        $this->redoData[$player->getName()][] = $blocks;
+        ClipboardManager::saveUndo($player, $blocks);
     }
 
     public function redo(Player $player): EditorResult {
-        $error = function () use ($player): EditorResult {
+        $error = function (): EditorResult {
             return EditorResult::error("There are not any actions to redo");
         };
 
-        if(!isset($this->redoData[$player->getName()])) {
+        if(ClipboardManager::hasActionToRedo($player)) {
             return $error();
         }
 
-        $blockList = array_pop($this->redoData[$player->getName()]);
+        $blockList = ClipboardManager::getNextRedoAction($player);
         if($blockList === null) {
             return $error();
         }

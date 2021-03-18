@@ -84,6 +84,11 @@ class WorldFixTask extends AsyncTask {
         }
 
         if(!$provider instanceof Anvil) {
+            if($provider === null) {
+                $this->error = "Unknown world provider.";
+                return;
+            }
+
             $this->error = "BuilderTools does not support fixing chunks with {$provider->getName()} provider.";
             return;
         }
@@ -95,10 +100,14 @@ class WorldFixTask extends AsyncTask {
         $chunksToFix = $this->getListOfChunksToFix($this->worldPath);
         foreach ($chunksToFix as $index => [$chunkX, $chunkZ]) {
             $chunk = $provider->loadChunk($chunkX, $chunkZ);
+            if($chunk === null) {
+                continue;
+            }
+
             for($x = 0; $x < 16; ++$x) {
                 for($z = 0; $z < 16; ++$z) {
                     for($y = 0; $y < $provider->getWorldHeight(); ++$y) {
-                        if(($id = $chunk->getBlockId($x, $y, $z)) !== 0) {
+                        if(($id = $chunk->getBlockId($x, $y, $z)) != 0) {
                             $data = $chunk->getBlockData($x, $y, $z);
 
                             $fixer->fixBlock($id, $data);
@@ -128,11 +137,19 @@ class WorldFixTask extends AsyncTask {
         MainLogger::getLogger()->debug("[BuilderTools] World fixed in " . round(microtime(true)-$startTime) .", affected " .count($chunksToFix). " chunks!");
     }
 
+    /**
+     * @return int[][]
+     */
     private function getListOfChunksToFix(string $worldPath): array {
         $regionPath = $worldPath . DIRECTORY_SEPARATOR . "region" . DIRECTORY_SEPARATOR;
 
+        $files = glob($regionPath . "*.mca*");
+        if(!$files) {
+            return [];
+        }
+
         $chunks = [];
-        foreach (glob($regionPath . "*.mca*") as $regionFilePath) {
+        foreach ($files as $regionFilePath) {
             $split = explode(".", basename($regionFilePath));
             $regionX = (int)$split[1];
             $regionZ = (int)$split[2];

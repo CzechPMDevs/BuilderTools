@@ -19,7 +19,6 @@
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\Replacement;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
@@ -63,14 +62,12 @@ class ReplaceCommand extends BuilderToolsCommand {
             return;
         }
 
-        $startTime = microtime(true);
+        $result = Replacement::getInstance()->directReplace($sender, $firstPos, $secondPos, $args[0], $args[1]);
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst processing the command: {$result->getErrorMessage()}");
+            return;
+        }
 
-        $list = Replacement::getInstance()->prepareReplace($firstPos, $secondPos, $firstPos->getLevelNonNull(), $args[0], $args[1]);
-
-        $result = Filler::getInstance()->fill($sender, $list);
-
-        $time = round(microtime(true) - $startTime, 3);
-
-        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->getBlocksChanged()} replaced (Took $time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->getBlocksChanged()} replaced (Took {$result->getProcessTime()} seconds)!");
     }
 }

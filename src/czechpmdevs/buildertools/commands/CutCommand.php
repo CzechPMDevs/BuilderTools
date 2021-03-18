@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
@@ -55,16 +54,12 @@ class CutCommand extends BuilderToolsCommand {
         /** @var Vector3 $pos2 */
         $pos2 = Selectors::getPosition($sender, 2);
 
-        $startTime = microtime(true);
+        $result = Copier::getInstance()->cut($pos1, $pos2, $sender);
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
+            return;
+        }
 
-        Copier::getInstance()->copy($pos1, $pos2, $sender);
-
-        $filler = Filler::getInstance();
-        $blockList = $filler->prepareFill($pos1, $pos2, $sender->getLevelNonNull(), "0");
-        $result = $filler->fill($sender, $blockList);
-
-        $time = round(microtime(true) - $startTime, 3);
-
-        $sender->sendMessage(BuilderTools::getPrefix()." §a{$result->getBlocksChanged()} blocks were cut out (Took $time seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix()." §a{$result->getBlocksChanged()} blocks were cut out (Took {$result->getProcessTime()} seconds)!");
     }
 }

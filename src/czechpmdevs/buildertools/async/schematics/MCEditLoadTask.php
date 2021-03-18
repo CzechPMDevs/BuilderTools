@@ -51,8 +51,14 @@ class MCEditLoadTask extends AsyncTask {
     /** @noinspection PhpUnused */
     public function onRun() {
         try {
+            $file = file_get_contents($this->path);
+            if(!$file) {
+                $this->error = "Could not read file {$this->path}";
+                return;
+            }
+
             /** @var CompoundTag $data */
-            $data = (new BigEndianNBTStream())->readCompressed(file_get_contents($this->path));
+            $data = (new BigEndianNBTStream())->readCompressed($file);
 
             $materials = SchematicData::MATERIALS_CLASSIC;
 

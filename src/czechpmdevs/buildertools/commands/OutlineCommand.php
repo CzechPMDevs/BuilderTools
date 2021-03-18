@@ -65,14 +65,12 @@ class OutlineCommand extends BuilderToolsCommand {
             return;
         }
 
-        $startTime = microtime(true);
+        $result = Filler::getInstance()->directFill($sender, $firstPos, $secondPos, $args[0], true);
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
+            return;
+        }
 
-        $filler = Filler::getInstance();
-        $blocks = $filler->prepareFill($firstPos->asVector3(), $secondPos->asVector3(), $firstPos->getLevelNonNull(), $args[0], false);
-        $result = $filler->fill($sender, $blocks);
-
-        $time = round(microtime(true) - $startTime, 3);
-
-        $sender->sendMessage(BuilderTools::getPrefix()."Filled, §a{$result->getBlocksChanged()} changed (Took $time seconds)");
+        $sender->sendMessage(BuilderTools::getPrefix()."Filled, §a{$result->getBlocksChanged()} changed (Took {$result->getProcessTime()} seconds)");
     }
 }

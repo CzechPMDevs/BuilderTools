@@ -24,7 +24,7 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\object\EditorResult;
-use czechpmdevs\buildertools\math\BlockGenerator;
+use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use InvalidArgumentException;
 use pocketmine\block\BlockIds;
@@ -34,23 +34,60 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelChunkPacket;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function max;
 use function microtime;
+use function min;
 
 class Filler {
     use SingletonTrait;
 
-    public function prepareFill(Vector3 $pos1, Vector3 $pos2, Level $level, string $blockArgs, bool $filled = true): BlockArray {
+    public function directFill(Player $player, Vector3 $pos1, Vector3 $pos2, string $blockArgs, bool $hollow = false): EditorResult {
+        $startTime = microtime(true);
+
+        $minX = (int)min($pos1->getX(), $pos2->getX());
+        $maxX = (int)max($pos1->getX(), $pos2->getX());
+        $minZ = (int)min($pos1->getZ(), $pos2->getZ());
+        $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
+
+        $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
+        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+
         $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
 
-        $updates = new BlockArray();
-        $updates->setLevel($level);
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2, !$filled) as $vector3) {
-            $stringToBlockDecoder->nextBlock($id, $meta);
-            $updates->addBlock($vector3, $id, $meta);
+        if($hollow) {
+            for($x = $minX; $x <= $maxX; ++$x) {
+                for($z = $minZ; $z <= $maxZ; ++$z) {
+                    for($y = $minY; $y <= $maxY; ++$y) {
+                        if(($x != $minX && $x != $maxX) && ($y != $minY && $y != $maxY) && ($z != $minZ && $z != $maxZ)) {
+                            continue;
+                        }
+
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+                    }
+                }
+            }
+        } else {
+            for($x = $minX; $x <= $maxX; ++$x) {
+                for($z = $minZ; $z <= $maxZ; ++$z) {
+                    for($y = $minY; $y <= $maxY; ++$y) {
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+                    }
+                }
+            }
         }
 
-        return $updates;
+        $fillSession->reloadChunks($player->getLevelNonNull());
+
+        /** @var BlockArray $changes */
+        $changes = $fillSession->getChanges();
+        Canceller::getInstance()->addStep($player, $changes);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function fill(Player $player, UpdateLevelData $updateData, ?Vector3 $relativePosition = null, bool $saveUndo = true, bool $saveRedo = false, bool $replaceOnlyAir = false): EditorResult {
@@ -96,6 +133,7 @@ class Filler {
             if($maxZ === null || $z > $maxZ) $maxZ = $z;
 
             $iterator->moveTo((int)$x, (int)$y, (int)$z);
+//            BuilderTools::getInstance()->getLogger()->debug("$x:$y:$z");
 
             if($iterator->currentChunk === null) {
                 BuilderTools::getInstance()->getLogger()->error("Error while filling: Chunk for $x:$y:$z is not generated.");

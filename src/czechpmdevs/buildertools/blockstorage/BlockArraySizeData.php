@@ -25,7 +25,7 @@ use pocketmine\math\Vector3;
 final class BlockArraySizeData {
 
     /** @var BlockArray */
-    protected BlockArray $blockArray;
+    private BlockArray $blockArray;
 
     /**
      * @var int|null $maxX
@@ -80,12 +80,12 @@ final class BlockArraySizeData {
 
     public function getMinimum(): Vector3 {
         /** @phpstan-ignore-next-line */
-        return new Vector3($this->minX, $this->minY, $this->minZ);
+        return new Vector3($this->minX, $this->minY, $this->minZ); // Ignored - we provide non-null values
     }
 
     public function getMaximum(): Vector3 {
         /** @phpstan-ignore-next-line */
-        return new Vector3($this->maxX, $this->maxY, $this->maxZ);
+        return new Vector3($this->maxX, $this->maxY, $this->maxZ); // Ignored - we provide non-null values
     }
 
 }

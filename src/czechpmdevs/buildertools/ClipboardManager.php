@@ -20,19 +20,19 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools;
 
-use czechpmdevs\buildertools\blockstorage\OfflineSession;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use pocketmine\Player;
-use pocketmine\Server;
+use function array_pop;
 
 class ClipboardManager {
 
     /** @var SelectionData[] */
     public static array $clipboards;
 
-    /** @var SelectionData[] */
+    /** @var BlockArray[][] */
     public static array $undoData;
-    /** @var SelectionData[] */
+    /** @var BlockArray[][] */
     public static array $redoData;
 
     public static function getClipboard(Player $player): ?SelectionData {
@@ -46,38 +46,28 @@ class ClipboardManager {
     public static function saveClipboard(Player $player, SelectionData $data): void {
         self::$clipboards[$player->getName()] = $data;
     }
-
-    /**
-     * TODO
-     * @noinspection PhpUnused
-     */
-    public static function loadPlayerSession(Player $player): void {
-
+    
+    public static function getNextUndoAction(Player $player): ?BlockArray {
+        return array_pop(self::$undoData[$player->getName()]);
     }
-
-    /**
-     * TODO
-     * @noinspection PhpUnused
-     */
-    public static function unloadPlayerSession(Player $player): void {
-        $offlineSession = OfflineSession::create($player);
-        if(self::hasClipboardCopied($player)) {
-            $offlineSession->setClipboard(self::$clipboards[$player->getName()]);
-        }
-        // TODO - Undo & Redo
-
-        $offlineSession->save();
+    
+    public static function hasActionToUndo(Player $player): bool {
+        return isset(self::$undoData[$player->getName()]) && !empty(self::$undoData[$player->getName()]);
     }
-
-    /**
-     * TODO
-     * @internal
-     */
-    public static function finishLoad(string $playerId, OfflineSession $session) {
-        if(Server::getInstance()->getPlayerExact($playerId) === null) {
-            $session->save();
-        }
-
-
+    
+    public static function saveUndo(Player $player, BlockArray $array): void {
+        self::$undoData[$player->getName()][] = $array;
+    }
+    
+    public static function getNextRedoAction(Player $player): ?BlockArray {
+        return array_pop(self::$redoData[$player->getName()]);
+    }
+    
+    public static function hasActionToRedo(Player $player): bool {
+        return isset(self::$redoData[$player->getName()]) && !empty(self::$redoData[$player->getName()]);
+    }
+    
+    public static function saveRedo(Player $player, BlockArray $array): void {
+        self::$redoData[$player->getName()][] = $array;
     }
 }

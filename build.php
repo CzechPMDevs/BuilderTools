@@ -12,7 +12,7 @@ const COMPRESSION = Phar::GZ;
 $startTime = microtime(true);
 
 // Input & Output directory...
-$from = getcwd() . DIRECTORY_SEPARATOR . "BuilderTools" . DIRECTORY_SEPARATOR;
+$from = getcwd() . DIRECTORY_SEPARATOR;
 $to = getcwd() . DIRECTORY_SEPARATOR . "out" . DIRECTORY_SEPARATOR . "BuilderTools" . DIRECTORY_SEPARATOR;
 
 @mkdir($to, 0777, true);

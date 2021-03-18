@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\blockstorage\FastBlockMap;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\BlockGenerator;
@@ -120,10 +119,6 @@ class Printer {
         $center = Position::fromObject($center->ceil(), $center->getLevel());
         $radius = abs($radius);
 
-        if($player->getY() - $radius < 0 || $player->getY() + $radius > Level::Y_MAX) {
-            return EditorResult::error("Shape is outside of the map!");
-        }
-
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
         if(!$stringToBlockDecoder->isValid()) {
             return EditorResult::error("0 blocks found");
@@ -133,18 +128,69 @@ class Printer {
         $floorY = $center->getFloorY();
         $floorZ = $center->getFloorZ();
 
-        $mapper = new FastBlockMap();
-        foreach (BlockGenerator::generateSphere($radius, $hollow) as [$x, $y, $z]) {
-            $mapper->addBlock($floorX + $x, $floorY + $y, $floorZ + $z);
-        }
-
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getLevelNonNull(), false, true);
         $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 
-        foreach ($mapper->readBlocks() as [$x, $y, $z]) {
-            $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+        $incDivX = 0;
+        for($x = 0; $x <= $radius; ++$x) {
+            $divX = $incDivX; // divX = dividedX = x / radius
+            $incDivX = ($x + 1) / $radius; // incDivX = increasedDividedX = (x + 1) / radius
+
+            $incDivY = 0;
+            for($y = 0; $y <= $radius; ++$y) {
+                $divY = $incDivY;
+                $incDivY = ($y + 1) / $radius;
+
+                $incDivZ = 0;
+                for($z = 0; $z <= $radius; ++$z) {
+                    $divZ = $incDivZ;
+                    $incDivZ = ($z + 1) / $radius;
+
+                    $lengthSquared = Math::lengthSquared3d($divX, $divY, $divZ);
+                    if($lengthSquared > 1) { // x**2 + y**2 + z**2 < r**2
+                        if ($z == 0) {
+                            if ($y == 0) {
+                                break 2;
+                            }
+                            break;
+                        }
+                        continue;
+                    }
+
+                    if($hollow && Math::lengthSquared3d($incDivX, $divY, $divZ) <= 1 && Math::lengthSquared3d($divX, $incDivY, $divZ) <= 1 && Math::lengthSquared3d($divX, $divY, $incDivZ) <= 1) {
+                        continue;
+                    }
+
+                    if($floorY + $y >= 0 && $floorY + $y < 256) { // TODO - Try creating 4 chunk iterators
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $id, $meta);
+
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $id, $meta);
+
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $id, $meta);
+                    }
+                    if($floorY - $y >= 0 && $floorY - $y < 256) {
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ + $z, $id, $meta);
+
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ + $z, $id, $meta);
+
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ - $z, $id, $meta);
+
+                        $stringToBlockDecoder->nextBlock($id, $meta);
+                        $fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ - $z, $id, $meta);
+                    }
+                }
+            }
         }
+
         $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @var BlockArray $undoList */
@@ -162,10 +208,6 @@ class Printer {
         $startTime = microtime(true);
         $center = Position::fromObject($center->ceil(), $center->getLevel());
 
-        if($player->getY() < 0 || $player->getY() + $height > Level::Y_MAX) {
-            return EditorResult::error("Shape is outside of the map!");
-        }
-
         $radius = abs($radius);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
@@ -177,18 +219,60 @@ class Printer {
         $floorY = $center->getFloorY();
         $floorZ = $center->getFloorZ();
 
-        $mapper = new FastBlockMap();
-        foreach (BlockGenerator::generateCylinder($radius, $height, $hollow) as [$x, $y, $z]) {
-            $mapper->addBlock($floorX + $x, $floorY + $y, $floorZ + $z);
+        // Optimizing Y values to belong <0;255>
+        if($floorY < 0) {
+            $height += $floorY;
+            $floorY = 0;
         }
+        if($floorY + $height > 255) {
+            $height = 255 - $floorY;
+        }
+        $finalHeight = $height + $floorY;
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getLevelNonNull(), false );
         $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 
-        foreach ($mapper->readBlocks() as [$x, $y, $z]) {
-            $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+        $incDivX = 0;
+        for($x = 0; $x <= $radius; ++$x) {
+            $divX = $incDivX;
+            $incDivX = ($x + 1) / $radius;
+            $incDivZ = 0;
+            for($z = 0; $z <= $radius; ++$z) {
+                $divZ = $incDivZ;
+                $incDivZ = ($z + 1) / $radius;
+
+                $lengthSquared = Math::lengthSquared2d($divX, $divZ);
+                if($lengthSquared > 1) { // checking if can skip blocks outside of circle
+                    if($z == 0) {
+                        break 2;
+                    }
+
+                    break;
+                }
+
+                if($hollow && Math::lengthSquared2d($divX, $incDivZ) <= 1 && Math::lengthSquared2d($incDivX, $divZ) <= 1) {
+                    continue;
+                }
+
+                for($y = $floorY; $y < $finalHeight; ++$y) {
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $id, $meta);
+                }
+                for($y = $floorY; $y < $finalHeight; ++$y) {
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $id, $meta);
+                }
+                for($y = $floorY; $y < $finalHeight; ++$y) {
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $id, $meta);
+                }
+                for($y = $floorY; $y < $finalHeight; ++$y) {
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $id, $meta);
+                }
+            }
         }
+
         $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @var BlockArray $undoList */
@@ -207,9 +291,6 @@ class Printer {
         $center = Position::fromObject($center->ceil(), $center->getLevel());
 
         $size = abs($size);
-        if($player->getY() < 0 || $player->getY() + $size > Level::Y_MAX) {
-            return EditorResult::error("Shape is outside of the map!");
-        }
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
         if(!$stringToBlockDecoder->isValid()) {
@@ -223,10 +304,38 @@ class Printer {
         $fillSession = new FillSession($player->getLevelNonNull(), false);
         $fillSession->setDimensions($floorX - $size, $floorX + $size, $floorZ - $size, $floorZ + $size);
 
+        $currentLevelHeight = $size;
+        for($y = 0; $y <= $size; ++$y) {
+            for($x = 0; $x <= $currentLevelHeight; ++$x) {
+                for($z = 0; $z <= $currentLevelHeight; ++$z) {
+                    if($hollow && ($x != $currentLevelHeight && $z != $currentLevelHeight)) {
+                        continue;
+                    }
+
+                    if($floorY + $y < 0 || $floorY + $y > 255) {
+                        continue;
+                    }
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt(-$x, $y, $z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($x, $y, -$z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt(-$x, $y, -$z, $id, $meta);
+                }
+            }
+            $currentLevelHeight--;
+        }
+
         foreach (BlockGenerator::generatePyramid($size, $hollow) as [$x, $y, $z]) {
             $stringToBlockDecoder->nextBlock($id, $meta);
             $fillSession->setBlockAt($x + $floorX, $y + $floorY, $z + $floorZ, $id, $meta);
         }
+
         $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @var BlockArray $undoList */
@@ -241,9 +350,9 @@ class Printer {
     }
 
     public function makeCube(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
-        $startTime = microtime(true);
         $center = Position::fromObject($center->ceil(), $center->getLevel());
         $radius = abs($radius);
+
         if($player->getY() - $radius < 0 || $player->getY() + $radius > Level::Y_MAX) {
             return EditorResult::error("Shape is outside of the map!");
         }
@@ -253,24 +362,7 @@ class Printer {
             return EditorResult::error("0 blocks found");
         }
 
-        $floorX = $center->getFloorX();
-        $floorY = $center->getFloorY();
-        $floorZ = $center->getFloorZ();
-
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
-        $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
-
-        foreach (BlockGenerator::generateCube($radius, $hollow) as [$x, $y, $z]) {
-            $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($x + $floorX, $y + $floorY, $z + $floorZ, $id, $meta);
-        }
-        $fillSession->reloadChunks($player->getLevelNonNull());
-
-        /** @var BlockArray $undoList */
-        $undoList = $fillSession->getChanges();
-
-        Canceller::getInstance()->addStep($player, $undoList);
-        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+        return Filler::getInstance()->directFill($player, $center->subtract($radius, $radius, $radius), $center->add($radius, $radius, $radius), $blocks, $hollow);
     }
 
     public function makeHollowCube(Player $player, Position $center, int $radius, string $blocks): EditorResult {

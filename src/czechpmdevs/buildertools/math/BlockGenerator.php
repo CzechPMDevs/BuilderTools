@@ -103,7 +103,6 @@ class BlockGenerator {
                     }
 
                     foreach(self::generateMissingBlocks3d($x, $y, $z) as $vector3) {
-                        /** @phpstan-ignore-next-line */
                         yield $vector3;
                     }
                 }
@@ -139,7 +138,6 @@ class BlockGenerator {
 
                 for($y = 0; $y < $height; ++$y) {
                     foreach (self::generateMissingBlocks2d($x, $y, $z) as $vector3) {
-                        /** @phpstan-ignore-next-line */
                         yield $vector3;
                     }
                 }
@@ -160,7 +158,6 @@ class BlockGenerator {
                     }
 
                     foreach (self::generateMissingBlocks2d($x, $y, $z) as $vector3) {
-                        /** @phpstan-ignore-next-line */
                         yield $vector3;
                     }
                 }

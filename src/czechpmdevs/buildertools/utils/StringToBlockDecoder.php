@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\utils;
 use ArrayOutOfBoundsException;
 use pocketmine\item\ItemFactory;
 
-final class StringToBlockDecoder {
+final class StringToBlockDecoder implements BlockIdentifierList {
 
     /** @var string */
     private string $string;

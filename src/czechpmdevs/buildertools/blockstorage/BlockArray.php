@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
@@ -20,38 +20,41 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use InvalidArgumentException;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use function ord;
-use function pack;
-use function strlen;
-use function substr;
-use function unpack;
+use function array_slice;
+use function count;
+use function in_array;
 
-/**
- * Saves block with it's position as Vector3
- * Uses 17x less memory than regular array with full block int
- * Uses 62x less memory than regular array with class
- */
 class BlockArray implements UpdateLevelData {
-    use DuplicateBlockDetector;
 
-    /** @var string */
-    public string $buffer = "";
+    /** @var bool */
+    protected bool $detectDuplicates;
+
+    /** @var int[] */
+    public array $blocks = [];
+    /** @var int[] */
+    public array $coords = [];
+
     /** @var int */
     public int $offset = 0;
 
-    /** @var BlockArraySizeData|null */
-    protected ?BlockArraySizeData $sizeData = null;
-
-    /** @var ChunkManager|null */
-    protected ?ChunkManager $level = null;
+    /**
+     * Fields to avoid allocating memory every time
+     * when writing or reading block from the
+     * array
+     */
+    protected int $lastHash, $lastBlockHash;
 
     public function __construct(bool $detectDuplicates = false) {
         $this->detectDuplicates = $detectDuplicates;
     }
+
+    /** @var BlockArraySizeData|null */
+    protected ?BlockArraySizeData $sizeData = null;
+    /** @var ChunkManager|null */
+    protected ?ChunkManager $level = null;
 
     /**
      * Adds block to the block array
@@ -68,18 +71,14 @@ class BlockArray implements UpdateLevelData {
      * @return $this
      */
     public function addBlockAt(int $x, int $y, int $z, int $id, int $meta): BlockArray {
-        $binHash = pack("q", Level::blockHash($x, $y, $z));
-        if($this->detectingDuplicates()) {
-            if($this->isDuplicate($binHash)) {
-                return $this;
-            }
+        $this->lastHash = Level::blockHash($x, $y, $z);
 
-            $this->duplicateCache .= $binHash;
+        if($this->detectDuplicates && in_array($this->lastHash, $this->coords)) {
+            return $this;
         }
 
-        $this->buffer .= chr($id);
-        $this->buffer .= chr($meta);
-        $this->buffer .= $binHash;
+        $this->coords[] = $this->lastHash;
+        $this->blocks[] = $id << 4 | $meta;
 
         return $this;
     }
@@ -88,54 +87,42 @@ class BlockArray implements UpdateLevelData {
      * Returns if it is possible read next block from the array
      */
     public function hasNext(): bool {
-        return $this->offset + 10 <= strlen($this->buffer);
+        return $this->offset < count($this->blocks);
     }
 
     /**
      * Reads next block in the array
      */
     public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void {
-        $id = ord($this->buffer[$this->offset++]);
-        $meta = ord($this->buffer[$this->offset++]);
+        $this->lastHash = $this->coords[$this->offset];
+        $this->lastBlockHash = $this->blocks[$this->offset++];
 
-        /** @phpstan-ignore-next-line */
-        $hash = unpack("q", substr($this->buffer, $this->offset, 8))[1] ?? 0;
-        Level::getBlockXYZ($hash, $x, $y, $z);
-        $this->offset += 8;
+        Level::getBlockXYZ($this->lastHash, $x, $y, $z);
+        $id = $this->lastBlockHash >> 4; $meta = $this->lastBlockHash & 0xf;
     }
 
     /**
      * @return int $size
      */
     public function size(): int {
-        return strlen($this->buffer) / 10;
+        return count($this->coords);
     }
 
     /**
      * Adds Vector3 to all the blocks in BlockArray
      */
     public function addVector3(Vector3 $vector3): BlockArray {
-        if(!$vector3->ceil()->equals($vector3)) {
-            throw new InvalidArgumentException("Vector3 coordinates must be integer.");
-        }
+        $floorX = $vector3->getFloorX();
+        $floorY = $vector3->getFloorY();
+        $floorZ = $vector3->getFloorZ();
 
         $blockArray = new BlockArray();
+        $blockArray->blocks = $this->blocks;
 
-        $len = strlen($this->buffer);
-        while ($this->offset < $len) {
-            $blockArray->buffer .= $this->buffer[$this->offset++];
-            $blockArray->buffer .= $this->buffer[$this->offset++];
-
-            /** @phpstan-ignore-next-line */
-            $hash = unpack("q", substr($this->buffer, $this->offset, 8))[1] ?? 0;
+        foreach ($this->coords as $hash) {
             Level::getBlockXYZ($hash, $x, $y, $z);
-
-            $blockArray->buffer .= pack("q", Level::blockHash($x + $vector3->getX(), $y + $vector3->getY(), $z + $vector3->getZ()));
-
-            $this->offset += 8;
+            $blockArray->coords[] = Level::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
         }
-
-        $this->offset = 0;
 
         return $blockArray;
     }
@@ -169,11 +156,27 @@ class BlockArray implements UpdateLevelData {
     }
 
     /**
+     * @return int[]
+     */
+    public function getBlockArray(): array {
+        return $this->blocks;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getCoordsArray(): array {
+        return $this->coords;
+    }
+
+    /**
      * Removes all the blocks whose were checked already
      * For cleaning duplicate cache use cancelDuplicateDetection()
      */
     public function cleanGarbage(): void {
-        $this->buffer = substr($this->buffer, $this->offset);
+        $this->coords = array_slice($this->coords, $this->offset);
+        $this->blocks = array_slice($this->blocks, $this->offset);
+
         $this->offset = 0;
     }
 }

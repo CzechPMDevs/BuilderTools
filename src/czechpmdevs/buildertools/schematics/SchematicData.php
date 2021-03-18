@@ -97,8 +97,8 @@ abstract class SchematicData extends BlockArray {
     }
 
     public function setAxisVector(Vector3 $vector3): void {
-        $this->width = $vector3->getX();
-        $this->height = $vector3->getY();
-        $this->length = $vector3->getZ();
+        $this->width = (int)$vector3->getX();
+        $this->height = (int)$vector3->getY();
+        $this->length = (int)$vector3->getZ();
     }
 }

@@ -22,12 +22,9 @@ namespace czechpmdevs\buildertools\blockstorage;
 
 use InvalidArgumentException;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 
 class SelectionData extends BlockArray {
 
-    /** @var Player */
-    protected Player $player;
     /** @var Vector3|null */
     protected ?Vector3 $playerPosition = null;
 
@@ -49,19 +46,6 @@ class SelectionData extends BlockArray {
         }
 
         return parent::addVector3($vector3);
-    }
-
-    public function getPlayer(): Player {
-        return $this->player;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setPlayer(Player $player): SelectionData {
-        $this->player = $player;
-
-        return $this;
     }
 
     public function getPlayerPosition(): ?Vector3 {

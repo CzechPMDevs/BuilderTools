@@ -25,6 +25,7 @@ use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\level\Level;
@@ -32,7 +33,9 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
 use function abs;
+use function max;
 use function microtime;
+use function min;
 use function round;
 
 class Copier {
@@ -46,11 +49,11 @@ class Copier {
         $startTime = microtime(true);
 
         $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
+        $level = $player->getLevelNonNull();
 
         $i = 0;
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $blockPos) {
-            $block = $player->getLevelNonNull()->getBlock($blockPos);
-            $clipboard->addBlock($blockPos, $block->getId(), $block->getDamage());
+        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
+            $clipboard->addBlockAt($x, $y, $z, $level->getBlockIdAt($x, $y, $z), $level->getBlockDataAt($x, $y, $z));
 
             $i++;
         }
@@ -58,6 +61,39 @@ class Copier {
         ClipboardManager::saveClipboard($player, $clipboard);
 
         return EditorResult::success($i, microtime(true) - $startTime);
+    }
+
+    public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
+        $startTime = microtime(true);
+
+        $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
+
+        $minX = (int)min($pos1->getX(), $pos2->getX());
+        $maxX = (int)max($pos1->getX(), $pos2->getX());
+        $minZ = (int)min($pos1->getZ(), $pos2->getZ());
+        $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
+
+        $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
+        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
+
+        for($x = $minX; $x <= $maxX; ++$x) {
+            for ($z = $minZ; $z <= $maxZ; ++$z) {
+                for ($y = $minY; $y <= $maxY; ++$y) {
+                    $fillSession->getBlockAt($x, $y, $z, $id, $meta);
+                    $clipboard->addBlockAt($x, $y, $z, $id, $meta);
+
+                    $fillSession->setBlockAt($x, $y, $z, 0, 0);
+                }
+            }
+        }
+
+        $fillSession->reloadChunks($player->getLevelNonNull());
+        ClipboardManager::saveClipboard($player, $clipboard);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function merge(Player $player): EditorResult {
@@ -184,7 +220,7 @@ class Copier {
     public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $add, Player $player): EditorResult {
         $start = microtime(true);
 
-        $blocks = new BlockArray(true);
+        $blocks = new BlockArray();
         $blocks->setLevel($player->getLevel());
 
         // Old blocks (to remove)

@@ -26,6 +26,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use function basename;
 
 class WorldFixUtil {
 
@@ -42,7 +43,8 @@ class WorldFixUtil {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix more than one world at the same time!");
             return;
         }
-        if(Server::getInstance()->getDefaultLevel()->getFolderName() == $worldName) {
+
+        if(Server::getInstance()->getDefaultLevel() !== null && Server::getInstance()->getDefaultLevel()->getFolderName() == $worldName) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
             return;
         }
@@ -56,6 +58,7 @@ class WorldFixUtil {
         self::$worldFixQueue[$worldName] = $sender->getName();
 
         if(Server::getInstance()->isLevelLoaded($worldName)) {
+            /** @phpstan-ignore-next-line */
             Server::getInstance()->unloadLevel(Server::getInstance()->getLevelByName($worldName), true);
         }
 
@@ -76,7 +79,7 @@ class WorldFixUtil {
             }
 
             if($asyncTask->error != "") {
-                $this->sender->sendMessage(BuilderTools::getPrefix() . "§c" . $asyncTask->error);
+                $sender->sendMessage(BuilderTools::getPrefix() . "§c" . $asyncTask->error);
                 goto finish;
             }
 
@@ -106,8 +109,12 @@ class WorldFixUtil {
 
     /**
      * @internal
+     *
+     * @param WorldFixTask<mixed> $task
      */
-    public static function finishWorldFixTask(WorldFixTask $task) {
-        unset(self::$worldFixQueue[basename($task->worldPath)]);
+    public static function finishWorldFixTask(WorldFixTask $task): void {
+        if(isset(self::$worldFixQueue[basename($task->worldPath)])) {
+            unset(self::$worldFixQueue[basename($task->worldPath)]);
+        }
     }
 }

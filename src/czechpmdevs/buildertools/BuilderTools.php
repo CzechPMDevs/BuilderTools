@@ -58,7 +58,9 @@ use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\plugin\PluginBase;
+use function glob;
 use function mkdir;
+use function unlink;
 
 class BuilderTools extends PluginBase {
 
@@ -75,7 +77,7 @@ class BuilderTools extends PluginBase {
     /** @var Command[] */
     private static array $commands = [];
 
-    /** @var array */
+    /** @var mixed[] */
     private static array $configuration = [];
 
     /** @noinspection PhpUnused */
@@ -84,6 +86,7 @@ class BuilderTools extends PluginBase {
         self::$prefix = "§7[BuilderTools] §a";
 
         $this->initConfig();
+        $this->cleanCache();
         $this->registerCommands();
         $this->initListener();
         $this->registerEnchantment();
@@ -92,25 +95,29 @@ class BuilderTools extends PluginBase {
         self::$schematicsManager = new SchematicsManager($this);
     }
 
-    private function initConfig() {
+    public function onDisable() {
+        $this->cleanCache();
+    }
+
+    private function initConfig(): void {
         if(!is_dir($this->getDataFolder() . "schematics")) {
             @mkdir($this->getDataFolder() . "schematics");
         }
-        if(!is_dir($this->getDataFolder() . "offline_sessions")) {
-            @mkdir($this->getDataFolder() . "offline_sessions");
+        if(!is_dir($this->getDataFolder() . "sessions")) {
+            @mkdir($this->getDataFolder() . "sessions");
         }
         self::$configuration = $this->getConfig()->getAll();
     }
 
-    private function initListener() {
+    private function initListener(): void {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
     }
 
-    private function registerEnchantment() {
+    private function registerEnchantment(): void {
         Enchantment::registerEnchantment(new Enchantment(50, "BuilderTools", Enchantment::RARITY_COMMON, 0, 0, 1));
     }
 
-    private function registerCommands() {
+    private function registerCommands(): void {
         $map = $this->getServer()->getCommandMap();
         self::$commands = [
             new BlockInfoCommand,
@@ -155,14 +162,26 @@ class BuilderTools extends PluginBase {
         HelpCommand::buildPages();
     }
 
-    public function sendWarnings() {
+    public function sendWarnings(): void {
         if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
             $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
         }
     }
 
+    public function cleanCache(): void {
+        $files = glob($this->getDataFolder() . "sessions/*.dat");
+        if(!$files) {
+            return;
+        }
+
+        /** @var string $offlineSession */
+        foreach ($files as $offlineSession) {
+            unlink($offlineSession);
+        }
+    }
+
     /**
-     * @return Command[] $commands
+     * @return Command[]
      */
     public static function getAllCommands(): array {
         return self::$commands;
@@ -172,6 +191,9 @@ class BuilderTools extends PluginBase {
         return self::$prefix;
     }
 
+    /**
+     * @return mixed[]
+     */
     public static function getConfiguration(): array {
         return self::$configuration;
     }

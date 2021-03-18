@@ -21,30 +21,59 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\math\BlockGenerator;
+use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function max;
+use function microtime;
+use function min;
 
 class Replacement {
     use SingletonTrait;
 
-    public function prepareReplace(Vector3 $pos1, Vector3 $pos2, Level $level, string $blocks, string $replace): BlockArray {
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
-        $anotherStringToBlockDecoder = new StringToBlockDecoder($replace);
+    public function directReplace(Player $player, Vector3 $pos1, Vector3 $pos2, string $blocks, string $replace): EditorResult {
+        $startTime = microtime(true);
 
-        $updateLevelData = new BlockArray();
-        $updateLevelData->setLevel($level);
+        $mask = new StringToBlockDecoder($blocks);
+        $stringToBlockDecoder = new StringToBlockDecoder($replace);
 
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $vector3) {
-            $block = $level->getBlock($vector3);
-            if($stringToBlockDecoder->containsBlock($block->getId(), $block->getDamage())) {
-                $anotherStringToBlockDecoder->nextBlock($id, $meta);
-                $updateLevelData->addBlock($vector3, $id, $meta);
+        if(!$mask->isValid()) { // Nothing to replace
+            return EditorResult::success(0, microtime(true) - $startTime);
+        }
+        if(!$stringToBlockDecoder->isValid()) {
+            return EditorResult::error("Could not read blocks from $blocks");
+        }
+
+        $minX = (int)min($pos1->getX(), $pos2->getX());
+        $maxX = (int)max($pos1->getX(), $pos2->getX());
+        $minZ = (int)min($pos1->getZ(), $pos2->getZ());
+        $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
+
+        $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
+        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+
+        $fillSession = new MaskedFillSession($player->getLevelNonNull(), false, true, $mask);
+        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
+
+        for($x = $minX; $x <= $maxX; ++$x) {
+            for($z = $minZ; $z <= $maxZ; ++$z) {
+                for($y = $minY; $y <= $maxY; ++$y) {
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+                }
             }
         }
 
-        return $updateLevelData;
+        $fillSession->reloadChunks($player->getLevelNonNull());
+
+        /** @var BlockArray $changes */
+        $changes = $fillSession->getChanges();
+        Canceller::getInstance()->addStep($player, $changes);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true)-$startTime);
     }
 }

@@ -59,8 +59,9 @@ class RotationUtil {
                     $alfa = fmod(atan2($z - $diff->getZ(), $x - $diff->getX()) + $rad, Math::PI_360);
                     $modifiedBlockArray->addBlock(new Vector3((int)round($dist * cos($alfa)) + $diff->getX(), $y, (int)round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
                 }
+
+                $blockArray->coords = $modifiedBlockArray->coords;
                 $blockArray->offset = 0;
-                $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             case self::X_AXIS:
                 while ($blockArray->hasNext()) {
@@ -74,8 +75,9 @@ class RotationUtil {
                     }
                     $blockArray->addBlock(new Vector3($x, $y, (int)round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
                 }
+
+                $blockArray->coords = $modifiedBlockArray->coords;
                 $blockArray->offset = 0;
-                $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             case self::Z_AXIS:
                 while ($blockArray->hasNext()) {
@@ -89,8 +91,9 @@ class RotationUtil {
                     }
                     $modifiedBlockArray->addBlock(new Vector3((int)round($dist * cos($alfa)), $y, $z), $id, $meta);
                 }
+
+                $blockArray->coords = $modifiedBlockArray->coords;
                 $blockArray->offset = 0;
-                $blockArray->buffer = $modifiedBlockArray->buffer;
                 return $blockArray;
             default:
                 return $blockArray;

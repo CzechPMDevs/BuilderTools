@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\event\listener;
 
+use czechpmdevs\buildertools\blockstorage\OfflineSession;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\Selectors;
@@ -28,6 +29,8 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\level\LevelLoadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -101,6 +104,14 @@ class EventListener implements Listener {
         if(WorldFixUtil::isInWorldFixQueue($event->getLevel()->getName())) {
             $this->getPlugin()->getServer()->unloadLevel($event->getLevel(), true);
         }
+    }
+
+    public function onJoin(PlayerJoinEvent $event): void {
+        OfflineSession::loadPlayerSession($event->getPlayer());
+    }
+
+    public function onQuit(PlayerQuitEvent $event): void {
+        OfflineSession::savePlayerSession($event->getPlayer());
     }
 
     public function getPlugin(): BuilderTools {
