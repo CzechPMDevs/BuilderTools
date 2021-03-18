@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function array_pop;
 
 class ClipboardManager {

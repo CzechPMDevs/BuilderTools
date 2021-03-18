@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use pocketmine\level\ChunkManager;
-use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\world\ChunkManager;
+use pocketmine\world\World;
 use function array_slice;
 use function count;
 use function in_array;
@@ -71,7 +71,7 @@ class BlockArray implements UpdateLevelData {
      * @return $this
      */
     public function addBlockAt(int $x, int $y, int $z, int $id, int $meta): BlockArray {
-        $this->lastHash = Level::blockHash($x, $y, $z);
+        $this->lastHash = World::blockHash($x, $y, $z);
 
         if($this->detectDuplicates && in_array($this->lastHash, $this->coords)) {
             return $this;
@@ -97,7 +97,7 @@ class BlockArray implements UpdateLevelData {
         $this->lastHash = $this->coords[$this->offset];
         $this->lastBlockHash = $this->blocks[$this->offset++];
 
-        Level::getBlockXYZ($this->lastHash, $x, $y, $z);
+        World::getBlockXYZ($this->lastHash, $x, $y, $z);
         $id = $this->lastBlockHash >> 4; $meta = $this->lastBlockHash & 0xf;
     }
 
@@ -120,8 +120,8 @@ class BlockArray implements UpdateLevelData {
         $blockArray->blocks = $this->blocks;
 
         foreach ($this->coords as $hash) {
-            Level::getBlockXYZ($hash, $x, $y, $z);
-            $blockArray->coords[] = Level::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
+            World::getBlockXYZ($hash, $x, $y, $z);
+            $blockArray->coords[] = World::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
         }
 
         return $blockArray;

@@ -22,10 +22,10 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\Position;
 use function mt_rand;
 
 class Decorator {
@@ -48,14 +48,15 @@ class Decorator {
                     check:
                     if ($y > 0) {
                         $vec = new Vector3($x, $y, $z);
-                        if ($center->getLevelNonNull()->getBlock($vec)->getId() == 0) {
+                        if ($center->getWorld()->getBlock($vec)->getId() == 0) {
                             $y--;
                             goto check;
                         } else {
-                            $undo->addBlock($vec, $center->getLevelNonNull()->getBlockIdAt($x, $y, $z), $center->getLevelNonNull()->getBlockDataAt($x, $y, $z));
+                            $block = $player->getWorld()->getBlockAt($x, $y, $z);
+                            $undo->addBlock($vec, $block->getId(), $block->getMeta());
 
                             $stringToBlockDecoder->nextBlock($id, $meta);
-                            $center->getLevelNonNull()->setBlock($vec->add(0, 1), $id, $meta);
+                            $center->getWorld()->setBlock($vec->add(0, 1, 0), $id, $meta);
                         }
                     }
                 }

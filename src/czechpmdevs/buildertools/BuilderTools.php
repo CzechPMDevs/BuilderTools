@@ -56,7 +56,9 @@ use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
+use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\Rarity;
 use pocketmine\plugin\PluginBase;
 use function glob;
 use function mkdir;
@@ -81,7 +83,7 @@ class BuilderTools extends PluginBase {
     private static array $configuration = [];
 
     /** @noinspection PhpUnused */
-    public function onEnable() {
+    public function onEnable(): void {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
 
@@ -95,7 +97,7 @@ class BuilderTools extends PluginBase {
         self::$schematicsManager = new SchematicsManager($this);
     }
 
-    public function onDisable() {
+    public function onDisable(): void {
         $this->cleanCache();
     }
 
@@ -114,7 +116,7 @@ class BuilderTools extends PluginBase {
     }
 
     private function registerEnchantment(): void {
-        Enchantment::registerEnchantment(new Enchantment(50, "BuilderTools", Enchantment::RARITY_COMMON, 0, 0, 1));
+        EnchantmentIdMap::getInstance()->register(50, new Enchantment(50, "BuilderTools", Rarity::COMMON, 0, 0, 1));
     }
 
     private function registerCommands(): void {
@@ -163,7 +165,7 @@ class BuilderTools extends PluginBase {
     }
 
     public function sendWarnings(): void {
-        if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
+        if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") != 0) {
             $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
         }
     }

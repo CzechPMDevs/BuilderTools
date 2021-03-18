@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CubeCommand extends BuilderToolsCommand {
 
@@ -44,7 +44,7 @@ class CubeCommand extends BuilderToolsCommand {
         }
         $radius = isset($args[1]) ? (int)$args[1] : 5;
 
-        $result = Printer::getInstance()->makeCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
+        $result = Printer::getInstance()->makeCube($sender, $sender->getPosition(), $radius, (string)$args[0]);
         $sender->sendMessage(BuilderTools::getPrefix()."§aCube created, {$result->getBlocksChanged()} block changed (Took {$result->getProcessTime()} seconds)!");
     }
 }

@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class HollowSphereCommand extends BuilderToolsCommand {
 
@@ -46,7 +46,7 @@ class HollowSphereCommand extends BuilderToolsCommand {
 
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
 
-        $result = Printer::getInstance()->makeHollowSphere($sender, $sender, $radius, $args[0]);
+        $result = Printer::getInstance()->makeHollowSphere($sender, $sender->getPosition(), $radius, $args[0]);
         if(!$result->successful()) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow sphere: {$result->getErrorMessage()}");
             return;

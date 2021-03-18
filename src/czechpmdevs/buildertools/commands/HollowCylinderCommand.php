@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class HollowCylinderCommand extends BuilderToolsCommand {
 
@@ -46,7 +46,7 @@ class HollowCylinderCommand extends BuilderToolsCommand {
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
         $height = isset($args[2]) ? (int)($args[2]) : 8;
 
-        $result = Printer::getInstance()->makeHollowCylinder($sender, $sender, $radius, $height, $args[0]);
+        $result = Printer::getInstance()->makeHollowCylinder($sender, $sender->getPosition(), $radius, $height, $args[0]);
         if(!$result->successful()) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow cylinder: {$result->getErrorMessage()}");
             return;

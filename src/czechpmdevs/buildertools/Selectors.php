@@ -21,8 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools;
 
 use InvalidArgumentException;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\world\Position;
 use function strtolower;
 
 class Selectors {
@@ -88,19 +88,19 @@ class Selectors {
             return null;
         }
 
-        if($pos1->getLevel() === null || $pos2->getLevel() === null) {
+        if($pos1->getWorld() === null || $pos2->getWorld() === null) {
             return null;
         }
 
-        if($pos1->getLevel()->isClosed() || $pos2->getLevel()->isClosed()) {
+        if($pos1->getWorld()->isClosed() || $pos2->getWorld()->isClosed()) {
             return null;
         }
 
-        if($pos1->getLevel()->getId() != $pos2->getLevel()->getId()) {
+        if($pos1->getWorld()->getId() != $pos2->getWorld()->getId()) {
             return null;
         }
 
-        $vec = $pos2->subtract($pos1)->abs()->add(1, 1, 1);
+        $vec = $pos2->subtract($pos1->getX(), $pos1->getY(), $pos1->getZ())->abs()->add(1, 1, 1);
         return (int)($vec->getX() * $vec->getY() * $vec->getZ());
     }
 

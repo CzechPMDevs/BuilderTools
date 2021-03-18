@@ -30,7 +30,7 @@ use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function abs;
 use function microtime;

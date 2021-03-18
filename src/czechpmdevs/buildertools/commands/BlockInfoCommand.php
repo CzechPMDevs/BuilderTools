@@ -23,10 +23,13 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
+use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\VanillaItems;
+use pocketmine\player\Player;
 
 class BlockInfoCommand extends BuilderToolsCommand {
 
@@ -42,11 +45,11 @@ class BlockInfoCommand extends BuilderToolsCommand {
             return;
         }
         if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
-            $item = Item::get(Item::STICK);
+            $item = VanillaItems::STICK();
             $item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
 
             /** @phpstan-ignore-next-line */
-            $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(50), 1));
+            $item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
             $sender->getInventory()->addItem($item);
             $sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
             return;

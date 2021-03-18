@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class PyramidCommand extends BuilderToolsCommand {
 
@@ -45,7 +45,7 @@ class PyramidCommand extends BuilderToolsCommand {
 
         $size = isset($args[1]) ? (int)($args[1]) : 5;
 
-        $result = Printer::getInstance()->makePyramid($sender, $sender, $size, $args[0]);
+        $result = Printer::getInstance()->makePyramid($sender, $sender->getPosition(), $size, $args[0]);
         $sender->sendMessage(BuilderTools::getPrefix()."§aPyramid created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
     }
 }

@@ -27,7 +27,7 @@ use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 
 class Naturalizer {

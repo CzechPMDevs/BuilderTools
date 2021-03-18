@@ -23,7 +23,9 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\VanillaItems;
+use pocketmine\player\Player;
 
 class ClearInventoryCommand extends BuilderToolsCommand {
 
@@ -40,7 +42,7 @@ class ClearInventoryCommand extends BuilderToolsCommand {
         }
         $removed = 0;
         foreach ($sender->getInventory()->getContents() as $index => $item) {
-            $sender->getInventory()->setItem($index, Item::get(Item::AIR));
+            $sender->getInventory()->setItem($index, ItemFactory::air());
             $removed++;
         }
 

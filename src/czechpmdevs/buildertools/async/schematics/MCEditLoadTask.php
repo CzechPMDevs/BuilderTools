@@ -26,8 +26,9 @@ use czechpmdevs\buildertools\schematics\format\MCEditSchematics;
 use czechpmdevs\buildertools\schematics\SchematicData;
 use Exception;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use function file_get_contents;
@@ -49,7 +50,7 @@ class MCEditLoadTask extends AsyncTask {
     }
 
     /** @noinspection PhpUnused */
-    public function onRun() {
+    public function onRun(): void {
         try {
             $file = file_get_contents($this->path);
             if(!$file) {
@@ -58,7 +59,7 @@ class MCEditLoadTask extends AsyncTask {
             }
 
             /** @var CompoundTag $data */
-            $data = (new BigEndianNBTStream())->readCompressed($file);
+            $data = (new BigEndianNbtSerializer())->read($file)->getTag(); // TODO - I am not sure this works (back in 3.0 there was used readCompressed() function)
 
             $materials = SchematicData::MATERIALS_CLASSIC;
 
@@ -66,7 +67,7 @@ class MCEditLoadTask extends AsyncTask {
             $height = $data->getShort("Height");
             $length = $data->getShort("Length");
 
-            if($data->offsetExists("Materials")) {
+            if($data->hasTag("Materials", StringTag::class)) {
                 $materials = $data->getString("Materials");
             }
 
@@ -108,7 +109,7 @@ class MCEditLoadTask extends AsyncTask {
     }
 
     /** @noinspection PhpUnused */
-    public function onCompletion(Server $server) {
+    public function onCompletion(): void {
         BuilderTools::getSchematicsManager()->registerSchematic($this->path, $this->schematics);
     }
 }

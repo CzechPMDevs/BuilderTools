@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use pocketmine\level\ChunkManager;
+use pocketmine\world\ChunkManager;
 
 interface UpdateLevelData {
 

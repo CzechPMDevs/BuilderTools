@@ -23,10 +23,10 @@ namespace czechpmdevs\buildertools\blockstorage;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\ClipboardManager;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntArrayTag;
-use pocketmine\Player;
+use pocketmine\nbt\TreeRoot;
+use pocketmine\player\Player;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -49,23 +49,23 @@ final class OfflineSession {
             /** @var Vector3 $playerPosition */
             $playerPosition = $clipboard->getPlayerPosition();
 
-            $nbt->setTag(new CompoundTag("Clipboard", [
-                new IntArrayTag("Blocks", $clipboard->blocks),
-                new IntArrayTag("Coordinates", $clipboard->coords),
-                new IntArrayTag("RelativePosition", [
+            $nbt->setTag("Clipboard", (new CompoundTag())
+                ->setIntArray("Blocks", $clipboard->blocks)
+                ->setIntArray("Coordinates", $clipboard->coords)
+                ->setIntArray("RelativePosition", [
                     $playerPosition->getFloorX(),
                     $playerPosition->getFloorY(),
                     $playerPosition->getFloorZ()
                 ])
-            ]));
+            );
 
             unset(ClipboardManager::$clipboards[$player->getName()]);
         }
 
-        $stream = new BigEndianNBTStream();
-        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $stream->writeCompressed($nbt));
+        $serializer = new BigEndianNbtSerializer();
+        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $serializer->write(new TreeRoot($nbt)));
 
-        unset($stream, $nbt);
+        unset($serializer, $nbt);
 
         BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 * 1024), 3) . "Mb ram)");
     }
@@ -75,7 +75,7 @@ final class OfflineSession {
             return;
         }
 
-        $stream = new BigEndianNBTStream();
+        $serializer = new BigEndianNbtSerializer();
 
         $buffer = file_get_contents($path);
         if(!$buffer || !@unlink($path)) {
@@ -83,7 +83,7 @@ final class OfflineSession {
         }
 
         /** @var CompoundTag|null $nbt */
-        $nbt = $stream->readCompressed($buffer);
+        $nbt = $serializer->read($buffer)->getTag();
 
         if($nbt === null) {
             return;

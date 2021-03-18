@@ -31,7 +31,7 @@ use Exception;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function basename;
 use function file_get_contents;
 use function glob;

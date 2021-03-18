@@ -24,8 +24,8 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\world\Position;
 
 class NaturalizeCommand extends BuilderToolsCommand {
 
@@ -54,7 +54,7 @@ class NaturalizeCommand extends BuilderToolsCommand {
         /** @var Position $secondPos */
         $secondPos = Selectors::getPosition($sender, 2);
 
-        if($firstPos->getLevelNonNull()->getName() != $secondPos->getLevelNonNull()->getName()) {
+        if($firstPos->getWorld()->getId() != $secondPos->getWorld()->getId()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return;
         }

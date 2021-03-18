@@ -22,11 +22,9 @@ namespace czechpmdevs\buildertools\async\schematics;
 
 use czechpmdevs\buildertools\schematics\SchematicData;
 use Exception;
-use pocketmine\nbt\BigEndianNBTStream;
-use pocketmine\nbt\tag\ByteArrayTag;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\ShortTag;
-use pocketmine\nbt\tag\StringTag;
+use pocketmine\nbt\TreeRoot;
 use pocketmine\scheduler\AsyncTask;
 use function chr;
 use function file_put_contents;
@@ -44,7 +42,7 @@ class MCEditSaveTask extends AsyncTask {
     }
 
     /** @noinspection PhpUnused */
-    public function onRun() {
+    public function onRun(): void {
         try {
             $blocks = "";
             $data = "";
@@ -55,19 +53,20 @@ class MCEditSaveTask extends AsyncTask {
                 $data .= chr($meta);
             }
 
-            $nbt = new BigEndianNBTStream();
-            $fileData = $nbt->writeCompressed(new CompoundTag('Schematic', [
-                new ByteArrayTag('Blocks', $blocks),
-                new ByteArrayTag('Data', $data),
-                new ShortTag('Width', $this->schematic->getXAxis()),
-                new ShortTag('Height', $this->schematic->getYAxis()),
-                new ShortTag('Length', $this->schematic->getZAxis()),
-                new StringTag('Materials', $this->schematic->getMaterialType())
-            ]));
+            $nbt = new BigEndianNbtSerializer();
+            $fileData = $nbt->write(new TreeRoot((new CompoundTag())
+                ->setByteArray("Blocks", $blocks)
+                ->setByteArray("Data", $data)
+                ->setShort("Height", $this->schematic->getXAxis())
+                ->setShort("Length", $this->schematic->getZAxis())
+                ->setString("Materials", $this->schematic->getMaterialType()
+            )));
 
             file_put_contents($this->file, $fileData);
         }
-        catch (Exception $ignore) {} // TODO - Handle errors
+        catch (Exception $ignore) {
+            // TODO - Handle errors
+        }
     }
 
 }

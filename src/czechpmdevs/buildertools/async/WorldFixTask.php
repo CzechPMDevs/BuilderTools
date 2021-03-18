@@ -22,12 +22,11 @@ namespace czechpmdevs\buildertools\async;
 
 use czechpmdevs\buildertools\editors\Fixer;
 use Error;
-use pocketmine\level\format\io\BaseLevelProvider;
-use pocketmine\level\format\io\LevelProviderManager;
-use pocketmine\level\format\io\region\Anvil;
-use pocketmine\level\format\io\region\RegionLoader;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\MainLogger;
+use pocketmine\world\format\io\BaseWorldProvider;
+use pocketmine\world\format\io\region\Anvil;
+use pocketmine\world\format\io\WorldProviderManager;
 use function basename;
 use function count;
 use function explode;
@@ -59,15 +58,16 @@ class WorldFixTask extends AsyncTask {
     }
 
     /** @noinspection PhpUnused */
-    public function onRun() {
-        MainLogger::getLogger()->debug("[BuilderTools] Fixing world $this->worldPath...");
+    public function onRun(): void {
+//        MainLogger::getLogger()->debug("[BuilderTools] Fixing world $this->worldPath...");
 
         if(!is_dir($this->worldPath)) {
             $this->error = "File not found";
             return;
         }
 
-        LevelProviderManager::init();
+        $providerManager = new WorldProviderManager(); // TODO
+
         $providerClass = LevelProviderManager::getProvider($this->worldPath);
         if($providerClass === null) {
             $this->error = "Unknown provider";
@@ -75,7 +75,7 @@ class WorldFixTask extends AsyncTask {
         }
 
         try {
-            /** @var BaseLevelProvider|Anvil|null $provider */
+            /** @var BaseWorldProvider|Anvil|null $provider */
             $provider = new $providerClass($this->worldPath . DIRECTORY_SEPARATOR);
         }
         catch (Error $error) {
@@ -83,13 +83,13 @@ class WorldFixTask extends AsyncTask {
             return;
         }
 
-        if(!$provider instanceof Anvil) {
+        if((!$provider instanceof Anvil)) { // TODO - LevelDB
             if($provider === null) {
                 $this->error = "Unknown world provider.";
                 return;
             }
 
-            $this->error = "BuilderTools does not support fixing chunks with {$provider->getName()} provider.";
+            $this->error = "BuilderTools does not support fixing chunks with " . get_class($provider) . " provider.";
             return;
         }
 
@@ -124,7 +124,7 @@ class WorldFixTask extends AsyncTask {
             $provider->saveChunk($chunk);
             $provider->doGarbageCollection();
 
-            MainLogger::getLogger()->debug("[BuilderTools] " . ($index + 1) . "/" . count($chunksToFix) . " chunks fixed!");
+//            MainLogger::getLogger()->debug("[BuilderTools] " . ($index + 1) . "/" . count($chunksToFix) . " chunks fixed!");
             if($this->forceStop) {
                 return;
             }

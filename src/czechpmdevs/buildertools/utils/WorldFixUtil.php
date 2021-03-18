@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\utils;
 use czechpmdevs\buildertools\async\WorldFixTask;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use function basename;
@@ -44,7 +44,7 @@ class WorldFixUtil {
             return;
         }
 
-        if(Server::getInstance()->getDefaultLevel() !== null && Server::getInstance()->getDefaultLevel()->getFolderName() == $worldName) {
+        if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld() == $worldName) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
             return;
         }
@@ -57,9 +57,9 @@ class WorldFixUtil {
 
         self::$worldFixQueue[$worldName] = $sender->getName();
 
-        if(Server::getInstance()->isLevelLoaded($worldName)) {
+        if(Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
             /** @phpstan-ignore-next-line */
-            Server::getInstance()->unloadLevel(Server::getInstance()->getLevelByName($worldName), true);
+            Server::getInstance()->getWorldManager()->unloadWorld(Server::getInstance()->getWorldManager()->getWorldByName($worldName), true);
         }
 
         $asyncTask = new WorldFixTask($path);
@@ -95,7 +95,7 @@ class WorldFixUtil {
                 $sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time ($asyncTask->chunkCount chunks updated)!");
 
                 finish:
-                BuilderTools::getInstance()->getScheduler()->cancelTask($task->getTaskId());
+                $task->getHandler()->cancel(); // TODO - Check if it's cancelled right
                 WorldFixUtil::finishWorldFixTask($asyncTask);
             }
         }), 1, 2);

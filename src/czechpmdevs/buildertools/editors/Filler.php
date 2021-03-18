@@ -27,13 +27,12 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use InvalidArgumentException;
-use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelChunkPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\utils\SubChunkExplorer;
+use pocketmine\world\World;
 use function max;
 use function microtime;
 use function min;
@@ -49,12 +48,12 @@ class Filler {
         $minZ = (int)min($pos1->getZ(), $pos2->getZ());
         $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
 
-        $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
-        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+        $minY = (int)max(min($pos1->getY(), $pos2->getY(), World::Y_MAX), 0);
+        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
         if($hollow) {
@@ -81,7 +80,7 @@ class Filler {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -106,7 +105,7 @@ class Filler {
             throw new InvalidArgumentException("Level is not specified in update level data.");
         }
 
-        $iterator = new SubChunkIteratorManager($level);
+        $iterator = new SubChunkExplorer($level);
 
         /** @var int|null $minX */
         $minX = null;
@@ -142,11 +141,11 @@ class Filler {
 
             if($iterator->currentSubChunk === null) {
                 /** @phpstan-ignore-next-line */
-                $iterator->currentSubChunk = $iterator->level->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4, true); // It is checked above
+                $iterator->currentSubChunk = $iterator->world->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4); // It is checked above
             }
 
             if($replaceOnlyAir) {
-                if($iterator->currentSubChunk->getBlockId($x & 0x0f, $y & 0x0f, $z & 0x0f) != BlockIds::AIR) {
+                if($iterator->currentSubChunk->getFullBlock($x & 0x0f, $y & 0x0f, $z & 0x0f) >> 4 != 0) {
                     continue;
                 }
             }
@@ -161,7 +160,7 @@ class Filler {
             $iterator->currentSubChunk->setBlock($x & 0x0f, $y & 0x0f, $z & 0x0f, $id, $meta);
         }
 
-        $this->reloadChunks($player->getLevelNonNull(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
+        $this->reloadChunks($player->getWorld(), (int)$minX, (int)$minZ, (int)$maxX, (int)$maxZ);
 
         if($saveUndo) {
             /** @var BlockArray $undoArray */
@@ -179,7 +178,7 @@ class Filler {
         return $this->fill($player, $updateData, $relativePosition, $saveUndo, $saveRedo, true);
     }
 
-    private function reloadChunks(Level $level, int $minX, int $minZ, int $maxX, int $maxZ): void {
+    private function reloadChunks(World $level, int $minX, int $minZ, int $maxX, int $maxZ): void {
         for($x = $minX >> 4; $x <= $maxX >> 4; ++$x) {
             for ($z = $minZ >> 4; $z <= $maxZ >> 4; ++$z) {
                 $tiles = $level->getChunkTiles($x, $z);

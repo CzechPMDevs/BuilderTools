@@ -9,7 +9,7 @@ use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicData;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use function max;
 use function min;

@@ -24,9 +24,9 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\world\Position;
 
 class MoveCommand extends BuilderToolsCommand {
 
@@ -62,8 +62,8 @@ class MoveCommand extends BuilderToolsCommand {
         /** @var Position $secondPos */
         $secondPos = Selectors::getPosition($sender, 2);
 
-        if($firstPos->getLevelNonNull()->getName() != $secondPos->getLevelNonNull()->getName()) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
+        if($firstPos->getWorld()->getId() != $secondPos->getWorld()->getId()) {
+            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in the same level");
             return;
         }
 

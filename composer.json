@@ -6,11 +6,12 @@
   "require": {
     "php": "^7.4 || ^8.0",
     "ext-yaml": "*",
-    "ext-pthreads": "*"
+    "ext-pthreads": "*",
+    "ext-chunkutils2": "^0.1.0"
   },
   "require-dev": {
     "phpstan/phpstan": "0.12.81",
-    "pocketmine/pocketmine-mp": "3.18.0"
+    "pocketmine/pocketmine-mp": "dev-master"
   },
   "autoload-dev": {
     "psr-4": {

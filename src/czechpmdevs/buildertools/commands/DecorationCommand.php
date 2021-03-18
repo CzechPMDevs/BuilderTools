@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Decorator;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class DecorationCommand extends BuilderToolsCommand {
 
@@ -49,7 +49,7 @@ class DecorationCommand extends BuilderToolsCommand {
             $percentage = intval($args[2]);
         }
 
-        Decorator::getInstance()->addDecoration($sender, $args[0], (int)$args[1], $percentage);
+        Decorator::getInstance()->addDecoration($sender->getPosition(), $args[0], (int)$args[1], $percentage);
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aDecoration placed!");
     }

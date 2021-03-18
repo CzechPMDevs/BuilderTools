@@ -26,7 +26,7 @@ use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function max;
 use function microtime;

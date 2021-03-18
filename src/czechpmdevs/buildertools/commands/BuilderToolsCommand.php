@@ -24,10 +24,10 @@ use czechpmdevs\buildertools\BuilderTools;
 use InvalidStateException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 
-abstract class BuilderToolsCommand extends Command implements PluginIdentifiableCommand {
+abstract class BuilderToolsCommand extends Command implements PluginOwned {
 
     public function __construct(string $name, string $description = "", string $usageMessage = null, $aliases = []) {
         $this->setPermission($this->getPerms($name));
@@ -51,6 +51,10 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
     }
 
     public function getPlugin(): Plugin {
+        return BuilderTools::getInstance();
+    }
+
+    public function getOwningPlugin(): Plugin {
         return BuilderTools::getInstance();
     }
 }

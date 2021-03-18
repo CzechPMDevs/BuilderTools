@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class HollowCubeCommand extends BuilderToolsCommand {
 
@@ -46,7 +46,7 @@ class HollowCubeCommand extends BuilderToolsCommand {
 
         $radius = isset($args[1]) ? (int)$args[1] : 5;
 
-        $result = Printer::getInstance()->makeHollowCube($sender, $sender->asPosition(), $radius, (string)$args[0]);
+        $result = Printer::getInstance()->makeHollowCube($sender, $sender->getPosition(), $radius, (string)$args[0]);
         if(!$result->successful()) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow cube: {$result->getErrorMessage()}");
             return;

@@ -23,8 +23,8 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\world\Position;
 
 class SecondPositionCommand extends BuilderToolsCommand {
 
@@ -40,7 +40,7 @@ class SecondPositionCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        $size = Selectors::addSelector($sender, 2, $position = new Position((int)$sender->getX(), (int)$sender->getY(), (int)$sender->getZ(), $sender->getLevel()));
+        $size = Selectors::addSelector($sender, 2, $position = new Position((int)$sender->getPosition()->getX(), (int)$sender->getPosition()->getY(), (int)$sender->getPosition()->getZ(), $sender->getWorld()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
     }
 }

@@ -22,12 +22,12 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
-use pocketmine\level\generator\object\BirchTree;
-use pocketmine\level\generator\object\JungleTree;
-use pocketmine\level\generator\object\OakTree;
-use pocketmine\level\generator\object\SpruceTree;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\Random;
+use pocketmine\world\generator\object\BirchTree;
+use pocketmine\world\generator\object\JungleTree;
+use pocketmine\world\generator\object\OakTree;
+use pocketmine\world\generator\object\SpruceTree;
 
 class TreeCommand extends BuilderToolsCommand {
 
@@ -75,7 +75,7 @@ class TreeCommand extends BuilderToolsCommand {
             return;
         }
 
-        $object->placeObject($sender->getLevelNonNull(), $sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), new Random(time()));
+        $object->placeObject($sender->getWorld(), $sender->getPosition()->getFloorX(), $sender->getPosition()->getFloorY(), $sender->getPosition()->getFloorZ(), new Random(time()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aObject $args[0] placed!");
     }
 }

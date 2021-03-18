@@ -28,10 +28,10 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\utils\RotationUtil;
-use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\World;
 use function abs;
 use function max;
 use function microtime;
@@ -48,12 +48,13 @@ class Copier {
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
-        $level = $player->getLevelNonNull();
+        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->ceil());
+        $level = $player->getWorld();
 
         $i = 0;
         foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
-            $clipboard->addBlockAt($x, $y, $z, $level->getBlockIdAt($x, $y, $z), $level->getBlockDataAt($x, $y, $z));
+            $block = $level->getBlockAt($x, $y, $z, true, false);
+            $clipboard->addBlockAt($x, $y, $z, $block->getId(), $block->getMeta());
 
             $i++;
         }
@@ -66,17 +67,17 @@ class Copier {
     public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->ceil());
 
         $minX = (int)min($pos1->getX(), $pos2->getX());
         $maxX = (int)max($pos1->getX(), $pos2->getX());
         $minZ = (int)min($pos1->getZ(), $pos2->getZ());
         $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
 
-        $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
-        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+        $minY = (int)max(min($pos1->getY(), $pos2->getY(), World::Y_MAX), 0);
+        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
         for($x = $minX; $x <= $maxX; ++$x) {
@@ -90,7 +91,7 @@ class Copier {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
         ClipboardManager::saveClipboard($player, $clipboard);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -103,12 +104,12 @@ class Copier {
 
         /** @var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
-        $clipboard->setLevel($player->getLevel());
+        $clipboard->setLevel($player->getWorld());
 
         /** @var Vector3 $playerPosition */
         $playerPosition = $clipboard->getPlayerPosition();
 
-        return Filler::getInstance()->merge($player, $clipboard, $player->ceil()->subtract($playerPosition));
+        return Filler::getInstance()->merge($player, $clipboard, $player->getPosition()->ceil()->subtractVector($playerPosition));
     }
 
     public function paste(Player $player): EditorResult {
@@ -118,12 +119,12 @@ class Copier {
 
         /** @var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
-        $clipboard->setLevel($player->getLevel());
+        $clipboard->setLevel($player->getWorld());
 
         /** @var Vector3 $playerPosition */
         $playerPosition = $clipboard->getPlayerPosition();
 
-        return Filler::getInstance()->fill($player, $clipboard, $player->ceil()->subtract($playerPosition));
+        return Filler::getInstance()->fill($player, $clipboard, $player->getPosition()->ceil()->subtractVector($playerPosition));
     }
 
     public function rotate(Player $player, int $axis, int $rotation): void {
@@ -148,7 +149,7 @@ class Copier {
         $clipboard = ClipboardManager::getClipboard($player);
 
         $updateData = new BlockArray();
-        $updateData->setLevel($player->getLevel());
+        $updateData->setLevel($player->getWorld());
 
         /** @var Vector3 $playerPosition */
         $playerPosition = $clipboard->getPlayerPosition();
@@ -156,7 +157,7 @@ class Copier {
         $center = $playerPosition->ceil(); // Why there was +vec(1, 0, 1)?
         switch ($mode) {
             case self::DIRECTION_PLAYER:
-                $d = $player->getDirection();
+                $d = $player->getDirectionPlane()->getFloorX(); // TODO - Is that substitute for Player->getDirection()?
                 switch ($d) {
                     case 0:
                     case 2:
@@ -221,7 +222,7 @@ class Copier {
         $start = microtime(true);
 
         $blocks = new BlockArray();
-        $blocks->setLevel($player->getLevel());
+        $blocks->setLevel($player->getWorld());
 
         // Old blocks (to remove)
         $blockPositions = [];
@@ -229,16 +230,16 @@ class Copier {
         // Add new blocks
         /** @var Vector3 $vector3 */
         foreach (BlockGenerator::fillCuboid($pos1, $pos2) as $vector3) {
-            if(($block = $player->getLevelNonNull()->getBlock($vector3))->getId() != 0) {
+            if(($block = $player->getWorld()->getBlock($vector3))->getId() != 0) {
                 /** @phpstan-ignore-next-line */
-                $blockPositions[] = Level::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ()); // BlockGenerator::fillCuboid returns only vectors with int coords
-                $blocks->addBlock($add->add($vector3), $block->getId(), $block->getDamage());
+                $blockPositions[] = World::blockHash($vector3->getX(), $vector3->getY(), $vector3->getZ()); // BlockGenerator::fillCuboid returns only vectors with int coords
+                $blocks->addBlock($add->addVector($vector3), $block->getId(), $block->getMeta());
             }
         }
 
         // Remove old blocks
         foreach ($blockPositions as $hash) {
-            Level::getBlockXYZ($hash, $x, $y, $z);
+            World::getBlockXYZ($hash, $x, $y, $z);
 
             $blocks->addBlock(new Vector3($x, $y, $z), 0, 0);
         }

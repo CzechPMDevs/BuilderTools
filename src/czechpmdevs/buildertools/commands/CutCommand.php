@@ -25,7 +25,7 @@ use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CutCommand extends BuilderToolsCommand {
 
