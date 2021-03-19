@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\math;
 
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use function max;
@@ -65,5 +66,20 @@ class Math {
         $length = max($pos1->getZ(), $pos2->getZ()) - min($pos1->getZ(), $pos2->getZ());
 
         return (new Vector3($width, $height, $length))->add(1, 1, 1);
+    }
+
+    public static function calculateMinAndMaxValues(Vector3 $pos1, Vector3 $pos2, bool $clampY, ?int &$minX, ?int &$maxX, ?int &$minY, ?int &$maxY, ?int &$minZ, ?int &$maxZ): void {
+        $minX = (int)min($pos1->getX(), $pos2->getX());
+        $maxX = (int)max($pos1->getX(), $pos2->getX());
+        $minZ = (int)min($pos1->getZ(), $pos2->getZ());
+        $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
+
+        if($clampY) {
+            $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
+            $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+        } else {
+            $minY = (int)min($pos1->getY(), $pos2->getY());
+            $maxY = (int)max($pos1->getY(), $pos2->getY());
+        }
     }
 }

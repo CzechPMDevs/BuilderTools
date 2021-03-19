@@ -23,8 +23,10 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\FillSession;
 use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
+use function microtime;
 
 class Canceller {
     use SingletonTrait;
@@ -42,12 +44,30 @@ class Canceller {
             return $error();
         }
 
-        $blockList = ClipboardManager::getNextUndoAction($player);
-        if($blockList === null) {
+        $undoAction = ClipboardManager::getNextUndoAction($player);
+        if($undoAction === null) {
             return $error();
         }
 
-        return Filler::getInstance()->fill($player, $blockList, null, false, true);
+        if($undoAction->getLevel() === null) {
+            return EditorResult::error("Could not find world to process updates on.");
+        }
+
+        $startTime = microtime(true);
+        $fillSession = new FillSession($undoAction->getLevel(), true, true);
+
+        while ($undoAction->hasNext()) {
+            $undoAction->readNext($x, $y, $z, $id, $meta);
+            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+        }
+
+        $fillSession->reloadChunks($player->getLevelNonNull());
+
+        /** @var BlockArray $updates */
+        $updates = $fillSession->getChanges();
+        Canceller::getInstance()->addRedo($player, $updates);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     public function addRedo(Player $player, BlockArray $blocks): void {
@@ -56,18 +76,36 @@ class Canceller {
 
     public function redo(Player $player): EditorResult {
         $error = function (): EditorResult {
-            return EditorResult::error("There are not any actions to redo");
+            return EditorResult::error("There are not any actions to undo");
         };
 
-        if(ClipboardManager::hasActionToRedo($player)) {
+        if(!ClipboardManager::hasActionToUndo($player)) {
             return $error();
         }
 
-        $blockList = ClipboardManager::getNextRedoAction($player);
-        if($blockList === null) {
+        $redoAction = ClipboardManager::getNextUndoAction($player);
+        if($redoAction === null) {
             return $error();
         }
 
-        return Filler::getInstance()->fill($player, $blockList);
+        if($redoAction->getLevel() === null) {
+            return EditorResult::error("Could not find world to process updates on.");
+        }
+
+        $startTime = microtime(true);
+        $fillSession = new FillSession($redoAction->getLevel(), true, true);
+
+        while ($redoAction->hasNext()) {
+            $redoAction->readNext($x, $y, $z, $id, $meta);
+            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
+        }
+
+        $fillSession->reloadChunks($player->getLevelNonNull());
+
+        /** @var BlockArray $updates */
+        $updates = $fillSession->getChanges();
+        Canceller::getInstance()->addStep($player, $updates);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 }

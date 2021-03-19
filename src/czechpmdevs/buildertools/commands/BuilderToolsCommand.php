@@ -21,10 +21,13 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\Selectors;
 use InvalidStateException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\level\Position;
+use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 
 abstract class BuilderToolsCommand extends Command implements PluginIdentifiableCommand {
@@ -44,6 +47,29 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
         if(!$sender->hasPermission($permission)) {
             $sender->sendMessage((string)$this->getPermissionMessage());
         }
+    }
+
+    protected function readPositions(Player $sender, ?Position &$firstPos = null, ?Position &$secondPos = null): bool {
+        if(!Selectors::isSelected(1, $sender)) {
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
+            return false;
+        }
+        if(!Selectors::isSelected(2, $sender)) {
+            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
+            return false;
+        }
+
+        /** @var Position $firstPos */
+        $firstPos = Selectors::getPosition($sender, 1);
+        /** @var Position $secondPos */
+        $secondPos = Selectors::getPosition($sender, 2);
+
+        if($firstPos->getLevelNonNull()->getId() != $secondPos->getLevelNonNull()->getId()) {
+            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
+            return false;
+        }
+
+        return true;
     }
 
     private function getPerms(string $name): string {

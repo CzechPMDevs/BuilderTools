@@ -38,7 +38,6 @@ class SelectionData extends BlockArray {
 
         if($this->playerPosition !== null) {
             $clipboard = clone $this;
-
             /** @phpstan-ignore-next-line */
             $clipboard->playerPosition->add($vector3);
 

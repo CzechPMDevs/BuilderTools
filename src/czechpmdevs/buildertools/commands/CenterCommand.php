@@ -21,14 +21,14 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Naturalizer;
+use pocketmine\block\BlockIds;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
-class NaturalizeCommand extends BuilderToolsCommand {
+class CenterCommand extends BuilderToolsCommand {
 
     public function __construct() {
-        parent::__construct("/naturalize", "Naturalize selected area.", null, []);
+        parent::__construct("/center", "Makes pattern blocks in the middle of selection");
     }
 
     /** @noinspection PhpUnused */
@@ -43,7 +43,30 @@ class NaturalizeCommand extends BuilderToolsCommand {
             return;
         }
 
-        $result = Naturalizer::getInstance()->naturalize($firstPos->getFloorX(), $firstPos->getFloorY(), $firstPos->getFloorY(), $secondPos->getFloorX(), $secondPos->getFloorY(), $secondPos->getFloorZ(), $sender->getLevelNonNull(), $sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+        $center = $firstPos->add($secondPos)->divide(2);
+
+        $min = $center->ceil();
+        $max = $center->ceil();
+
+        if($center->getX() != $center->getFloorX()) {
+            $max->x = $center->getFloorX() + 1;
+        }
+        if($center->getY() != $center->getFloorY()) {
+            $max->y = $center->getFloorY() + 1;
+        }
+        if($center->getZ() != $center->getFloorZ()) {
+            $max->z = $center->getFloorZ() + 1;
+        }
+
+        for($x = $min->getFloorX(); $x <= $max->getFloorX(); ++$x) {
+            for($y = $min->getFloorY(); $y <= $max->getFloorY(); ++$y) {
+                for($z = $min->getFloorZ(); $z <= $max->getFloorZ(); ++$z) {
+                    $firstPos->getLevelNonNull()->setBlockIdAt($x, $y, $z, BlockIds::BEDROCK);
+                    $firstPos->getLevelNonNull()->setBlockDataAt($x, $y, $z, 0);
+                }
+            }
+        }
+
+        $sender->sendMessage(BuilderTools::getPrefix() . "Center of the selection found at {$center->getX()}, {$center->getY()}, {$center->getZ()}");
     }
 }

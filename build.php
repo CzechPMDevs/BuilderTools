@@ -1,8 +1,10 @@
 <?php
 
-#
-# Build script for BuilderTools
-#
+declare(strict_types=1);
+
+/**
+ * Build script for BuilderTools
+ */
 
 // For example C:/pmmp-server/plugins/BuilderTools.phar
 const CUSTOM_OUTPUT_PATH = "";
@@ -70,7 +72,7 @@ function cleanDirectory(string $directory): void {
     }
 }
 
-function preProcess(string &$file) {
+function preProcess(string &$file): void {
     if(!defined("replacements")) {
         $patterns = [
             'Math::lengthSquared2d({%1}, {%2})' => '({%1} ** 2) + ({%2} ** 2)',

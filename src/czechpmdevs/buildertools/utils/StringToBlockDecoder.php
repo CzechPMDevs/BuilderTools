@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\utils;
 
 use ArrayOutOfBoundsException;
+use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use pocketmine\item\ItemFactory;
 
 final class StringToBlockDecoder implements BlockIdentifierList {
@@ -54,7 +55,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
         $hash = $this->blockMap[array_rand($this->blockMap)];
 
         $id = $hash >> 4;
-        $meta = $hash & 0x0f;
+        $meta = $hash & 0xf;
     }
 
     /**

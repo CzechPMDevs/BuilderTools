@@ -44,9 +44,9 @@ final class OfflineSession {
 
         // Clipboard
         if(ClipboardManager::hasClipboardCopied($player)) {
-            /** @var SelectionData $clipboard */
+            /** @phpstan-var SelectionData $clipboard */
             $clipboard = ClipboardManager::getClipboard($player);
-            /** @var Vector3 $playerPosition */
+            /** @phpstan-var Vector3 $playerPosition */
             $playerPosition = $clipboard->getPlayerPosition();
 
             $nbt->setTag(new CompoundTag("Clipboard", [
@@ -82,15 +82,16 @@ final class OfflineSession {
             return;
         }
 
-        /** @var CompoundTag|null $nbt */
+        /** @phpstan-var CompoundTag|null $nbt */
         $nbt = $stream->readCompressed($buffer);
 
         if($nbt === null) {
             return;
         }
 
+        // Clipboard
         if($nbt->hasTag("Clipboard")) {
-            /** @var CompoundTag $clipboardTag */
+            /** @phpstan-var CompoundTag $clipboardTag */
             $clipboardTag = $nbt->getCompoundTag("Clipboard");
 
             $clipboard = new SelectionData();

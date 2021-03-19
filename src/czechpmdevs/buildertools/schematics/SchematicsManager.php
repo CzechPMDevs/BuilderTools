@@ -66,7 +66,7 @@ class SchematicsManager {
         $this->schematics = [];
 
         $files = glob($this->plugin->getDataFolder() . "schematics/*.schematic");
-        if(!$files) {
+        if($files === false) {
             BuilderTools::getInstance()->getLogger()->error("Could not read schematics folder.");
             return;
         }

@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors\object;
 
-use czechpmdevs\buildertools\utils\BlockIdentifierList;
+use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use pocketmine\level\ChunkManager;
 
 class MaskedFillSession extends FillSession {

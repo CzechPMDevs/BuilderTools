@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools;
 
 use czechpmdevs\buildertools\commands\BlockInfoCommand;
+use czechpmdevs\buildertools\commands\CenterCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
 use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
@@ -52,6 +53,7 @@ use czechpmdevs\buildertools\commands\SphereCommand;
 use czechpmdevs\buildertools\commands\StackCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
 use czechpmdevs\buildertools\commands\UndoCommand;
+use czechpmdevs\buildertools\commands\WallsCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
@@ -121,6 +123,7 @@ class BuilderTools extends PluginBase {
         $map = $this->getServer()->getCommandMap();
         self::$commands = [
             new BlockInfoCommand,
+            new CenterCommand,
             new ClearInventoryCommand,
             new CopyCommand,
             new CubeCommand,
@@ -152,6 +155,7 @@ class BuilderTools extends PluginBase {
             new StackCommand,
             new TreeCommand,
             new UndoCommand,
+            new WallsCommand,
             new WandCommand
         ];
 
@@ -170,7 +174,7 @@ class BuilderTools extends PluginBase {
 
     public function cleanCache(): void {
         $files = glob($this->getDataFolder() . "sessions/*.dat");
-        if(!$files) {
+        if($files === false) {
             return;
         }
 

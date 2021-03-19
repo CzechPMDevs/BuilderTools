@@ -231,6 +231,7 @@ class Printer {
 
         $fillSession = new FillSession($player->getLevelNonNull(), false );
         $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
+        $fillSession->loadChunks($player->getLevelNonNull());
 
         $incDivX = 0;
         for($x = 0; $x <= $radius; ++$x) {

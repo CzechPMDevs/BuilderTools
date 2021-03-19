@@ -53,7 +53,7 @@ class MCEditLoadTask extends AsyncTask {
         try {
             $file = file_get_contents($this->path);
             if(!$file) {
-                $this->error = "Could not read file {$this->path}";
+                $this->error = "Could not read file $this->path";
                 return;
             }
 

@@ -144,7 +144,7 @@ class WorldFixTask extends AsyncTask {
         $regionPath = $worldPath . DIRECTORY_SEPARATOR . "region" . DIRECTORY_SEPARATOR;
 
         $files = glob($regionPath . "*.mca*");
-        if(!$files) {
+        if($files === false) {
             return [];
         }
 

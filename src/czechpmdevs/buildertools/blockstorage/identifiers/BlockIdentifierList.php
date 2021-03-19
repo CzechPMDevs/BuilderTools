@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\utils;
+namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
 interface BlockIdentifierList {
 

@@ -21,33 +21,25 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\editors\Filler;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use function strtolower;
 
-class StackCommand extends BuilderToolsCommand {
+class WallsCommand extends BuilderToolsCommand {
 
     public function __construct() {
-        parent::__construct("/stack", "Stack copied area", null, []);
+        parent::__construct("/walls", "Makes walls around selection", null, ["/wall"]);
     }
 
     /** @noinspection PhpUnused */
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
-
         if(!$sender instanceof Player) {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-
         if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//stack <count> [side|up|down]");
-            return;
-        }
-
-        if(!is_numeric($args[0])) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cType number!");
+            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//walls <id1:meta1,id2:meta2,...>");
             return;
         }
 
@@ -55,24 +47,12 @@ class StackCommand extends BuilderToolsCommand {
             return;
         }
 
-        $count = (int)$args[0];
-        $mode = Copier::DIRECTION_PLAYER;
-        if(isset($args[1])) {
-            switch (strtolower($args[1])):
-                case "up":
-                    $mode = Copier::DIRECTION_UP;
-                    break;
-                case "down":
-                    $mode = Copier::DIRECTION_DOWN;
-            endswitch;
-        }
-
-        $result = Copier::getInstance()->stack($sender, $firstPos, $secondPos, $count, $mode);
+        $result = Filler::getInstance()->directWalls($sender, $firstPos, $secondPos, $args[0]);
         if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem whilst stacking selection: {$result->getErrorMessage()}");
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
             return;
         }
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "Section stacked $count times (m=$mode), {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()})");
+        $sender->sendMessage(BuilderTools::getPrefix()."Walls made, §a{$result->getBlocksChanged()} changed (Took {$result->getProcessTime()} seconds)");
     }
 }
