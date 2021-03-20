@@ -21,7 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\BuilderTools;
 use Error;
+use pocketmine\block\BlockFactory;
+use pocketmine\block\Solid;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
@@ -124,6 +127,24 @@ class FillSession {
         $id = $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf);
     }
 
+    public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
+        for($y = 255; $y >= 0; --$y) {
+            $this->iterator->moveTo($x, $y, $z);
+
+            /** @phpstan-ignore-next-line */
+            $id = $this->iterator->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+            if($id >> 4 != 0) {
+                if(BlockFactory::get($id >> 4, $id & 0xf) instanceof Solid) {
+                    $y++;
+                    return true;
+                }
+
+                return false;
+            }
+        }
+        return false;
+    }
+
     public function getChanges(): ?BlockArray {
         return $this->changes;
     }
@@ -152,6 +173,10 @@ class FillSession {
     }
 
     public function reloadChunks(Level $level): void {
+        if($this->error) {
+            BuilderTools::getInstance()->getLogger()->notice("Some chunks were not found");
+        }
+
         $minX = $this->minX >> 4;
         $maxX = $this->maxX >> 4;
         $minZ = $this->minZ >> 4;
@@ -188,10 +213,10 @@ class FillSession {
         }
 
         if($this->calculateDimensions) {
-            if(!isset($this->minX) || $x < $this->minX) $this->minX = $x;
-            if(!isset($this->minZ) || $z < $this->minZ) $this->minZ = $z;
-            if(!isset($this->maxX) || $x > $this->maxX) $this->maxX = $x;
-            if(!isset($this->maxZ) || $z > $this->maxZ) $this->maxZ = $z;
+            if((!isset($this->minX)) || $x < $this->minX) $this->minX = $x;
+            if((!isset($this->minZ)) || $z < $this->minZ) $this->minZ = $z;
+            if((!isset($this->maxX)) || $x > $this->maxX) $this->maxX = $x;
+            if((!isset($this->maxZ)) || $z > $this->maxZ) $this->maxZ = $z;
         }
 
         return true;

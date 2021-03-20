@@ -60,6 +60,6 @@ class CutCommand extends BuilderToolsCommand {
             return;
         }
 
-        $sender->sendMessage(BuilderTools::getPrefix()." §a{$result->getBlocksChanged()} blocks were cut out (Took {$result->getProcessTime()} seconds)!");
+        $sender->sendMessage(BuilderTools::getPrefix()."§a{$result->getBlocksChanged()} blocks were cut out (Took {$result->getProcessTime()} seconds)!");
     }
 }

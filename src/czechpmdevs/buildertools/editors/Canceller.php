@@ -71,7 +71,7 @@ class Canceller {
     }
 
     public function addRedo(Player $player, BlockArray $blocks): void {
-        ClipboardManager::saveUndo($player, $blocks);
+        ClipboardManager::saveRedo($player, $blocks);
     }
 
     public function redo(Player $player): EditorResult {

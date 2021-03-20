@@ -114,6 +114,8 @@ class Copier {
             $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
         }
 
+        $fillSession->reloadChunks($player->getLevelNonNull());
+
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
         Canceller::getInstance()->addStep($player, $changes);
@@ -145,6 +147,8 @@ class Copier {
             $clipboard->readNext($x, $y, $z, $id, $meta);
             $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
         }
+
+        $fillSession->reloadChunks($player->getLevelNonNull());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();

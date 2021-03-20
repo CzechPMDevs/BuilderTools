@@ -20,141 +20,198 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\schematics;
 
-use czechpmdevs\buildertools\async\schematics\MCEditLoadTask;
-use czechpmdevs\buildertools\async\schematics\MCEditSaveTask;
+use Closure;
+use czechpmdevs\buildertools\async\AsyncQueue;
+use czechpmdevs\buildertools\async\schematics\SchematicCreateTask;
+use czechpmdevs\buildertools\async\schematics\SchematicLoadTask;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Filler;
+use czechpmdevs\buildertools\editors\Canceller;
+use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
-use czechpmdevs\buildertools\schematics\format\MCEditSchematics;
-use czechpmdevs\buildertools\Selectors;
-use Exception;
+use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
+use Error;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\ShortTag;
 use pocketmine\Player;
+use function array_keys;
 use function basename;
-use function file_get_contents;
-use function glob;
-use function mkdir;
+use function file_exists;
+use function microtime;
+use function pathinfo;
+use function touch;
+use function unserialize;
+use const DIRECTORY_SEPARATOR;
+use const PATHINFO_EXTENSION;
 
 class SchematicsManager {
 
-    public const SCHEMATIC_MCEDIT_FORMAT = 0x00;
-    public const SCHEMATIC_UNKNOWN_FORMAT = 0x01;
+    /** @var BlockArray[] */
+    private static array $loadedSchematics = [];
 
-    /** @var BuilderTools */
-    protected BuilderTools $plugin;
+    /**
+     * @phpstan-param Closure(SchematicActionResult $result): void $callback
+     */
+    public static function loadSchematic(string $schematic, Closure $callback): void {
+        $startTime = microtime(true);
 
-    /** @var SchematicData[] */
-    public array $schematics = [];
-    /** @var SchematicData[] */
-    public array $players;
-
-    public function __construct(BuilderTools $plugin) {
-        $this->plugin = $plugin;
-        $this->init();
-        $this->loadSchematics();
-    }
-
-    public function init(): void {
-        if(!file_exists($this->getPlugin()->getDataFolder() . "schematics")) {
-            @mkdir($this->getPlugin()->getDataFolder() . "schematics");
-        }
-    }
-
-    public function loadSchematics(): void {
-        $this->schematics = [];
-
-        $files = glob($this->plugin->getDataFolder() . "schematics/*.schematic");
-        if($files === false) {
-            BuilderTools::getInstance()->getLogger()->error("Could not read schematics folder.");
+        $file = $schematic;
+        if(!self::findSchematicFile($file)) {
+            $callback(SchematicActionResult::error("Could not find file for $schematic"));
             return;
         }
 
-        foreach ($files as $file) {
-            $this->loadSchematic($file);
-        }
-    }
-
-    public function registerSchematic(string $file, SchematicData $schematic): void {
-        $this->schematics[basename($file, ".schematic")] = $schematic;
-    }
-
-    public function loadSchematic(string $path): void {
-        $this->plugin->getLogger()->info("Loading schematic from $path...");
-        switch ($this->getSchematicFormat($path)) {
-            case self::SCHEMATIC_MCEDIT_FORMAT:
-                $this->plugin->getServer()->getAsyncPool()->submitTask(new MCEditLoadTask($path));
-                break;
-            case self::SCHEMATIC_UNKNOWN_FORMAT:
-                $this->plugin->getLogger()->error("Unrecognised schematics format for file $path");
-                break;
-        }
-    }
-
-    private function getSchematicFormat(string $path): int {
-        try {
-            $file = file_get_contents($path);
-            if(!$file) {
-                BuilderTools::getInstance()->getLogger()->error("Could not read $path");
-                return self::SCHEMATIC_UNKNOWN_FORMAT;
+        /** @phpstan-ignore-next-line */
+        AsyncQueue::submitTask(new SchematicLoadTask($file), function (SchematicLoadTask $task) use ($startTime, $schematic, $callback): void {
+            if($task->error !== null) {
+                $callback(SchematicActionResult::error($task->error));
+                return;
             }
 
-            /** @var CompoundTag $data */
-            $data = (new BigEndianNBTStream())->readCompressed($file);
-            if($data->offsetExists("Blocks") && $data->offsetExists("Data")) {
-                return self::SCHEMATIC_MCEDIT_FORMAT;
+            $blockArray = unserialize($task->blockArray);
+
+            if(!$blockArray instanceof BlockArray) {
+                $callback(SchematicActionResult::error("Error whilst reading object from another thread."));
             }
-        }
-        catch (Exception $ignore) {}
 
-        return self::SCHEMATIC_UNKNOWN_FORMAT;
+            self::$loadedSchematics[basename($schematic, ".schematic")] = $blockArray;
+
+            $callback(SchematicActionResult::success(microtime(true) - $startTime));
+        });
     }
 
-    public function addToPaste(Player $player, SchematicData $schematic): void {
-        $this->players[$player->getName()] = $schematic;
-    }
-
-    public function pasteSchematic(Player $player): bool {
-        if(!isset($this->players[$player->getName()])) {
-            $player->sendMessage(BuilderTools::getPrefix(). "§cType //schem load <filename> to load schematic first!");
+    public static function unloadSchematic(string $schematic): bool {
+        $schematic = basename($schematic, ".schematic");
+        if(!isset(self::$loadedSchematics[$schematic])) {
             return false;
         }
 
-        $schematic = $this->players[$player->getName()]->addVector3($player);
-        $schematic->setLevel($player->getLevel());
-
-        Filler::getInstance()->fill($player, $schematic);
-
-        $player->sendMessage(BuilderTools::getPrefix() . "Schematic successfully pasted.");
+        unset(self::$loadedSchematics[$schematic]);
         return true;
     }
 
-    public function createSchematic(Player $player, string $file): void {
-        /** @var Vector3 $pos1 */
-        $pos1 = Selectors::getPosition($player, 1);
-        /** @var Vector3 $pos2 */
-        $pos2 = Selectors::getPosition($player, 2);
-
-        $schematic = new MCEditSchematics();
-        $schematic->setFile($file);
-        $schematic->setAxisVector(Math::calculateAxisVec($pos1, $pos2));
-
-        $this->getPlugin()->getServer()->getAsyncPool()->submitTask(new MCEditSaveTask($schematic));
-    }
-
-    public function getSchematic(string $name): ?SchematicData {
-        return $this->schematics[$name] ?? null;
+    /**
+     * @return string[]
+     */
+    public static function getLoadedSchematics(): array {
+        return array_keys(self::$loadedSchematics);
     }
 
     /**
-     * @return SchematicData[]
+     * @phpstan-param Closure(SchematicActionResult $result): void $callback
      */
-    public function getAllSchematics(): array {
-        return $this->schematics;
+    public static function createSchematic(Player $player, Vector3 $pos1, Vector3 $pos2, string $schematicName, Closure $callback): void {
+        $startTime = microtime(true);
+
+        $targetFile = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR . basename($schematicName, ".schematic") . ".schematic";
+        if(!@touch($targetFile)) {
+            $callback(SchematicActionResult::error("Could not access target file"));
+            return;
+        }
+
+        $fillSession = new FillSession($player->getLevelNonNull());
+        $blocks = new BlockArray();
+
+        Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+        $floorX = $player->getFloorX();
+        $floorY = $player->getFloorY();
+        $floorZ = $player->getFloorZ();
+
+        for($y = $minY; $y <= $maxY; ++$y) {
+            for($x = $minX; $x <= $maxX; ++$x) {
+                for($z = $minZ; $z <= $maxZ; ++$z) {
+                    $fillSession->getBlockAt($x, $y, $z, $id, $meta);
+                    $blocks->addBlockAt($x - $floorX, $y - $floorY, $z - $floorZ, $id, $meta);
+                }
+            }
+        }
+
+        /** @phpstan-ignore-next-line */
+        AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $blocks), function (SchematicCreateTask $task) use ($startTime): void {
+            if($task->error !== null) {
+                SchematicActionResult::error($task->error);
+                return;
+            }
+
+            SchematicActionResult::success(microtime(true) - $startTime);
+        });
     }
 
-    public function getPlugin(): BuilderTools {
-        return $this->plugin;
+    public static function pasteSchematic(Player $player, string $schematicName): EditorResult {
+        $startTime = microtime(true);
+
+        $schematicName = basename($schematicName, ".schematic");
+        if(!isset(self::$loadedSchematics[$schematicName])) {
+            return EditorResult::error("Schematic $schematicName is not loaded.");
+        }
+
+        $schematic = clone self::$loadedSchematics[$schematicName];
+
+        $fillSession = new FillSession($player->getLevelNonNull(), true, true);
+
+        $floorX = $player->getFloorX();
+        $floorY = $player->getFloorY();
+        $floorZ = $player->getFloorZ();
+
+        while ($schematic->hasNext()) {
+            $schematic->readNext($x, $y, $z, $id, $meta);
+            if($id != 0)
+                $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+        }
+
+        $fillSession->reloadChunks($player->getLevelNonNull());
+
+        /** @phpstan-var BlockArray $changes */
+        $changes = $fillSession->getChanges();
+        Canceller::getInstance()->addStep($player, $changes);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+    }
+
+    private static function findSchematicFile(string &$file): bool {
+        $dataFolder = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR;
+
+        $ext = pathinfo($file, PATHINFO_EXTENSION);
+        if($ext != "schematic") {
+            $file .= ".schematic";
+        }
+
+        if(file_exists($dataFolder . $file)) {
+            $file = $dataFolder . $file;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string $class
+     */
+    public static function getSchematicFormat(string $rawData): ?string {
+        try {
+            $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+            if(!$nbt instanceof CompoundTag) {
+                return null;
+            }
+
+            if(
+                $nbt->hasTag("Width", ShortTag::class) &&
+                $nbt->hasTag("Height", ShortTag::class) &&
+                $nbt->hasTag("Length", ShortTag::class) &&
+                $nbt->hasTag("Blocks", ByteArrayTag::class) &&
+                $nbt->hasTag("Data", ByteArrayTag::class)
+            ) {
+                return MCEditSchematic::class;
+            }
+
+            return null;
+        } catch (Error $error) {
+            return null;
+        }
     }
 }

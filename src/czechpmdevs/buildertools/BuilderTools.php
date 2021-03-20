@@ -56,7 +56,6 @@ use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WallsCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
-use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\plugin\PluginBase;
@@ -73,8 +72,6 @@ class BuilderTools extends PluginBase {
 
     /** @var EventListener */
     private static EventListener $listener;
-    /** @var SchematicsManager */
-    private static SchematicsManager $schematicsManager;
 
     /** @var Command[] */
     private static array $commands = [];
@@ -93,8 +90,6 @@ class BuilderTools extends PluginBase {
         $this->initListener();
         $this->registerEnchantment();
         $this->sendWarnings();
-
-        self::$schematicsManager = new SchematicsManager($this);
     }
 
     public function onDisable() {
@@ -196,14 +191,10 @@ class BuilderTools extends PluginBase {
     }
 
     /**
-     * @return mixed[]
+     * @phpstan-return mixed[]
      */
     public static function getConfiguration(): array {
         return self::$configuration;
-    }
-
-    public static function getSchematicsManager(): SchematicsManager {
-        return self::$schematicsManager;
     }
 
     public static function getInstance(): BuilderTools {

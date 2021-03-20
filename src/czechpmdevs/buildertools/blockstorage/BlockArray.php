@@ -20,22 +20,38 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
+use InvalidStateException;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\tag\ByteArrayTag;
+use pocketmine\nbt\tag\ByteTag;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntArrayTag;
+use Serializable;
 use function array_slice;
+use function array_values;
 use function count;
 use function in_array;
+use function is_string;
+use function pack;
+use function unpack;
 
-class BlockArray implements UpdateLevelData {
+class BlockArray implements UpdateLevelData, Serializable {
 
     /** @var bool */
     protected bool $detectDuplicates;
 
     /** @var int[] */
-    public array $blocks = [];
-    /** @var int[] */
     public array $coords = [];
+    /** @var int[] */
+    public array $blocks = [];
+
+    /** @var string */
+    public string $compressedCoords;
+    /** @var string */
+    public string $compressedBlocks;
 
     /** @var int */
     public int $offset = 0;
@@ -169,14 +185,83 @@ class BlockArray implements UpdateLevelData {
         return $this->coords;
     }
 
+    public function compress(bool $cleanDecompressed = true): void {
+        $coords = pack("q*", ...$this->coords);
+        $blocks = pack("N*", ...$this->blocks);
+
+        if($coords === false || $blocks === false) {
+            throw new InvalidStateException("Error whilst compressing");
+        }
+
+        $this->compressedCoords = $coords;
+        $this->compressedBlocks = $blocks;
+
+        if($cleanDecompressed) {
+            $this->coords = [];
+            $this->blocks = [];
+        }
+    }
+
+    public function decompress(bool $cleanCompressed = true): void {
+        $coords = unpack("q*", $this->compressedCoords);
+        $blocks = unpack("N*", $this->compressedBlocks);
+
+        if($coords === false || $blocks === false) {
+            throw new InvalidStateException("Error whilst decompressing");
+        }
+
+        $this->coords = array_values($coords);
+        $this->blocks = array_values($blocks);
+
+        if($cleanCompressed) {
+            unset($this->compressedCoords);
+            unset($this->compressedBlocks);
+        }
+    }
+
     /**
      * Removes all the blocks whose were checked already
-     * For cleaning duplicate cache use cancelDuplicateDetection()
      */
     public function cleanGarbage(): void {
         $this->coords = array_slice($this->coords, $this->offset);
         $this->blocks = array_slice($this->blocks, $this->offset);
 
         $this->offset = 0;
+    }
+
+    public function serialize() {
+        $this->compress();
+
+        $nbt = new CompoundTag("BlockArray");
+        $nbt->setByteArray("Coords", $this->compressedCoords);
+        $nbt->setByteArray("Blocks", $this->compressedBlocks);
+        $nbt->setByte("DuplicateDetection", $this->detectDuplicates ? 1 : 0);
+
+        $stream = new BigEndianNBTStream();
+        $buffer = $stream->writeCompressed($nbt);
+
+        if($buffer === false) {
+            return null;
+        }
+
+        return $buffer;
+    }
+
+    public function unserialize($data): void {
+        if(!is_string($data)) {
+            return;
+        }
+
+        /** @var CompoundTag $nbt */
+        $nbt = (new BigEndianNBTStream())->readCompressed($data);
+        if(!$nbt->hasTag("Coords", ByteArrayTag::class) || !$nbt->hasTag("Blocks", ByteArrayTag::class) || !$nbt->hasTag("DuplicateDetection", ByteTag::class)) {
+            return;
+        }
+
+        $this->compressedCoords = $nbt->getByteArray("Coords");
+        $this->compressedBlocks = $nbt->getByteArray("Blocks");
+        $this->detectDuplicates = $nbt->getByte("DuplicateDetection") == 1;
+
+        $this->decompress();
     }
 }

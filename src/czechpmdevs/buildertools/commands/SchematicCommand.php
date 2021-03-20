@@ -21,7 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\schematics\SchematicActionResult;
+use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -38,63 +39,67 @@ class SchematicCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        if(!isset($args[0]) || !in_array($args[0], ["load", "reload", "list", "paste", "create"])) {
-            $sender->sendMessage("§cUsage: §7//schem <reload|load|create|list|paste> [filename]");
+        if(!isset($args[0]) || !in_array($args[0], ["load", "list", "paste", "create"])) {
+            $sender->sendMessage("§cUsage: §7//schem <load|create|list|paste> [filename]");
             return;
         }
+
         switch ($args[0]) {
             case "create":
                 if(!isset($args[1])) {
-                    $sender->sendMessage("§cUsage: §7//schem <create> <filename>");
+                    $sender->sendMessage("§cUsage: §7//schem <create> <name>");
                     break;
                 }
 
-                if(!Selectors::isSelected(1, $sender)) {
-                    $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
-                    return;
+                if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+                    break;
                 }
 
-                if(!Selectors::isSelected(2, $sender)) {
-                    $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
-                    return;
-                }
+                $sender->sendMessage(BuilderTools::getPrefix() . "§6Saving schematic...");
+                SchematicsManager::createSchematic($sender, $firstPos, $secondPos, $args[1], function (SchematicActionResult $result) use ($sender): void {
+                    if($result->successful()) {
+                        $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic saved! (Took {$result->getProcessTime()} seconds)");
+                        return;
+                    }
 
-                $fileName = stripos($args[1], ".schematic") === false ? $args[1] . ".schematic" : str_replace(".schematic", "", $args[1]) . ".schematic";
-                $fileName = $this->getPlugin()->getDataFolder() . "schematics/" . $fileName;
-
-                BuilderTools::getSchematicsManager()->createSchematic($sender, $fileName);
-
-                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic will be saved as $fileName");
+                    $sender->sendMessage(BuilderTools::getPrefix() . "§cUnable to create schematic: {$result->getErrorMessage()}");
+                });
                 break;
+
             case "load":
                 if(!isset($args[1])) {
-                    $sender->sendMessage("§cUsage: §7//schem <load> <filename>");
+                    $sender->sendMessage("§cUsage: §7//schem load <name>");
                     break;
                 }
 
-                $schematic = BuilderTools::getSchematicsManager()->getSchematic(str_replace(".schematic", "", $args[1]));
+                SchematicsManager::loadSchematic($args[1], function (SchematicActionResult $result) use ($args, $sender): void {
+                    if($result->successful()) {
+                        $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic loaded in {$result->getProcessTime()} seconds, to paste schematic use §e//schem paste $args[1]§a!");
+                        return;
+                    }
 
-                if($schematic === null) {
-                    $sender->sendMessage(BuilderTools::getPrefix() . "§cSchematic was not found!");
-                    break;
-                }
-
-                BuilderTools::getSchematicsManager()->addToPaste($sender, $schematic);
-                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic copied to clipboard, type §2//schem paste§a to paste!");
+                    $sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst loading schematic: {$result->getErrorMessage()}");
+                });
                 break;
+
             case "paste":
-                BuilderTools::getSchematicsManager()->pasteSchematic($sender);
-                break;
-            case "list":
-                $list = [];
-                foreach (BuilderTools::getSchematicsManager()->getAllSchematics() as $name => $schematic) {
-                    $list[] = $name;
+                if(!isset($args[1])) {
+                    $sender->sendMessage("§cUsage: §7//schem paste <name>");
+                    break;
                 }
-                $sender->sendMessage(BuilderTools::getPrefix() . count($list) . " loaded schematics: " . implode(", ", $list));
+
+                $result = SchematicsManager::pasteSchematic($sender, $args[1]);
+                if($result->successful()) {
+                    $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic pasted, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
+                    break;
+                }
+
+                $sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst pasting schematic: {$result->getErrorMessage()}");
                 break;
-            case "reload":
-                BuilderTools::getSchematicsManager()->loadSchematics();
-                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematics reloaded. Type §2//schem list §ato get list of all loaded schematics.");
+
+            case "list":
+                $loaded = SchematicsManager::getLoadedSchematics();
+                $sender->sendMessage(BuilderTools::getPrefix() . count($loaded) . " loaded schematics: " . implode(", ", $loaded));
                 break;
         }
     }

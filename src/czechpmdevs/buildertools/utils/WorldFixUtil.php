@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\utils;
 
-use czechpmdevs\buildertools\async\WorldFixTask;
+use czechpmdevs\buildertools\async\convert\WorldFixTask;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;

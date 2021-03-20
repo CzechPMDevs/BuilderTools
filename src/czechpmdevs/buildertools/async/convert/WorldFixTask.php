@@ -18,7 +18,7 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\async;
+namespace czechpmdevs\buildertools\async\convert;
 
 use czechpmdevs\buildertools\editors\Fixer;
 use Error;
