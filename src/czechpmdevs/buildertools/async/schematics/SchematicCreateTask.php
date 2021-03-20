@@ -43,6 +43,7 @@ class SchematicCreateTask extends BuilderToolsAsyncTask {
         $this->blockArray = serialize($blockArray);
     }
 
+    /** @noinspection PhpUnused */
     public function onRun() {
         $blockArray = unserialize($this->blockArray);
         if(!$blockArray instanceof BlockArray) {

@@ -40,7 +40,7 @@ class SchematicCommand extends BuilderToolsCommand {
             return;
         }
         if(!isset($args[0]) || !in_array($args[0], ["load", "list", "paste", "create"])) {
-            $sender->sendMessage("§cUsage: §7//schem <load|create|list|paste> [filename]");
+            $sender->sendMessage("§cUsage: §7//schem <load|unload|create|list|paste> [filename]");
             return;
         }
 
@@ -81,7 +81,19 @@ class SchematicCommand extends BuilderToolsCommand {
                     $sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst loading schematic: {$result->getErrorMessage()}");
                 });
                 break;
+            case "unload":
+                if(!isset($args[1])) {
+                    $sender->sendMessage("§cUsage: §7//schem unload <name>");
+                    break;
+                }
 
+                if(!SchematicsManager::unloadSchematic($args[1])) {
+                    $sender->sendMessage(BuilderTools::getPrefix() . "§cSchematic $args[1] is not loaded.");
+                    break;
+                }
+
+                $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic $args[1] unloaded from memory!");
+                break;
             case "paste":
                 if(!isset($args[1])) {
                     $sender->sendMessage("§cUsage: §7//schem paste <name>");

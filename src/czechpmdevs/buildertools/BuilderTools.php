@@ -76,7 +76,10 @@ class BuilderTools extends PluginBase {
     /** @var Command[] */
     private static array $commands = [];
 
-    /** @var mixed[] */
+    /**
+     * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
+     * @phpstan-var mixed[]
+     */
     private static array $configuration = [];
 
     /** @noinspection PhpUnused */
@@ -92,6 +95,7 @@ class BuilderTools extends PluginBase {
         $this->sendWarnings();
     }
 
+    /** @noinspection PhpUnused */
     public function onDisable() {
         $this->cleanCache();
     }
@@ -191,6 +195,7 @@ class BuilderTools extends PluginBase {
     }
 
     /**
+     * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
      * @phpstan-return mixed[]
      */
     public static function getConfiguration(): array {

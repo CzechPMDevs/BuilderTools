@@ -38,9 +38,6 @@ class MCEditSchematic implements Schematic {
     public const MATERIALS_BEDROCK = "Pocket";
     public const MATERIALS_ALPHA = "Alpha";
 
-    /** @var string */
-    protected string $materialType = self::MATERIALS_BEDROCK;
-
     /**
      * @throws SchematicException
      */
@@ -140,11 +137,10 @@ class MCEditSchematic implements Schematic {
         $xz = $width * $length;
         $totalSize = $xz * $height;
 
-
         $blocks = $data = str_repeat(chr(0), $totalSize);
         while ($blockArray->hasNext()) {
             $blockArray->readNext($x, $y, $z, $id, $meta);
-            $key = $z + ($length * $x) + ($xz * $y);
+            $key = $z + ($width * $x) + ($xz * $y);
 
             $blocks[$key] = chr($id);
             $data[$key] = chr($meta);
@@ -178,6 +174,7 @@ class MCEditSchematic implements Schematic {
         $nbt->setByteArray("Data", $data);
     }
 
+    /** @noinspection PhpSameParameterValueInspection */
     private function writeMaterials(CompoundTag $nbt, string $materials): void {
         $nbt->setString("Materials", $materials);
     }

@@ -31,6 +31,7 @@ abstract class BuilderToolsAsyncTask extends AsyncTask {
      */
     public function complete(): void {}
 
+    /** @noinspection PhpUnused */
     final public function onCompletion(Server $server) {
         $this->complete();
         AsyncQueue::callCallback($this);

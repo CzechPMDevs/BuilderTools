@@ -76,6 +76,7 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
         return "bt.cmd." . str_replace("/", "", strtolower($name));
     }
 
+    /** @noinspection PhpUnused */
     public function getPlugin(): Plugin {
         return BuilderTools::getInstance();
     }

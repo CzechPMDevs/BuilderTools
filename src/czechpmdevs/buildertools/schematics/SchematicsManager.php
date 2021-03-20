@@ -118,27 +118,23 @@ class SchematicsManager {
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $floorX = $player->getFloorX();
-        $floorY = $player->getFloorY();
-        $floorZ = $player->getFloorZ();
-
         for($y = $minY; $y <= $maxY; ++$y) {
             for($x = $minX; $x <= $maxX; ++$x) {
                 for($z = $minZ; $z <= $maxZ; ++$z) {
                     $fillSession->getBlockAt($x, $y, $z, $id, $meta);
-                    $blocks->addBlockAt($x - $floorX, $y - $floorY, $z - $floorZ, $id, $meta);
+                    $blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $id, $meta);
                 }
             }
         }
 
         /** @phpstan-ignore-next-line */
-        AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $blocks), function (SchematicCreateTask $task) use ($startTime): void {
+        AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $blocks), function (SchematicCreateTask $task) use ($callback, $startTime): void {
             if($task->error !== null) {
-                SchematicActionResult::error($task->error);
+                $callback(SchematicActionResult::error($task->error));
                 return;
             }
 
-            SchematicActionResult::success(microtime(true) - $startTime);
+            $callback(SchematicActionResult::success(microtime(true) - $startTime));
         });
     }
 
@@ -162,6 +158,10 @@ class SchematicsManager {
             $schematic->readNext($x, $y, $z, $id, $meta);
             if($id != 0)
                 $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+        }
+
+        if($fillSession->getBlocksChanged() == 0) {
+            return EditorResult::error("0 blocks changed");
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());

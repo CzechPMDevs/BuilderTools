@@ -79,11 +79,11 @@ class Canceller {
             return EditorResult::error("There are not any actions to undo");
         };
 
-        if(!ClipboardManager::hasActionToUndo($player)) {
+        if(!ClipboardManager::hasActionToRedo($player)) {
             return $error();
         }
 
-        $redoAction = ClipboardManager::getNextUndoAction($player);
+        $redoAction = ClipboardManager::getNextRedoAction($player);
         if($redoAction === null) {
             return $error();
         }

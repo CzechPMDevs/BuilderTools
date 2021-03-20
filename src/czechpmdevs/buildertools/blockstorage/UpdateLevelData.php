@@ -35,12 +35,6 @@ interface UpdateLevelData {
     public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
 
     /**
-     * Returns how many blocks should have been
-     * updated
-     */
-    public function size(): int;
-
-    /**
      * Should not be null when used in filler
      */
     public function getLevel(): ?ChunkManager;

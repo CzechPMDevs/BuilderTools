@@ -69,6 +69,8 @@ final class BlockArraySizeData {
                 $this->minZ = $z;
             }
         }
+
+        $this->blockArray->offset = 0;
     }
 
     /**

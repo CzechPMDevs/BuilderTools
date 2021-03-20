@@ -42,6 +42,7 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
         $this->file = $file;
     }
 
+    /** @noinspection PhpUnused */
     public function onRun() {
         if(!file_exists($this->file)) {
             $this->error = "File not found.";

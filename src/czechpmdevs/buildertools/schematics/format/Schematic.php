@@ -29,7 +29,8 @@ interface Schematic {
      * Function which should be used to load schematics and
      * convert it to BlockArray.
      *
-     * - It should be independent on main thread classes
+     * - It should be independent on main thread classes if used
+     *   on pmmp server
      *
      * @throws SchematicException
      */
@@ -39,7 +40,8 @@ interface Schematic {
      * Function which should be used to save schematics from
      * BlockArray as string.
      *
-     * - It should be independent on main thread classes
+     * - It should be independent on main thread classes if used
+     *   on pmmp server
      *
      * @throws SchematicException
      */

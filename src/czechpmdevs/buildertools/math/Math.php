@@ -60,14 +60,6 @@ class Math {
         return ($x ** 2) + ($y ** 2) + ($z ** 2);
     }
 
-    public static function calculateAxisVec(Vector3 $pos1, Vector3 $pos2): Vector3 {
-        $width = max($pos1->getX(), $pos2->getX()) - min($pos1->getX(), $pos2->getX());
-        $height = max($pos1->getY(), $pos2->getY()) - min($pos1->getY(), $pos2->getY());
-        $length = max($pos1->getZ(), $pos2->getZ()) - min($pos1->getZ(), $pos2->getZ());
-
-        return (new Vector3($width, $height, $length))->add(1, 1, 1);
-    }
-
     public static function calculateMinAndMaxValues(Vector3 $pos1, Vector3 $pos2, bool $clampY, ?int &$minX, ?int &$maxX, ?int &$minY, ?int &$maxY, ?int &$minZ, ?int &$maxZ): void {
         $minX = (int)min($pos1->getX(), $pos2->getX());
         $maxX = (int)max($pos1->getX(), $pos2->getX());

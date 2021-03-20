@@ -28,7 +28,6 @@ use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntArrayTag;
 use Serializable;
 use function array_slice;
 use function array_values;
@@ -118,13 +117,6 @@ class BlockArray implements UpdateLevelData, Serializable {
     }
 
     /**
-     * @return int $size
-     */
-    public function size(): int {
-        return count($this->coords);
-    }
-
-    /**
      * Adds Vector3 to all the blocks in BlockArray
      */
     public function addVector3(Vector3 $vector3): BlockArray {
@@ -186,7 +178,9 @@ class BlockArray implements UpdateLevelData, Serializable {
     }
 
     public function compress(bool $cleanDecompressed = true): void {
+        /** @phpstan-var string|false $coords */
         $coords = pack("q*", ...$this->coords);
+        /** @phpstan-var string|false $blocks */
         $blocks = pack("N*", ...$this->blocks);
 
         if($coords === false || $blocks === false) {
@@ -229,7 +223,7 @@ class BlockArray implements UpdateLevelData, Serializable {
         $this->offset = 0;
     }
 
-    public function serialize() {
+    public function serialize(): ?string {
         $this->compress();
 
         $nbt = new CompoundTag("BlockArray");
