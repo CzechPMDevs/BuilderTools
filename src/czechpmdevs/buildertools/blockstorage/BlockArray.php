@@ -197,9 +197,9 @@ class BlockArray implements UpdateLevelData, Serializable {
     }
 
     public function decompress(bool $cleanCompressed = true): void {
-        /** @phpstan-var array|false $coords */
+        /** @phpstan-var int[]|false $coords */
         $coords = unpack("q*", $this->compressedCoords);
-        /** @phpstan-var array|false $coords */
+        /** @phpstan-var int[]|false $coords */
         $blocks = unpack("N*", $this->compressedBlocks);
 
         if($coords === false || $blocks === false) {
