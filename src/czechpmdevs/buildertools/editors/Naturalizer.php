@@ -59,7 +59,7 @@ class Naturalizer {
 
         if($blockY === null) return;
 
-        for($y = $blockY; $y > $minY; $y--) {
+        for($y = $blockY; $y > $minY; --$y) {
             switch ($blockY-$y) {
                 case 0:
                     $list->addBlock(new Vector3($x, $y, $z), BlockIds::GRASS, 0);
