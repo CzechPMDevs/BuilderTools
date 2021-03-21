@@ -297,6 +297,7 @@ class Copier {
                         $fillSession->setBlockAt($x, $y, $z, 0, 0);
                     }
 
+                    /** @phpstan-var int $finalY */
                     $finalY = $floorY + $y;
                     if($finalY >= 0 && $finalY <= 255) {
                         $fillSession->setBlockAt($floorX + $x, $finalY, $floorZ + $z, $id, $meta);
