@@ -1,4 +1,4 @@
-<a align="center"><img src="https://i.ibb.co/Zhkf4xF/Builder-Tools-v1-2-0-beta1.png"></a>  
+<a align="center"><img src="https://i.ibb.co/Hqq6Z3R/bt.png"></a>  
   
 <p align="center">  
    <a href="https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools">  
@@ -24,34 +24,37 @@
     <br>  
     ✔️ Supports fast filling  
     <br>  
-    ✔️ Schematics support  
-    <br>  
-    ✔️Simple hill making  
+    ✔️ Supports schematics  
     <br>  
     ✔️ Minecraft: Java Version maps world fixer  
     <br>  
-    ✔️ Supports last pocketmine api version  
+    ✔️ Supports last pocketmine API version  
     <br><br>  
 </p>  
   
-## 👍 1.2 Update:  
-> - Plugin cleanup  
-> - Lots of new commands  
-> - Plugin now supports 4.0.0 api versions too  
-> - Bug fixes  
-> - Schematics support  
+## 👍 1.2.0-beta3 Update:  
+> - Plugin cleanup
+> - Memory & CPU optimization
+> - Schematics are now created & saved asynchronously
+> - Bug fixes
+> - New commands (`//wals`, `//cut`, `//center`, `//d`)
+> - Changed permissions prefix from `bt` to `buildertools`
+> - `//fix` command now fixes whole world asynchronously
+> - Dropped support for php 7.3 & PocketMine api versions lower than 3.16.0
   
   
   
 ## ⬇️ Downloads:  
   
-| Version | Phar Download | Zip Download | API | Stable | Pre release |  
-| --- | --- | --- | --- | --- | --- | 
-| 1.2.0-beta1 | - | - | 3.x.x, 4.x.x | ✔️ | ✔️ |  
-| 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | 3.x.x | ✔️ | ❌ |  
-| 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ✔️ | ✔️|  
-| 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ❌ | ✔️|  
-| 1.0.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.0.0/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.0.0.zip) | 3.0.0-ALPHA7 | ✔️ | ❌|  
+| Version | Phar Download | Zip Download | API | Min php version |
+| --- | --- | --- | --- | --- |
+| 1.2.0-beta3 | [Try latest dev version from Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta2 | [Poggit](https://poggit.pmmp.io/r/62312/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/41b127a689d523683f8cd3c5e3704688073a818f.zip) | 3.x.x | 7.0 |
+| 1.2.0-beta1 | [Poggit](https://poggit.pmmp.io/r/55728/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/648661f756b8bd8c89582e637ee864f9411763a2.zip) | 3.x.x | 7.0 |
+| 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | 3.x.x | 7.0 |
+| 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta2) | 3.x.x | 7.0 |
+| 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | 7.0 |
+| 1.0.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.0.0/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.0.0.zip) | 3.0.0-ALPHA7 | 7.0 |
   
 <br>  
   
@@ -125,39 +128,40 @@
   
 **All BuilderTools Permissions:**
   
-| Permission | Command | Opertor |  
+| Permission | Command | Operator Permissions required |  
 | --- | --- | --- |  
-| bt.cmd.help | `//commands` | ✔️ |  
-| bt.cmd.pos1 | `//pos1` | ✔️ |  
-| bt.cmd.pos2 | `//pos2` | ✔️ |  
-| bt.cmd.fill | `//fill` | ✔️ |  
-| bt.cmd.wand | `//wand` | ✔️ |  
-| bt.cmd.sphere | `//sphere` | ✔️ |  
-| bt.cmd.cube | `//cube` | ✔️ |  
-| bt.cmd.draw | `//draw` | ✔️ |  
-| bt.cmd.copy | `//copy` | ✔️ |  
-| bt.cmd.paste | `//paste` | ✔️ |  
-| bt.cmd.merge | `//merge` | ✔️ |  
-| bt.cmd.rotate | `//rotate` | ✔️ |  
-| bt.cmd.flip | `//flip` | ✔️ |  
-| bt.cmd.undo | `//undo` | ✔️ |  
-| bt.cmd.fix | `//fix` | ✔️ |  
-| bt.cmd.tree | `//tree` | ✔️ |  
-| bt.cmd.naturalize | `//naturalize` | ✔️ |  
-| bt.cmd.id | `//id` | ✔️ |  
-| bt.cmd.clearinventory | `//clearinventory` | ✔️ |  
-| bt.cmd.blockinfo | `//blockinfo` | ✔️ |  
-| bt.cmd.hsphere | `//hsphere` | ✔️ |  
-| bt.cmd.hcube | `//hcube` | ✔️ |  
-| bt.cmd.schematic | `//schematic` | ✔️ |  
-| bt.cmd.cylinder | `//cylinder` | ✔️ |  
-| bt.cmd.hcylinder | `//hcylinder` | ✔️ |  
-| bt.cmd.pyramid | `//pyramid` | ✔️ |  
-| bt.cmd.hpyramid | `//hpyramid` | ✔️ |  
-| bt.cmd.stack | `//stack` | ✔️ |  
-| bt.cmd.outline | `//outline` | ✔️ |  
-| bt.cmd.move | `//move` | ✔️ |  
-| bt.cmd.schematic | `//schematic` | ✔️ |  
+| buildertools.command.help | `//commands` | ✔️ |  
+| buildertools.command.blockinfo | `//blockinfo` | ✔️ |  
+| buildertools.command.clearinventory | `//clearinventory` | ✔️ |  
+| buildertools.command.copy | `//copy` | ✔️ |  
+| buildertools.command.cube | `//cube` | 
+| buildertools.command.cut | `//cut` | ✔️ |
+| buildertools.command.cylinder | `//cylinder` | ✔️ |
+| buildertools.command.decoration | `//decoration` | ✔️ |
+| buildertools.command.draw | `//draw` | ✔️ |  
+| buildertools.command.fill | `//fill` | ✔️ |  
+| buildertools.command.fix | `//fix` | ✔️ |
+| buildertools.command.hcube | `//hcube` | ✔️ |  
+| buildertools.command.hcylinder | `//hcylinder` | ✔️ |  
+| buildertools.command.hpyramid | `//hpyramid` | ✔️ |  
+| buildertools.command.hsphere | `//hsphere` | ✔️ |  
+| buildertools.command.id | `//id` | ✔️ |  
+| buildertools.command.merge | `//merge` | ✔️ |  
+| buildertools.command.move | `//move` | ✔️ |  
+| buildertools.command.naturalize | `//naturalize` | ✔️ |  
+| buildertools.command.outline | `//outline` | ✔️ |  
+| buildertools.command.paste | `//paste` | ✔️ |  
+| buildertools.command.pos1 | `//pos1` | ✔️ |  
+| buildertools.command.pos2 | `//pos2` | ✔️ |  
+| buildertools.command.pyramid | `//pyramid` | ✔️ |  
+| buildertools.command.rotate | `//rotate` | ✔️ |  
+| buildertools.command.schematic | `//schematic` | ✔️ |  
+| buildertools.command.sphere | `//sphere` | ✔️ |  
+| buildertools.command.stack | `//stack` | ✔️ |  
+| buildertools.command.tree | `//tree` | ✔️ |  
+| buildertools.command.undo | `//undo` | ✔️ |
+| buildertools.command.walls | `//walls` | ✔️ |
+| buildertools.command.wand | `//wand` | ✔️ |  
   
 ## 🔧 Configuration  
 - New in 1.2  
@@ -166,13 +170,8 @@
 ```yaml  
 ---
 # Do not change this!
-config-version: 1.2.0    
-    
-schematics:    
-  # Available modes: startup, oncommand    
-  # - startup - when plugin starts, all schematics will loaded
-  # - oncommand - schematics will been loaded when player use '//schem load' command
- load: startup    
+config-version: 1.2.1    
+
  items:    
   wand-axe:    
     enabled: true    
@@ -188,7 +187,7 @@ schematics:
 ## 💰 Credits  
   
 - Icon made by [Freepik](http://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")  
-- Spawn built by FlammyNetwork's builder team  
+- Seabuild spawn built by CryptoKey
 
 <br>
 

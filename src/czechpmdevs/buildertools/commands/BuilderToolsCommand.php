@@ -73,7 +73,7 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
     }
 
     private function getPerms(string $name): string {
-        return "bt.cmd." . str_replace("/", "", strtolower($name));
+        return "buildertools.command." . str_replace("/", "", strtolower($name));
     }
 
     /** @noinspection PhpUnused */

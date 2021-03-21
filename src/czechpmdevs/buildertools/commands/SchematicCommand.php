@@ -39,12 +39,12 @@ class SchematicCommand extends BuilderToolsCommand {
             $sender->sendMessage("§cThis command can be used only in game!");
             return;
         }
-        if(!isset($args[0]) || !in_array($args[0], ["load", "list", "paste", "create"])) {
+        if(!isset($args[0]) || !in_array($args[0], ["load", "unload", "list", "paste", "create"])) {
             $sender->sendMessage("§cUsage: §7//schem <load|unload|create|list|paste> [filename]");
             return;
         }
 
-        switch ($args[0]) {
+        switch ($args[0]):
             case "create":
                 if(!isset($args[1])) {
                     $sender->sendMessage("§cUsage: §7//schem <create> <name>");
@@ -81,6 +81,7 @@ class SchematicCommand extends BuilderToolsCommand {
                     $sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst loading schematic: {$result->getErrorMessage()}");
                 });
                 break;
+
             case "unload":
                 if(!isset($args[1])) {
                     $sender->sendMessage("§cUsage: §7//schem unload <name>");
@@ -94,6 +95,7 @@ class SchematicCommand extends BuilderToolsCommand {
 
                 $sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic $args[1] unloaded from memory!");
                 break;
+
             case "paste":
                 if(!isset($args[1])) {
                     $sender->sendMessage("§cUsage: §7//schem paste <name>");
@@ -111,8 +113,11 @@ class SchematicCommand extends BuilderToolsCommand {
 
             case "list":
                 $loaded = SchematicsManager::getLoadedSchematics();
+                if(count($loaded) == 0) {
+                    $sender->sendMessage(BuilderTools::getPrefix() . "§cThere aren't any loaded schematics on the server");
+                }
                 $sender->sendMessage(BuilderTools::getPrefix() . count($loaded) . " loaded schematics: " . implode(", ", $loaded));
                 break;
-        }
+        endswitch;
     }
 }

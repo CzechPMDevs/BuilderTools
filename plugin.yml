@@ -10,107 +10,110 @@ extensions:
   Core: '>=7.4'
 
 permissions:
-  bt.cmd:
+  buildertools.cmd:
     default: op
     description: Permissions for all BuilderTools commands
     children:
-      bt.cmd.blockinfo:
+      buildertools.command.blockinfo:
         description: Permissions for //blockinfo
         default: op
-      bt.cmd.clearinventory:
+      buildertools.command.clearinventory:
         description: Permissions for //clearinventory
         default: op
-      bt.cmd.copy:
+      buildertools.command.copy:
         description: Permissions for //copy
         default: op
-      bt.cmd.cube:
+      buildertools.command.cube:
         description: Permissions for //cube
         default: op
-      bt.cmd.cut:
+      buildertools.command.cut:
         description: Permissions for //cut
         default: op
-      bt.cmd.cylinder:
+      buildertools.command.cylinder:
         description: Permission for //cylinder
         default: op
-      bt.cmd.decoration:
+      buildertools.command.decoration:
         description: Permission for //decoration
         default: op
-      bt.cmd.draw:
+      buildertools.command.draw:
         description: Permission for //draw
         default: op
-      bt.cmd.fill:
+      buildertools.command.fill:
         descripion: Permissions for //fill
         default: op
-      bt.cmd.pos1:
+      buildertools.command.pos1:
         description: Permissions for //pos1
         default: op
-      bt.cmd.fix:
+      buildertools.command.fix:
         descripion: Permissions for //fix
         default: op
-      bt.cmd.help:
+      buildertools.command.help:
         description: Permissions for //commands
         default: op
-      bt.cmd.hcube:
+      buildertools.command.hcube:
         description: Permission for //hcube
         default: op
-      bt.cmd.hcylinder:
+      buildertools.command.hcylinder:
         description: Permission for //hcylinder
         default: op
-      bt.cmd.hpyrdamid:
+      buildertools.command.hpyrdamid:
         description: Permission for //hpyramid
         default: op
-      bt.cmd.hsphere:
+      buildertools.command.hsphere:
         descripton: Permissions for //hsphere
         default: op
-      bt.cmd.id:
+      buildertools.command.id:
         description: Permissions for //id
         default: op
-      bt.cmd.merge:
+      buildertools.command.merge:
         description: Permissions for //merge
         default: op
-      bt.cmd.move:
+      buildertools.command.move:
         description: Permission for //move
         default: op
-      bt.cmd.naturalize:
+      buildertools.command.naturalize:
         description: Permissions for //naturalize
         default: op
-      bt.cmd.outline:
+      buildertools.command.outline:
         description: Permission for //outline
         default: op
-      bt.cmd.paste:
+      buildertools.command.paste:
         description: Permissions for //paste
         default: op
-      bt.cmd.pyrdamid:
+      buildertools.command.pyrdamid:
         description: Permission for //pyramid
         default: op
-      bt.cmd.redo:
+      buildertools.command.redo:
         description: Permission for //redo
         default: op
-      bt.cmd.replace:
+      buildertools.command.replace:
         description: Permission for //replace
         default: op
-      bt.cmd.rotate:
+      buildertools.command.rotate:
         description: Permission for //rotate
         default: op
-      bt.cmd.schematic:
+      buildertools.command.schematic:
         description: Permission for //schematics
         default: op
-      bt.cmd.pos2:
+      buildertools.command.pos2:
         description: Permissions for //pos2
         default: op
-      bt.cmd.sphere:
+      buildertools.command.sphere:
         description: Permissions for //sphere
         default: op
-      bt.cmd.stack:
+      buildertools.command.stack:
         description: Permission for //stack
         default: op
-      bt.cmd.tree:
+      buildertools.command.tree:
         description: Permission for //tree
         default: op
-      bt.cmd.undo:
+      buildertools.command.undo:
         description: Permission for //undo
         default: op
-      bt.cmd.wand:
+      buildertools.command.walls:
+        description: Permission for //walls
+        default: op
+      buildertools.command.wand:
         description: Permissions for //wand
         default: op
 
