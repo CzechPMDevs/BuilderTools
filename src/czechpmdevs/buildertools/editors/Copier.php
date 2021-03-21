@@ -247,7 +247,9 @@ class Copier {
                 $j = $i * $ySize;
                 while ($temporaryBlockArray->hasNext()) {
                     $temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
-                    $fillSession->setBlockAt($x, $y + $j, $z, $id, $meta);
+                    if($y >= 0 && $y <= 255) {
+                        $fillSession->setBlockAt($x, $y + $j, $z, $id, $meta);
+                    }
                 }
 
                 // Resets array header

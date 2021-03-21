@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\utils;
 
 use ArrayOutOfBoundsException;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
+use InvalidArgumentException;
 use pocketmine\item\ItemFactory;
 
 final class StringToBlockDecoder implements BlockIdentifierList {
@@ -87,7 +88,13 @@ final class StringToBlockDecoder implements BlockIdentifierList {
                 $block = substr($entry, $pos + 1);
             }
 
-            $item = ItemFactory::fromStringSingle($block);
+            try {
+                $item = ItemFactory::fromStringSingle($block);
+            }
+            catch (InvalidArgumentException $ignore) {
+                continue; // Item not found
+            }
+
             $class = $item->getBlock();
             if($class->getId() == 0 && $item->getId() != 0) {
                 continue;

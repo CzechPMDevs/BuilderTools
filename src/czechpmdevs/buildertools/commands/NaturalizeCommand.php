@@ -43,7 +43,7 @@ class NaturalizeCommand extends BuilderToolsCommand {
             return;
         }
 
-        $result = Naturalizer::getInstance()->naturalize($firstPos->getFloorX(), $firstPos->getFloorY(), $firstPos->getFloorY(), $secondPos->getFloorX(), $secondPos->getFloorY(), $secondPos->getFloorZ(), $sender->getLevelNonNull(), $sender);
+        $result = Naturalizer::getInstance()->naturalize($firstPos, $secondPos, $sender);
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
     }
 }

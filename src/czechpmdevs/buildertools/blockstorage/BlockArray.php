@@ -203,7 +203,7 @@ class BlockArray implements UpdateLevelData, Serializable {
         $blocks = unpack("N*", $this->compressedBlocks);
 
         /** @phpstan-ignore-next-line */
-        if($coords === false || $blocks === false) {
+        if($coords === false || $blocks === false) { // Somehow poggit has problem with that
             throw new InvalidStateException("Error whilst decompressing");
         }
 

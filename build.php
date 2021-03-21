@@ -7,7 +7,7 @@ declare(strict_types=1);
  */
 
 // For example C:/pmmp-server/plugins/BuilderTools.phar
-const CUSTOM_OUTPUT_PATH = "";
+const CUSTOM_OUTPUT_PATH = "C:\Users\stehl\Desktop\pmmp\plugins\BuilderTools.phar";
 const COMPRESS_FILES = true;
 const COMPRESSION = Phar::GZ;
 
