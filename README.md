@@ -17,7 +17,7 @@
       <img src="https://img.shields.io/github/license/CzechPMDevs/BuilderTools.svg?style=flat-square">  
    </a>  
    <a href="https://poggit.pmmp.io/p/BuilderTools">  
-      <img src="https://poggit.pmmp.io/shield.state/BuilderTools?style=flat-square">  
+      <img src="https://poggit.pmmp.io/shield.downloads/BuilderTools?style=flat-square">  
    </a>  
 <br><br>  
    ✔️ Advanced WorldEdit commands  

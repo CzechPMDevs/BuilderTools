@@ -21,12 +21,18 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use InvalidArgumentException;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use function pack;
+use function unpack;
 
 class SelectionData extends BlockArray {
 
     /** @var Vector3|null */
     protected ?Vector3 $playerPosition = null;
+
+    /** @var string */
+    public string $compressedPlayerPosition;
 
     /**
      * @param bool $modifyBuffer If it's false, only relative position will be changed.
@@ -58,5 +64,28 @@ class SelectionData extends BlockArray {
         $this->playerPosition = $playerPosition === null ? null : $playerPosition->ceil();
 
         return $this;
+    }
+
+    public function compress(bool $cleanDecompressed = true): void {
+        parent::compress($cleanDecompressed);
+
+        $vector3 = $this->getPlayerPosition();
+        if($vector3 === null) {
+            return;
+        }
+
+        $this->compressedPlayerPosition = pack("q", Level::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
+    }
+
+    public function decompress(bool $cleanCompressed = true): void {
+        parent::decompress($cleanCompressed);
+
+        if(!isset($this->compressedPlayerPosition)) {
+            return;
+        }
+
+        /** @phpstan-ignore-next-line */
+        Level::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z);
+        $this->playerPosition = new Vector3($x, $y, $z);
     }
 }
