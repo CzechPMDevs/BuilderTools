@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\utils;
 
-use ArrayOutOfBoundsException;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use InvalidArgumentException;
-use pocketmine\item\ItemFactory;
+use OutOfBoundsException;
+use pocketmine\item\LegacyStringToItemParser;
 
 final class StringToBlockDecoder implements BlockIdentifierList {
 
@@ -50,7 +50,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 
     /**
      * Reads next block from the string,
-     * @throws ArrayOutOfBoundsException if string is not valid.
+     * @throws OutOfBoundsException if string is not valid.
      */
     public function nextBlock(?int &$id, ?int &$meta): void {
         $hash = $this->blockMap[array_rand($this->blockMap)];
@@ -62,8 +62,8 @@ final class StringToBlockDecoder implements BlockIdentifierList {
     /**
      * @return bool Returns if the block is in the array
      */
-    public function containsBlock(int $id, int $meta): bool {
-        return in_array($id << 4 | $meta, $this->blockMap);
+    public function containsBlock(int $blockHash): bool {
+        return in_array($blockHash, $this->blockMap);
     }
 
     /**
@@ -89,7 +89,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
             }
 
             try {
-                $item = ItemFactory::fromStringSingle($block);
+                $item = LegacyStringToItemParser::getInstance()->parse($block);
             }
             catch (InvalidArgumentException $ignore) {
                 continue; // Item not found
@@ -102,7 +102,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 
             for($i = 0; $i < $count; $i++) {
                 $this->blockIdMap[] = $class->getId();
-                $this->blockMap[] = $class->getId() << 4 | $class->getDamage();
+                $this->blockMap[] = $class->getId() << 4 | $class->getMeta();
             }
         }
     }

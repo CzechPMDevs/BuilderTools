@@ -29,7 +29,7 @@ use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
@@ -43,9 +43,9 @@ class Filler {
 
         $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        $fillSession->loadChunks($player->getLevelNonNull());
+        $fillSession->loadChunks($player->getWorld());
 
         if($hollow) {
             for($x = $minX; $x <= $maxX; ++$x) {
@@ -71,7 +71,7 @@ class Filler {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -87,9 +87,9 @@ class Filler {
 
         $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        $fillSession->loadChunks($player->getLevelNonNull());
+        $fillSession->loadChunks($player->getWorld());
 
         for($x = $minX; $x <= $maxX; ++$x) {
             for($z = $minZ; $z <= $maxZ; ++$z) {
@@ -102,7 +102,7 @@ class Filler {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -116,16 +116,16 @@ class Filler {
      * @link FillSession
      */
     public function fill(Player $player, UpdateLevelData $changes, ?Vector3 $relativePosition = null, bool $saveUndo = true, bool $saveRedo = false, bool $airMask = false): EditorResult {
-        if($changes->getLevel() === null) {
+        if($changes->getWorld() === null) {
             return EditorResult::error("Could not find world to process updates on.");
         }
 
         $startTime = microtime(true);
 
         if($airMask) {
-            $fillSession = new MaskedFillSession($changes->getLevel(), true, true, SingleBlockIdentifier::airIdentifier());
+            $fillSession = new MaskedFillSession($changes->getWorld(), true, true, SingleBlockIdentifier::airIdentifier());
         } else {
-            $fillSession = new FillSession($changes->getLevel(), true, $saveUndo || $saveRedo);
+            $fillSession = new FillSession($changes->getWorld(), true, $saveUndo || $saveRedo);
         }
 
         if($relativePosition === null) {

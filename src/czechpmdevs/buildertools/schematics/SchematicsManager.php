@@ -33,11 +33,11 @@ use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
 use Error;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ShortTag;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function array_keys;
 use function basename;
 use function file_exists;
@@ -45,6 +45,7 @@ use function microtime;
 use function pathinfo;
 use function touch;
 use function unserialize;
+use function zlib_decode;
 use const DIRECTORY_SEPARATOR;
 use const PATHINFO_EXTENSION;
 
@@ -113,7 +114,7 @@ class SchematicsManager {
             return;
         }
 
-        $fillSession = new FillSession($player->getLevelNonNull());
+        $fillSession = new FillSession($player->getWorld());
         $blocks = new BlockArray();
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
@@ -148,11 +149,11 @@ class SchematicsManager {
 
         $schematic = clone self::$loadedSchematics[$schematicName];
 
-        $fillSession = new FillSession($player->getLevelNonNull(), true, true);
+        $fillSession = new FillSession($player->getWorld(), true, true);
 
-        $floorX = $player->getFloorX();
-        $floorY = $player->getFloorY();
-        $floorZ = $player->getFloorZ();
+        $floorX = $player->getPosition()->getFloorX();
+        $floorY = $player->getPosition()->getFloorY();
+        $floorZ = $player->getPosition()->getFloorZ();
 
         while ($schematic->hasNext()) {
             $schematic->readNext($x, $y, $z, $id, $meta);
@@ -164,7 +165,7 @@ class SchematicsManager {
             return EditorResult::error("0 blocks changed");
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -194,7 +195,8 @@ class SchematicsManager {
      */
     public static function getSchematicFormat(string $rawData): ?string {
         try {
-            $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+            $root = (new BigEndianNbtSerializer())->read(zlib_decode($rawData));
+            $nbt = $root->getTag();
             if(!$nbt instanceof CompoundTag) {
                 return null;
             }

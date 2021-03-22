@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use pocketmine\level\ChunkManager;
+use pocketmine\world\ChunkManager;
 
 class MaskedFillSession extends FillSession {
 
@@ -42,19 +42,14 @@ class MaskedFillSession extends FillSession {
             return;
         }
 
-        if($this->mask !== null && !$this->mask->containsBlock(
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
-        )) {
+        if($this->mask !== null && !$this->mask->containsBlock($this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf))) {
             return;
         }
 
         $this->saveChanges($x, $y, $z);
 
         /** @phpstan-ignore-next-line */
-        $this->iterator->currentSubChunk->setBlock($x & 0xf, $y & 0xf, $z & 0xf, $id, $meta);
+        $this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4 | $meta);
         $this->blocksChanged++;
     }
 
@@ -66,19 +61,14 @@ class MaskedFillSession extends FillSession {
             return;
         }
 
-        if($this->mask !== null && !$this->mask->containsBlock(
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
-        )) {
+        if($this->mask !== null && !$this->mask->containsBlock($this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf))) {
             return;
         }
 
         $this->saveChanges($x, $y, $z);
 
         /** @phpstan-ignore-next-line */
-        $this->iterator->currentSubChunk->setBlockId($x & 0xf, $y & 0xf, $z & 0xf, $id);
+        $this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id);
         $this->blocksChanged++;
     }
 }

@@ -20,11 +20,11 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\utils;
 
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 
 class RotationHelper {
 
-    private const STAIRS_IDS = [BlockIds::COBBLESTONE_STAIRS, BlockIds::WOODEN_STAIRS, BlockIds::SPRUCE_STAIRS, BlockIds::BIRCH_STAIRS, BlockIds::JUNGLE_STAIRS, BlockIds::ACACIA_STAIRS, BlockIds::STONE_BRICK_STAIRS, BlockIds::SANDSTONE_STAIRS, BlockIds::RED_SANDSTONE_STAIRS, BlockIds::BRICK_STAIRS, BlockIds::NETHER_BRICK_STAIRS, BlockIds::QUARTZ_STAIRS, BlockIds::PURPUR_STAIRS];
+    private const STAIRS_IDS = [BlockLegacyIds::COBBLESTONE_STAIRS, BlockLegacyIds::WOODEN_STAIRS, BlockLegacyIds::SPRUCE_STAIRS, BlockLegacyIds::BIRCH_STAIRS, BlockLegacyIds::JUNGLE_STAIRS, BlockLegacyIds::ACACIA_STAIRS, BlockLegacyIds::STONE_BRICK_STAIRS, BlockLegacyIds::SANDSTONE_STAIRS, BlockLegacyIds::RED_SANDSTONE_STAIRS, BlockLegacyIds::BRICK_STAIRS, BlockLegacyIds::NETHER_BRICK_STAIRS, BlockLegacyIds::QUARTZ_STAIRS, BlockLegacyIds::PURPUR_STAIRS];
     private const STAIRS_ROTATION_DATA = [0 => 2, 1 => 3, 2 => 1, 3 => 0, 4 => 6, 5 => 7, 6 => 5, 7 => 4];
 
     /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */

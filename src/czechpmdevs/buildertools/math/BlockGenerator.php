@@ -21,35 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\math;
 
 use Generator;
-use pocketmine\math\Vector3;
-use function max;
-use function min;
 
 class BlockGenerator {
-
-    /**
-     * @return Generator<int[]>
-     */
-    public static function fillCuboid(Vector3 $pos1, Vector3 $pos2, bool $hollow = false): Generator {
-        $minX = (int)min($pos1->getX(), $pos2->getX());
-        $maxX = (int)max($pos1->getX(), $pos2->getX());
-        $minZ = (int)min($pos1->getZ(), $pos2->getZ());
-        $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
-        $minY = (int)min($pos1->getY(), $pos2->getY());
-        $maxY = (int)max($pos1->getY(), $pos2->getY());
-
-        for($x = $minX; $x <= $maxX; ++$x) {
-            for($z = $minZ; $z <= $maxZ; ++$z) {
-                for($y = $minY; $y <= $maxY; ++$y) {
-                    if($hollow && ($x != $minX && $x != $maxX) && ($y != $minY && $y != $maxY) && ($z != $minZ && $z != $maxZ)) {
-                        continue;
-                    }
-
-                    yield [$x, $y, $z];
-                }
-            }
-        }
-    }
 
     /**
      * @return Generator<int[]>

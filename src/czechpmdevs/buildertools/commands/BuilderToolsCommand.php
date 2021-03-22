@@ -25,12 +25,12 @@ use czechpmdevs\buildertools\Selectors;
 use InvalidStateException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\world\Position;
 
-abstract class BuilderToolsCommand extends Command implements PluginIdentifiableCommand {
+abstract class BuilderToolsCommand extends Command implements PluginOwned {
 
     public function __construct(string $name, string $description = "", string $usageMessage = null, $aliases = []) {
         $this->setPermission($this->getPerms($name));
@@ -64,7 +64,7 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
         /** @var Position $secondPos */
         $secondPos = Selectors::getPosition($sender, 2);
 
-        if($firstPos->getLevelNonNull()->getId() != $secondPos->getLevelNonNull()->getId()) {
+        if($firstPos->getWorld()->getId() != $secondPos->getWorld()->getId()) {
             $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
             return false;
         }
@@ -77,7 +77,7 @@ abstract class BuilderToolsCommand extends Command implements PluginIdentifiable
     }
 
     /** @noinspection PhpUnused */
-    public function getPlugin(): Plugin {
+    public function getOwningPlugin(): Plugin {
         return BuilderTools::getInstance();
     }
 }

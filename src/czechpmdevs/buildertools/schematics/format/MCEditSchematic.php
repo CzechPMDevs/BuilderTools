@@ -23,14 +23,18 @@ namespace czechpmdevs\buildertools\schematics\format;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\SchematicException;
-use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ShortTag;
+use pocketmine\nbt\TreeRoot;
 use function chr;
 use function ord;
 use function str_repeat;
 use function strtolower;
+use function zlib_decode;
+use function zlib_encode;
+use const ZLIB_ENCODING_GZIP;
 
 class MCEditSchematic implements Schematic {
 
@@ -42,7 +46,7 @@ class MCEditSchematic implements Schematic {
      * @throws SchematicException
      */
     public function load(string $rawData): BlockArray {
-        $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+        $nbt = (new BigEndianNbtSerializer())->read(zlib_decode($rawData))->getTag();
         if(!$nbt instanceof CompoundTag) {
             throw new SchematicException("NBT root must be compound tag");
         }
@@ -155,7 +159,7 @@ class MCEditSchematic implements Schematic {
         $this->writeBlockData($nbt, $blocks, $data);
         $this->writeMaterials($nbt, self::MATERIALS_BEDROCK);
 
-        $rawData = (new BigEndianNBTStream())->writeCompressed($nbt);
+        $rawData = zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP);
         if($rawData === false) {
             throw new SchematicException("Could not compress nbt");
         }

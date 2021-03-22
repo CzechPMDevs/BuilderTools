@@ -40,7 +40,7 @@ class FirstPositionCommand extends BuilderToolsCommand {
             return;
         }
 
-        $size = Selectors::addSelector($sender, 1, $position = new Position((int)$sender->getX(), (int)$sender->getY(), (int)$sender->getZ(), $sender->getLevel()));
+        $size = Selectors::addSelector($sender, 1, $position = Position::fromObject($sender->getPosition()->ceil(), $sender->getWorld()));
         $sender->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
     }
 }

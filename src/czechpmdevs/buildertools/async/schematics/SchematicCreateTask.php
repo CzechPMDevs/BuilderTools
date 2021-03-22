@@ -44,7 +44,7 @@ class SchematicCreateTask extends BuilderToolsAsyncTask {
     }
 
     /** @noinspection PhpUnused */
-    public function onRun() {
+    public function onRun(): void {
         $blockArray = unserialize($this->blockArray);
         if(!$blockArray instanceof BlockArray) {
             $this->error = "Error whilst moving block array on to another thread";

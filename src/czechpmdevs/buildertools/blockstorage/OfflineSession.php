@@ -22,18 +22,19 @@ namespace czechpmdevs\buildertools\blockstorage;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\ClipboardManager;
-use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNBTStream;
-use pocketmine\nbt\tag\ByteArrayTag;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntArrayTag;
-use pocketmine\Player;
+use pocketmine\nbt\TreeRoot;
+use pocketmine\player\Player;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
 use function memory_get_usage;
 use function microtime;
 use function unlink;
+use function zlib_decode;
+use function zlib_encode;
+use const ZLIB_ENCODING_GZIP;
 
 final class OfflineSession {
 
@@ -50,18 +51,17 @@ final class OfflineSession {
 
             $clipboard->compress();
 
-            $nbt->setTag(new CompoundTag("Clipboard", [
-                new ByteArrayTag("Coordinates", $clipboard->compressedCoords),
-                new ByteArrayTag("Blocks", $clipboard->compressedBlocks),
-                new ByteArrayTag("RelativePosition", $clipboard->compressedPlayerPosition)
-                ]
-            ));
+            $nbt->setTag("Clipboard", (new CompoundTag())
+                ->setByteArray("Coordinates", $clipboard->compressedCoords)
+                ->setByteArray("Blocks", $clipboard->compressedBlocks)
+                ->setByteArray("RelativePosition", $clipboard->compressedPlayerPosition)
+            );
+
 
             unset(ClipboardManager::$clipboards[$player->getName()]);
         }
 
-        $stream = new BigEndianNBTStream();
-        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $stream->writeCompressed($nbt));
+        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP));
 
         unset($stream, $nbt);
 
@@ -73,17 +73,15 @@ final class OfflineSession {
             return;
         }
 
-        $stream = new BigEndianNBTStream();
-
         $buffer = file_get_contents($path);
         if(!$buffer || !@unlink($path)) {
             return;
         }
 
-        /** @phpstan-var CompoundTag|null $nbt */
-        $nbt = $stream->readCompressed($buffer);
+        /** @phpstan-var CompoundTag $nbt */
+        $nbt = (new BigEndianNbtSerializer())->read(zlib_decode($buffer));
 
-        if($nbt === null) {
+        if(!$nbt instanceof CompoundTag) {
             return;
         }
 

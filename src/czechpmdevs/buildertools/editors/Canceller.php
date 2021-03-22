@@ -24,7 +24,7 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
@@ -49,19 +49,19 @@ class Canceller {
             return $error();
         }
 
-        if($undoAction->getLevel() === null) {
+        if($undoAction->getWorld() === null) {
             return EditorResult::error("Could not find world to process updates on.");
         }
 
         $startTime = microtime(true);
-        $fillSession = new FillSession($undoAction->getLevel(), true, true);
+        $fillSession = new FillSession($undoAction->getWorld(), true, true);
 
         while ($undoAction->hasNext()) {
             $undoAction->readNext($x, $y, $z, $id, $meta);
             $fillSession->setBlockAt($x, $y, $z, $id, $meta);
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $updates */
         $updates = $fillSession->getChanges();
@@ -88,19 +88,19 @@ class Canceller {
             return $error();
         }
 
-        if($redoAction->getLevel() === null) {
+        if($redoAction->getWorld() === null) {
             return EditorResult::error("Could not find world to process updates on.");
         }
 
         $startTime = microtime(true);
-        $fillSession = new FillSession($redoAction->getLevel(), true, true);
+        $fillSession = new FillSession($redoAction->getWorld(), true, true);
 
         while ($redoAction->hasNext()) {
             $redoAction->readNext($x, $y, $z, $id, $meta);
             $fillSession->setBlockAt($x, $y, $z, $id, $meta);
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $updates */
         $updates = $fillSession->getChanges();

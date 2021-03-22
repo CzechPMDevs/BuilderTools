@@ -24,10 +24,6 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
-use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
-use pocketmine\level\Level;
-use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
@@ -41,7 +37,7 @@ class Naturalizer {
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
         for($x = $minX; $x <= $maxX; ++$x) {
@@ -68,50 +64,12 @@ class Naturalizer {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-    }
-
-    private function fix(BlockArray $list, Vector2 $vector2, int $minY, int $maxY, Level $level): void {
-        $x = $vector2->getFloorX();
-        $z = $vector2->getFloorY();
-
-        $blockY = null;
-        for($y = $minY; $y <= $maxY; ++$y) {
-            if($level->getBlockAt($x, $y, $z, true, false)->getId() !== Block::AIR && ($blockY === null || $blockY < $y)) {
-                $blockY = $y;
-            }
-        }
-
-        if($blockY === null) return;
-
-        for($y = $blockY; $y > $minY; --$y) {
-            switch ($blockY-$y) {
-                case 0:
-                    $list->addBlock(new Vector3($x, $y, $z), BlockIds::GRASS, 0);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
-                        $list->addBlock(new Vector3($x, $y, $z), BlockIds::DIRT, 0);
-                    }
-                    break;
-                case 4:
-                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
-                        $list->addBlock(new Vector3($x, $y, $z), rand(0, 1) ? BlockIds::DIRT : BlockIds::STONE, 0);
-                    }
-                    break;
-                default:
-                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
-                        $list->addBlock(new Vector3($x, $y, $z), BlockIds::STONE, 0);
-                    }
-            }
-        }
     }
 }

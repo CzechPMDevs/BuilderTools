@@ -24,10 +24,10 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
-use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\World;
 use function max;
 use function microtime;
 use function min;
@@ -53,10 +53,10 @@ class Replacement {
         $minZ = (int)min($pos1->getZ(), $pos2->getZ());
         $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
 
-        $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
-        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+        $minY = (int)max(min($pos1->getY(), $pos2->getY(), World::Y_MAX), 0);
+        $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX);
 
-        $fillSession = new MaskedFillSession($player->getLevelNonNull(), false, true, $mask);
+        $fillSession = new MaskedFillSession($player->getWorld(), false, true, $mask);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
         for($x = $minX; $x <= $maxX; ++$x) {
@@ -68,7 +68,7 @@ class Replacement {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();

@@ -7,7 +7,8 @@
     "php": "^7.4 || ^8.0",
     "ext-yaml": "*",
     "ext-pthreads": "*",
-    "ext-chunkutils2": "^0.1.0"
+    "ext-chunkutils2": "^0.1.0",
+    "ext-zlib": "*"
   },
   "require-dev": {
     "phpstan/phpstan": "0.12.81",

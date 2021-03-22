@@ -27,11 +27,11 @@ use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\block\Block;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 use function abs;
 use function microtime;
 
@@ -47,26 +47,23 @@ class Printer {
 
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false): void {
         $undoList = new BlockArray();
-        $undoList->setLevel($center->getLevel());
+        $undoList->setWorld($center->getWorld());
         $center = Math::ceilPosition($center);
 
-        $level = $center->getLevelNonNull();
+        $level = $center->getWorld();
 
         $placeBlock = function (Vector3 $vector3) use ($level, $undoList, $block, $center, $throwBlock) {
             if($throwBlock) {
-                $vector3 = $this->throwBlock(Position::fromObject($vector3, $center->getLevel()), $block);
+                $vector3 = $this->throwBlock(Position::fromObject($vector3, $center->getWorld()));
             }
             if($vector3->getY() < 0) {
                 return;
             }
 
             $fullBlock = $level->getBlock($vector3);
-            $undoList->addBlock($vector3, $fullBlock->getId(), $fullBlock->getDamage());
+            $undoList->addBlock($vector3, $fullBlock->getId(), $fullBlock->getMeta());
 
-            /** @phpstan-ignore-next-line */
-            $level->setBlockIdAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getId());
-            /** @phpstan-ignore-next-line */
-            $level->setBlockDataAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getDamage());
+            $level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block);
         };
 
         if($mode == self::CUBE) {
@@ -98,25 +95,22 @@ class Printer {
         Canceller::getInstance()->addStep($player, $undoList);
     }
 
-    private function throwBlock(Position $position, Block $block): Vector3 {
-        $level = $position->getLevelNonNull();
+    private function throwBlock(Position $position): Vector3 {
+        $level = $position->getWorld();
 
         $x = $position->getFloorX();
         $y = $position->getFloorY();
         $z = $position->getFloorZ();
 
         /** @noinspection PhpStatementHasEmptyBodyInspection */
-        for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() == Block::AIR; $y--);
-
-        $level->setBlockIdAt($x, $y, $z, $block->getId());
-        $level->setBlockDataAt($x, $y, $z, $block->getDamage());
+        for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() == 0; $y--);
 
         return new Vector3($x, ++$y, $z);
     }
 
     public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
-        $center = Position::fromObject($center->ceil(), $center->getLevel());
+        $center = Position::fromObject($center->ceil(), $center->getWorld());
         $radius = abs($radius);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
@@ -128,7 +122,7 @@ class Printer {
         $floorY = $center->getFloorY();
         $floorZ = $center->getFloorZ();
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false, true);
+        $fillSession = new FillSession($player->getWorld(), false, true);
         $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 
         $incDivX = 0;
@@ -191,7 +185,7 @@ class Printer {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
@@ -206,7 +200,7 @@ class Printer {
 
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
-        $center = Position::fromObject($center->ceil(), $center->getLevel());
+        $center = Position::fromObject($center->ceil(), $center->getWorld());
 
         $radius = abs($radius);
 
@@ -229,9 +223,9 @@ class Printer {
         }
         $finalHeight = $height + $floorY;
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false );
+        $fillSession = new FillSession($player->getWorld(), false );
         $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
-        $fillSession->loadChunks($player->getLevelNonNull());
+        $fillSession->loadChunks($player->getWorld());
 
         $incDivX = 0;
         for($x = 0; $x <= $radius; ++$x) {
@@ -274,7 +268,7 @@ class Printer {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
@@ -289,7 +283,7 @@ class Printer {
 
     public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
-        $center = Position::fromObject($center->ceil(), $center->getLevel());
+        $center = Position::fromObject($center->ceil(), $center->getWorld());
 
         $size = abs($size);
 
@@ -302,7 +296,7 @@ class Printer {
         $floorY = $center->getFloorY();
         $floorZ = $center->getFloorZ();
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($floorX - $size, $floorX + $size, $floorZ - $size, $floorZ + $size);
 
         $currentLevelHeight = $size;
@@ -337,7 +331,7 @@ class Printer {
             $fillSession->setBlockAt($x + $floorX, $y + $floorY, $z + $floorZ, $id, $meta);
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
@@ -351,10 +345,10 @@ class Printer {
     }
 
     public function makeCube(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
-        $center = Position::fromObject($center->ceil(), $center->getLevel());
+        $center = Position::fromObject($center->ceil(), $center->getWorld());
         $radius = abs($radius);
 
-        if($player->getY() - $radius < 0 || $player->getY() + $radius > Level::Y_MAX) {
+        if($player->getPosition()->getY() - $radius < 0 || $player->getPosition()->getY() + $radius > World::Y_MAX) {
             return EditorResult::error("Shape is outside of the map!");
         }
 

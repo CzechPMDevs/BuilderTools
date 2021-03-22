@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\async;
 
 use Closure;
 use pocketmine\Server;
+use function spl_object_hash;
 
 class AsyncQueue {
 
@@ -36,7 +37,7 @@ class AsyncQueue {
         Server::getInstance()->getAsyncPool()->submitTask($task);
 
         if($callback !== null) {
-            self::$queue[$task->getTaskId()] = $callback;
+            self::$queue[spl_object_hash($task)] = $callback;
         }
     }
 
@@ -46,11 +47,11 @@ class AsyncQueue {
      * @phpstan-param BuilderToolsAsyncTask<mixed> $task
      */
     public static function callCallback(BuilderToolsAsyncTask $task): void {
-        if(!isset(self::$queue[$task->getTaskId()])) {
+        if(!isset(self::$queue[spl_object_hash($task)])) {
             return;
         }
 
-        $callback = self::$queue[$task->getTaskId()];
+        $callback = self::$queue[spl_object_hash($task)];
         $callback($task);
     }
 }

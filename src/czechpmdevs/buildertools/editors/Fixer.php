@@ -18,7 +18,7 @@
 
 namespace czechpmdevs\buildertools\editors;
 
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\utils\SingletonTrait;
 use function is_int;
 
@@ -26,23 +26,23 @@ class Fixer {
     use SingletonTrait;
 
     private const BLOCK_FIX_DATA = [
-        158 => [BlockIds::WOODEN_SLAB, 0],
-        125 => [BlockIds::DOUBLE_WOODEN_SLAB, ""],
-        188 => [BlockIds::FENCE, 0],
-        189 => [BlockIds::FENCE, 1],
-        190 => [BlockIds::FENCE, 2],
-        191 => [BlockIds::FENCE, 3],
-        192 => [BlockIds::FENCE, 4],
-        193 => [BlockIds::FENCE, 5],
-        166 => [BlockIds::INVISIBLE_BEDROCK, 0],
-        208 => [BlockIds::GRASS_PATH, 0],
-        198 => [BlockIds::END_ROD, 0],
-        126 => [BlockIds::WOODEN_SLAB, ""],
-        95  => [BlockIds::STAINED_GLASS, ""],
-        199 => [BlockIds::CHORUS_PLANT, 0],
-        202 => [BlockIds::PURPUR_BLOCK, 0],
-        251 => [BlockIds::CONCRETE, 0],
-        204 => [BlockIds::PURPUR_BLOCK, 0]
+        158 => [BlockLegacyIds::WOODEN_SLAB, 0],
+        125 => [BlockLegacyIds::DOUBLE_WOODEN_SLAB, ""],
+        188 => [BlockLegacyIds::FENCE, 0],
+        189 => [BlockLegacyIds::FENCE, 1],
+        190 => [BlockLegacyIds::FENCE, 2],
+        191 => [BlockLegacyIds::FENCE, 3],
+        192 => [BlockLegacyIds::FENCE, 4],
+        193 => [BlockLegacyIds::FENCE, 5],
+        166 => [BlockLegacyIds::INVISIBLE_BEDROCK, 0],
+        208 => [BlockLegacyIds::GRASS_PATH, 0],
+        198 => [BlockLegacyIds::END_ROD, 0],
+        126 => [BlockLegacyIds::WOODEN_SLAB, ""],
+        95  => [BlockLegacyIds::STAINED_GLASS, ""],
+        199 => [BlockLegacyIds::CHORUS_PLANT, 0],
+        202 => [BlockLegacyIds::PURPUR_BLOCK, 0],
+        251 => [BlockLegacyIds::CONCRETE, 0],
+        204 => [BlockLegacyIds::PURPUR_BLOCK, 0]
     ];
 
     public function fixBlock(int &$id, int &$damage): void {
@@ -53,11 +53,11 @@ class Fixer {
             $id = self::BLOCK_FIX_DATA[$id][0];
         }
 
-        if($id == BlockIds::TRAPDOOR || $id == BlockIds::IRON_TRAPDOOR) {
+        if($id == BlockLegacyIds::TRAPDOOR || $id == BlockLegacyIds::IRON_TRAPDOOR) {
             $damage = $this->fixTrapdoorMeta($damage);
         }
 
-        if($id == BlockIds::WOODEN_BUTTON || $id == BlockIds::STONE_BUTTON) {
+        if($id == BlockLegacyIds::WOODEN_BUTTON || $id == BlockLegacyIds::STONE_BUTTON) {
             $damage = $this->fixButtonMeta($damage);
         }
     }

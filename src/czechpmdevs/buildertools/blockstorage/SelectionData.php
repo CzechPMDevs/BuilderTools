@@ -21,8 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use InvalidArgumentException;
-use pocketmine\level\Level;
 use pocketmine\math\Vector3;
+use pocketmine\world\World;
 use function pack;
 use function unpack;
 
@@ -45,7 +45,7 @@ class SelectionData extends BlockArray {
         if($this->playerPosition !== null) {
             $clipboard = clone $this;
             /** @phpstan-ignore-next-line */
-            $clipboard->playerPosition->add($vector3);
+            $clipboard->playerPosition->addVector($vector3);
 
             return $clipboard;
         }
@@ -74,7 +74,7 @@ class SelectionData extends BlockArray {
             return;
         }
 
-        $this->compressedPlayerPosition = pack("q", Level::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
+        $this->compressedPlayerPosition = pack("q", World::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
     }
 
     public function decompress(bool $cleanCompressed = true): void {
@@ -84,7 +84,7 @@ class SelectionData extends BlockArray {
             return;
         }
 
-        Level::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z); // poggit...
+        World::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z); // poggit...
         $this->playerPosition = new Vector3($x, $y, $z);
     }
 }

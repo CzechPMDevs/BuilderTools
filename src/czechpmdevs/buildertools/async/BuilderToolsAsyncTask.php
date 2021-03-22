@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\async;
 
 use pocketmine\scheduler\AsyncTask;
-use pocketmine\Server;
 
 abstract class BuilderToolsAsyncTask extends AsyncTask {
 
@@ -32,7 +31,7 @@ abstract class BuilderToolsAsyncTask extends AsyncTask {
     public function complete(): void {}
 
     /** @noinspection PhpUnused */
-    final public function onCompletion(Server $server) {
+    final public function onCompletion(): void {
         $this->complete();
         AsyncQueue::callCallback($this);
     }

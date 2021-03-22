@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Decorator;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function is_numeric;
 use function str_replace;
 
@@ -55,7 +55,7 @@ class DecorationCommand extends BuilderToolsCommand {
             $percentage = (int)($args[2]);
         }
 
-        $result = Decorator::getInstance()->addDecoration($sender, $args[0], (int)($args[1]), $percentage, $sender);
+        $result = Decorator::getInstance()->addDecoration($sender->getPosition(), $args[0], (int)($args[1]), $percentage, $sender);
         if(!$result->successful()) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cAn error occurred whilst adding decoration: {$result->getErrorMessage()}");
             return;

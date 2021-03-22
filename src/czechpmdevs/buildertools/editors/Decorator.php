@@ -24,9 +24,9 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\Position;
 use function microtime;
 use function mt_rand;
 
@@ -36,7 +36,7 @@ class Decorator {
     public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $fillSession = new FillSession($center->getLevelNonNull(), false, true);
+        $fillSession = new FillSession($center->getWorld(), false, true);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
 
@@ -63,7 +63,7 @@ class Decorator {
             }
         }
 
-        $fillSession->reloadChunks($center->getLevelNonNull());
+        $fillSession->reloadChunks($center->getWorld());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();

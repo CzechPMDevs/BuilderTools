@@ -37,5 +37,5 @@ interface UpdateLevelData {
     /**
      * Should not be null when used in filler
      */
-    public function getLevel(): ?ChunkManager;
+    public function getWorld(): ?ChunkManager;
 }

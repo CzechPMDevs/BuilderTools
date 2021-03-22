@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\math;
 
-use pocketmine\level\Level;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 use function max;
 use function min;
 use const M_PI;
@@ -32,7 +32,7 @@ class Math {
     public const PI_360 = M_PI * 2;
 
     public static function ceilPosition(Position $position): Position {
-        return Position::fromObject($position->ceil(), $position->getLevel());
+        return Position::fromObject($position->ceil(), $position->getWorld());
     }
 
     /**
@@ -67,8 +67,8 @@ class Math {
         $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
 
         if($clampY) {
-            $minY = (int)max(min($pos1->getY(), $pos2->getY(), Level::Y_MAX), 0);
-            $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), Level::Y_MAX);
+            $minY = (int)max(min($pos1->getY(), $pos2->getY(), World::Y_MAX), 0);
+            $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX);
         } else {
             $minY = (int)min($pos1->getY(), $pos2->getY());
             $maxY = (int)max($pos1->getY(), $pos2->getY());

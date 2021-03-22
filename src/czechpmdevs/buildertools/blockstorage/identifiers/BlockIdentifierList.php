@@ -31,5 +31,5 @@ interface BlockIdentifierList {
      * Function which returns if the block
      * in the list
      */
-    public function containsBlock(int $id, int $meta): bool;
+    public function containsBlock(int $blockHash): bool;
 }

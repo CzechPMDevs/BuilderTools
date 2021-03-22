@@ -28,11 +28,10 @@ use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
-use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
@@ -46,13 +45,13 @@ class Copier {
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->ceil());
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        $fillSession->loadChunks($player->getLevelNonNull());
+        $fillSession->loadChunks($player->getWorld());
 
         for($x = $minX; $x <= $maxX; ++$x) {
             for ($z = $minZ; $z <= $maxZ; ++$z) {
@@ -71,13 +70,13 @@ class Copier {
     public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->ceil());
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        $fillSession->loadChunks($player->getLevelNonNull());
+        $fillSession->loadChunks($player->getWorld());
 
         for($x = $minX; $x <= $maxX; ++$x) {
             for ($z = $minZ; $z <= $maxZ; ++$z) {
@@ -90,7 +89,7 @@ class Copier {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
         ClipboardManager::saveClipboard($player, $clipboard);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -105,23 +104,23 @@ class Copier {
 
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
-        $clipboard->setLevel($player->getLevel());
+        $clipboard->setWorld($player->getWorld());
 
         /** @phpstan-var Vector3 $relativePosition */
         $relativePosition = $clipboard->getPlayerPosition();
 
-        $fillSession = new MaskedFillSession($player->getLevelNonNull(), true, true, SingleBlockIdentifier::airIdentifier());
+        $fillSession = new MaskedFillSession($player->getWorld(), true, true, SingleBlockIdentifier::airIdentifier());
 
-        $floorX = $player->getFloorX() - $relativePosition->getFloorX();
-        $floorY = $player->getFloorY() - $relativePosition->getFloorY();
-        $floorZ = $player->getFloorZ() - $relativePosition->getFloorZ();
+        $floorX = $player->getPosition()->getFloorX() - $relativePosition->getFloorX();
+        $floorY = $player->getPosition()->getFloorY() - $relativePosition->getFloorY();
+        $floorZ = $player->getPosition()->getFloorZ() - $relativePosition->getFloorZ();
 
         while ($clipboard->hasNext()) {
             $clipboard->readNext($x, $y, $z, $id, $meta);
             $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -139,23 +138,23 @@ class Copier {
 
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
-        $clipboard->setLevel($player->getLevel());
+        $clipboard->setWorld($player->getWorld());
 
         /** @phpstan-var Vector3 $relativePosition */
         $relativePosition = $clipboard->getPlayerPosition();
 
-        $fillSession = new FillSession($player->getLevelNonNull(), true, true);
+        $fillSession = new FillSession($player->getWorld(), true, true);
 
-        $floorX = $player->getFloorX() - $relativePosition->getFloorX();
-        $floorY = $player->getFloorY() - $relativePosition->getFloorY();
-        $floorZ = $player->getFloorZ() - $relativePosition->getFloorZ();
+        $floorX = $player->getPosition()->getFloorX() - $relativePosition->getFloorX();
+        $floorY = $player->getPosition()->getFloorY() - $relativePosition->getFloorY();
+        $floorZ = $player->getPosition()->getFloorZ() - $relativePosition->getFloorZ();
 
         while ($clipboard->hasNext()) {
             $clipboard->readNext($x, $y, $z, $id, $meta);
             $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -178,7 +177,7 @@ class Copier {
     public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER): EditorResult {
         $startTime = microtime(true);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false, true);
+        $fillSession = new FillSession($player->getWorld(), false, true);
 
         // Copying on to block array
         $temporaryBlockArray = new BlockArray();
@@ -193,7 +192,7 @@ class Copier {
             }
         }
 
-        $direction = $player->getDirection();
+        $direction = $player->getDirectionPlane(); // TODO!!!
         if($mode == self::DIRECTION_PLAYER) {
             if($direction == 0 || $direction == 2) { // Moving along x axis (z = const)
                 $xSize = ($maxX - $minX) + 1;
@@ -205,7 +204,7 @@ class Copier {
                     $xSize = -$xSize;
                 }
 
-                $fillSession->loadChunks($player->getLevelNonNull());
+                $fillSession->loadChunks($player->getWorld());
 
                 for($i = 1; $i < $pasteCount; ++$i) {
                     $j = $i * $xSize;
@@ -227,7 +226,7 @@ class Copier {
                     $zSize = -$zSize;
                 }
 
-                $fillSession->loadChunks($player->getLevelNonNull());
+                $fillSession->loadChunks($player->getWorld());
 
                 for($i = 1; $i < $pasteCount; ++$i) {
                     $j = $i * $zSize;
@@ -248,7 +247,7 @@ class Copier {
                 $ySize = -$ySize;
             }
 
-            $fillSession->loadChunks($player->getLevelNonNull());
+            $fillSession->loadChunks($player->getWorld());
 
             for($i = 1; $i < $pasteCount; ++$i) {
                 $j = $i * $ySize;
@@ -264,7 +263,7 @@ class Copier {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -276,7 +275,7 @@ class Copier {
     public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $motion, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false, true);
+        $fillSession = new FillSession($player->getWorld(), false, true);
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -292,7 +291,7 @@ class Copier {
         $finalMaxZ = $maxZ + $motion->getFloorZ();
 
         $fillSession->setDimensions(min($minX, $finalMinX), max($maxX, $finalMaxX), min($minZ, $finalMinZ), max($maxZ, $finalMaxZ));
-        $fillSession->loadChunks($player->getLevelNonNull());
+        $fillSession->loadChunks($player->getWorld());
 
         for($x = $minX; $x <= $maxX; ++$x) {
             $isXInside = $x >= $finalMinX && $x <= $finalMaxX;
@@ -315,7 +314,7 @@ class Copier {
             }
         }
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->reloadChunks($player->getWorld());
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();

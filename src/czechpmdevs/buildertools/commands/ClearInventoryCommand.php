@@ -22,9 +22,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 
 class ClearInventoryCommand extends BuilderToolsCommand {

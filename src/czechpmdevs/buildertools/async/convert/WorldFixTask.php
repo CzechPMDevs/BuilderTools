@@ -23,9 +23,9 @@ namespace czechpmdevs\buildertools\async\convert;
 use czechpmdevs\buildertools\editors\Fixer;
 use Error;
 use pocketmine\scheduler\AsyncTask;
-use pocketmine\utils\MainLogger;
-use pocketmine\world\format\io\BaseWorldProvider;
 use pocketmine\world\format\io\region\Anvil;
+use pocketmine\world\format\io\region\RegionLoader;
+use pocketmine\world\format\io\WorldProvider;
 use pocketmine\world\format\io\WorldProviderManager;
 use function basename;
 use function count;
@@ -59,7 +59,6 @@ class WorldFixTask extends AsyncTask {
 
     /** @noinspection PhpUnused */
     public function onRun(): void {
-//        MainLogger::getLogger()->debug("[BuilderTools] Fixing world $this->worldPath...");
 
         if(!is_dir($this->worldPath)) {
             $this->error = "File not found";
@@ -67,15 +66,18 @@ class WorldFixTask extends AsyncTask {
         }
 
         $providerManager = new WorldProviderManager(); // TODO
+        $providerClass = null;
+        foreach ($providerManager->getMatchingProviders($this->worldPath) as $providerClass) {
+            break;
+        }
 
-        $providerClass = LevelProviderManager::getProvider($this->worldPath);
         if($providerClass === null) {
             $this->error = "Unknown provider";
             return;
         }
 
         try {
-            /** @var BaseWorldProvider|Anvil|null $provider */
+            /** @var WorldProvider $provider */
             $provider = new $providerClass($this->worldPath . DIRECTORY_SEPARATOR);
         }
         catch (Error $error) {
@@ -106,14 +108,13 @@ class WorldFixTask extends AsyncTask {
 
             for($x = 0; $x < 16; ++$x) {
                 for($z = 0; $z < 16; ++$z) {
-                    for($y = 0; $y < $provider->getWorldHeight(); ++$y) {
-                        if(($id = $chunk->getBlockId($x, $y, $z)) != 0) {
-                            $data = $chunk->getBlockData($x, $y, $z);
+                    for($y = 0; $y < $provider->getWorldMaxY(); ++$y) {
+                        $fullBlock = $chunk->getFullBlock($x, $y, $z);
+                        if(($id = $fullBlock >> 4) != 0) {
+                            $data = $fullBlock & 0xf;
 
                             $fixer->fixBlock($id, $data);
-
-                            $chunk->setBlockId($x, $y, $z, $id);
-                            $chunk->setBlockData($x, $y, $z, $data);
+                            $chunk->setFullBlock($x, $y, $z, $id << 4 | $data);
                         }
                     }
                 }
@@ -121,7 +122,7 @@ class WorldFixTask extends AsyncTask {
 
             $this->percentage = (($index + 1) * 100) / count($chunksToFix);
 
-            $provider->saveChunk($chunk);
+            $provider->saveChunk($chunkX, $chunkZ, $chunk);
             $provider->doGarbageCollection();
 
 //            MainLogger::getLogger()->debug("[BuilderTools] " . ($index + 1) . "/" . count($chunksToFix) . " chunks fixed!");
@@ -134,7 +135,7 @@ class WorldFixTask extends AsyncTask {
         $this->time = round(microtime(true) - $startTime);
 
         $this->percentage = -1;
-        MainLogger::getLogger()->debug("[BuilderTools] World fixed in " . round(microtime(true)-$startTime) .", affected " .count($chunksToFix). " chunks!");
+//        MainLogger::getLogger()->debug("[BuilderTools] World fixed in " . round(microtime(true)-$startTime) .", affected " .count($chunksToFix). " chunks!");
     }
 
     /**
@@ -154,7 +155,7 @@ class WorldFixTask extends AsyncTask {
             $regionX = (int)$split[1];
             $regionZ = (int)$split[2];
 
-            $region = new RegionLoader($regionFilePath, $regionX, $regionZ);
+            $region = new RegionLoader($regionFilePath);
             $region->open();
 
             for($x = 0; $x < 32; ++$x) {

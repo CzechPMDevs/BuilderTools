@@ -20,17 +20,25 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use pocketmine\level\ChunkManager;
-use pocketmine\level\Level;
+use InvalidStateException;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\BigEndianNbtSerializer;
+use pocketmine\nbt\tag\ByteArrayTag;
+use pocketmine\nbt\tag\ByteTag;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\TreeRoot;
+use pocketmine\world\ChunkManager;
+use pocketmine\world\World;
 use Serializable;
 use function array_slice;
 use function array_values;
 use function count;
 use function in_array;
-use function is_string;
 use function pack;
 use function unpack;
+use function zlib_decode;
+use function zlib_encode;
+use const ZLIB_ENCODING_GZIP;
 
 class BlockArray implements UpdateLevelData, Serializable {
 
@@ -64,7 +72,7 @@ class BlockArray implements UpdateLevelData, Serializable {
     /** @var BlockArraySizeData|null */
     protected ?BlockArraySizeData $sizeData = null;
     /** @var ChunkManager|null */
-    protected ?ChunkManager $level = null;
+    protected ?ChunkManager $world = null;
 
     /**
      * Adds block to the block array
@@ -81,7 +89,7 @@ class BlockArray implements UpdateLevelData, Serializable {
      * @return $this
      */
     public function addBlockAt(int $x, int $y, int $z, int $id, int $meta): BlockArray {
-        $this->lastHash = Level::blockHash($x, $y, $z);
+        $this->lastHash = World::blockHash($x, $y, $z);
 
         if($this->detectDuplicates && in_array($this->lastHash, $this->coords)) {
             return $this;
@@ -107,7 +115,7 @@ class BlockArray implements UpdateLevelData, Serializable {
         $this->lastHash = $this->coords[$this->offset];
         $this->lastBlockHash = $this->blocks[$this->offset++];
 
-        Level::getBlockXYZ($this->lastHash, $x, $y, $z);
+        World::getBlockXYZ($this->lastHash, $x, $y, $z);
         $id = $this->lastBlockHash >> 4; $meta = $this->lastBlockHash & 0xf;
     }
 
@@ -130,8 +138,8 @@ class BlockArray implements UpdateLevelData, Serializable {
         $blockArray->blocks = $this->blocks;
 
         foreach ($this->coords as $hash) {
-            Level::getBlockXYZ($hash, $x, $y, $z);
-            $blockArray->coords[] = Level::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
+            World::getBlockXYZ($hash, $x, $y, $z);
+            $blockArray->coords[] = World::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
         }
 
         return $blockArray;
@@ -155,14 +163,14 @@ class BlockArray implements UpdateLevelData, Serializable {
         return $this->sizeData;
     }
 
-    public function setLevel(?ChunkManager $level): self {
-        $this->level = $level;
+    public function setWorld(?ChunkManager $level): self {
+        $this->world = $level;
 
         return $this;
     }
 
-    public function getLevel(): ?ChunkManager {
-        return $this->level;
+    public function getWorld(): ?ChunkManager {
+        return $this->world;
     }
 
     /**
@@ -227,5 +235,41 @@ class BlockArray implements UpdateLevelData, Serializable {
         $this->blocks = array_slice($this->blocks, $this->offset);
 
         $this->offset = 0;
+    }
+
+    public function serialize(): ?string {
+        $this->compress();
+
+        $nbt = new CompoundTag();
+        $nbt->setByteArray("Coords", $this->compressedCoords);
+        $nbt->setByteArray("Blocks", $this->compressedBlocks);
+        $nbt->setByte("DuplicateDetection", $this->detectDuplicates ? 1 : 0);
+
+        $serializer = new BigEndianNbtSerializer();
+        $buffer = zlib_encode($serializer->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP);
+
+        if($buffer === false) {
+            return null;
+        }
+
+        return $buffer;
+    }
+
+    public function unserialize($data): void {
+        if(!is_string($data)) {
+            return;
+        }
+
+        /** @var CompoundTag $nbt */
+        $nbt = (new BigEndianNbtSerializer())->read(zlib_decode($data))->getTag();
+        if(!$nbt->hasTag("Coords", ByteArrayTag::class) || !$nbt->hasTag("Blocks", ByteArrayTag::class) || !$nbt->hasTag("DuplicateDetection", ByteTag::class)) {
+            return;
+        }
+
+        $this->compressedCoords = $nbt->getByteArray("Coords");
+        $this->compressedBlocks = $nbt->getByteArray("Blocks");
+        $this->detectDuplicates = $nbt->getByte("DuplicateDetection") == 1;
+
+        $this->decompress();
     }
 }

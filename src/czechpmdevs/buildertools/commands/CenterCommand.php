@@ -21,9 +21,9 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CenterCommand extends BuilderToolsCommand {
 
@@ -61,7 +61,7 @@ class CenterCommand extends BuilderToolsCommand {
         for($x = $min->getFloorX(); $x <= $max->getFloorX(); ++$x) {
             for($y = $min->getFloorY(); $y <= $max->getFloorY(); ++$y) {
                 for($z = $min->getFloorZ(); $z <= $max->getFloorZ(); ++$z) {
-                    $firstPos->getLevelNonNull()->setBlockIdAt($x, $y, $z, BlockIds::BEDROCK);
+                    $firstPos->getLevelNonNull()->setBlockIdAt($x, $y, $z, BlockLegacyIds::BEDROCK);
                     $firstPos->getLevelNonNull()->setBlockDataAt($x, $y, $z, 0);
                 }
             }
