@@ -47,18 +47,25 @@ class Copier {
         $startTime = microtime(true);
 
         $clipboard = (new SelectionData())->setPlayerPosition($player->ceil());
-        $level = $player->getLevelNonNull();
 
-        $i = 0;
-        foreach (BlockGenerator::fillCuboid($pos1, $pos2) as [$x, $y, $z]) {
-            $clipboard->addBlockAt($x, $y, $z, $level->getBlockIdAt($x, $y, $z), $level->getBlockDataAt($x, $y, $z));
+        Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-            $i++;
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
+        $fillSession->loadChunks($player->getLevelNonNull());
+
+        for($x = $minX; $x <= $maxX; ++$x) {
+            for ($z = $minZ; $z <= $maxZ; ++$z) {
+                for ($y = $minY; $y <= $maxY; ++$y) {
+                    $fillSession->getBlockAt($x, $y, $z, $id, $meta);
+                    $clipboard->addBlockAt($x, $y, $z, $id, $meta);
+                }
+            }
         }
 
         ClipboardManager::saveClipboard($player, $clipboard);
 
-        return EditorResult::success($i, microtime(true) - $startTime);
+        return EditorResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
     }
 
     public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
@@ -105,9 +112,9 @@ class Copier {
 
         $fillSession = new MaskedFillSession($player->getLevelNonNull(), true, true, SingleBlockIdentifier::airIdentifier());
 
-        $floorX = $relativePosition->getFloorX();
-        $floorY = $relativePosition->getFloorY();
-        $floorZ = $relativePosition->getFloorZ();
+        $floorX = $player->getFloorX() - $relativePosition->getFloorX();
+        $floorY = $player->getFloorY() - $relativePosition->getFloorY();
+        $floorZ = $player->getFloorZ() - $relativePosition->getFloorZ();
 
         while ($clipboard->hasNext()) {
             $clipboard->readNext($x, $y, $z, $id, $meta);
@@ -139,9 +146,9 @@ class Copier {
 
         $fillSession = new FillSession($player->getLevelNonNull(), true, true);
 
-        $floorX = $relativePosition->getFloorX();
-        $floorY = $relativePosition->getFloorY();
-        $floorZ = $relativePosition->getFloorZ();
+        $floorX = $player->getFloorX() - $relativePosition->getFloorX();
+        $floorY = $player->getFloorY() - $relativePosition->getFloorY();
+        $floorZ = $player->getFloorZ() - $relativePosition->getFloorZ();
 
         while ($clipboard->hasNext()) {
             $clipboard->readNext($x, $y, $z, $id, $meta);

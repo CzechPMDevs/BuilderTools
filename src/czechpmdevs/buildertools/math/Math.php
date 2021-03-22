@@ -74,4 +74,10 @@ class Math {
             $maxY = (int)max($pos1->getY(), $pos2->getY());
         }
     }
+
+    public static function selectionSize(Vector3 $pos1, Vector3 $pos2): int {
+        Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+        return (($maxX - $minX) + 1) * (($maxY - $minY) + 1) * (($maxZ - $minZ) + 1);
+    }
 }

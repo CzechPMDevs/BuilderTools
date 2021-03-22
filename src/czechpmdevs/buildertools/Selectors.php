@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools;
 
+use czechpmdevs\buildertools\math\Math;
 use InvalidArgumentException;
 use pocketmine\level\Position;
 use pocketmine\Player;
@@ -99,8 +100,7 @@ class Selectors {
             return null;
         }
 
-        $vec = $pos2->subtract($pos1)->abs()->add(1, 1, 1);
-        return (int)($vec->getX() * $vec->getY() * $vec->getZ());
+        return Math::selectionSize($pos1, $pos2);
     }
 
     public static function getPosition(Player $player, int $pos): ?Position {
