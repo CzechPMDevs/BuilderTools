@@ -63,7 +63,7 @@ class Fixer {
     }
 
     private function fixButtonMeta(int $meta): int {
-        return (6 - $meta) % 6;
+        return ((6 - $meta) % 6) & 0xf;
     }
 
     private function fixTrapdoorMeta(int $meta): int {

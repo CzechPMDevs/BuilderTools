@@ -21,50 +21,54 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
-use pocketmine\math\Vector3;
-use pocketmine\player\Player;
+use pocketmine\level\Position;
+use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
-use pocketmine\world\Position;
+use function microtime;
 use function mt_rand;
 
 class Decorator {
     use SingletonTrait;
 
-    /**
-     * TODO
-     */
-    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, ?Player $player = null): void {
-        $undo = new BlockArray();
+    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): EditorResult {
+        $startTime = microtime(true);
+
+        $fillSession = new FillSession($center->getLevelNonNull(), false, true);
+
         $stringToBlockDecoder = new StringToBlockDecoder($blocks);
 
-        for ($x = $center->getX() - $radius; $x <= $center->getX() + $radius; ++$x) {
-            /** @var int $x */
-            for ($z = $center->getZ() - $radius; $z <= $center->getZ() + $radius; ++$z) {
-                /** @var int $z */
-                if (mt_rand(1, 100) <= $percentage) {
-                    /** @var int $y */
-                    $y = $center->getY() + $radius;
-                    check:
-                    if ($y > 0) {
-                        $vec = new Vector3($x, $y, $z);
-                        if ($center->getWorld()->getBlock($vec)->getId() == 0) {
-                            $y--;
-                            goto check;
-                        } else {
-                            $block = $player->getWorld()->getBlockAt($x, $y, $z);
-                            $undo->addBlock($vec, $block->getId(), $block->getMeta());
+        $minX = $center->getFloorX() - $radius;
+        $maxX = $center->getFloorX() + $radius;
+        $minZ = $center->getFloorZ() - $radius;
+        $maxZ = $center->getFloorZ() + $radius;
 
-                            $stringToBlockDecoder->nextBlock($id, $meta);
-                            $center->getWorld()->setBlock($vec->add(0, 1, 0), $id, $meta);
-                        }
-                    }
+        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
+
+        for ($x = $minX; $x <= $maxX; ++$x) {
+            /** @var int $x */
+            for ($z = $minZ; $z <= $maxZ; ++$z) {
+                if(mt_rand(1, 100) > $percentage) {
+                    continue;
                 }
+
+                if(!$fillSession->getHighestBlockAt($x, $z, $y)) {
+                    continue;
+                }
+
+                $stringToBlockDecoder->nextBlock($id, $meta);
+                $fillSession->setBlockAt($x, $y, $z, $id, $meta);
             }
         }
 
-        if($player !== null) {
-            Canceller::getInstance()->addStep($player, $undo);
-        }
+        $fillSession->reloadChunks($center->getLevelNonNull());
+
+        /** @phpstan-var BlockArray $changes */
+        $changes = $fillSession->getChanges();
+        Canceller::getInstance()->addStep($player, $changes);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 }

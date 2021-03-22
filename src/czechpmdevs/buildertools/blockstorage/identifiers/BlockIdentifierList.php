@@ -18,24 +18,18 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\blockstorage;
+namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
-use pocketmine\world\ChunkManager;
-
-interface UpdateLevelData {
+interface BlockIdentifierList {
 
     /**
-     * @return bool Returns if it is possible read next blocks
+     * Function which outputs next random block
      */
-    public function hasNext(): bool;
+    public function nextBlock(?int &$id, ?int &$meta): void;
 
     /**
-     * Reads next block from the array
+     * Function which returns if the block
+     * in the list
      */
-    public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
-
-    /**
-     * Should not be null when used in filler
-     */
-    public function getLevel(): ?ChunkManager;
+    public function containsBlock(int $id, int $meta): bool;
 }

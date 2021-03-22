@@ -1,4 +1,4 @@
-<a align="center"><img src="https://i.ibb.co/Zhkf4xF/Builder-Tools-v1-2-0-beta1.png"></a>  
+<a align="center"><img src="https://i.ibb.co/Hqq6Z3R/bt.png"></a>  
   
 <p align="center">  
    <a href="https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools">  
@@ -12,47 +12,49 @@
    </a>  
    <a href="https://github.com/CzechPMDevs/BuilderTools/releases">  
       <img src="https://img.shields.io/github/downloads/CzechPMDevs/BuilderTools/total.svg?style=flat-square">  
-   </a>  
-   </a>  
+   </a>
    <a href="https://github.com/CzechPMDevs/BuilderTools/blob/master/LICENSE">  
       <img src="https://img.shields.io/github/license/CzechPMDevs/BuilderTools.svg?style=flat-square">  
    </a>  
    <a href="https://poggit.pmmp.io/p/BuilderTools">  
-      <img src="https://poggit.pmmp.io/shield.state/BuilderTools?style=flat-square">  
+      <img src="https://poggit.pmmp.io/shield.downloads/BuilderTools?style=flat-square">  
    </a>  
 <br><br>  
    ✔️ Advanced WorldEdit commands  
     <br>  
     ✔️ Supports fast filling  
     <br>  
-    ✔️ Schematics support  
-    <br>  
-    ✔️Simple hill making  
+    ✔️ Supports schematics  
     <br>  
     ✔️ Minecraft: Java Version maps world fixer  
     <br>  
-    ✔️ Supports last pocketmine api version  
+    ✔️ Supports last pocketmine API version  
     <br><br>  
 </p>  
   
-## 👍 1.2 Update:  
-> - Plugin cleanup  
-> - Lots of new commands  
-> - Plugin now supports 4.0.0 api versions too  
-> - Bug fixes  
-> - Schematics support  
+## 👍 1.2.0-beta3 Update:  
+> - Plugin cleanup
+> - Memory & CPU optimization
+> - Schematics are now created & saved asynchronously
+> - Bug fixes
+> - New commands (`//wals`, `//cut`, `//center`, `//d`)
+> - Changed permissions prefix from `bt` to `buildertools`
+> - `//fix` command now fixes whole world asynchronously
+> - Dropped support for php 7.3 & PocketMine api versions lower than 3.16.0
   
   
   
 ## ⬇️ Downloads:  
   
-| Version | Phar Download | Zip Download | API | Stable | Pre release |  
-| --- | --- | --- | --- | --- | --- | 
-| 1.2.0-beta1 | - | - | 3.x.x, 4.x.x | ✔️ | ✔️ |  
-| 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | 3.x.x | ✔️ | ❌ |  
-| 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ✔️ | ✔️|  
-| 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | ❌ | ✔️|  
-| 1.0.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.0.0/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.0.0.zip) | 3.0.0-ALPHA7 | ✔️ | ❌|  
+| Version | Phar Download | Zip Download | API | Min php version |
+| --- | --- | --- | --- | --- |
+| 1.2.0-beta3 | [Try latest dev version from Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta2 | [Poggit](https://poggit.pmmp.io/r/62312/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/41b127a689d523683f8cd3c5e3704688073a818f.zip) | 3.x.x | 7.0 |
+| 1.2.0-beta1 | [Poggit](https://poggit.pmmp.io/r/55728/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/648661f756b8bd8c89582e637ee864f9411763a2.zip) | 3.x.x | 7.0 |
+| 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | 3.x.x | 7.0 |
+| 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta2) | 3.x.x | 7.0 |
+| 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | 7.0 |
+| 1.0.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.0.0/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.0.0.zip) | 3.0.0-ALPHA7 | 7.0 |
   
 <br>  
   
@@ -84,78 +86,82 @@
 | **Command** | **Description** |  
 | --- | --- |  
 | **//commands** | **Displays list BuilderTools commands** <br><br> Alias: `//commands`, `/buildertools` <br>Usage: `//commands <page: 1-4>`|  
-| **//pos1** | **Select first position** <br><br> Aliases: `//1`, `//pos1` <br> Usage: `//pos1` <br><br> You need select two possitions for eg. filling or fixing Minecraft: Java Edition maps. |  
-| **//pos2** | **Select second position** <br><br> Aliases: `//2`, `//pos2` <br> Usage: `//pos2` <br><br> You need select two possitions for eg. filling or fixing Minecraft: Java Edition maps. |  
-| **//fill** | **Fill selected area** <br><br> Aliases: `//set`, `//change` <br> Usage: `//fill <id1:dmg1,id2,...>` <br><br> First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
-| **//wand** |**Switch wand tool** <br><br> Usage: `//wand` <br><br> First position is set  by breaking the block, second by touching the block. Wand tool can be turned of typing `//wand` again.|  
-| **//sphere** | **Creates sphere** <br><br> Usage: `//sphere <id1:dmg1,id2,...> <radius>` <br><br> Creates a sphere in your position. |  
-| **//cube** | **Creates cube** <br><br> Usage: `//cube <id1:dmg1,id2,...> <radius>` <br><br> Creates a cube in your position. |  
-| **//replace** | **Replace blocks in selected area** <br><br> Usage: `//replace <blocksToReplace: id1,id2> <blocks: id1:dmg1,id2,...>` <br><br> Replace blocks in selected area. First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
-| **//draw** | **Draws with blocks** <br><br>Usage: `//draw <cube|sphere|off> [brush: 1-6] [fall = false]` <br><br> We are recommend to use this command while creating big mountains. Draw mode is turned on by typing `//draw <cube|sphere>` and can be turned of typing `//draw off`. |  
-| **//copy** | **Copy selected area into the clipboard** <br><br> Usage: `//copy` <br><br> Copied area can be placed again using `//paste`, merged with the environment `//merge` or rotated `//rotate`.|  
-| **//paste** | **Paste copied area** <br><br> Usage: `//paste` |  
-| **//merge** | **Merge copied area** <br><br> Usage: `//merge` |  
-| **//rotate** | **Rotate copied area** <br><br>Usage: `//rotate` <br><br> When rotating an object, you must rotate to the side to which you want to rotate the object, and then write the `confirm` to the chat. If you want to cancel rotation, type `cancel` into the chat.|  
-| **//flip** | **Flip copied area** <br><br> Usage: `//flip` <br><br> Rotate copied area upside down.|  
-| **//undo** | **Cancels BuilderTools action** <br><br> Usage: `//undo` |  
-| **//fix** | **Fixes blocks from Minecraft: Java Edition** <br><br> Usage: `//fix` <br><br> First you must create area using `//pos1`, `//pos2` or by `//wand`.|  
-| **//tree** | **Spawns tree** <br><br> Usage: `//tree <tree|list>` <br><br> There are implemented only basic trees (`oak`, `spruce`, `jungle` and `birch`) |  
-| **//naturalize** | **Replaces blocks in selected area to grass,dirt and stone** <br><br>Usage: `//naturalize` |  
-| **//id** | **Displays id of item in your hand** <br><br>Usage: `//id` |  
-| **//clearinventory** | **Clears inventory** <br><br>Usage: `//clearinventory`<br>Alias: `//ci`  |  
 | **//blockinfo** | **Switch block info mode** <br><br>Usage: `//blockinfo`<br>Alias: `//bi`<br><br>In blockinfo mode you can get information about block by touching it.  |  
-| **//hsphere** | **Creates hollow sphere** <br><br>Usage: `//hsphere <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow sphere in your position.  |  
-| **//hcube** | **Creates hollow cube** <br><br>Usage: `//hcube <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cube in your position.  |  
+| **//clearinventory** | **Clears inventory** <br><br>Usage: `//clearinventory`<br>Alias: `//ci`  |  
+| **//center** | **Finds center of the selection** <br><br> Usage: `//center` <br><br> Bedrock will appear in the middle of the selection |  
+| **//copy** | **Copy selected area into the clipboard** <br><br> Usage: `//copy` <br><br> Copied area can be placed again using `//paste`, merged with the environment `//merge` or rotated `//rotate`.|  
+| **//cube** | **Creates cube** <br><br> Usage: `//cube <id1:dmg1,id2,...> <radius>` <br><br> Creates a cube at your position. |  
+| **//cut** | **Cuts out selected area** <br><br> Usage: `//cube <id1:dmg1,id2,...> <radius>` <br><br> The are is afterwards moved on to clipboard. |
+| **//cylinder** | **Creates cylinder** <br><br> Usage: `//cube <id1:dmg1,id2,...> <radius>` <br><br> Creates a cylinder at your position. |
+| **//draw** | **Draws with blocks** <br><br>Usage: `//draw <cube|sphere|off> [brush: 1-6] [fall = false]` <br><br> We recommend to use this command while creating big mountains. Draw mode is turned on by typing `//draw <cube|sphere>` and can be turned of typing `//draw off`. |  
+| **//fill** | **Fill selected area** <br><br> Aliases: `//set`, `//change` <br> Usage: `//fill <id1:dmg1,id2,...>` <br><br> First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
+| **//fix** | **Fixes block in world from Minecraft: Java Edition** <br><br> Usage: `//fix <world>` |  
+| **//hcube** | **Creates hollow cube** <br><br>Usage: `//hcube <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cube at your position.  |  
+| **//hcylinder** | **Creates hollow cylinder** <br><br>Usage: `//hcyl <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cylinder at your position.  |  
+| **//hpyramid** | **Creates hollow pyramid** <br><br>Usage: `//hpyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow pyramid at your position.  |  
+| **//hsphere** | **Creates hollow sphere** <br><br>Usage: `//hsphere <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow sphere at your position.  |  
+| **//id** | **Displays id of item in your hand** <br><br>Usage: `//id` |  
+| **//merge** | **Merge copied area** <br><br> Usage: `//merge` |  
+| **//move** | **Move blocks in selection** <br><br>Usage: `//move <x> <y> <z>`<br><br>Move blocks in selected area.  |  
+| **//naturalize** | **Replaces blocks in selected area to grass,dirt and stone** <br><br>Usage: `//naturalize` |  
+| **//outline** | **Fills hollow selected area** <br><br>Usage: `//outline <id1:dmg1,id2,...>`<br><br>Changes the all the outer layers.  |  
+| **//paste** | **Paste copied area** <br><br> Usage: `//paste` |  
+| **//pos1** | **Select first position** <br><br> Aliases: `//1`, `//pos1` <br> Usage: `//pos1` <br><br> You need select two positions for eg. filling or fixing Minecraft: Java Edition maps. |  
+| **//pos2** | **Select second position** <br><br> Aliases: `//2`, `//pos2` <br> Usage: `//pos2` <br><br> You need select two positions for eg. filling or fixing Minecraft: Java Edition maps. |  
 | **//pyramid** | **Creates pyramid** <br><br>Usage: `//pyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates pyramid in your position.  |  
-| **//hpyramid** | **Creates hollow pyramid** <br><br>Usage: `//hpyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow pyramid in your position.  |  
+| **//redo** | **Re-do BuilderTools action** <br><br> Usage: `//redo` |
+| **//replace** | **Replace blocks in selected area** <br><br> Usage: `//replace <blocksToReplace: id1,id2> <blocks: id1:dmg1,id2,...>` <br><br> Replace blocks in selected area. First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
+| **//rotate** | **Rotate copied area** <br><br>Usage: `//rotate` <br><br> When rotating an object, you must rotate to the side to which you want to rotate the object, and then write the `confirm` to the chat. If you want to cancel rotation, type `cancel` into the chat.|  
+| **//schematic** | **Manage with schematics** <br><br>Usage: `//schem <reload|load|list|paste> [filename]`<br><br>Manage with schematics (reload - loads all schematics to memory; load - loads schematics for //schem paste; list - displays list of loaded schematics.  |  
+| **//sphere** | **Creates sphere** <br><br> Usage: `//sphere <id1:dmg1,id2,...> <radius>` <br><br> Creates a sphere in your position. |  
 | **//stack** | **Stacks copied area** <br><br>Usage: `//stack <count> [side|up|down]`<br><br>Stacks blocks in line.  |  
-| **//outline** | **Fills holow selected area** <br><br>Usage: `//outline <id1:dmg1,id2,...>`<br><br>Fills holow selected area.  |  
-| **//move** | **Move blocks** <br><br>Usage: `//move <x> <y> <z>`<br><br>Move blocks in selected area.  |  
-| **//schematic** | **Manage with schematics** <br><br>Usage: `//schem <reload|load|list|paste> [filename]`<br><br>Manage with schematics (reload - loads all schematics to memory; load - lodads schematics for //schem paste; list - displays list of loaded schematics.  |  
-  
-  
+| **//tree** | **Spawns tree** <br><br> Usage: `//tree <tree|list>` <br><br> There are implemented only basic trees (`oak`, `spruce`, `jungle` and `birch`) |  
+| **//undo** | **Cancels BuilderTools action** <br><br> Usage: `//undo` |  
+| **//walls** | **Makes walls around selection** <br><br> Usage: `//walls` |   
+| **//wand** |**Switch wand tool** <br><br> Usage: `//wand` <br><br> First position is set  by breaking the block, second by touching the block. Wand tool can be turned of typing `//wand` again.|  
+
+<br>
   
 ## 📃  Permissions:  
   
 <br>  
   
-**All BuilderTools Permissions:**  
+**All BuilderTools Permissions:**
   
-  
-  
-| Permission | Command | Opertor |  
+| Permission | Command | Operator Permissions required |  
 | --- | --- | --- |  
-| bt.cmd.help | `//commands` | ✔️ |  
-| bt.cmd.pos1 | `//pos1` | ✔️ |  
-| bt.cmd.pos2 | `//pos2` | ✔️ |  
-| bt.cmd.fill | `//fill` | ✔️ |  
-| bt.cmd.wand | `//wand` | ✔️ |  
-| bt.cmd.sphere | `//sphere` | ✔️ |  
-| bt.cmd.cube | `//cube` | ✔️ |  
-| bt.cmd.draw | `//draw` | ✔️ |  
-| bt.cmd.copy | `//copy` | ✔️ |  
-| bt.cmd.paste | `//paste` | ✔️ |  
-| bt.cmd.merge | `//merge` | ✔️ |  
-| bt.cmd.rotate | `//rotate` | ✔️ |  
-| bt.cmd.flip | `//flip` | ✔️ |  
-| bt.cmd.undo | `//undo` | ✔️ |  
-| bt.cmd.fix | `//fix` | ✔️ |  
-| bt.cmd.tree | `//tree` | ✔️ |  
-| bt.cmd.naturalize | `//naturalize` | ✔️ |  
-| bt.cmd.id | `//id` | ✔️ |  
-| bt.cmd.clearinventory | `//clearinventory` | ✔️ |  
-| bt.cmd.blockinfo | `//blockinfo` | ✔️ |  
-| bt.cmd.hsphere | `//hsphere` | ✔️ |  
-| bt.cmd.hcube | `//hcube` | ✔️ |  
-| bt.cmd.schematic | `//schematic` | ✔️ |  
-| bt.cmd.cylinder | `//cylinder` | ✔️ |  
-| bt.cmd.hcylinder | `//hcylinder` | ✔️ |  
-| bt.cmd.pyramid | `//pyramid` | ✔️ |  
-| bt.cmd.hpyramid | `//hpyramid` | ✔️ |  
-| bt.cmd.stack | `//stack` | ✔️ |  
-| bt.cmd.outline | `//outline` | ✔️ |  
-| bt.cmd.move | `//move` | ✔️ |  
-| bt.cmd.schematic | `//schematic` | ✔️ |  
+| buildertools.command.help | `//commands` | ✔️ |  
+| buildertools.command.blockinfo | `//blockinfo` | ✔️ |  
+| buildertools.command.clearinventory | `//clearinventory` | ✔️ |  
+| buildertools.command.copy | `//copy` | ✔️ |  
+| buildertools.command.cube | `//cube` | 
+| buildertools.command.cut | `//cut` | ✔️ |
+| buildertools.command.cylinder | `//cylinder` | ✔️ |
+| buildertools.command.decoration | `//decoration` | ✔️ |
+| buildertools.command.draw | `//draw` | ✔️ |  
+| buildertools.command.fill | `//fill` | ✔️ |  
+| buildertools.command.fix | `//fix` | ✔️ |
+| buildertools.command.hcube | `//hcube` | ✔️ |  
+| buildertools.command.hcylinder | `//hcylinder` | ✔️ |  
+| buildertools.command.hpyramid | `//hpyramid` | ✔️ |  
+| buildertools.command.hsphere | `//hsphere` | ✔️ |  
+| buildertools.command.id | `//id` | ✔️ |  
+| buildertools.command.merge | `//merge` | ✔️ |  
+| buildertools.command.move | `//move` | ✔️ |  
+| buildertools.command.naturalize | `//naturalize` | ✔️ |  
+| buildertools.command.outline | `//outline` | ✔️ |  
+| buildertools.command.paste | `//paste` | ✔️ |  
+| buildertools.command.pos1 | `//pos1` | ✔️ |  
+| buildertools.command.pos2 | `//pos2` | ✔️ |  
+| buildertools.command.pyramid | `//pyramid` | ✔️ |  
+| buildertools.command.rotate | `//rotate` | ✔️ |  
+| buildertools.command.schematic | `//schematic` | ✔️ |  
+| buildertools.command.sphere | `//sphere` | ✔️ |  
+| buildertools.command.stack | `//stack` | ✔️ |  
+| buildertools.command.tree | `//tree` | ✔️ |  
+| buildertools.command.undo | `//undo` | ✔️ |
+| buildertools.command.walls | `//walls` | ✔️ |
+| buildertools.command.wand | `//wand` | ✔️ |  
   
 ## 🔧 Configuration  
 - New in 1.2  
@@ -164,13 +170,8 @@
 ```yaml  
 ---
 # Do not change this!
-config-version: 1.2.0    
-    
-schematics:    
-  # Available modes: startup, oncommand    
-  # - startup - when plugin starts, all schematics will loaded
-  # - oncommand - schematics will been loaded when player use '//schem load' command
- load: startup    
+config-version: 1.2.1    
+
  items:    
   wand-axe:    
     enabled: true    
@@ -179,13 +180,17 @@ schematics:
     enabled: false    
     name: "§r§fDebug Stick\n§7§oTouch block for info"    
 ...  
-```  
+```
+
+<br>
   
 ## 💰 Credits  
   
 - Icon made by [Freepik](http://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")  
-- Spawn built by FlammyNetwork's builder team  
-  
+- Seabuild spawn built by CryptoKey
+
+<br>
+
 ##  💡 License  
   
 ```  

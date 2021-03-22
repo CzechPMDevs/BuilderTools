@@ -22,6 +22,8 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\FillSession;
+use czechpmdevs\buildertools\math\Math;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\level\Level;
@@ -29,26 +31,55 @@ use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use function microtime;
 
 class Naturalizer {
     use SingletonTrait;
 
-    public function naturalize(int $x1, int $y1, int $z1, int $x2, int $y2, int $z2, Level $level, Player $player): EditorResult {
-        $list = new BlockArray();
-        $list->setLevel($level);
+    public function naturalize(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
+        $startTime = microtime(true);
 
-        for($x = min($x1, $x2); $x <= max($x1, $x2); ++$x) {
-            for($z = min($z1, $z2); $z <= max($z1, $z2); ++$z) {
-                $this->fix($list, new Vector2($x, $z), (int)min($y1, $y2), (int)max($y1, $y2), $level);
+        Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
+
+        for($x = $minX; $x <= $maxX; ++$x) {
+            for($z = $minZ; $z <= $maxZ; ++$z) {
+                $state = 0;
+                for($y = 255; $y >= 0; --$y) {
+                    $fillSession->getBlockIdAt($x, $y, $z, $id);
+                    if($id == 0) {
+                        $state = 0;
+                    } elseif($state == 0) {
+                        $state = 1;
+                        $fillSession->setBlockAt($x, $y, $z, 2, 0); // Grass
+                    } elseif($state < 5) { // 1 - 3
+                        if($state == 3) {
+                            $state += 2;
+                        } else {
+                            $state++;
+                        }
+                        $fillSession->setBlockAt($x, $y, $z, 3, 0);
+                    } else {
+                        $fillSession->setBlockAt($x, $y, $z, 1, 0);
+                    }
+                }
             }
         }
 
-        return Filler::getInstance()->fill($player, $list);
+        $fillSession->reloadChunks($player->getLevelNonNull());
+
+        /** @phpstan-var BlockArray $changes */
+        $changes = $fillSession->getChanges();
+        Canceller::getInstance()->addStep($player, $changes);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
     private function fix(BlockArray $list, Vector2 $vector2, int $minY, int $maxY, Level $level): void {
-        $x = (int)$vector2->getX();
-        $z = (int)$vector2->getY();
+        $x = $vector2->getFloorX();
+        $z = $vector2->getFloorY();
 
         $blockY = null;
         for($y = $minY; $y <= $maxY; ++$y) {
@@ -59,7 +90,7 @@ class Naturalizer {
 
         if($blockY === null) return;
 
-        for($y = $blockY; $y > $minY; $y--) {
+        for($y = $blockY; $y > $minY; --$y) {
             switch ($blockY-$y) {
                 case 0:
                     $list->addBlock(new Vector3($x, $y, $z), BlockIds::GRASS, 0);

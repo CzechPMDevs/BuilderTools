@@ -22,10 +22,8 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Filler;
-use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
-use pocketmine\player\Player;
-use pocketmine\world\Position;
+use pocketmine\Player;
 
 class FillCommand extends BuilderToolsCommand {
 
@@ -45,23 +43,7 @@ class FillCommand extends BuilderToolsCommand {
             return;
         }
 
-        if(!Selectors::isSelected(1, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
-            return;
-        }
-
-        if(!Selectors::isSelected(2, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
-            return;
-        }
-
-        /** @var Position $firstPos */
-        $firstPos = Selectors::getPosition($sender, 1);
-        /** @var Position $secondPos */
-        $secondPos = Selectors::getPosition($sender, 2);
-
-        if($firstPos->getWorld()->getId() != $secondPos->getWorld()->getId()) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cPositions must be in same level");
+        if(!$this->readPositions($sender, $firstPos, $secondPos)) {
             return;
         }
 

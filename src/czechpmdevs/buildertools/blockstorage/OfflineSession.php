@@ -23,10 +23,11 @@ namespace czechpmdevs\buildertools\blockstorage;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\ClipboardManager;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNbtSerializer;
+use pocketmine\nbt\BigEndianNBTStream;
+use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\TreeRoot;
-use pocketmine\player\Player;
+use pocketmine\nbt\tag\IntArrayTag;
+use pocketmine\Player;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -44,30 +45,27 @@ final class OfflineSession {
 
         // Clipboard
         if(ClipboardManager::hasClipboardCopied($player)) {
-            /** @var SelectionData $clipboard */
+            /** @phpstan-var SelectionData $clipboard */
             $clipboard = ClipboardManager::getClipboard($player);
-            /** @var Vector3 $playerPosition */
-            $playerPosition = $clipboard->getPlayerPosition();
 
-            $nbt->setTag("Clipboard", (new CompoundTag())
-                ->setIntArray("Blocks", $clipboard->blocks)
-                ->setIntArray("Coordinates", $clipboard->coords)
-                ->setIntArray("RelativePosition", [
-                    $playerPosition->getFloorX(),
-                    $playerPosition->getFloorY(),
-                    $playerPosition->getFloorZ()
-                ])
-            );
+            $clipboard->compress();
+
+            $nbt->setTag(new CompoundTag("Clipboard", [
+                new ByteArrayTag("Coordinates", $clipboard->compressedCoords),
+                new ByteArrayTag("Blocks", $clipboard->compressedBlocks),
+                new ByteArrayTag("RelativePosition", $clipboard->compressedPlayerPosition)
+                ]
+            ));
 
             unset(ClipboardManager::$clipboards[$player->getName()]);
         }
 
-        $serializer = new BigEndianNbtSerializer();
-        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $serializer->write(new TreeRoot($nbt)));
+        $stream = new BigEndianNBTStream();
+        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $stream->writeCompressed($nbt));
 
-        unset($serializer, $nbt);
+        unset($stream, $nbt);
 
-        BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 * 1024), 3) . "Mb ram)");
+        BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 ** 2), 3) . "Mb ram)");
     }
 
     public static function loadPlayerSession(Player $player): void {
@@ -75,28 +73,31 @@ final class OfflineSession {
             return;
         }
 
-        $serializer = new BigEndianNbtSerializer();
+        $stream = new BigEndianNBTStream();
 
         $buffer = file_get_contents($path);
         if(!$buffer || !@unlink($path)) {
             return;
         }
 
-        /** @var CompoundTag|null $nbt */
-        $nbt = $serializer->read($buffer)->getTag();
+        /** @phpstan-var CompoundTag|null $nbt */
+        $nbt = $stream->readCompressed($buffer);
 
         if($nbt === null) {
             return;
         }
 
+        // Clipboard
         if($nbt->hasTag("Clipboard")) {
-            /** @var CompoundTag $clipboardTag */
+            /** @phpstan-var CompoundTag $clipboardTag */
             $clipboardTag = $nbt->getCompoundTag("Clipboard");
 
             $clipboard = new SelectionData();
-            $clipboard->coords = $clipboardTag->getIntArray("Coordinates");
-            $clipboard->blocks = $clipboardTag->getIntArray("Blocks");
-            $clipboard->setPlayerPosition(new Vector3(...$clipboardTag->getIntArray("RelativePosition")));
+            $clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
+            $clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
+            $clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
+
+            $clipboard->decompress();
 
             ClipboardManager::saveClipboard($player, $clipboard);
         }

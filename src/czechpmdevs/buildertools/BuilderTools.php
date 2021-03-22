@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools;
 
 use czechpmdevs\buildertools\commands\BlockInfoCommand;
+use czechpmdevs\buildertools\commands\CenterCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
 use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
@@ -52,13 +53,11 @@ use czechpmdevs\buildertools\commands\SphereCommand;
 use czechpmdevs\buildertools\commands\StackCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
 use czechpmdevs\buildertools\commands\UndoCommand;
+use czechpmdevs\buildertools\commands\WallsCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
-use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
-use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\Enchantment;
-use pocketmine\item\enchantment\Rarity;
 use pocketmine\plugin\PluginBase;
 use function glob;
 use function mkdir;
@@ -73,17 +72,18 @@ class BuilderTools extends PluginBase {
 
     /** @var EventListener */
     private static EventListener $listener;
-    /** @var SchematicsManager */
-    private static SchematicsManager $schematicsManager;
 
     /** @var Command[] */
     private static array $commands = [];
 
-    /** @var mixed[] */
+    /**
+     * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
+     * @phpstan-var mixed[]
+     */
     private static array $configuration = [];
 
     /** @noinspection PhpUnused */
-    public function onEnable(): void {
+    public function onEnable() {
         self::$instance = $this;
         self::$prefix = "§7[BuilderTools] §a";
 
@@ -97,7 +97,8 @@ class BuilderTools extends PluginBase {
         self::$schematicsManager = new SchematicsManager($this);
     }
 
-    public function onDisable(): void {
+    /** @noinspection PhpUnused */
+    public function onDisable() {
         $this->cleanCache();
     }
 
@@ -116,13 +117,14 @@ class BuilderTools extends PluginBase {
     }
 
     private function registerEnchantment(): void {
-        EnchantmentIdMap::getInstance()->register(50, new Enchantment(50, "BuilderTools", Rarity::COMMON, 0, 0, 1));
+        Enchantment::registerEnchantment(new Enchantment(50, "BuilderTools", Enchantment::RARITY_COMMON, 0, 0, 1));
     }
 
     private function registerCommands(): void {
         $map = $this->getServer()->getCommandMap();
         self::$commands = [
             new BlockInfoCommand,
+            new CenterCommand,
             new ClearInventoryCommand,
             new CopyCommand,
             new CubeCommand,
@@ -154,6 +156,7 @@ class BuilderTools extends PluginBase {
             new StackCommand,
             new TreeCommand,
             new UndoCommand,
+            new WallsCommand,
             new WandCommand
         ];
 
@@ -165,14 +168,14 @@ class BuilderTools extends PluginBase {
     }
 
     public function sendWarnings(): void {
-        if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") != 0) {
+        if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
             $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
         }
     }
 
     public function cleanCache(): void {
         $files = glob($this->getDataFolder() . "sessions/*.dat");
-        if(!$files) {
+        if($files === false) {
             return;
         }
 
@@ -194,14 +197,11 @@ class BuilderTools extends PluginBase {
     }
 
     /**
-     * @return mixed[]
+     * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
+     * @phpstan-return mixed[]
      */
     public static function getConfiguration(): array {
         return self::$configuration;
-    }
-
-    public static function getSchematicsManager(): SchematicsManager {
-        return self::$schematicsManager;
     }
 
     public static function getInstance(): BuilderTools {

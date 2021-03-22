@@ -18,24 +18,22 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\blockstorage;
+namespace czechpmdevs\buildertools\async;
 
-use pocketmine\world\ChunkManager;
+use pocketmine\scheduler\AsyncTask;
+use pocketmine\Server;
 
-interface UpdateLevelData {
-
-    /**
-     * @return bool Returns if it is possible read next blocks
-     */
-    public function hasNext(): bool;
+abstract class BuilderToolsAsyncTask extends AsyncTask {
 
     /**
-     * Reads next block from the array
+     * This function is called on main thread before calling
+     * callback function
      */
-    public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
+    public function complete(): void {}
 
-    /**
-     * Should not be null when used in filler
-     */
-    public function getLevel(): ?ChunkManager;
+    /** @noinspection PhpUnused */
+    final public function onCompletion(Server $server) {
+        $this->complete();
+        AsyncQueue::callCallback($this);
+    }
 }

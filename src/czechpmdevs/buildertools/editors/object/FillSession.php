@@ -21,15 +21,18 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use pocketmine\utils\MainLogger;
-use pocketmine\world\ChunkManager;
-use pocketmine\world\utils\SubChunkExplorer;
-use pocketmine\world\World;
+use czechpmdevs\buildertools\BuilderTools;
+use Error;
+use pocketmine\block\BlockFactory;
+use pocketmine\block\Solid;
+use pocketmine\level\ChunkManager;
+use pocketmine\level\Level;
+use pocketmine\level\utils\SubChunkIteratorManager;
 
 class FillSession {
 
-    /** @var SubChunkExplorer */
-    protected SubChunkExplorer $iterator;
+    /** @var SubChunkIteratorManager */
+    protected SubChunkIteratorManager $iterator;
 
     /** @var bool */
     protected bool $calculateDimensions;
@@ -46,16 +49,12 @@ class FillSession {
 
     /** @var int */
     protected int $blocksChanged = 0;
-    
-    /** 
-     * Field to avoid re-allocating memory
-     * 
-     * @var int 
-     */
-    protected int $lastHash;
+
+    /** @var bool */
+    protected bool $error = false;
 
     public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true) {
-        $this->iterator = new SubChunkExplorer($world);
+        $this->iterator = new SubChunkIteratorManager($world);
 
         $this->calculateDimensions = $calculateDimensions;
         $this->saveChanges = $saveChanges;
@@ -83,7 +82,22 @@ class FillSession {
         $this->saveChanges($x, $y, $z);
 
         /** @phpstan-ignore-next-line */
-        $this->iterator->currentSubChunk->setFullBlock($x & 0x0f, $y & 0x0f, $z & 0x0f, $id << 4 | $meta);
+        $this->iterator->currentSubChunk->setBlock($x & 0xf, $y & 0xf, $z & 0xf, $id, $meta);
+        $this->blocksChanged++;
+    }
+
+    /**
+     * @param int $y 0-255
+     */
+    public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
+        if(!$this->moveTo($x, $y, $z)) {
+            return;
+        }
+
+        $this->saveChanges($x, $y, $z);
+
+        /** @phpstan-ignore-next-line */
+        $this->iterator->currentSubChunk->setBlockId($x & 0xf, $y & 0xf, $z & 0xf, $id);
         $this->blocksChanged++;
     }
 
@@ -94,22 +108,75 @@ class FillSession {
         if(!$this->moveTo($x, $y, $z)) {
             return;
         }
-        
-        $this->lastHash = $this->iterator->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
 
-        $id = $this->lastHash >> 4;
-        $meta = $this->lastHash & 0xf;
+        /** @phpstan-ignore-next-line */
+        $id = $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf);
+        /** @phpstan-ignore-next-line */
+        $meta = $this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf);
+    }
+
+    /**
+     * @param int $y 0-255
+     */
+    public function getBlockIdAt(int $x, int $y, int $z, ?int &$id): void {
+        if(!$this->moveTo($x, $y, $z)) {
+            return;
+        }
+
+        /** @phpstan-ignore-next-line */
+        $id = $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf);
+    }
+
+    public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
+        for($y = 255; $y >= 0; --$y) {
+            $this->iterator->moveTo($x, $y, $z);
+
+            /** @phpstan-ignore-next-line */
+            $id = $this->iterator->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+            if($id >> 4 != 0) {
+                if(BlockFactory::get($id >> 4, $id & 0xf) instanceof Solid) {
+                    $y++;
+                    return true;
+                }
+
+                return false;
+            }
+        }
+        return false;
     }
 
     public function getChanges(): ?BlockArray {
         return $this->changes;
     }
 
+    /**
+     * @return int
+     */
     public function getBlocksChanged(): int {
         return $this->blocksChanged;
     }
 
-    public function reloadChunks(World $world): void {
+    public function loadChunks(Level $level): void {
+        $minX = $this->minX >> 4;
+        $maxX = $this->maxX >> 4;
+        $minZ = $this->minZ >> 4;
+        $maxZ = $this->maxZ >> 4;
+
+        for($x = $minX; $x <= $maxX; $x++) {
+            for($z = $minZ; $z <= $maxZ; $z++) {
+                $chunk = $level->getChunk($x, $z);
+                if($chunk === null) {
+                    $level->loadChunk($x, $z);
+                }
+            }
+        }
+    }
+
+    public function reloadChunks(Level $level): void {
+        if($this->error) {
+            BuilderTools::getInstance()->getLogger()->notice("Some chunks were not found");
+        }
+
         $minX = $this->minX >> 4;
         $maxX = $this->maxX >> 4;
         $minZ = $this->minZ >> 4;
@@ -117,13 +184,16 @@ class FillSession {
 
         for($x = $minX; $x <= $maxX; ++$x) {
             for($z = $minZ; $z <= $maxZ; ++$z) {
-                $chunk = $world->getChunk($x, $z);
+                $level->clearChunkCache($x, $z);
+
+                $chunk = $level->getChunk($x, $z);
                 if($chunk === null) {
                     continue;
                 }
 
-                foreach ($world->getChunkListeners($x, $z) as $listener) {
-                    $listener->onChunkChanged($x, $z, $chunk);
+                $chunk->setChanged();
+                foreach ($level->getChunkLoaders($x, $z) as $loader) {
+                    $loader->onChunkChanged($chunk);
                 }
             }
         }
@@ -133,15 +203,20 @@ class FillSession {
         $this->iterator->moveTo($x, $y, $z);
 
         if($this->iterator->currentSubChunk === null) {
-//            MainLogger::getLogger()->debug("[BuilderTools] Chunk at " . ($x >> 4) . ":" . ($z >> 4) . " does not exist. Skipping the block...");
-            return false;
+            try {
+                /** @phpstan-ignore-next-line */
+                $this->iterator->level->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4, true);
+            } catch (Error $exception) { // For the case if chunk is null
+                $this->error = true;
+                return false;
+            }
         }
 
         if($this->calculateDimensions) {
-            if(!isset($this->minX) || $x < $this->minX) $this->minX = $x;
-            if(!isset($this->minZ) || $z < $this->minZ) $this->minZ = $z;
-            if(!isset($this->maxX) || $x > $this->maxX) $this->maxX = $x;
-            if(!isset($this->maxZ) || $z > $this->maxZ) $this->maxZ = $z;
+            if((!isset($this->minX)) || $x < $this->minX) $this->minX = $x;
+            if((!isset($this->minZ)) || $z < $this->minZ) $this->minZ = $z;
+            if((!isset($this->maxX)) || $x > $this->maxX) $this->maxX = $x;
+            if((!isset($this->maxZ)) || $z > $this->maxZ) $this->maxZ = $z;
         }
 
         return true;
@@ -149,11 +224,11 @@ class FillSession {
 
     protected function saveChanges(int $x, int $y, int $z): void {
         if($this->saveChanges) {
-            $this->lastHash = $this->iterator->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-
-            $id = $this->lastHash >> 4;
-            $meta = $this->lastHash & 0xf;
-
+            /** @phpstan-ignore-next-line */
+            $id = $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf);
+            /** @phpstan-ignore-next-line */
+            $meta = $this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf);
+            /** @phpstan-ignore-next-line */
             $this->changes->addBlockAt($x, $y, $z, $id, $meta);
         }
     }

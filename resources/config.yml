@@ -1,16 +1,10 @@
 ---
-# \
-## > BuilderTools configuration file
-# /
+#
+# BuilderTools configuration file
+#
 
 # Do not change this!
-config-version: 1.2.0
-
-schematics:
-  # Available modes: startup, oncommand
-  #  - startup - when plugin starts, all schematics will loaded using async task
-  #  - oncommand - schematics will been loaded when player use '//schem load' command without async
-  load: startup
+config-version: 1.2.0.1
 
 items:
   wand-axe:

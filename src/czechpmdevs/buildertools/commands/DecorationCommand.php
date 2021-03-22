@@ -23,7 +23,9 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Decorator;
 use pocketmine\command\CommandSender;
-use pocketmine\player\Player;
+use pocketmine\Player;
+use function is_numeric;
+use function str_replace;
 
 class DecorationCommand extends BuilderToolsCommand {
 
@@ -39,17 +41,25 @@ class DecorationCommand extends BuilderToolsCommand {
             return;
         }
         if(count($args) <= 2) {
-            $sender->sendMessage("§cUsage: §7//d <decoration: id1:dmg1,id2,...> <radius> <percentage: 30%> <radius: cube> ");
+            $sender->sendMessage("§cUsage: §7//d <decoration: id1:dmg1,id2,...> <radius> [percentage: 90%]");
             return;
         }
 
-        $percentage = 30;
-
-        if(isset($args[2]) && is_numeric($args[2])) {
-            $percentage = intval($args[2]);
+        if(!is_numeric($args[1])) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cUse integer for radius!");
+            return;
         }
 
-        Decorator::getInstance()->addDecoration($sender->getPosition(), $args[0], (int)$args[1], $percentage);
+        $percentage = 90;
+        if(isset($args[2]) && is_numeric(str_replace("%", "", $args[2]))) {
+            $percentage = (int)($args[2]);
+        }
+
+        $result = Decorator::getInstance()->addDecoration($sender, $args[0], (int)($args[1]), $percentage, $sender);
+        if(!$result->successful()) {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cAn error occurred whilst adding decoration: {$result->getErrorMessage()}");
+            return;
+        }
 
         $sender->sendMessage(BuilderTools::getPrefix()."§aDecoration placed!");
     }

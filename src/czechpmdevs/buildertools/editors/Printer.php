@@ -111,7 +111,7 @@ class Printer {
         $level->setBlockIdAt($x, $y, $z, $block->getId());
         $level->setBlockDataAt($x, $y, $z, $block->getDamage());
 
-        return new Vector3($x, $y, $z);
+        return new Vector3($x, ++$y, $z);
     }
 
     public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
@@ -231,6 +231,7 @@ class Printer {
 
         $fillSession = new FillSession($player->getLevelNonNull(), false );
         $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
+        $fillSession->loadChunks($player->getLevelNonNull());
 
         $incDivX = 0;
         for($x = 0; $x <= $radius; ++$x) {

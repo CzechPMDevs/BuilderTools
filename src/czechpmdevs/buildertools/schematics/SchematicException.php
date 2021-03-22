@@ -18,18 +18,8 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\utils;
+namespace czechpmdevs\buildertools\schematics;
 
-interface BlockIdentifierList {
+use Exception;
 
-    /**
-     * Function which outputs next random block
-     */
-    public function nextBlock(?int &$id, ?int &$meta): void;
-
-    /**
-     * Function which returns if the block
-     * in the list
-     */
-    public function containsBlock(int $id, int $meta): bool;
-}
+class SchematicException extends Exception {}

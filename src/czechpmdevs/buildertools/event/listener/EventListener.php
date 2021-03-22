@@ -112,6 +112,7 @@ class EventListener implements Listener {
 
     public function onQuit(PlayerQuitEvent $event): void {
         OfflineSession::savePlayerSession($event->getPlayer());
+        Selectors::unloadPlayer($event->getPlayer());
     }
 
     public function getPlugin(): BuilderTools {
