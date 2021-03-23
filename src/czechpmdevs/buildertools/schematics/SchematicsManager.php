@@ -50,7 +50,7 @@ use const PATHINFO_EXTENSION;
 
 class SchematicsManager {
 
-    /** @phpstan-var class_string<Schematic>[] $registeredTypes */
+    /** @phpstan-var array<class-string<Schematic>> $registeredTypes */
     private static array $registeredTypes = [];
     /** @var BlockArray[] */
     private static array $loadedSchematics = [];

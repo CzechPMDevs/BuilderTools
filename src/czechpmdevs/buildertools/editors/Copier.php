@@ -28,7 +28,6 @@ use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
-use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\math\Vector3;

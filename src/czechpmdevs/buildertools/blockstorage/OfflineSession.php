@@ -22,11 +22,9 @@ namespace czechpmdevs\buildertools\blockstorage;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\ClipboardManager;
-use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\Player;
 use function file_exists;
 use function file_get_contents;

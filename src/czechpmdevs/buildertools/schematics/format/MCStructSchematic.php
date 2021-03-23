@@ -45,7 +45,7 @@ class MCStructSchematic implements Schematic {
 
     /** @var CompoundTag[] */
     private array $internalId2StatesMap;
-    /** @var string|int[][] */
+    /** @var array<int[][]|int[][][]>  */
     private array $states2InternalIdMap;
 
     public function load(string $rawData): BlockArray {
@@ -89,8 +89,14 @@ class MCStructSchematic implements Schematic {
         return $blockArray;
     }
 
+    /**
+     * @throws SchematicException
+     */
     private function readVector3(CompoundTag $nbt, string $name): Vector3 {
         $tag = $nbt->getListTag($name);
+        if($tag === null) {
+            throw new SchematicException("List Tag $name was not found.");
+        }
 
         return new Vector3(...$tag->getAllValues());
     }
@@ -101,11 +107,7 @@ class MCStructSchematic implements Schematic {
      */
     private function readPalette(CompoundTag $nbt): array {
         /** @var CompoundTag[] $paletteData */
-        $paletteData = $nbt->getCompoundTag("structure")
-            ->getCompoundTag("palette")
-            ->getCompoundTag("default")
-            ->getListTag("block_palette")
-            ->getAllValues();
+        $paletteData = $nbt->getCompoundTag("structure")->getCompoundTag("palette")->getCompoundTag("default")->getListTag("block_palette")->getAllValues(); // @phpstan-ignore-line (We provide validated values)
 
         $palette = [];
         foreach ($paletteData as $i => $entry) {
@@ -120,9 +122,8 @@ class MCStructSchematic implements Schematic {
      */
     private function readIndexArray(CompoundTag $nbt): array {
         /** @var ListTag $listTag */
-        $listTag = $nbt->getCompoundTag("structure")
-            ->getListTag("block_indices")
-            ->get(0); // TODO : Find out why there is another list tag on index 1 full of -1 values
+        $listTag = $nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0); // @phpstan-ignore-line (We provide valid values)
+        // TODO : Find out why there is another list tag on index 1 full of -1 values
 
         return $listTag->getAllValues();
     }
@@ -136,9 +137,12 @@ class MCStructSchematic implements Schematic {
             throw new SchematicException("Unmapped identifier $name");
         }
 
+        /** @var array<int[]|int[][]> $data */
         $data = $this->states2InternalIdMap[$name];
 
+        /** @var int $id */
         $id = $data["id"];
+        /** @var int $meta */
         $meta = $data["meta"][$blockState->toString()] ?? 0;
 
         return $id << 4 | $meta;
@@ -146,6 +150,7 @@ class MCStructSchematic implements Schematic {
 
     /**
      * Experimental, I am not sure this works
+     * @throws SchematicException
      */
     public function save(BlockArray $blockArray): string {
         $nbt = new CompoundTag();
@@ -205,7 +210,7 @@ class MCStructSchematic implements Schematic {
 
         $nbt->setTag($structureNbt);
 //        return (new LittleEndianNBTStream())->write($nbt); // TODO
-        return (new BigEndianNBTStream())->writeCompressed($nbt);
+        return (new BigEndianNBTStream())->writeCompressed($nbt); // @phpstan-ignore-line (Only for testing purposes)
     }
 
     private function writeVector3(CompoundTag $nbt, string $name, Vector3 $vector3): void {
@@ -233,10 +238,21 @@ class MCStructSchematic implements Schematic {
             throw new SchematicException($dataPath . "states2InternalIdMap.serialized was not found");
         }
 
-        $reader = new LittleEndianNBTStream();
-        $this->internalId2StatesMap = array_map(fn($val) => $reader->read($val), unserialize(file_get_contents($id2StatesPath)));
+        $id2StatesContents = file_get_contents($id2StatesPath);
+        $states2IdContents = file_get_contents($states2IdPath);
+        if($id2StatesContents === false || $states2IdContents === false) {
+            throw new SchematicException("Unable to read files required for mapping");
+        }
 
-        $this->states2InternalIdMap = unserialize(file_get_contents($states2IdPath));
+        $reader = new LittleEndianNBTStream();
+
+        /** @var CompoundTag[] $id2StatesMap */
+        $id2StatesMap = array_map(fn(string $val) => $reader->read($val), unserialize($id2StatesContents));
+        /** @var array<int[][]|int[][][]> $states2IdMap */
+        $states2IdMap = unserialize($states2IdContents);
+
+        $this->internalId2StatesMap = $id2StatesMap;
+        $this->states2InternalIdMap = $states2IdMap;
     }
 
     public static function getFileExtension(): string {
@@ -251,11 +267,11 @@ class MCStructSchematic implements Schematic {
             }
 
             // Test if palette exists
-            $nbt->getCompoundTag("structure")->getCompoundTag("palette")->getCompoundTag("default")->getListTag("block_palette")->getAllValues();
+            $nbt->getCompoundTag("structure")->getCompoundTag("palette")->getCompoundTag("default")->getListTag("block_palette")->getAllValues(); // @phpstan-ignore-line (Errors are caught)
             // Test if block indexes exists
-            $nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0)->getValue();
+            $nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0)->getValue(); // @phpstan-ignore-line (Errors are caught)
 
-            return $nbt->hasTag("size", ListTag::class) && $nbt->getListTag("size")->count() == 3;
+            return $nbt->hasTag("size", ListTag::class) && $nbt->getListTag("size")->count() == 3; // @phpstan-ignore-line (Errors are caught)
         }
         catch (Throwable $ignore) {
             return false;

@@ -76,42 +76,4 @@ class Naturalizer {
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
-
-    private function fix(BlockArray $list, Vector2 $vector2, int $minY, int $maxY, Level $level): void {
-        $x = $vector2->getFloorX();
-        $z = $vector2->getFloorY();
-
-        $blockY = null;
-        for($y = $minY; $y <= $maxY; ++$y) {
-            if($level->getBlockAt($x, $y, $z, true, false)->getId() !== Block::AIR && ($blockY === null || $blockY < $y)) {
-                $blockY = $y;
-            }
-        }
-
-        if($blockY === null) return;
-
-        for($y = $blockY; $y > $minY; --$y) {
-            switch ($blockY-$y) {
-                case 0:
-                    $list->addBlock(new Vector3($x, $y, $z), BlockIds::GRASS, 0);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
-                        $list->addBlock(new Vector3($x, $y, $z), BlockIds::DIRT, 0);
-                    }
-                    break;
-                case 4:
-                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
-                        $list->addBlock(new Vector3($x, $y, $z), rand(0, 1) ? BlockIds::DIRT : BlockIds::STONE, 0);
-                    }
-                    break;
-                default:
-                    if($level->getBlockAt($x, $y, $z, true, false)->getId() != BlockIds::AIR) {
-                        $list->addBlock(new Vector3($x, $y, $z), BlockIds::STONE, 0);
-                    }
-            }
-        }
-    }
 }
