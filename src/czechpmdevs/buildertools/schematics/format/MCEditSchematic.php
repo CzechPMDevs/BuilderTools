@@ -27,6 +27,7 @@ use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ShortTag;
+use Throwable;
 use function chr;
 use function ord;
 use function str_repeat;
@@ -177,5 +178,33 @@ class MCEditSchematic implements Schematic {
     /** @noinspection PhpSameParameterValueInspection */
     private function writeMaterials(CompoundTag $nbt, string $materials): void {
         $nbt->setString("Materials", $materials);
+    }
+
+    public static function getFileExtension(): string {
+        return "schematic";
+    }
+
+    public static function validate(string $rawData): bool {
+        try {
+            $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+            if(!$nbt instanceof CompoundTag) {
+                return false;
+            }
+
+            // MCEdit
+            if(
+                $nbt->hasTag("Width", ShortTag::class) &&
+                $nbt->hasTag("Height", ShortTag::class) &&
+                $nbt->hasTag("Length", ShortTag::class) &&
+                $nbt->hasTag("Blocks", ByteArrayTag::class) &&
+                $nbt->hasTag("Data", ByteArrayTag::class)
+            ) {
+                return true;
+            }
+
+            return false;
+        } catch (Throwable $ignore) {
+            return false;
+        }
     }
 }

@@ -46,4 +46,18 @@ interface Schematic {
      * @throws SchematicException
      */
     public function save(BlockArray $blockArray): string;
+
+    /**
+     * Returns extension of the exported file (mostly
+     * '.schematic')
+     */
+    public static function getFileExtension(): string;
+
+    /**
+     * This function is used to validate format from raw data
+     * - Should not throw any errors neither exceptions
+     *
+     * @return bool
+     */
+    public static function validate(string $rawData): bool;
 }

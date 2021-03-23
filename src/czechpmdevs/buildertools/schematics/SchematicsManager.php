@@ -31,16 +31,16 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
-use Error;
+use czechpmdevs\buildertools\schematics\format\MCStructSchematic;
+use czechpmdevs\buildertools\schematics\format\Schematic;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNBTStream;
-use pocketmine\nbt\tag\ByteArrayTag;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\ShortTag;
 use pocketmine\Player;
 use function array_keys;
+use function array_map;
+use function array_unique;
 use function basename;
 use function file_exists;
+use function in_array;
 use function microtime;
 use function pathinfo;
 use function touch;
@@ -50,8 +50,19 @@ use const PATHINFO_EXTENSION;
 
 class SchematicsManager {
 
+    /** @phpstan-var class_string<Schematic>[] $registeredTypes */
+    private static array $registeredTypes = [];
     /** @var BlockArray[] */
     private static array $loadedSchematics = [];
+
+    public static function lazyInit(): void {
+        if(!empty(self::$registeredTypes)) {
+            return;
+        }
+
+        self::$registeredTypes[] = MCEditSchematic::class;
+        self::$registeredTypes[] = MCStructSchematic::class;
+    }
 
     /**
      * @phpstan-param Closure(SchematicActionResult $result): void $callback
@@ -78,14 +89,13 @@ class SchematicsManager {
                 $callback(SchematicActionResult::error("Error whilst reading object from another thread."));
             }
 
-            self::$loadedSchematics[basename($schematic, ".schematic")] = $blockArray;
+            self::$loadedSchematics[$task->name] = $blockArray;
 
             $callback(SchematicActionResult::success(microtime(true) - $startTime));
         });
     }
 
     public static function unloadSchematic(string $schematic): bool {
-        $schematic = basename($schematic, ".schematic");
         if(!isset(self::$loadedSchematics[$schematic])) {
             return false;
         }
@@ -141,7 +151,6 @@ class SchematicsManager {
     public static function pasteSchematic(Player $player, string $schematicName): EditorResult {
         $startTime = microtime(true);
 
-        $schematicName = basename($schematicName, ".schematic");
         if(!isset(self::$loadedSchematics[$schematicName])) {
             return EditorResult::error("Schematic $schematicName is not loaded.");
         }
@@ -175,15 +184,20 @@ class SchematicsManager {
 
     private static function findSchematicFile(string &$file): bool {
         $dataFolder = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR;
-
+        $allowedExtensions = array_unique(array_map(fn(Schematic $schematic) => $schematic::getFileExtension(), self::$registeredTypes));
         $ext = pathinfo($file, PATHINFO_EXTENSION);
-        if($ext != "schematic") {
-            $file .= ".schematic";
+        if(in_array($ext, $allowedExtensions)) {
+            if(file_exists($dataFolder . $file)) {
+                $file = $dataFolder . $file;
+                return true;
+            }
         }
 
-        if(file_exists($dataFolder . $file)) {
-            $file = $dataFolder . $file;
-            return true;
+        foreach ($allowedExtensions as $extension) {
+            if(file_exists($dataFolder . $file . "." . $extension)) {
+                $file = $dataFolder . $file . "." . $extension;
+                return true;
+            }
         }
 
         return false;
@@ -193,25 +207,12 @@ class SchematicsManager {
      * @return string $class
      */
     public static function getSchematicFormat(string $rawData): ?string {
-        try {
-            $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
-            if(!$nbt instanceof CompoundTag) {
-                return null;
+        foreach (self::$registeredTypes as $class) {
+            if($class::validate($rawData)) {
+                return $class;
             }
-
-            if(
-                $nbt->hasTag("Width", ShortTag::class) &&
-                $nbt->hasTag("Height", ShortTag::class) &&
-                $nbt->hasTag("Length", ShortTag::class) &&
-                $nbt->hasTag("Blocks", ByteArrayTag::class) &&
-                $nbt->hasTag("Data", ByteArrayTag::class)
-            ) {
-                return MCEditSchematic::class;
-            }
-
-            return null;
-        } catch (Error $error) {
-            return null;
         }
+
+        return null;
     }
 }

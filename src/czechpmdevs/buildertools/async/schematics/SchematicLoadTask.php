@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use function basename;
 use function file_exists;
 use function file_get_contents;
 use function serialize;
@@ -32,6 +33,9 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 
     /** @var string */
     public string $file;
+
+    /** @var string */
+    public string $name;
     /** @var string */
     public string $blockArray;
 
@@ -55,6 +59,8 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
             return;
         }
 
+        SchematicsManager::lazyInit();
+
         $format = SchematicsManager::getSchematicFormat($rawData);
         if($format === null) {
             $this->error = "Unrecognised format";
@@ -72,6 +78,7 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
             return;
         }
 
+        $this->name = basename($this->file, "." . $schematic::getFileExtension());
         $this->blockArray = serialize($blockArray);
     }
 }
