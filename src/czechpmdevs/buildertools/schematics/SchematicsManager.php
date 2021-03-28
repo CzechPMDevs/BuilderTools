@@ -30,8 +30,9 @@ use czechpmdevs\buildertools\editors\Canceller;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\schematics\format\BuilderToolsSchematic;
 use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
-use czechpmdevs\buildertools\schematics\format\MCStructSchematic;
+use czechpmdevs\buildertools\schematics\format\MCStructureSchematic;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -43,6 +44,7 @@ use function file_exists;
 use function in_array;
 use function microtime;
 use function pathinfo;
+use function strtolower;
 use function touch;
 use function unserialize;
 use const DIRECTORY_SEPARATOR;
@@ -50,7 +52,7 @@ use const PATHINFO_EXTENSION;
 
 class SchematicsManager {
 
-    /** @phpstan-var array<class-string<Schematic>> $registeredTypes */
+    /** @phpstan-var array<class-string<Schematic>> */
     private static array $registeredTypes = [];
     /** @var BlockArray[] */
     private static array $loadedSchematics = [];
@@ -60,8 +62,9 @@ class SchematicsManager {
             return;
         }
 
+        self::$registeredTypes[] = BuilderToolsSchematic::class;
         self::$registeredTypes[] = MCEditSchematic::class;
-        self::$registeredTypes[] = MCStructSchematic::class;
+        self::$registeredTypes[] = MCStructureSchematic::class;
     }
 
     /**
@@ -117,7 +120,11 @@ class SchematicsManager {
     public static function createSchematic(Player $player, Vector3 $pos1, Vector3 $pos2, string $schematicName, Closure $callback): void {
         $startTime = microtime(true);
 
-        $targetFile = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR . basename($schematicName, ".schematic") . ".schematic";
+        $format = self::getSchematicByExtension(BuilderTools::getConfiguration()["output-schematics-format"] ?? "");
+        BuilderTools::getInstance()->getLogger()->debug("Using $format format to create schematic...");
+
+        /** @noinspection ALL */
+        $targetFile = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR . basename($schematicName, ".schematic") . "." . $format::getFileExtension();
         if(!@touch($targetFile)) {
             $callback(SchematicActionResult::error("Could not access target file"));
             return;
@@ -138,7 +145,7 @@ class SchematicsManager {
         }
 
         /** @phpstan-ignore-next-line */
-        AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $blocks), function (SchematicCreateTask $task) use ($callback, $startTime): void {
+        AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function (SchematicCreateTask $task) use ($callback, $startTime): void {
             if($task->error !== null) {
                 $callback(SchematicActionResult::error($task->error));
                 return;
@@ -204,7 +211,7 @@ class SchematicsManager {
     }
 
     /**
-     * @return string $class
+     * @return class-string<Schematic>|null
      */
     public static function getSchematicFormat(string $rawData): ?string {
         foreach (self::$registeredTypes as $class) {
@@ -214,5 +221,21 @@ class SchematicsManager {
         }
 
         return null;
+    }
+
+    /**
+     * @return class-string<Schematic>
+     */
+    public static function getSchematicByExtension(string $extension): string {
+        $extension = trim(strtolower($extension));
+
+        foreach (self::$registeredTypes as $class) {
+            if(strtolower($class::getFileExtension()) == $extension) {
+                return $class;
+            }
+        }
+
+        BuilderTools::getInstance()->getLogger()->warning("Invalid default schematic format set in config.yml! Using MCEdit...");
+        return MCEditSchematic::class;
     }
 }

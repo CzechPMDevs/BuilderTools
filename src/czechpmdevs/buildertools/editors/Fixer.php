@@ -22,27 +22,30 @@ use pocketmine\block\BlockIds;
 use pocketmine\utils\SingletonTrait;
 use function is_int;
 
+// TODO - Quartz slabs are wrong
 class Fixer {
     use SingletonTrait;
 
+    /** @phpstan-var mixed[][] */
     private const BLOCK_FIX_DATA = [
-        158 => [BlockIds::WOODEN_SLAB, 0],
         125 => [BlockIds::DOUBLE_WOODEN_SLAB, ""],
+        126 => [BlockIds::WOODEN_SLAB, ""],
+        158 => [BlockIds::WOODEN_SLAB, 0],
+        166 => [BlockIds::INVISIBLE_BEDROCK, 0],
         188 => [BlockIds::FENCE, 0],
         189 => [BlockIds::FENCE, 1],
         190 => [BlockIds::FENCE, 2],
         191 => [BlockIds::FENCE, 3],
         192 => [BlockIds::FENCE, 4],
         193 => [BlockIds::FENCE, 5],
-        166 => [BlockIds::INVISIBLE_BEDROCK, 0],
-        208 => [BlockIds::GRASS_PATH, 0],
         198 => [BlockIds::END_ROD, 0],
-        126 => [BlockIds::WOODEN_SLAB, ""],
-        95  => [BlockIds::STAINED_GLASS, ""],
         199 => [BlockIds::CHORUS_PLANT, 0],
         202 => [BlockIds::PURPUR_BLOCK, 0],
-        251 => [BlockIds::CONCRETE, 0],
-        204 => [BlockIds::PURPUR_BLOCK, 0]
+        204 => [BlockIds::PURPUR_BLOCK, 0],
+        208 => [BlockIds::GRASS_PATH, 0],
+        251 => [BlockIds::CONCRETE, ""],
+        252 => [BlockIds::CONCRETE_POWDER, ""],
+        95  => [BlockIds::STAINED_GLASS, ""],
     ];
 
     public function fixBlock(int &$id, int &$damage): void {

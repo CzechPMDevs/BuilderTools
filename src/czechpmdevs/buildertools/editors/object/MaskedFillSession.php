@@ -46,7 +46,7 @@ class MaskedFillSession extends FillSession {
             /** @phpstan-ignore-next-line */
             $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
             /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
+            $this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf)
         )) {
             return;
         }

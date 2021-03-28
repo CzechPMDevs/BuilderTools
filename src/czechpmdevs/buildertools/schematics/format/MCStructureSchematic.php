@@ -24,7 +24,6 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\LittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
@@ -41,7 +40,7 @@ use const DIRECTORY_SEPARATOR;
  * MCStructSchematic is schematic format created by Mojang for structure blocks
  * - It should have different extension (.mcstructure instead of .schematic)
  */
-class MCStructSchematic implements Schematic {
+class MCStructureSchematic implements Schematic {
 
     /** @var CompoundTag[] */
     private array $internalId2StatesMap;
@@ -76,12 +75,17 @@ class MCStructSchematic implements Schematic {
         for($x = 0; $x < $width; ++$x) {
             for($y = 0; $y < $height; ++$y) {
                 for($z = 0; $z < $length; ++$z) {
-                    $fullBlockId = $palette[$indexes[$i++]];
+                    $fullBlockId = $palette[$indexes[$i]];
                     $id = $fullBlockId >> 4;
                     $meta = $fullBlockId & 0xf;
 
                     $fixer->fixBlock($id, $meta);
+                    if($id > 255 || $id < 0) {
+                        $id = 0;
+                    }
+
                     $blockArray->addBlockAt($x, $y, $z, $fullBlockId >> 4, $fullBlockId & 0xf);
+                    ++$i;
                 }
             }
         }
@@ -155,6 +159,9 @@ class MCStructSchematic implements Schematic {
     public function save(BlockArray $blockArray): string {
         $nbt = new CompoundTag();
 
+        // Format version
+        $nbt->setInt("format_version", 1);
+
         $sizeData = $blockArray->getSizeData();
 
         $width = (($sizeData->maxX - $sizeData->minX) + 1);
@@ -197,9 +204,12 @@ class MCStructSchematic implements Schematic {
 
         // Indices
         $indexes = new ListTag("", array_map(fn(int $int) => new IntTag("", $int), $indexes));
-        $anotherIndexes = new ListTag("", array_fill(0, $indexes->count() - 1, new IntTag("", -1))); // Seems Mojang do it same way :D
+        $anotherIndexes = new ListTag("", array_fill(0, $indexes->count(), new IntTag("", -1))); // Seems Mojang do it same way :D
 
         $structureNbt->setTag(new ListTag("block_indices", [$indexes, $anotherIndexes]));
+
+        // Entities
+        $structureNbt->setTag(new ListTag("entities"));
 
         // Palette
         $structureNbt->setTag(new CompoundTag("palette", [
@@ -209,8 +219,13 @@ class MCStructSchematic implements Schematic {
         ]));
 
         $nbt->setTag($structureNbt);
-//        return (new LittleEndianNBTStream())->write($nbt); // TODO
-        return (new BigEndianNBTStream())->writeCompressed($nbt); // @phpstan-ignore-line (Only for testing purposes)
+
+        $rawData = (new LittleEndianNBTStream())->write($nbt);
+        if($rawData === false) {
+            throw new SchematicException("Unable to write NBT to LittleEndianNBTStream");
+        }
+
+        return $rawData;
     }
 
     private function writeVector3(CompoundTag $nbt, string $name, Vector3 $vector3): void {

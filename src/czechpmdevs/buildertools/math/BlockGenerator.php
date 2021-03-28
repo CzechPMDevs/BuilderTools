@@ -21,9 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\math;
 
 use Generator;
-use pocketmine\math\Vector3;
-use function max;
-use function min;
 
 class BlockGenerator {
 
