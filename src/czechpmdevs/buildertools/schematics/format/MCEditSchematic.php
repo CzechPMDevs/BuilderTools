@@ -70,12 +70,8 @@ class MCEditSchematic implements Schematic {
         if($materials == self::MATERIALS_CLASSIC || $materials == self::MATERIALS_ALPHA) {
             $fixer = Fixer::getInstance();
 
-            foreach ($blockArray->blocks as $i => $fullBlock) {
-                $id = $fullBlock >> 4;
-                $meta = $fullBlock & 0xf;
-
-                $fixer->fixBlock($id, $meta);
-                $blockArray->blocks[$i] = $id << 4 | $meta;
+            foreach ($blockArray->blocks as &$fullBlock) {
+                $fixer->convertJavaToBedrockId($fullBlock);
             }
         }
 

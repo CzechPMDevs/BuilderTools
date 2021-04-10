@@ -71,8 +71,7 @@ class WorldFixUtil {
         /** @var ClosureTask $task */
         $task = null;
 
-        $lastPercent = 0;
-        BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function (int $currentTick) use (&$lastPercent, $asyncTask, $sender, &$task): void {
+        BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function (int $currentTick) use ($asyncTask, $sender, &$task): void {
             if($sender instanceof Player && !$sender->isOnline()) {
                 $asyncTask->forceStop = true;
                 goto finish;
@@ -83,15 +82,7 @@ class WorldFixUtil {
                 goto finish;
             }
 
-            if($asyncTask->percentage != $lastPercent) {
-                if($sender instanceof Player && $asyncTask->percentage > 0) {
-                    $sender->sendTip(BuilderTools::getPrefix() . "§aWorld is fixed from " . $asyncTask->percentage . "%%%");
-                }
-                $lastPercent = $asyncTask->percentage;
-                return;
-            }
-
-            if($asyncTask->percentage == -1) {
+            if($asyncTask->done) {
                 $sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time ($asyncTask->chunkCount chunks updated)!");
 
                 finish:

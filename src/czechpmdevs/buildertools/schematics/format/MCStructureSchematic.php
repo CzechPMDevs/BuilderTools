@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\schematics\format;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\LittleEndianNBTStream;
@@ -67,8 +66,6 @@ class MCStructureSchematic implements Schematic {
         $height = $size->getFloorY();
         $length = $size->getFloorZ();
 
-        /** @var Fixer $fixer */
-        $fixer = Fixer::getInstance();
         $blockArray = new BlockArray();
 
         $i = 0;
@@ -79,12 +76,11 @@ class MCStructureSchematic implements Schematic {
                     $id = $fullBlockId >> 4;
                     $meta = $fullBlockId & 0xf;
 
-                    $fixer->fixBlock($id, $meta);
                     if($id > 255 || $id < 0) {
                         $id = 0;
                     }
 
-                    $blockArray->addBlockAt($x, $y, $z, $fullBlockId >> 4, $fullBlockId & 0xf);
+                    $blockArray->addBlockAt($x, $y, $z, $id, $meta);
                     ++$i;
                 }
             }

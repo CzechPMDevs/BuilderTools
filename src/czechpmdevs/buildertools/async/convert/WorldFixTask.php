@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\async\convert;
 
 use czechpmdevs\buildertools\editors\Fixer;
 use Error;
+use Generator;
 use pocketmine\level\format\io\BaseLevelProvider;
 use pocketmine\level\format\io\LevelProviderManager;
 use pocketmine\level\format\io\region\Anvil;
@@ -29,7 +30,6 @@ use pocketmine\level\format\io\region\RegionLoader;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\MainLogger;
 use function basename;
-use function count;
 use function explode;
 use function glob;
 use function is_dir;
@@ -40,11 +40,11 @@ class WorldFixTask extends AsyncTask {
     
     /** @var string */
     public string $worldPath;
-    
-    /** @var int */
-    public int $percentage = 0;
+
     /** @var string */
     public string $error = "";
+    /** @var bool */
+    public bool $done = false;
 
     /** @var float */
     public float $time = 0.0;
@@ -93,54 +93,44 @@ class WorldFixTask extends AsyncTask {
             return;
         }
 
-        $fixer = new Fixer();
-
         $startTime = microtime(true);
 
-        $chunksToFix = $this->getListOfChunksToFix($this->worldPath);
-        foreach ($chunksToFix as $index => [$chunkX, $chunkZ]) {
-            $chunk = $provider->loadChunk($chunkX, $chunkZ);
-            if($chunk === null) {
-                continue;
-            }
+        $fixer = Fixer::getInstance();
 
-            for($x = 0; $x < 16; ++$x) {
-                for($z = 0; $z < 16; ++$z) {
-                    for($y = 0; $y < $provider->getWorldHeight(); ++$y) {
-                        if(($id = $chunk->getBlockId($x, $y, $z)) != 0) {
-                            $data = $chunk->getBlockData($x, $y, $z);
+        $maxY = $provider->getWorldHeight();
+        $chunksFixed = 0;
 
-                            $fixer->fixBlock($id, $data);
+        foreach ($this->getListOfChunksToFix($this->worldPath) as $chunksToFix) {
+            foreach ($chunksToFix as [$chunkX, $chunkZ]) {
+                $chunk = $provider->loadChunk($chunkX, $chunkZ);
+                if($chunk === null) {
+                    continue;
+                }
 
-                            $chunk->setBlockId($x, $y, $z, $id);
-                            $chunk->setBlockData($x, $y, $z, $data);
-                        }
-                    }
+                if($fixer->convertJavaToBedrockChunk($chunk, $maxY)) {
+                    $provider->saveChunk($chunk);
+                }
+
+                $chunksFixed++;
+                MainLogger::getLogger()->debug("[BuilderTools] $chunksFixed chunks fixed!");
+                if($this->forceStop) {
+                    return;
                 }
             }
 
-            $this->percentage = (($index + 1) * 100) / count($chunksToFix);
-
-            $provider->saveChunk($chunk);
             $provider->doGarbageCollection();
-
-            MainLogger::getLogger()->debug("[BuilderTools] " . ($index + 1) . "/" . count($chunksToFix) . " chunks fixed!");
-            if($this->forceStop) {
-                return;
-            }
         }
 
-        $this->chunkCount = count($chunksToFix);
         $this->time = round(microtime(true) - $startTime);
+        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time, affected $chunksFixed chunks!");
 
-        $this->percentage = -1;
-        MainLogger::getLogger()->debug("[BuilderTools] World fixed in " . round(microtime(true)-$startTime) .", affected " .count($chunksToFix). " chunks!");
+        $this->done = true;
     }
 
     /**
-     * @return int[][]
+     * @phpstan-return Generator<int[][]>
      */
-    private function getListOfChunksToFix(string $worldPath): array {
+    private function getListOfChunksToFix(string $worldPath): Generator {
         $regionPath = $worldPath . DIRECTORY_SEPARATOR . "region" . DIRECTORY_SEPARATOR;
 
         $files = glob($regionPath . "*.mca*");
@@ -164,8 +154,9 @@ class WorldFixTask extends AsyncTask {
                     }
                 }
             }
-        }
 
-        return $chunks;
+            yield $chunks;
+            $chunks = [];
+        }
     }
 }
