@@ -84,7 +84,8 @@ class SelectionData extends BlockArray {
             return;
         }
 
-        Level::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z); // poggit...
+        /** @phpstan-ignore-next-line */
+        Level::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z);
         $this->playerPosition = new Vector3($x, $y, $z);
     }
 }
