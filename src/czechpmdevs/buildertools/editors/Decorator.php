@@ -38,7 +38,7 @@ class Decorator {
         
         $fillSession = new FillSession($center->getLevelNonNull(), false, true);
         
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
 
         $minX = $center->getFloorX() - $radius;
         $maxX = $center->getFloorX() + $radius;

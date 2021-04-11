@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
@@ -23,21 +23,36 @@ namespace czechpmdevs\buildertools\utils;
 use ArrayOutOfBoundsException;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use InvalidArgumentException;
+use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use function array_rand;
+use function count;
+use function explode;
+use function in_array;
+use function is_numeric;
+use function min;
+use function str_replace;
+use function strpos;
+use function substr;
 
 final class StringToBlockDecoder implements BlockIdentifierList {
 
     /** @var string */
     private string $string;
+    /** @var string|null */
+    private ?string $itemInHand;
 
     /** @var int[] */
     private array $blockIdMap = [];
     /** @var int[] */
     private array $blockMap = [];
 
-    public function __construct(string $string) {
+    public function __construct(string $string, ?Item $handItem = null) {
         $this->string = $string;
-        $this->decode();
+
+        if($handItem !== null) {
+            $this->itemInHand = "{$handItem->getId()}:{$handItem->getDamage()}";
+        }
     }
 
     /**
@@ -74,6 +89,10 @@ final class StringToBlockDecoder implements BlockIdentifierList {
     }
 
     public function decode(): void {
+        if($this->itemInHand !== null) {
+            $this->string = str_replace("hand", $this->itemInHand, $this->string);
+        }
+
         $split = explode(",", $this->string);
         foreach ($split as $entry) {
             $count = 1;

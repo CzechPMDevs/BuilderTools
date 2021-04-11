@@ -41,7 +41,7 @@ class Filler {
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
+        $stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 
         $fillSession = new FillSession($player->getLevelNonNull(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
@@ -85,7 +85,7 @@ class Filler {
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blockArgs);
+        $stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 
         $fillSession = new FillSession($player->getLevelNonNull(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
