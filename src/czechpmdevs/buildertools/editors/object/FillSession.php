@@ -23,11 +23,13 @@ namespace czechpmdevs\buildertools\editors\object;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use Error;
+use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\Solid;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
+use ReflectionClass;
 
 class FillSession {
 
@@ -182,9 +184,22 @@ class FillSession {
         $minZ = $this->minZ >> 4;
         $maxZ = $this->maxZ >> 4;
 
+        // PocketMine unfortunately does not have method for clearing block cache per chunk.
+        // I am planning to make pull request for that, however, this hack should be kept
+        // for backwards compatibility.
+        $blockCacheProperty = (new ReflectionClass(Level::class))->getProperty("blockCache");
+        $blockCacheProperty->setAccessible(true);
+
+        /** @var Block[][] $blockCache */
+        $blockCache = $blockCacheProperty->getValue($level);
+        $clearBlockCache = function (int $chunkX, int $chunkZ) use (&$blockCache): void {
+            unset($blockCache[Level::chunkHash($chunkX, $chunkZ)]);
+        };
+
         for($x = $minX; $x <= $maxX; ++$x) {
             for($z = $minZ; $z <= $maxZ; ++$z) {
                 $level->clearChunkCache($x, $z);
+                $clearBlockCache($x, $z);
 
                 $chunk = $level->getChunk($x, $z);
                 if($chunk === null) {
@@ -197,6 +212,8 @@ class FillSession {
                 }
             }
         }
+
+        $blockCacheProperty->setValue($level, $blockCache);
     }
 
     protected function moveTo(int $x, int $y, int $z): bool {
