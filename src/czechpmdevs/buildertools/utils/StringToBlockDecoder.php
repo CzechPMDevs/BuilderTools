@@ -53,6 +53,8 @@ final class StringToBlockDecoder implements BlockIdentifierList {
         if($handItem !== null) {
             $this->itemInHand = "{$handItem->getId()}:{$handItem->getDamage()}";
         }
+
+        $this->decode();
     }
 
     /**

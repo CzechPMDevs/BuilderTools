@@ -83,7 +83,7 @@ class WorldFixUtil {
             }
 
             if($asyncTask->done) {
-                $sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time ($asyncTask->chunkCount chunks updated)!");
+                $sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time seconds, ($asyncTask->chunkCount chunks updated)!");
 
                 finish:
                 BuilderTools::getInstance()->getScheduler()->cancelTask($task->getTaskId());
