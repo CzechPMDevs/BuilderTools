@@ -152,20 +152,11 @@ class Selectors {
     }
 
     public static function unloadPlayer(Player $player): void {
-        if(isset(self::$wandSelectors[$player->getName()])) {
-            unset(self::$wandSelectors[$player->getName()]);
-        }
-        if(isset(self::$blockInfoPlayers[$player->getName()])) {
-            unset(self::$blockInfoPlayers[$player->getName()]);
-        }
-        if(isset(self::$drawingPlayers[$player->getName()])) {
-            unset(self::$drawingPlayers[$player->getName()]);
-        }
-        if(isset(self::$pos1[$player->getName()])) {
-            unset(self::$pos1[$player->getName()]);
-        }
-        if(isset(self::$pos2[$player->getName()])) {
-            unset(self::$pos2[$player->getName()]);
-        }
+        unset(self::$wandSelectors[$player->getName()]);
+        unset(self::$blockInfoPlayers[$player->getName()]);
+        unset(self::$drawingPlayers[$player->getName()]);
+
+        unset(self::$pos1[$player->getName()]);
+        unset(self::$pos2[$player->getName()]);
     }
 }

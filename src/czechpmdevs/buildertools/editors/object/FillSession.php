@@ -194,9 +194,7 @@ class FillSession {
         /** @var Block[][] $blockCache */
         $blockCache = $blockCacheProperty->getValue($level);
         $clearBlockCache = function (int $chunkX, int $chunkZ) use (&$blockCache): void {
-            if(array_key_exists($hash = Level::chunkHash($chunkX, $chunkZ), $blockCache)) {
-                unset($blockCache[$hash]);
-            }
+            unset($blockCache[Level::chunkHash($chunkX, $chunkZ)]);
         };
 
         for($x = $minX; $x <= $maxX; ++$x) {

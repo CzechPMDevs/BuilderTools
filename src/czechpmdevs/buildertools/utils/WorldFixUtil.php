@@ -104,8 +104,6 @@ class WorldFixUtil {
      * @param WorldFixTask<mixed> $task
      */
     public static function finishWorldFixTask(WorldFixTask $task): void {
-        if(isset(self::$worldFixQueue[basename($task->worldPath)])) {
-            unset(self::$worldFixQueue[basename($task->worldPath)]);
-        }
+        unset(self::$worldFixQueue[basename($task->worldPath)]);
     }
 }

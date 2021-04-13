@@ -191,7 +191,7 @@ class SchematicsManager {
 
     private static function findSchematicFile(string &$file): bool {
         $dataFolder = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR;
-        $allowedExtensions = array_unique(array_map(fn(Schematic $schematic) => $schematic::getFileExtension(), self::$registeredTypes));
+        $allowedExtensions = array_unique(array_map(fn(string $schematic) => $schematic::getFileExtension(), self::$registeredTypes));
         $ext = pathinfo($file, PATHINFO_EXTENSION);
         if(in_array($ext, $allowedExtensions)) {
             if(file_exists($dataFolder . $file)) {
