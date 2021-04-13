@@ -22,13 +22,13 @@
 <br><br>  
    ✔️ Advanced WorldEdit commands  
     <br>  
-    ✔️ Supports fast filling  
+    ✔️ Using Sub Chunk Iterator to make block placing faster
     <br>  
     ✔️ Supports schematics  
     <br>  
     ✔️ Minecraft: Java Version maps world fixer  
     <br>  
-    ✔️ Supports last pocketmine API version  
+    ✔️ Supports last PocketMine API version  
     <br><br>  
 </p>  
   
@@ -36,13 +36,13 @@
 > - Plugin cleanup
 > - Memory & CPU optimization
 > - Schematics are now created & saved asynchronously
+> - MCStructure schematic format is now supported
 > - Bug fixes
 > - New commands (`//wals`, `//cut`, `//center`, `//d`)
 > - Changed permissions prefix from `bt` to `buildertools`
 > - `//fix` command now fixes whole world asynchronously
 > - Dropped support for php 7.3 & PocketMine api versions lower than 3.16.0
-  
-  
+> - When you select both positions, you see how many blocks is in the selection
   
 ## ⬇️ Downloads:  
   
@@ -55,18 +55,17 @@
 | 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta2) | 3.x.x | 7.0 |
 | 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1) | 3.x.x | 7.0 |
 | 1.0.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.0.0/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.0.0.zip) | 3.0.0-ALPHA7 | 7.0 |
-  
+
 <br>  
-  
+
 > **All released versions [here](https://github.com/CzechPMDevs/BuilderTools/releases)**  
-> **Other plugins by CzechPMDevs [here](https://poggit.pmmp.io/plugins/by/CzechPMDevs)**  
-  
-<br>  
-  
-## 📁 Supported software:  
-  
-**This plugin works only on PocketMine-MP.**  
-  
+> **Other plugins by CzechPMDevs [here](https://poggit.pmmp.io/plugins/by/CzechPMDevs)**
+
+<br> 
+
+## 💬 FAQ
+- `Required extension Core has an incompatible version (7.* not >=7.4)`
+    - Your server is using outdated PHP version. If you host your server by yourself, update your php binaries [More information](https://pmmp.readthedocs.io/en/rtfd/installation/installing-manually.html#getting-php-for-your-server). If you are using some host provider, contact them to update their php version.
   
 ## 🔧 How to install BuilderTools?  
   
@@ -74,14 +73,14 @@
 2) Move dowloaded file to your server **/plugins/** folder  
 3) Restart the server  
   
-## 🏠 BuilderTools commands:  
+## 🏠 BuilderTools commands  
   
 - All BuilderTools commands starts with `//`except for the `/buildertools` command that was added as an alias because `//help` not works in newer versions.  
 - In game, you can get list of all commands using commands `//commands`  
   
 <br>  
   
-**All BuilderTools Commands:**  
+**Commands**  
   
 | **Command** | **Description** |  
 | --- | --- |  
@@ -112,17 +111,40 @@
 | **//redo** | **Re-do BuilderTools action** <br><br> Usage: `//redo` |
 | **//replace** | **Replace blocks in selected area** <br><br> Usage: `//replace <blocksToReplace: id1,id2> <blocks: id1:dmg1,id2,...>` <br><br> Replace blocks in selected area. First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
 | **//rotate** | **Rotate copied area** <br><br>Usage: `//rotate` <br><br> When rotating an object, you must rotate to the side to which you want to rotate the object, and then write the `confirm` to the chat. If you want to cancel rotation, type `cancel` into the chat.|  
-| **//schematic** | **Manage with schematics** <br><br>Usage: `//schem <reload|load|list|paste> [filename]`<br><br>Manage with schematics (reload - loads all schematics to memory; load - loads schematics for //schem paste; list - displays list of loaded schematics.  |  
+| **//schematic** | **Manage with schematics** <br><br>Usage: `//schem <reload OR load OR list OR paste> [filename]`<br><br>Manage with schematics (reload - loads all schematics to memory; load - loads schematics for //schem paste; list - displays list of loaded schematics.  |  
 | **//sphere** | **Creates sphere** <br><br> Usage: `//sphere <id1:dmg1,id2,...> <radius>` <br><br> Creates a sphere in your position. |  
 | **//stack** | **Stacks copied area** <br><br>Usage: `//stack <count> [side|up|down]`<br><br>Stacks blocks in line.  |  
-| **//tree** | **Spawns tree** <br><br> Usage: `//tree <tree|list>` <br><br> There are implemented only basic trees (`oak`, `spruce`, `jungle` and `birch`) |  
+| **//tree** | **Spawns tree** <br><br> Usage: `//tree <tree OR list>` <br><br> There are implemented only basic trees (`oak`, `spruce`, `jungle` and `birch`) |  
 | **//undo** | **Cancels BuilderTools action** <br><br> Usage: `//undo` |  
 | **//walls** | **Makes walls around selection** <br><br> Usage: `//walls` |   
 | **//wand** |**Switch wand tool** <br><br> Usage: `//wand` <br><br> First position is set  by breaking the block, second by touching the block. Wand tool can be turned of typing `//wand` again.|  
 
 <br>
-  
-## 📃  Permissions:  
+
+## 🛠️ Other features:
+
+### 📜 Schematics
+- You can save your selection to a file and then load it again
+- BuilderTools supports loading [MCEdit](https://minecraft.fandom.com/wiki/Schematic_file_format) and [MCStructure](https://minecraft.fandom.com/wiki/Structure_Block#Save) formats and creating schematics wth MCEdit format.
+- Schematics are loaded asynchronously, that means it won't lag server while loading.
+
+#### Loading schematics:
+1) Move schematic file to `/plugin_data/BuilderTools/schematics` directory
+2) Load schematic using `//schem load <schematic>`
+3) Paste into the world using `//schem paste <schematic>`
+
+#### Creating schematics:
+1) Select two positions using `//pos1` & `//pos2` commands or using wand axe.
+2) Use `//schem create <schematicName>`
+3) File will be saved in directory `/plugin_data/BuilderTools/schematics/schematicName.schematic`
+
+### 🌎 Fixing Java: Edition worlds
+- BuilderTools is able to fix block ids in worlds generated by Minecraft: Java Edition.
+- Currently, we support only [Anvil](https://minecraft.fandom.com/wiki/Anvil_file_format) world format
+- To fix a world use `//fix <worldName>`
+- Worlds are fixed asynchronously, so the process will not freeze server. Players are able to play while fixing world, but are not able to join the world, which is being fixed.
+
+## 📃  Permissions  
   
 <br>  
   
@@ -134,7 +156,7 @@
 | buildertools.command.blockinfo | `//blockinfo` | ✔️ |  
 | buildertools.command.clearinventory | `//clearinventory` | ✔️ |  
 | buildertools.command.copy | `//copy` | ✔️ |  
-| buildertools.command.cube | `//cube` | 
+| buildertools.command.cube | `//cube` | ✔️ |
 | buildertools.command.cut | `//cut` | ✔️ |
 | buildertools.command.cylinder | `//cylinder` | ✔️ |
 | buildertools.command.decoration | `//decoration` | ✔️ |

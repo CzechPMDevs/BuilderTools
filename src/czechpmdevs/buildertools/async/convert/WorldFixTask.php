@@ -28,9 +28,11 @@ use pocketmine\world\format\io\region\RegionLoader;
 use pocketmine\world\format\io\WorldProvider;
 use pocketmine\world\format\io\WorldProviderManager;
 use function basename;
+use function ceil;
 use function count;
 use function explode;
 use function glob;
+use function gmdate;
 use function is_dir;
 use function microtime;
 use function round;
@@ -39,11 +41,11 @@ class WorldFixTask extends AsyncTask {
     
     /** @var string */
     public string $worldPath;
-    
-    /** @var int */
-    public int $percentage = 0;
+
     /** @var string */
     public string $error = "";
+    /** @var bool */
+    public bool $done = false;
 
     /** @var float */
     public float $time = 0.0;
@@ -95,17 +97,32 @@ class WorldFixTask extends AsyncTask {
             return;
         }
 
-        $fixer = new Fixer();
-
         $startTime = microtime(true);
 
-        $chunksToFix = $this->getListOfChunksToFix($this->worldPath);
-        foreach ($chunksToFix as $index => [$chunkX, $chunkZ]) {
-            $chunk = $provider->loadChunk($chunkX, $chunkZ);
-            if($chunk === null) {
-                continue;
-            }
+        $fixer = Fixer::getInstance();
 
+        $maxY = $provider->getWorldHeight();
+        $chunksFixed = $regionsFixed = 0;
+
+        foreach ($this->getListOfChunksToFix($this->worldPath, $regionCount) as $chunksToFix) {
+            foreach ($chunksToFix as [$chunkX, $chunkZ]) {
+                try {
+                    $chunk = $provider->loadChunk($chunkX, $chunkZ);
+                } catch (CorruptedChunkException $e) {
+                    MainLogger::getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
+                    continue;
+                } catch (UnsupportedChunkFormatException $e) {
+                    MainLogger::getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is using unsupported format. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
+                    continue;
+                }
+
+                if($chunk === null) {
+                    continue;
+                }
+
+                if($fixer->convertJavaToBedrockChunk($chunk, $maxY)) {
+                    $provider->saveChunk($chunk);
+                }
             for($x = 0; $x < 16; ++$x) {
                 for($z = 0; $z < 16; ++$z) {
                     for($y = 0; $y < $provider->getWorldMaxY(); ++$y) {
@@ -125,23 +142,41 @@ class WorldFixTask extends AsyncTask {
             $provider->saveChunk($chunkX, $chunkZ, $chunk);
             $provider->doGarbageCollection();
 
+                $chunksFixed++;
+
+                if($this->forceStop) {
+                    return;
+                }
+            }
 //            MainLogger::getLogger()->debug("[BuilderTools] " . ($index + 1) . "/" . count($chunksToFix) . " chunks fixed!");
             if($this->forceStop) {
                 return;
             }
         }
 
-        $this->chunkCount = count($chunksToFix);
+            $percent = round(((++$regionsFixed) * 100) / $regionCount, 3);
+            $timePerChunk = round((microtime(true) - $startTime) / $chunksFixed, 3);
+            $timePerRegion = (microtime(true) - $startTime) / $regionsFixed;
+            $expectedTime = gmdate("H:i:s", (int)ceil($timePerRegion * ($regionCount - $regionsFixed)));
+
+            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
+
+            $provider->doGarbageCollection();
+        }
+
         $this->time = round(microtime(true) - $startTime);
+        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
 
         $this->percentage = -1;
 //        MainLogger::getLogger()->debug("[BuilderTools] World fixed in " . round(microtime(true)-$startTime) .", affected " .count($chunksToFix). " chunks!");
+        $this->done = true;
+        $this->chunkCount = $chunksFixed;
     }
 
     /**
-     * @return int[][]
+     * @phpstan-return Generator<int[][]>
      */
-    private function getListOfChunksToFix(string $worldPath): array {
+    private function getListOfChunksToFix(string $worldPath, ?int &$regionCount = null): Generator {
         $regionPath = $worldPath . DIRECTORY_SEPARATOR . "region" . DIRECTORY_SEPARATOR;
 
         $files = glob($regionPath . "*.mca*");
@@ -149,14 +184,22 @@ class WorldFixTask extends AsyncTask {
             return [];
         }
 
+        $regionCount = count($files);
+
         $chunks = [];
         foreach ($files as $regionFilePath) {
             $split = explode(".", basename($regionFilePath));
             $regionX = (int)$split[1];
             $regionZ = (int)$split[2];
 
-            $region = new RegionLoader($regionFilePath);
-            $region->open();
+            $region = new RegionLoader($regionFilePath, $regionX, $regionZ);
+
+            try {
+                $region->open();
+            } catch (CorruptedRegionException $e) {
+                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 4 << 5) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
+                continue;
+            }
 
             for($x = 0; $x < 32; ++$x) {
                 for($z = 0; $z < 32; ++$z) {
@@ -165,8 +208,9 @@ class WorldFixTask extends AsyncTask {
                     }
                 }
             }
-        }
 
-        return $chunks;
+            yield $chunks;
+            $chunks = [];
+        }
     }
 }

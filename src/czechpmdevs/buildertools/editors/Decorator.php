@@ -46,7 +46,7 @@ class Decorator {
         $maxZ = $center->getFloorZ() + $radius;
 
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-
+        
         for ($x = $minX; $x <= $maxX; ++$x) {
             /** @var int $x */
             for ($z = $minZ; $z <= $maxZ; ++$z) {

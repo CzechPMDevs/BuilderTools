@@ -4,28 +4,29 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d37cd0d02241c1890b39b5ea3757b76e",
+    "content-hash": "48529149e1c027dc19d49ad0790006c0",
     "packages": [],
     "packages-dev": [
         {
             "name": "adhocore/json-comment",
-            "version": "0.1.0",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/adhocore/php-json-comment.git",
-                "reference": "8448076039389f558f39ad0553aab87db3f81614"
+                "reference": "fc2f76979f0a44a5f5bc2a2b600d0762fe0e78e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adhocore/php-json-comment/zipball/8448076039389f558f39ad0553aab87db3f81614",
-                "reference": "8448076039389f558f39ad0553aab87db3f81614",
+                "url": "https://api.github.com/repos/adhocore/php-json-comment/zipball/fc2f76979f0a44a5f5bc2a2b600d0762fe0e78e7",
+                "reference": "fc2f76979f0a44a5f5bc2a2b600d0762fe0e78e7",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4"
+                "ext-ctype": "*",
+                "php": ">=7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.5 || ^7.5"
+                "phpunit/phpunit": "^6.5 || ^7.5 || ^8.5"
             },
             "type": "library",
             "autoload": {
@@ -51,9 +52,15 @@
             ],
             "support": {
                 "issues": "https://github.com/adhocore/php-json-comment/issues",
-                "source": "https://github.com/adhocore/php-json-comment/tree/0.1.0"
+                "source": "https://github.com/adhocore/php-json-comment/tree/1.1.2"
             },
-            "time": "2020-01-03T13:51:23+00:00"
+            "funding": [
+                {
+                    "url": "https://paypal.me/ji10",
+                    "type": "custom"
+                }
+            ],
+            "time": "2021-04-09T03:06:06+00:00"
         },
         {
             "name": "brick/math",
@@ -845,7 +852,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-03-18T00:08:16+00:00"
+            "time": "2021-04-12T15:25:50+00:00"
         },
         {
             "name": "pocketmine/raklib",
@@ -853,12 +860,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/RakLib.git",
-                "reference": "3c226482dd0e966ee9bf26fac405f083cb97ea68"
+                "reference": "bd8b75396e4585116838435839f7ccd51862663d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/RakLib/zipball/3c226482dd0e966ee9bf26fac405f083cb97ea68",
-                "reference": "3c226482dd0e966ee9bf26fac405f083cb97ea68",
+                "url": "https://api.github.com/repos/pmmp/RakLib/zipball/bd8b75396e4585116838435839f7ccd51862663d",
+                "reference": "bd8b75396e4585116838435839f7ccd51862663d",
                 "shasum": ""
             },
             "require": {
@@ -1232,7 +1239,6 @@
                 "ext-bcmath": "Arbitrary Precision Mathematics",
                 "ext-fileinfo": "File Information",
                 "ext-mbstring": "Multibyte String Functions",
-                "sokil/php-isocodes": "To enable ISO codes validations",
                 "symfony/validator": "Use Symfony validator through Respect\\Validation",
                 "zendframework/zend-validator": "Use Zend Framework validator through Respect\\Validation"
             },
@@ -1261,67 +1267,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Respect/Validation/issues",
-                "source": "https://github.com/Respect/Validation/tree/workflows/update-tld"
+                "source": "https://github.com/Respect/Validation/tree/2.2"
             },
-            "time": "2021-03-14T00:30:48+00:00"
-        },
-        {
-            "name": "sokil/php-isocodes",
-            "version": "3.3.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sokil/php-isocodes.git",
-                "reference": "a399f184a9cba9d56c27fdaff94e80cd5b932834"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sokil/php-isocodes/zipball/a399f184a9cba9d56c27fdaff94e80cd5b932834",
-                "reference": "a399f184a9cba9d56c27fdaff94e80cd5b932834",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "ext-gettext": "*",
-                "infection/infection": ">=0.11.5",
-                "php-coveralls/php-coveralls": "^2.1",
-                "phpmd/phpmd": "@stable",
-                "phpunit/phpunit": ">=7.5.20",
-                "squizlabs/php_codesniffer": "^3.4",
-                "symfony/translation": "^4.4.17|^5.2",
-                "vimeo/psalm": "^4.3"
-            },
-            "suggest": {
-                "ext-gettext": "Required for gettext translation driver",
-                "phpbench/phpbench": "Required to run benchmarks",
-                "symfony/translation": "Translation driver by Symfont project"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Sokil\\IsoCodes\\": [
-                        "src/"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Dmytro Sokil",
-                    "email": "dmytro.sokil@gmail.com"
-                }
-            ],
-            "description": "ISO country, subdivision, language, currency and script definitions and their translations. Based on pythons pycountry and Debian's iso-codes.",
-            "support": {
-                "issues": "https://github.com/sokil/php-isocodes/issues",
-                "source": "https://github.com/sokil/php-isocodes/tree/3.3.6"
-            },
-            "time": "2021-03-17T16:39:05+00:00"
+            "time": "2021-03-19T14:12:45+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -1496,7 +1444,8 @@
         "php": "^7.4 || ^8.0",
         "ext-yaml": "*",
         "ext-pthreads": "*",
-        "ext-chunkutils2": "^0.1.0"
+        "ext-chunkutils2": "^0.2.0",
+        "ext-zlib": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"

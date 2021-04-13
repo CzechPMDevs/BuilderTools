@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\async\schematics;
 
 use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
+use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use function file_put_contents;
 use function serialize;
@@ -32,14 +32,20 @@ class SchematicCreateTask extends BuilderToolsAsyncTask {
 
     /** @var string */
     public string $targetFilePath;
+    /** @var class-string<Schematic> */
+    public string $format;
     /** @var string */
     public string $blockArray;
 
     /** @var string|null */
     public ?string $error = null;
 
-    public function __construct(string $targetFilePath, BlockArray $blockArray) {
+    /**
+     * @param class-string<Schematic> $format
+     */
+    public function __construct(string $targetFilePath, string $format, BlockArray $blockArray) {
         $this->targetFilePath = $targetFilePath;
+        $this->format = $format;
         $this->blockArray = serialize($blockArray);
     }
 
@@ -52,7 +58,7 @@ class SchematicCreateTask extends BuilderToolsAsyncTask {
         }
 
         try {
-            $schematic = new MCEditSchematic();
+            $schematic = new $this->format;
             $rawData = $schematic->save($blockArray);
         }
         catch (SchematicException $exception) {

@@ -38,8 +38,8 @@ class Replacement {
     public function directReplace(Player $player, Vector3 $pos1, Vector3 $pos2, string $blocks, string $replace): EditorResult {
         $startTime = microtime(true);
 
-        $mask = new StringToBlockDecoder($blocks);
-        $stringToBlockDecoder = new StringToBlockDecoder($replace);
+        $mask = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
+        $stringToBlockDecoder = new StringToBlockDecoder($replace, $player->getInventory()->getItemInHand());
 
         if(!$mask->isValid()) { // Nothing to replace
             return EditorResult::success(0, microtime(true) - $startTime);

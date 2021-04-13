@@ -113,7 +113,7 @@ class Printer {
         $center = Position::fromObject($center->ceil(), $center->getWorld());
         $radius = abs($radius);
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
         if(!$stringToBlockDecoder->isValid()) {
             return EditorResult::error("0 blocks found");
         }
@@ -204,7 +204,7 @@ class Printer {
 
         $radius = abs($radius);
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
         if(!$stringToBlockDecoder->isValid()) {
             return EditorResult::error("0 blocks found");
         }
@@ -287,7 +287,7 @@ class Printer {
 
         $size = abs($size);
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
         if(!$stringToBlockDecoder->isValid()) {
             return EditorResult::error("0 blocks found");
         }
@@ -352,7 +352,7 @@ class Printer {
             return EditorResult::error("Shape is outside of the map!");
         }
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
         if(!$stringToBlockDecoder->isValid()) {
             return EditorResult::error("0 blocks found");
         }

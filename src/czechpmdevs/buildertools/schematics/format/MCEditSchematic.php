@@ -27,6 +27,7 @@ use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ShortTag;
+use Throwable;
 use pocketmine\nbt\TreeRoot;
 use function chr;
 use function ord;
@@ -73,12 +74,8 @@ class MCEditSchematic implements Schematic {
         if($materials == self::MATERIALS_CLASSIC || $materials == self::MATERIALS_ALPHA) {
             $fixer = Fixer::getInstance();
 
-            foreach ($blockArray->blocks as $i => $fullBlock) {
-                $id = $fullBlock >> 4;
-                $meta = $fullBlock & 0xf;
-
-                $fixer->fixBlock($id, $meta);
-                $blockArray->blocks[$i] = $id << 4 | $meta;
+            foreach ($blockArray->blocks as &$fullBlock) {
+                $fixer->convertJavaToBedrockId($fullBlock);
             }
         }
 
@@ -181,5 +178,33 @@ class MCEditSchematic implements Schematic {
     /** @noinspection PhpSameParameterValueInspection */
     private function writeMaterials(CompoundTag $nbt, string $materials): void {
         $nbt->setString("Materials", $materials);
+    }
+
+    public static function getFileExtension(): string {
+        return "schematic";
+    }
+
+    public static function validate(string $rawData): bool {
+        try {
+            $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+            if(!$nbt instanceof CompoundTag) {
+                return false;
+            }
+
+            // MCEdit
+            if(
+                $nbt->hasTag("Width", ShortTag::class) &&
+                $nbt->hasTag("Height", ShortTag::class) &&
+                $nbt->hasTag("Length", ShortTag::class) &&
+                $nbt->hasTag("Blocks", ByteArrayTag::class) &&
+                $nbt->hasTag("Data", ByteArrayTag::class)
+            ) {
+                return true;
+            }
+
+            return false;
+        } catch (Throwable $ignore) {
+            return false;
+        }
     }
 }

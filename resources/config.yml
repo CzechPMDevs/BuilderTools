@@ -1,11 +1,15 @@
 ---
-#
 # BuilderTools configuration file
-#
+# Target BuilderTools version: 1.2.0-beta3
 
-# Do not change this!
+# Do not change this line.
 config-version: 1.2.0.1
 
+# This is format which will be used for creating schematics
+# Supported formats: 'mcedit', 'mcstructure'
+output-schematics-format: 'mcedit'
+
+# PowerItems settings:
 items:
   wand-axe:
     enabled: true

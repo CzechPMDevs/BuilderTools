@@ -56,12 +56,15 @@ use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WallsCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
+use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\Rarity;
 use pocketmine\plugin\PluginBase;
 use function glob;
+use function is_dir;
+use function is_file;
 use function mkdir;
 use function unlink;
 
@@ -70,7 +73,7 @@ class BuilderTools extends PluginBase {
     /** @var BuilderTools */
     private static BuilderTools $instance;
     /** @var string */
-    private static string $prefix;
+    private static string $prefix = "§7[BuilderTools] §a";
 
     /** @var EventListener */
     private static EventListener $listener;
@@ -87,7 +90,6 @@ class BuilderTools extends PluginBase {
     /** @noinspection PhpUnused */
     public function onEnable(): void {
         self::$instance = $this;
-        self::$prefix = "§7[BuilderTools] §a";
 
         $this->initConfig();
         $this->cleanCache();
@@ -95,6 +97,7 @@ class BuilderTools extends PluginBase {
         $this->initListener();
         $this->registerEnchantment();
         $this->sendWarnings();
+        $this->loadSchematicsManager();
     }
 
     /** @noinspection PhpUnused */
@@ -109,11 +112,20 @@ class BuilderTools extends PluginBase {
         if(!is_dir($this->getDataFolder() . "sessions")) {
             @mkdir($this->getDataFolder() . "sessions");
         }
+        if(!is_dir($this->getDataFolder() . "data")) {
+            @mkdir($this->getDataFolder() . "data");
+        }
+        if(!is_file($this->getDataFolder() . "data/internalId2StatesMap.serialized")) {
+            $this->saveResource("data/internalId2StatesMap.serialized");
+        }
+        if(!is_file($this->getDataFolder() . "data/states2InternalIdMap.serialized")) {
+            $this->saveResource("data/states2InternalIdMap.serialized");
+        }
         self::$configuration = $this->getConfig()->getAll();
     }
 
     private function initListener(): void {
-        $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener, $this);
+        $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener(), $this);
     }
 
     private function registerEnchantment(): void {
@@ -171,6 +183,10 @@ class BuilderTools extends PluginBase {
         if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") != 0) {
             $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
         }
+    }
+
+    public function loadSchematicsManager(): void {
+        SchematicsManager::lazyInit();
     }
 
     public function cleanCache(): void {
