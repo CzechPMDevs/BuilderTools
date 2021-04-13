@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use InvalidArgumentException;
-use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\world\World;
 use function pack;
@@ -46,7 +45,7 @@ class SelectionData extends BlockArray {
         if($this->playerPosition !== null) {
             $clipboard = clone $this;
             /** @phpstan-ignore-next-line */
-            $clipboard->playerPosition->add($vector3);
+            $clipboard->playerPosition->addVector($vector3);
 
             return $clipboard;
         }

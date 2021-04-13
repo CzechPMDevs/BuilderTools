@@ -18,10 +18,10 @@
 
 namespace czechpmdevs\buildertools\editors;
 
-use pocketmine\block\BlockIds;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\format\Chunk;
+use pocketmine\world\format\SubChunk;
 use function array_key_exists;
-use function json_decode;
 
 class Fixer {
     use SingletonTrait;
@@ -58,7 +58,7 @@ class Fixer {
                 $currentY = $y >> 4;
                 $subChunk = $chunk->getSubChunk($y >> 4);
 
-                if($subChunk instanceof EmptySubChunk) {
+                if($subChunk->isEmptyFast()) {
                     continue;
                 }
             }
@@ -67,8 +67,7 @@ class Fixer {
                 for($z = 0; $z < 16; ++$z) {
                     $fullBlock = $subChunk->getFullBlock($x, $y & 0xf, $z);
                     if($this->convertJavaToBedrockId($fullBlock)) {
-                        $subChunk->setBlockId($x, $y & 0xf, $z, $fullBlock >> 4);
-                        $subChunk->setBlockData($x, $y & 0xf, $z, $fullBlock & 0xf);
+                        $subChunk->setFullBlock($x, $y & 0xf, $z, $fullBlock);
 
                         $hasChanged = true;
                     }

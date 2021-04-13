@@ -23,10 +23,11 @@ namespace czechpmdevs\buildertools\schematics\format;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\LittleEndianNBTStream;
+use pocketmine\nbt\LittleEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\TreeRoot;
 use Throwable;
 use function array_fill;
 use function array_map;
@@ -47,7 +48,7 @@ class MCStructureSchematic implements Schematic {
     private array $states2InternalIdMap;
 
     public function load(string $rawData): BlockArray {
-        $nbt = (new LittleEndianNBTStream())->read($rawData);
+        $nbt = (new LittleEndianNbtSerializer())->read($rawData)->getTag();
         if(!$nbt instanceof CompoundTag) {
             throw new SchematicException("NBT root must be compound tag");
         }
@@ -196,39 +197,35 @@ class MCStructureSchematic implements Schematic {
             $fullId = $targetIndex;
         }
 
-        $structureNbt = new CompoundTag("structure");
+        $structureNbt = new CompoundTag();
 
         // Indices
-        $indexes = new ListTag("", array_map(fn(int $int) => new IntTag("", $int), $indexes));
-        $anotherIndexes = new ListTag("", array_fill(0, $indexes->count(), new IntTag("", -1))); // Seems Mojang do it same way :D
+        $indexes = new ListTag(array_map(fn(int $int) => new IntTag($int), $indexes));
+        $anotherIndexes = new ListTag(array_fill(0, $indexes->count(), new IntTag(-1))); // Seems Mojang do it same way :D
 
-        $structureNbt->setTag(new ListTag("block_indices", [$indexes, $anotherIndexes]));
+        $structureNbt->setTag("block_indices", new ListTag([$indexes, $anotherIndexes]));
 
         // Entities
-        $structureNbt->setTag(new ListTag("entities"));
+        $structureNbt->setTag("entities", new ListTag());
 
         // Palette
-        $structureNbt->setTag(new CompoundTag("palette", [
-            new CompoundTag("default", [
-                new ListTag("block_palette", $palette)
-            ])
-        ]));
+        $structureNbt->setTag("palette", (new CompoundTag())
+            ->setTag("default", (new CompoundTag())
+                ->setTag("block_palette", new ListTag($palette)
+                )
+            )
+        );
 
-        $nbt->setTag($structureNbt);
+        $nbt->setTag("structure", $structureNbt);
 
-        $rawData = (new LittleEndianNBTStream())->write($nbt);
-        if($rawData === false) {
-            throw new SchematicException("Unable to write NBT to LittleEndianNBTStream");
-        }
-
-        return $rawData;
+        return (new LittleEndianNbtSerializer())->write(new TreeRoot($nbt, "structure"));
     }
 
     private function writeVector3(CompoundTag $nbt, string $name, Vector3 $vector3): void {
-        $nbt->setTag(new ListTag($name, [
-            new IntTag("", $vector3->getFloorX()),
-            new IntTag("", $vector3->getFloorY()),
-            new IntTag("", $vector3->getFloorZ())
+        $nbt->setTag($name, new ListTag([
+            new IntTag($vector3->getFloorX()),
+            new IntTag($vector3->getFloorY()),
+            new IntTag($vector3->getFloorZ())
         ]));
     }
 
@@ -255,10 +252,10 @@ class MCStructureSchematic implements Schematic {
             throw new SchematicException("Unable to read files required for mapping");
         }
 
-        $reader = new LittleEndianNBTStream();
+        $reader = new LittleEndianNbtSerializer();
 
         /** @var CompoundTag[] $id2StatesMap */
-        $id2StatesMap = array_map(fn(string $val) => $reader->read($val), unserialize($id2StatesContents));
+        $id2StatesMap = array_map(fn(string $val) => $reader->read($val)->getTag(), unserialize($id2StatesContents));
         /** @var array<int[][]|int[][][]> $states2IdMap */
         $states2IdMap = unserialize($states2IdContents);
 
@@ -272,13 +269,14 @@ class MCStructureSchematic implements Schematic {
 
     public static function validate(string $rawData): bool {
         try {
-            $nbt = (new LittleEndianNBTStream())->read($rawData);
+            $nbt = (new LittleEndianNbtSerializer())->read($rawData)->getTag();
             if(!$nbt instanceof CompoundTag) {
                 return false;
             }
 
             // Test if palette exists
             $nbt->getCompoundTag("structure")->getCompoundTag("palette")->getCompoundTag("default")->getListTag("block_palette")->getAllValues(); // @phpstan-ignore-line (Errors are caught)
+
             // Test if block indexes exists
             $nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0)->getValue(); // @phpstan-ignore-line (Errors are caught)
 

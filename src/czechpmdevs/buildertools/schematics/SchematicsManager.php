@@ -35,10 +35,6 @@ use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
 use czechpmdevs\buildertools\schematics\format\MCStructureSchematic;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNbtSerializer;
-use pocketmine\nbt\tag\ByteArrayTag;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\ShortTag;
 use pocketmine\player\Player;
 use function array_keys;
 use function array_map;
@@ -48,10 +44,8 @@ use function file_exists;
 use function in_array;
 use function microtime;
 use function pathinfo;
-use function strtolower;
 use function touch;
 use function unserialize;
-use function zlib_decode;
 use const DIRECTORY_SEPARATOR;
 use const PATHINFO_EXTENSION;
 
@@ -219,12 +213,6 @@ class SchematicsManager {
      * @return class-string<Schematic>|null
      */
     public static function getSchematicFormat(string $rawData): ?string {
-        try {
-            $root = (new BigEndianNbtSerializer())->read(zlib_decode($rawData));
-            $nbt = $root->getTag();
-            if(!$nbt instanceof CompoundTag) {
-                return null;
-            }
         foreach (self::$registeredTypes as $class) {
             if($class::validate($rawData)) {
                 return $class;

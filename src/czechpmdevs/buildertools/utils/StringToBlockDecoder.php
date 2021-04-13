@@ -22,8 +22,9 @@ namespace czechpmdevs\buildertools\utils;
 
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use InvalidArgumentException;
+use OutOfBoundsException;
 use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
+use pocketmine\item\LegacyStringToItemParser;
 use function array_rand;
 use function count;
 use function explode;
@@ -33,8 +34,6 @@ use function min;
 use function str_replace;
 use function strpos;
 use function substr;
-use OutOfBoundsException;
-use pocketmine\item\LegacyStringToItemParser;
 
 final class StringToBlockDecoder implements BlockIdentifierList {
 
@@ -52,7 +51,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
         $this->string = $string;
 
         if($handItem !== null) {
-            $this->itemInHand = "{$handItem->getId()}:{$handItem->getDamage()}";
+            $this->itemInHand = "{$handItem->getId()}:{$handItem->getMeta()}";
         }
 
         $this->decode();
