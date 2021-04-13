@@ -30,6 +30,7 @@ use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use ReflectionClass;
+use function array_key_exists;
 
 class FillSession {
 
@@ -193,7 +194,9 @@ class FillSession {
         /** @var Block[][] $blockCache */
         $blockCache = $blockCacheProperty->getValue($level);
         $clearBlockCache = function (int $chunkX, int $chunkZ) use (&$blockCache): void {
-            unset($blockCache[Level::chunkHash($chunkX, $chunkZ)]);
+            if(array_key_exists($hash = Level::chunkHash($chunkX, $chunkZ), $blockCache)) {
+                unset($blockCache[$hash]);
+            }
         };
 
         for($x = $minX; $x <= $maxX; ++$x) {
