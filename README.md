@@ -48,7 +48,8 @@
   
 | Version | Phar Download | Zip Download | API | Min php version |
 | --- | --- | --- | --- | --- |
-| 1.2.0-beta3 | [Try latest dev version from Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta4 | [Try latest dev version from Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta3 | [Poggit](https://poggit.pmmp.io/r/122470/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.2.0-beta3.zip) | 3.16.0^ | 7.4 |
 | 1.2.0-beta2 | [Poggit](https://poggit.pmmp.io/r/62312/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/41b127a689d523683f8cd3c5e3704688073a818f.zip) | 3.x.x | 7.0 |
 | 1.2.0-beta1 | [Poggit](https://poggit.pmmp.io/r/55728/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/648661f756b8bd8c89582e637ee864f9411763a2.zip) | 3.x.x | 7.0 |
 | 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | 3.x.x | 7.0 |
