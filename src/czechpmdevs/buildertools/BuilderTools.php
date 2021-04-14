@@ -58,7 +58,6 @@ use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
-use pocketmine\item\enchantment\Enchantment;
 use pocketmine\plugin\PluginBase;
 use function glob;
 use function is_dir;
@@ -93,7 +92,6 @@ class BuilderTools extends PluginBase {
         $this->cleanCache();
         $this->registerCommands();
         $this->initListener();
-        $this->registerEnchantment();
         $this->sendWarnings();
         $this->loadSchematicsManager();
     }
@@ -124,10 +122,6 @@ class BuilderTools extends PluginBase {
 
     private function initListener(): void {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener(), $this);
-    }
-
-    private function registerEnchantment(): void {
-        Enchantment::registerEnchantment(new Enchantment(50, "BuilderTools", Enchantment::RARITY_COMMON, 0, 0, 1));
     }
 
     private function registerCommands(): void {

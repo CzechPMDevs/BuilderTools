@@ -30,7 +30,6 @@ use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use ReflectionClass;
-use function array_key_exists;
 
 class FillSession {
 
