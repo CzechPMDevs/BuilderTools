@@ -137,7 +137,7 @@ class MCEditSchematic implements Schematic {
         $blocks = $data = str_repeat(chr(0), $totalSize);
         while ($blockArray->hasNext()) {
             $blockArray->readNext($x, $y, $z, $id, $meta);
-            $key = $z + ($width * $x) + ($xz * $y);
+            $key = $x + ($width * $z) + ($xz * $y);
 
             $blocks[$key] = chr($id);
             $data[$key] = chr($meta);

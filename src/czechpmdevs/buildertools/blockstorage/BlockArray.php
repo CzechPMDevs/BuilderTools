@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
+use czechpmdevs\buildertools\BuilderTools;
 use InvalidStateException;
 use pocketmine\level\ChunkManager;
 use pocketmine\level\Level;
@@ -47,8 +48,16 @@ class BlockArray implements UpdateLevelData, Serializable {
     /** @var int[] */
     public array $blocks = [];
 
+    /** @var BlockArraySizeData|null */
+    protected ?BlockArraySizeData $sizeData = null;
+    /** @var ChunkManager|null */
+    protected ?ChunkManager $level = null;
+
+    /** @var bool */
+    protected bool $isCompressed = false;
     /** @var string */
     public string $compressedCoords;
+
     /** @var string */
     public string $compressedBlocks;
 
@@ -65,11 +74,6 @@ class BlockArray implements UpdateLevelData, Serializable {
     public function __construct(bool $detectDuplicates = false) {
         $this->detectDuplicates = $detectDuplicates;
     }
-
-    /** @var BlockArraySizeData|null */
-    protected ?BlockArraySizeData $sizeData = null;
-    /** @var ChunkManager|null */
-    protected ?ChunkManager $level = null;
 
     /**
      * Adds block to the block array
@@ -177,6 +181,20 @@ class BlockArray implements UpdateLevelData, Serializable {
         return $this->coords;
     }
 
+    public function save(): void {
+        if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+            $this->compress();
+            $this->isCompressed = true;
+        }
+    }
+
+    public function load(): void {
+        if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+            $this->decompress();
+            $this->isCompressed = false;
+        }
+    }
+
     public function compress(bool $cleanDecompressed = true): void {
         /** @phpstan-var string|false $coords */
         $coords = pack("q*", ...$this->coords);
@@ -213,6 +231,10 @@ class BlockArray implements UpdateLevelData, Serializable {
             unset($this->compressedCoords);
             unset($this->compressedBlocks);
         }
+    }
+
+    public function isCompressed(): bool {
+        return $this->isCompressed;
     }
 
     /**

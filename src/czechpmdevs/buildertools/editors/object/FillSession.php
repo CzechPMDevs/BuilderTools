@@ -66,6 +66,9 @@ class FillSession {
         }
     }
 
+    /**
+     * Requests block coordinates (not chunk ones)
+     */
     public function setDimensions(int $minX, int $maxX, int $minZ, int $maxZ): void {
         $this->minX = $minX;
         $this->maxX = $maxX;
@@ -129,6 +132,16 @@ class FillSession {
         $id = $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf);
     }
 
+    public function setBiomeAt(int $x, int $z, int $id): void {
+        if(!$this->iterator->moveTo($x, 0, $z)) {
+            return;
+        }
+
+        /** @phpstan-ignore-next-line */
+        $this->iterator->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
+        $this->blocksChanged++;
+    }
+
     public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
         for($y = 255; $y >= 0; --$y) {
             $this->iterator->moveTo($x, $y, $z);
@@ -166,10 +179,7 @@ class FillSession {
 
         for($x = $minX; $x <= $maxX; $x++) {
             for($z = $minZ; $z <= $maxZ; $z++) {
-                $chunk = $level->getChunk($x, $z);
-                if($chunk === null) {
-                    $level->loadChunk($x, $z);
-                }
+                $level->loadChunk($x, $z);
             }
         }
     }

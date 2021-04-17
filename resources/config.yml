@@ -1,13 +1,22 @@
 ---
 # BuilderTools configuration file
-# Target BuilderTools version: 1.2.0-beta3
+# Target BuilderTools version: 1.2.0-beta4
 
 # Do not change this line.
-config-version: 1.2.0.1
+config-version: 1.2.0.2
 
 # This is format which will be used for creating schematics
 # Supported formats: 'mcedit', 'mcstructure'
 output-schematics-format: 'mcedit'
+
+# Option for compressing clipboards. This will make the actions
+# slower, but reduces RAM usage.
+clipboard-compression: false
+
+# BuilderTools saves player's clipboard, undo & redo stuff when player
+# leaves server to disk. This cache should be cleaned after restart (to
+# avoid unexpected bugs). This  option is to disable removing those files.
+clean-cache: true
 
 # PowerItems settings:
 items:

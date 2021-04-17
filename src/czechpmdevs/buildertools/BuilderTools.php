@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools;
 
+use czechpmdevs\buildertools\commands\BiomeCommand;
 use czechpmdevs\buildertools\commands\BlockInfoCommand;
 use czechpmdevs\buildertools\commands\CenterCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
@@ -59,13 +60,18 @@ use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
 use pocketmine\plugin\PluginBase;
+use function array_key_exists;
 use function glob;
 use function is_dir;
 use function is_file;
 use function mkdir;
+use function rename;
 use function unlink;
+use function version_compare;
 
 class BuilderTools extends PluginBase {
+
+    public const CURRENT_CONFIG_VERSION = "1.2.0.2";
 
     /** @var BuilderTools */
     private static BuilderTools $instance;
@@ -77,12 +83,6 @@ class BuilderTools extends PluginBase {
 
     /** @var Command[] */
     private static array $commands = [];
-
-    /**
-     * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
-     * @phpstan-var mixed[]
-     */
-    private static array $configuration = [];
 
     /** @noinspection PhpUnused */
     public function onEnable() {
@@ -117,7 +117,25 @@ class BuilderTools extends PluginBase {
         if(!is_file($this->getDataFolder() . "data/states2InternalIdMap.serialized")) {
             $this->saveResource("data/states2InternalIdMap.serialized");
         }
-        self::$configuration = $this->getConfig()->getAll();
+
+        $configuration = $this->getConfig()->getAll();
+        $needUpdate = false;
+        if(
+            !array_key_exists("config-version", $configuration) ||
+            version_compare((string)$configuration["config-version"], BuilderTools::CURRENT_CONFIG_VERSION) < 0
+        ) {
+            $needUpdate = true;
+        }
+
+        if($needUpdate) {
+            @unlink($this->getDataFolder() . "config.yml.old");
+            @rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
+
+            $this->saveResource("config.yml", true);
+            $this->getConfig()->reload();
+
+            $this->getLogger()->notice("Config updated. Old config was renamed to 'config.yml.old'.");
+        }
     }
 
     private function initListener(): void {
@@ -127,6 +145,7 @@ class BuilderTools extends PluginBase {
     private function registerCommands(): void {
         $map = $this->getServer()->getCommandMap();
         self::$commands = [
+            new BiomeCommand,
             new BlockInfoCommand,
             new CenterCommand,
             new ClearInventoryCommand,
@@ -182,6 +201,10 @@ class BuilderTools extends PluginBase {
     }
 
     public function cleanCache(): void {
+        if(BuilderTools::getConfiguration()["clean-cache"] ?? false) {
+            return;
+        }
+
         $files = glob($this->getDataFolder() . "sessions/*.dat");
         if($files === false) {
             return;
@@ -209,7 +232,7 @@ class BuilderTools extends PluginBase {
      * @phpstan-return mixed[]
      */
     public static function getConfiguration(): array {
-        return self::$configuration;
+        return self::$instance->getConfig()->getAll();
     }
 
     public static function getInstance(): BuilderTools {

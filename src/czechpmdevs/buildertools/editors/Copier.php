@@ -62,6 +62,7 @@ class Copier {
             }
         }
 
+        $clipboard->save();
         ClipboardManager::saveClipboard($player, $clipboard);
 
         return EditorResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
@@ -90,7 +91,15 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+
+        $clipboard->save();
         ClipboardManager::saveClipboard($player, $clipboard);
+
+        /** @var BlockArray $changes */
+        $changes = $fillSession->getChanges();
+        $changes->save();
+
+        Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
@@ -105,6 +114,7 @@ class Copier {
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
         $clipboard->setLevel($player->getLevel());
+        $clipboard->load();
 
         /** @phpstan-var Vector3 $relativePosition */
         $relativePosition = $clipboard->getPlayerPosition();
@@ -124,6 +134,7 @@ class Copier {
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -139,6 +150,7 @@ class Copier {
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
         $clipboard->setLevel($player->getLevel());
+        $clipboard->load();
 
         /** @phpstan-var Vector3 $relativePosition */
         $relativePosition = $clipboard->getPlayerPosition();
@@ -158,6 +170,7 @@ class Copier {
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -171,7 +184,12 @@ class Copier {
 
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
-        ClipboardManager::saveClipboard($player, RotationUtil::rotate($clipboard, $axis, $rotation));
+        $clipboard->load();
+
+        $clipboard = RotationUtil::rotate($clipboard, $axis, $rotation);
+        $clipboard->save();
+
+        ClipboardManager::saveClipboard($player, $clipboard);
     }
 
     public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER): EditorResult {
@@ -267,6 +285,7 @@ class Copier {
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -318,6 +337,7 @@ class Copier {
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);

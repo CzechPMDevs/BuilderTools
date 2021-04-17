@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\math\Math;
 use InvalidArgumentException;
 use pocketmine\level\Position;
 use pocketmine\Player;
+use function array_key_exists;
 
 class Selectors {
 
@@ -61,7 +62,7 @@ class Selectors {
     }
 
     public static function isDrawingPlayer(Player $player): bool {
-        return isset(self::$drawingPlayers[$player->getName()]);
+        return array_key_exists($player->getName(), self::$drawingPlayers);
     }
 
     /**
@@ -116,39 +117,37 @@ class Selectors {
 
     public static function isSelected(int $pos, Player $player): bool {
         if($pos == 1) {
-            return isset(self::$pos1[$player->getName()]);
+            return array_key_exists($player->getName(), self::$pos1);
         }
         if($pos == 2) {
-            return isset(self::$pos2[$player->getName()]);
+            return array_key_exists($player->getName(), self::$pos2);
         }
 
         return false;
     }
 
     public static function switchWandSelector(Player $player): void {
-        if(isset(self::$wandSelectors[$player->getName()])) {
+        if(array_key_exists($player->getName(), self::$wandSelectors)) {
             unset(self::$wandSelectors[$player->getName()]);
-        }
-        else {
+        } else {
             self::$wandSelectors[$player->getName()] = $player;
         }
     }
 
     public static function switchBlockInfoSelector(Player $player): void {
-        if(isset(self::$blockInfoPlayers[$player->getName()])) {
+        if(array_key_exists($player->getName(), self::$blockInfoPlayers)) {
             unset(self::$blockInfoPlayers[$player->getName()]);
-        }
-        else {
+        } else {
             self::$blockInfoPlayers[$player->getName()] = $player;
         }
     }
 
     public static function isWandSelector(Player $player): bool {
-        return isset(self::$wandSelectors[$player->getName()]);
+        return array_key_exists($player->getName(), self::$wandSelectors);
     }
 
     public static function isBlockInfoPlayer(Player $player): bool {
-        return isset(self::$blockInfoPlayers[$player->getName()]);
+        return array_key_exists($player->getName(), self::$blockInfoPlayers);
     }
 
     public static function unloadPlayer(Player $player): void {

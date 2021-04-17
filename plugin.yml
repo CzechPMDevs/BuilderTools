@@ -14,6 +14,9 @@ permissions:
     default: op
     description: Permissions for all BuilderTools commands
     children:
+      buildertools.command.biome:
+        description: Permissions for //biome
+        default: op
       buildertools.command.blockinfo:
         description: Permissions for //blockinfo
         default: op

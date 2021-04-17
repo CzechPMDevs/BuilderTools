@@ -86,6 +86,7 @@
 | **Command** | **Description** |  
 | --- | --- |  
 | **//commands** | **Displays list BuilderTools commands** <br><br> Alias: `//commands`, `/buildertools` <br>Usage: `//commands <page: 1-4>`|  
+| **//biome** | **Changes biome in selected area** <br><br> Usage: `//biome list` OR `//biome <biomeId>` |
 | **//blockinfo** | **Switch block info mode** <br><br>Usage: `//blockinfo`<br>Alias: `//bi`<br><br>In blockinfo mode you can get information about block by touching it.  |  
 | **//clearinventory** | **Clears inventory** <br><br>Usage: `//clearinventory`<br>Alias: `//ci`  |  
 | **//center** | **Finds center of the selection** <br><br> Usage: `//center` <br><br> Bedrock will appear in the middle of the selection |  
@@ -111,7 +112,7 @@
 | **//pyramid** | **Creates pyramid** <br><br>Usage: `//pyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates pyramid in your position.  |  
 | **//redo** | **Re-do BuilderTools action** <br><br> Usage: `//redo` |
 | **//replace** | **Replace blocks in selected area** <br><br> Usage: `//replace <blocksToReplace: id1,id2> <blocks: id1:dmg1,id2,...>` <br><br> Replace blocks in selected area. First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
-| **//rotate** | **Rotate copied area** <br><br>Usage: `//rotate` <br><br> When rotating an object, you must rotate to the side to which you want to rotate the object, and then write the `confirm` to the chat. If you want to cancel rotation, type `cancel` into the chat.|  
+| **//rotate** | **Rotate copied area** <br><br>Usage: `//rotate <y> [x] [z]` <br><br> Y, X or Z is axis you can rotate object around. Use degrees as unit. Example: `//rotate 90` |  
 | **//schematic** | **Manage with schematics** <br><br>Usage: `//schem <reload OR load OR list OR paste> [filename]`<br><br>Manage with schematics (reload - loads all schematics to memory; load - loads schematics for //schem paste; list - displays list of loaded schematics.  |  
 | **//sphere** | **Creates sphere** <br><br> Usage: `//sphere <id1:dmg1,id2,...> <radius>` <br><br> Creates a sphere in your position. |  
 | **//stack** | **Stacks copied area** <br><br>Usage: `//stack <count> [side|up|down]`<br><br>Stacks blocks in line.  |  
@@ -154,6 +155,7 @@
 | Permission | Command | Operator Permissions required |  
 | --- | --- | --- |  
 | buildertools.command.help | `//commands` | ✔️ |  
+| buildertools.command.biome | `//biome` | ✔️ |  
 | buildertools.command.blockinfo | `//blockinfo` | ✔️ |  
 | buildertools.command.clearinventory | `//clearinventory` | ✔️ |  
 | buildertools.command.copy | `//copy` | ✔️ |  
@@ -191,18 +193,33 @@
 - Default configuration:
 
 ```yaml  
----
-# Do not change this!
-config-version: 1.2.1    
+# BuilderTools configuration file
+# Target BuilderTools version: 1.2.0-beta4
 
- items:    
-  wand-axe:    
-    enabled: true    
-    name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"    
-  blockinfo-stick:    
-    enabled: false    
-    name: "§r§fDebug Stick\n§7§oTouch block for info"    
-...  
+# Do not change this line.
+config-version: 1.2.0.2
+
+# This is format which will be used for creating schematics
+# Supported formats: 'mcedit', 'mcstructure'
+output-schematics-format: 'mcedit'
+
+# Option for compressing clipboards. This will make the actions
+# slower, but reduces RAM usage.
+clipboard-compression: false
+
+# BuilderTools saves player's clipboard, undo & redo stuff when player
+# leaves server to disk. This cache should be cleaned after restart (to
+# avoid unexpected bugs). This  option is to disable removing those files.
+clean-cache: true
+
+# PowerItems settings:
+items:
+  wand-axe:
+    enabled: true
+    name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"
+  blockinfo-stick:
+    enabled: false
+    name: "§r§fDebug Stick\n§7§oTouch block for info"
 ```
 
 <br>

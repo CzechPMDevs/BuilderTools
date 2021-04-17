@@ -95,6 +95,7 @@ class Printer {
             }
         }
 
+        $undoList->save();
         Canceller::getInstance()->addStep($player, $undoList);
     }
 
@@ -195,8 +196,9 @@ class Printer {
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
-        
+        $undoList->save();
         Canceller::getInstance()->addStep($player, $undoList);
+
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
@@ -247,7 +249,6 @@ class Printer {
                     if($z == 0) {
                         break 2;
                     }
-
                     break;
                 }
 
@@ -278,8 +279,9 @@ class Printer {
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
-
+        $undoList->save();
         Canceller::getInstance()->addStep($player, $undoList);
+
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
@@ -341,8 +343,9 @@ class Printer {
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
-
+        $undoList->save();
         Canceller::getInstance()->addStep($player, $undoList);
+
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 

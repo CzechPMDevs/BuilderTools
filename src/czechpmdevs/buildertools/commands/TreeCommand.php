@@ -28,6 +28,8 @@ use pocketmine\level\generator\object\OakTree;
 use pocketmine\level\generator\object\SpruceTree;
 use pocketmine\Player;
 use pocketmine\utils\Random;
+use function strtolower;
+use function time;
 
 class TreeCommand extends BuilderToolsCommand {
 

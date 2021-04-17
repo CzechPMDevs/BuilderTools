@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\utils;
 
 use pocketmine\block\BlockIds;
+use function in_array;
 
 class RotationHelper {
 
