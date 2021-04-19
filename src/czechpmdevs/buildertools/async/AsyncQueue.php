@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\async;
 
 use Closure;
 use pocketmine\Server;
+use function array_key_exists;
 
 class AsyncQueue {
 
@@ -46,7 +47,10 @@ class AsyncQueue {
      * @phpstan-param BuilderToolsAsyncTask<mixed> $task
      */
     public static function callCallback(BuilderToolsAsyncTask $task): void {
-        if(!isset(self::$queue[$task->getTaskId()])) {
+        if($task->getTaskId() === null) {
+            return;
+        }
+        if(!array_key_exists($task->getTaskId(), AsyncQueue::$queue)) {
             return;
         }
 
