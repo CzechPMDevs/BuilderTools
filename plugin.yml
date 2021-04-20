@@ -10,7 +10,7 @@ extensions:
   Core: '>=7.4'
 
 permissions:
-  buildertools.cmd:
+  buildertools.command:
     default: op
     description: Permissions for all BuilderTools commands
     children:
