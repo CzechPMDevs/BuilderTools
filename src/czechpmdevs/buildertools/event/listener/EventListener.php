@@ -83,7 +83,7 @@ class EventListener implements Listener {
             $event->setCancelled(true);
         }
 
-        if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::STICK && $event->getItem()->hasEnchantment(50))) {
+        if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::STICK && $event->getItem()->getNamedTag()->hasTag("buildertools"))) {
             // antispam ._.
             if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true)-$this->blockInfoClicks[$player->getName()] < 0.5) {
                 return;
