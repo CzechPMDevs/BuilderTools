@@ -93,8 +93,8 @@ class SelectionData extends BlockArray {
         $selectionData = new SelectionData();
         $selectionData->setPlayerPosition($playerPosition);
         $selectionData->setLevel($blockArray->getLevel());
-        $selectionData->blocks = $selectionData->getBlockArray();
-        $selectionData->coords = $selectionData->getCoordsArray();
+        $selectionData->blocks = $blockArray->getBlockArray();
+        $selectionData->coords = $blockArray->getCoordsArray();
 
         return $selectionData;
     }

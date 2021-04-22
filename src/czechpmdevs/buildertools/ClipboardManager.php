@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use pocketmine\Player;
+use function array_key_exists;
 use function array_pop;
 
 class ClipboardManager {
@@ -40,7 +41,7 @@ class ClipboardManager {
     }
 
     public static function hasClipboardCopied(Player $player): bool {
-        return isset(self::$clipboards[$player->getName()]);
+        return array_key_exists($player->getName(), self::$clipboards);
     }
 
     public static function saveClipboard(Player $player, SelectionData $data): void {
@@ -52,7 +53,7 @@ class ClipboardManager {
     }
     
     public static function hasActionToUndo(Player $player): bool {
-        return isset(self::$undoData[$player->getName()]) && !empty(self::$undoData[$player->getName()]);
+        return array_key_exists($player->getName(), self::$undoData) && !empty(self::$undoData[$player->getName()]);
     }
     
     public static function saveUndo(Player $player, BlockArray $array): void {
@@ -64,7 +65,7 @@ class ClipboardManager {
     }
     
     public static function hasActionToRedo(Player $player): bool {
-        return isset(self::$redoData[$player->getName()]) && !empty(self::$redoData[$player->getName()]);
+        return array_key_exists($player->getName(), self::$redoData) && !empty(self::$redoData[$player->getName()]);
     }
     
     public static function saveRedo(Player $player, BlockArray $array): void {

@@ -193,6 +193,7 @@ class Printer {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
@@ -276,6 +277,7 @@ class Printer {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
@@ -340,6 +342,7 @@ class Printer {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();

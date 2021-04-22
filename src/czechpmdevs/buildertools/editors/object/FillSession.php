@@ -259,4 +259,8 @@ class FillSession {
             $this->changes->addBlockAt($x, $y, $z, $id, $meta);
         }
     }
+
+    public function close(): void {
+        $this->iterator->invalidate();
+    }
 }

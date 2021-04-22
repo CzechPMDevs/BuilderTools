@@ -181,6 +181,7 @@ class SchematicsManager {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();

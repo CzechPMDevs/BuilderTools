@@ -69,6 +69,7 @@ class Replacement {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();

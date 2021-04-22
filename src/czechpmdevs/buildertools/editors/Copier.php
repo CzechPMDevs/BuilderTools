@@ -91,6 +91,7 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         $clipboard->save();
         ClipboardManager::saveClipboard($player, $clipboard);
@@ -133,6 +134,7 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -171,6 +173,7 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -286,6 +289,7 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -338,6 +342,7 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();

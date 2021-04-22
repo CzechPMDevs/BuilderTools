@@ -63,6 +63,7 @@ class Canceller {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @var BlockArray $updates */
         $updates = $fillSession->getChanges();
@@ -105,6 +106,7 @@ class Canceller {
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
+        $fillSession->close();
 
         /** @var BlockArray $updates */
         $updates = $fillSession->getChanges();
