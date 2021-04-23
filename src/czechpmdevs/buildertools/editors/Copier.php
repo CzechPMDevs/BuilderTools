@@ -29,6 +29,7 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\utils\FlipUtil;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -194,6 +195,22 @@ class Copier {
         $clipboard->load();
 
         $clipboard = RotationUtil::rotate($clipboard, $axis, $rotation);
+        $clipboard->save();
+
+        ClipboardManager::saveClipboard($player, $clipboard);
+    }
+
+    public function flip(Player $player, int $axis): void {
+        if(!ClipboardManager::hasClipboardCopied($player)) {
+            $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+            return;
+        }
+
+        /** @phpstan-var SelectionData $clipboard */
+        $clipboard = ClipboardManager::getClipboard($player);
+        $clipboard->load();
+
+        $clipboard = FlipUtil::flip($clipboard, $axis);
         $clipboard->save();
 
         ClipboardManager::saveClipboard($player, $clipboard);

@@ -33,6 +33,7 @@ use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
 use czechpmdevs\buildertools\commands\FixCommand;
+use czechpmdevs\buildertools\commands\FlipCommand;
 use czechpmdevs\buildertools\commands\HelpCommand;
 use czechpmdevs\buildertools\commands\HollowCubeCommand;
 use czechpmdevs\buildertools\commands\HollowCylinderCommand;
@@ -158,6 +159,7 @@ class BuilderTools extends PluginBase {
             new FillCommand,
             new FirstPositionCommand,
             new FixCommand,
+            new FlipCommand,
             new HelpCommand,
             new HollowCubeCommand,
             new HollowCylinderCommand,

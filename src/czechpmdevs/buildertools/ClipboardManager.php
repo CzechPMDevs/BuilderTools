@@ -29,12 +29,12 @@ use function array_pop;
 class ClipboardManager {
 
     /** @var SelectionData[] */
-    public static array $clipboards;
+    public static array $clipboards = [];
 
     /** @var BlockArray[][] */
-    public static array $undoData;
+    public static array $undoData = [];
     /** @var BlockArray[][] */
-    public static array $redoData;
+    public static array $redoData = [];
 
     public static function getClipboard(Player $player): ?SelectionData {
         return clone self::$clipboards[$player->getName()] ?? null;

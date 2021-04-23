@@ -185,6 +185,11 @@ class FillSession {
     }
 
     public function reloadChunks(Level $level): void {
+        if($this->blocksChanged == 0) {
+            BuilderTools::getInstance()->getLogger()->debug("Could not reload chunks for fill session with 0 blocks changed.");
+            return;
+        }
+
         if($this->error) {
             BuilderTools::getInstance()->getLogger()->notice("Some chunks were not found");
         }

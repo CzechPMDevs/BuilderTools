@@ -23,14 +23,16 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\utils\Axis;
-use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
+use function microtime;
+use function round;
+use function strtolower;
 
-class RotateCommand extends BuilderToolsCommand {
+class FlipCommand extends BuilderToolsCommand {
 
     public function __construct() {
-        parent::__construct("/rotate", "Rotates selected area", null, []);
+        parent::__construct("/flip", "Flips selected area", null, []);
     }
 
     /** @noinspection PhpUnused */
@@ -42,37 +44,25 @@ class RotateCommand extends BuilderToolsCommand {
         }
 
         if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
+            $sender->sendMessage("§cUsage: §7//flip <axis: x|y|z>");
             return;
         }
 
-        foreach ($args as $arg) {
-            if(!is_numeric($arg)) {
-                $sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
-                return;
-            }
-
-            if(!RotationUtil::areDegreesValid((int)$arg)) {
-                $sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid degrees. You can rotate just about 90, 180 and 270 (-90) degrees!");
-                return;
-            }
+        if(strtolower($args[0]) == "x") {
+            $axis = Axis::X_AXIS;
+        } else if(strtolower($args[0]) == "y") {
+            $axis = Axis::Y_AXIS;
+        } else if(strtolower($args[0]) == "z") {
+            $axis = Axis::Z_AXIS;
+        } else {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cUnknown axis '$args[0]'. You can use only 'X', 'Y' and 'Z' axis.");
+            return;
         }
 
         $startTime = microtime(true);
 
         $copier = Copier::getInstance();
-
-        foreach ($args as $i => $arg) {
-            if($i === 0) {
-                $copier->rotate($sender, Axis::Y_AXIS, RotationUtil::getRotation((int)$arg));
-            }
-            elseif($i === 1) {
-                $copier->rotate($sender, Axis::X_AXIS, RotationUtil::getRotation((int)$arg));
-            }
-            elseif ($i === 2) {
-                $copier->rotate($sender, Axis::Z_AXIS, RotationUtil::getRotation((int)$arg));
-            }
-        }
+        $copier->flip($sender, $axis);
 
         $time = round(microtime(true)-$startTime, 3);
 

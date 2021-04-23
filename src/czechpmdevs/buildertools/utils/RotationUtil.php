@@ -34,10 +34,6 @@ class RotationUtil {
     public const ROTATE_270 = 270;
     public const ROTATE_360 = 0;
 
-    public const X_AXIS = 0;
-    public const Y_AXIS = 1;
-    public const Z_AXIS = 2;
-
     public static function rotate(SelectionData $blockArray, int $axis, int $degrees): SelectionData {
         if($degrees == 0) {
             return $blockArray;
@@ -50,7 +46,7 @@ class RotationUtil {
 
         $modifiedBlockArray = new SelectionData();
         switch ($axis) {
-            case self::Y_AXIS:
+            case Axis::Y_AXIS:
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
                     RotationHelper::rotate($degrees, $id, $meta);
@@ -63,7 +59,7 @@ class RotationUtil {
                 $blockArray->coords = $modifiedBlockArray->coords;
                 $blockArray->offset = 0;
                 return $blockArray;
-            case self::X_AXIS:
+            case Axis::X_AXIS:
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
 
@@ -79,7 +75,7 @@ class RotationUtil {
                 $blockArray->coords = $modifiedBlockArray->coords;
                 $blockArray->offset = 0;
                 return $blockArray;
-            case self::Z_AXIS:
+            case Axis::Z_AXIS:
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
 

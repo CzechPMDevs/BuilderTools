@@ -97,6 +97,7 @@
 | **//draw** | **Draws with blocks** <br><br>Usage: `//draw <cube|sphere|off> [brush: 1-6] [fall = false]` <br><br> We recommend to use this command while creating big mountains. Draw mode is turned on by typing `//draw <cube|sphere>` and can be turned of typing `//draw off`. |  
 | **//fill** | **Fill selected area** <br><br> Aliases: `//set`, `//change` <br> Usage: `//fill <id1:dmg1,id2,...>` <br><br> First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
 | **//fix** | **Fixes block in world from Minecraft: Java Edition** <br><br> Usage: `//fix <world>` |  
+| **//flip** | **Flips selection** <br><br>Usage `//flip x` OR `//flip y` OR `//flip z`<br><br>The argument represents axis to flip the selection through. |
 | **//hcube** | **Creates hollow cube** <br><br>Usage: `//hcube <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cube at your position.  |  
 | **//hcylinder** | **Creates hollow cylinder** <br><br>Usage: `//hcyl <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cylinder at your position.  |  
 | **//hpyramid** | **Creates hollow pyramid** <br><br>Usage: `//hpyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow pyramid at your position.  |  
