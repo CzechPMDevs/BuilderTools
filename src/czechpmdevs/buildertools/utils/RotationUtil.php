@@ -26,7 +26,7 @@ use pocketmine\math\Vector3;
 
 class RotationUtil {
 
-    public const VALID_DEGREES = [self::ROTATE_0, self::ROTATE_90, self::ROTATE_180, self::ROTATE_270];
+    public const VALID_DEGREES = [RotationUtil::ROTATE_0, RotationUtil::ROTATE_90, RotationUtil::ROTATE_180, RotationUtil::ROTATE_270];
 
     public const ROTATE_0 = 0;
     public const ROTATE_90 = 90;
@@ -99,7 +99,7 @@ class RotationUtil {
     public static function areDegreesValid(int $degrees): bool {
         $degrees = fmod($degrees, 360);
 
-        return in_array($degrees, self::VALID_DEGREES);
+        return in_array($degrees, RotationUtil::VALID_DEGREES);
     }
 
     public static function getRotation(int $degrees): int {
@@ -107,15 +107,15 @@ class RotationUtil {
 
         switch ($basic) {
             case 0:
-                return self::ROTATE_0;
+                return RotationUtil::ROTATE_0;
             case 90:
-                return self::ROTATE_90;
+                return RotationUtil::ROTATE_90;
             case 180:
-                return self::ROTATE_180;
+                return RotationUtil::ROTATE_180;
             case 270:
-                return self::ROTATE_270;
+                return RotationUtil::ROTATE_270;
         }
 
-        return self::ROTATE_360;
+        return RotationUtil::ROTATE_360;
     }
 }

@@ -52,6 +52,9 @@ class WorldFixTask extends AsyncTask {
     /** @var bool */
     public bool $done = false;
 
+    /** @var int */
+    public int $percent = 0;
+
     /** @var float */
     public float $time = 0.0;
     /** @var int */
@@ -140,6 +143,7 @@ class WorldFixTask extends AsyncTask {
 
             MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
 
+            $this->percent = (int)$percent;
             $provider->doGarbageCollection();
         }
 

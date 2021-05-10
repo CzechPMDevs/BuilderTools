@@ -30,13 +30,19 @@ use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use Serializable;
+use function array_combine;
+use function array_keys;
+use function array_reverse;
 use function array_slice;
+use function array_unique;
 use function array_values;
 use function count;
 use function in_array;
 use function is_string;
+use function microtime;
 use function pack;
 use function unpack;
+use const SORT_REGULAR;
 
 class BlockArray implements UpdateLevelData, Serializable {
 
@@ -179,6 +185,21 @@ class BlockArray implements UpdateLevelData, Serializable {
      */
     public function getCoordsArray(): array {
         return $this->coords;
+    }
+
+    public function removeDuplicates(): void {
+        if(!(BuilderTools::getConfiguration()["remove-duplicate-blocks"] ?? true)) {
+            return;
+        }
+
+        // TODO - Optimize this
+        $blocks = array_combine(array_reverse($this->coords, true), array_reverse($this->blocks, true));
+        if($blocks === false) {
+            return;
+        }
+
+        $this->coords = array_keys($blocks);
+        $this->blocks = array_values($blocks);
     }
 
     public function save(): void {

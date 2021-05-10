@@ -75,7 +75,7 @@ class BlockGenerator {
                         continue;
                     }
 
-                    foreach(self::generateMissingBlocks3d($x, $y, $z) as $vector3) {
+                    foreach(BlockGenerator::generateMissingBlocks3d($x, $y, $z) as $vector3) {
                         yield $vector3;
                     }
                 }
@@ -110,7 +110,7 @@ class BlockGenerator {
                 }
 
                 for($y = 0; $y < $height; ++$y) {
-                    foreach (self::generateMissingBlocks2d($x, $y, $z) as $vector3) {
+                    foreach (BlockGenerator::generateMissingBlocks2d($x, $y, $z) as $vector3) {
                         yield $vector3;
                     }
                 }
@@ -130,7 +130,7 @@ class BlockGenerator {
                         continue;
                     }
 
-                    foreach (self::generateMissingBlocks2d($x, $y, $z) as $vector3) {
+                    foreach (BlockGenerator::generateMissingBlocks2d($x, $y, $z) as $vector3) {
                         yield $vector3;
                     }
                 }

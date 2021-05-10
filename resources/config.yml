@@ -3,15 +3,21 @@
 # Target BuilderTools version: 1.2.0-beta4
 
 # Do not change this line.
-config-version: 1.2.0.2
+config-version: 1.2.0.3
 
 # This is format which will be used for creating schematics
-# Supported formats: 'mcedit', 'mcstructure'
+# Supported formats: 'mcedit', 'mcstructure', 'buildertools'
 output-schematics-format: 'mcedit'
 
 # Option for compressing clipboards. This will make the actions
 # slower, but reduces RAM usage.
 clipboard-compression: false
+
+# Some shapes are generated with duplicate blocks. This problem causes
+# some blocks are not reverted right when doing //undo. This option
+# is for removing duplicates.
+# Warning: This action takes around 98% time of the whole process!
+remove-duplicate-blocks: true
 
 # BuilderTools saves player's clipboard, undo & redo stuff when player
 # leaves server to disk. This cache should be cleaned after restart (to

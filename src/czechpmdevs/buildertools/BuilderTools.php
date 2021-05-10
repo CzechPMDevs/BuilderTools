@@ -72,7 +72,7 @@ use function version_compare;
 
 class BuilderTools extends PluginBase {
 
-    public const CURRENT_CONFIG_VERSION = "1.2.0.2";
+    public const CURRENT_CONFIG_VERSION = "1.2.0.3";
 
     /** @var BuilderTools */
     private static BuilderTools $instance;
@@ -87,7 +87,7 @@ class BuilderTools extends PluginBase {
 
     /** @noinspection PhpUnused */
     public function onEnable() {
-        self::$instance = $this;
+        BuilderTools::$instance = $this;
 
         $this->initConfig();
         $this->cleanCache();
@@ -120,15 +120,11 @@ class BuilderTools extends PluginBase {
         }
 
         $configuration = $this->getConfig()->getAll();
-        $needUpdate = false;
         if(
             !array_key_exists("config-version", $configuration) ||
             version_compare((string)$configuration["config-version"], BuilderTools::CURRENT_CONFIG_VERSION) < 0
         ) {
-            $needUpdate = true;
-        }
-
-        if($needUpdate) {
+            // Update is required
             @unlink($this->getDataFolder() . "config.yml.old");
             @rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
 
@@ -140,12 +136,12 @@ class BuilderTools extends PluginBase {
     }
 
     private function initListener(): void {
-        $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(BuilderTools::$listener = new EventListener(), $this);
     }
 
     private function registerCommands(): void {
         $map = $this->getServer()->getCommandMap();
-        self::$commands = [
+        BuilderTools::$commands = [
             new BiomeCommand,
             new BlockInfoCommand,
             new CenterCommand,
@@ -185,7 +181,7 @@ class BuilderTools extends PluginBase {
             new WandCommand
         ];
 
-        foreach (self::$commands as $command) {
+        foreach (BuilderTools::$commands as $command) {
             $map->register("BuilderTools", $command);
         }
 
@@ -222,11 +218,11 @@ class BuilderTools extends PluginBase {
      * @return Command[]
      */
     public static function getAllCommands(): array {
-        return self::$commands;
+        return BuilderTools::$commands;
     }
 
     public static function getPrefix(): string {
-        return self::$prefix;
+        return BuilderTools::$prefix;
     }
 
     /**
@@ -234,10 +230,10 @@ class BuilderTools extends PluginBase {
      * @phpstan-return mixed[]
      */
     public static function getConfiguration(): array {
-        return self::$instance->getConfig()->getAll();
+        return BuilderTools::$instance->getConfig()->getAll();
     }
 
     public static function getInstance(): BuilderTools {
-        return self::$instance;
+        return BuilderTools::$instance;
     }
 }

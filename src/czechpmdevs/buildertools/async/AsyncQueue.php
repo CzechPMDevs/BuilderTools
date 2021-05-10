@@ -37,7 +37,7 @@ class AsyncQueue {
         Server::getInstance()->getAsyncPool()->submitTask($task);
 
         if($callback !== null) {
-            self::$queue[$task->getTaskId()] = $callback;
+            AsyncQueue::$queue[$task->getTaskId()] = $callback;
         }
     }
 
@@ -54,7 +54,7 @@ class AsyncQueue {
             return;
         }
 
-        $callback = self::$queue[$task->getTaskId()];
+        $callback = AsyncQueue::$queue[$task->getTaskId()];
         $callback($task);
     }
 }

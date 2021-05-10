@@ -69,27 +69,27 @@ class Printer {
             $level->setBlockDataAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block->getDamage());
         };
 
-        if($mode == self::CUBE) {
+        if($mode == Printer::CUBE) {
             foreach (BlockGenerator::generateCube($brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::SPHERE) {
+        } elseif($mode == Printer::SPHERE) {
             foreach (BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::CYLINDER) {
+        } elseif($mode == Printer::CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::HOLLOW_CUBE) {
+        } elseif($mode == Printer::HOLLOW_CUBE) {
             foreach (BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::HOLLOW_SPHERE) {
+        } elseif($mode == Printer::HOLLOW_SPHERE) {
             foreach (BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::HOLLOW_CYLINDER) {
+        } elseif($mode == Printer::HOLLOW_CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush,true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
@@ -197,7 +197,9 @@ class Printer {
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
+        $undoList->removeDuplicates();
         $undoList->save();
+
         Canceller::getInstance()->addStep($player, $undoList);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -281,6 +283,7 @@ class Printer {
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
+        $undoList->removeDuplicates();
         $undoList->save();
         Canceller::getInstance()->addStep($player, $undoList);
 
@@ -320,25 +323,21 @@ class Printer {
                     if($floorY + $y < 0 || $floorY + $y > 255) {
                         continue;
                     }
-                    $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt($x, $y, $z, $id, $meta);
 
                     $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt(-$x, $y, $z, $id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 
                     $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt($x, $y, -$z, $id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $id, $meta);
 
                     $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt(-$x, $y, -$z, $id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $id, $meta);
                 }
             }
             $currentLevelHeight--;
-        }
-
-        foreach (BlockGenerator::generatePyramid($size, $hollow) as [$x, $y, $z]) {
-            $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($x + $floorX, $y + $floorY, $z + $floorZ, $id, $meta);
         }
 
         $fillSession->reloadChunks($player->getLevelNonNull());
@@ -346,6 +345,7 @@ class Printer {
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
+        $undoList->removeDuplicates();
         $undoList->save();
         Canceller::getInstance()->addStep($player, $undoList);
 

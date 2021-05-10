@@ -31,32 +31,32 @@ class RotationHelper {
     /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
     public static function rotate(int $degrees, int &$id, int &$meta): void {
         if($degrees == 90) {
-            self::rotate90($id, $meta);
+            RotationHelper::rotate90($id, $meta);
         } elseif($degrees == 180) {
-            self::rotate180($id, $meta);
+            RotationHelper::rotate180($id, $meta);
         } elseif($degrees == 270) {
-            self::rotate270($id, $meta);
+            RotationHelper::rotate270($id, $meta);
         }
     }
 
     public static function rotate90(int $id, int &$meta): void {
-        if(in_array($id, self::STAIRS_IDS)) {
-            $meta = self::STAIRS_ROTATION_DATA[$meta % 8];
+        if(in_array($id, RotationHelper::STAIRS_IDS)) {
+            $meta = RotationHelper::STAIRS_ROTATION_DATA[$meta % 8];
         }
     }
 
     public static function rotate180(int $id, int &$meta): void {
-        if(in_array($id, self::STAIRS_IDS)) {
-            $meta = self::STAIRS_ROTATION_DATA[$meta % 8];
-            $meta = self::STAIRS_ROTATION_DATA[$meta % 8];
+        if(in_array($id, RotationHelper::STAIRS_IDS)) {
+            $meta = RotationHelper::STAIRS_ROTATION_DATA[$meta % 8];
+            $meta = RotationHelper::STAIRS_ROTATION_DATA[$meta % 8];
         }
     }
 
     public static function rotate270(int $id, int &$meta): void {
-        if(in_array($id, self::STAIRS_IDS)) {
-            $meta = self::STAIRS_ROTATION_DATA[$meta % 8];
-            $meta = self::STAIRS_ROTATION_DATA[$meta % 8];
-            $meta = self::STAIRS_ROTATION_DATA[$meta % 8];
+        if(in_array($id, RotationHelper::STAIRS_IDS)) {
+            $meta = RotationHelper::STAIRS_ROTATION_DATA[$meta % 8];
+            $meta = RotationHelper::STAIRS_ROTATION_DATA[$meta % 8];
+            $meta = RotationHelper::STAIRS_ROTATION_DATA[$meta % 8];
         }
     }
 }

@@ -35,7 +35,7 @@ class Fixer {
     private array $fullBlockFixData;
 
     protected function __construct() {
-        $this->fullBlockFixData = json_decode(self::BLOCK_FIX_DATA, true);
+        $this->fullBlockFixData = json_decode(Fixer::BLOCK_FIX_DATA, true);
     }
 
     public function convertJavaToBedrockId(int &$fullBlock): bool {

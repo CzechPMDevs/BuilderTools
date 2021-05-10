@@ -235,7 +235,7 @@ class Copier {
         }
 
         $direction = $player->getDirection();
-        if($mode == self::DIRECTION_PLAYER) {
+        if($mode == Copier::DIRECTION_PLAYER) {
             if($direction == 0 || $direction == 2) { // Moving along x axis (z = const)
                 $xSize = ($maxX - $minX) + 1;
 
@@ -285,7 +285,7 @@ class Copier {
             $ySize = ($maxY - $minY) + 1;
 
             $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-            if($mode == self::DIRECTION_DOWN) {
+            if($mode == Copier::DIRECTION_DOWN) {
                 $ySize = -$ySize;
             }
 

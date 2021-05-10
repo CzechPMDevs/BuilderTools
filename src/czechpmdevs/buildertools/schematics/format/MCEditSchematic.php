@@ -67,7 +67,7 @@ class MCEditSchematic implements Schematic {
             }
         }
 
-        if($materials == self::MATERIALS_CLASSIC || $materials == self::MATERIALS_ALPHA) {
+        if($materials == MCEditSchematic::MATERIALS_CLASSIC || $materials == MCEditSchematic::MATERIALS_ALPHA) {
             $fixer = Fixer::getInstance();
 
             foreach ($blockArray->blocks as &$fullBlock) {
@@ -111,12 +111,12 @@ class MCEditSchematic implements Schematic {
     }
 
     private function readMaterials(CompoundTag $nbt, ?string &$materials): void {
-        if(strtolower($nbt->getString("Materials", self::MATERIALS_CLASSIC)) == strtolower(self::MATERIALS_BEDROCK)) {
-            $materials = self::MATERIALS_BEDROCK;
+        if(strtolower($nbt->getString("Materials", MCEditSchematic::MATERIALS_CLASSIC)) == strtolower(MCEditSchematic::MATERIALS_BEDROCK)) {
+            $materials = MCEditSchematic::MATERIALS_BEDROCK;
             return;
         }
 
-        $materials = self::MATERIALS_CLASSIC;
+        $materials = MCEditSchematic::MATERIALS_CLASSIC;
     }
 
     /**
@@ -150,7 +150,7 @@ class MCEditSchematic implements Schematic {
          * @phpstan-var string $data
          */
         $this->writeBlockData($nbt, $blocks, $data);
-        $this->writeMaterials($nbt, self::MATERIALS_BEDROCK);
+        $this->writeMaterials($nbt, MCEditSchematic::MATERIALS_BEDROCK);
 
         $rawData = (new BigEndianNBTStream())->writeCompressed($nbt);
         if($rawData === false) {
