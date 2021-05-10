@@ -24,7 +24,7 @@
     <br>  
     ✔️ Using Sub Chunk Iterator to make block placing faster
     <br>  
-    ✔️ Supports schematics  
+    ✔️ Supports schematics
     <br>  
     ✔️ Minecraft: Java Version maps world fixer  
     <br>  
@@ -32,23 +32,20 @@
     <br><br>  
 </p>  
   
-## 👍 1.2.0-beta3 Update:  
-> - Plugin cleanup
-> - Memory & CPU optimization
-> - Schematics are now created & saved asynchronously
-> - MCStructure schematic format is now supported
-> - Bug fixes
-> - New commands (`//wals`, `//cut`, `//center`, `//d`)
-> - Changed permissions prefix from `bt` to `buildertools`
-> - `//fix` command now fixes whole world asynchronously
-> - Dropped support for php 7.3 & PocketMine api versions lower than 3.16.0
-> - When you select both positions, you see how many blocks is in the selection
+## 👍 1.2.0-beta4 Update:  
+> - Bug fixes (#132, #142, #143, #146, #147, #148, #152)
+> - New //biome and //flip commands
+> - Fixed accuracy on //copy & //paste commands
+> - Fixed parent permission wasn't working
+> - New option in config (for compressing clipboards, cleaning player cache and for removing duplicate blocks)
+> - Fixed //undo wasn't working properly with some shapes
   
 ## ⬇️ Downloads:  
   
 | Version | Phar Download | Zip Download | API | Min php version |
 | --- | --- | --- | --- | --- |
-| 1.2.0-beta4 | [Try latest dev version from Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta5 | [Try Latest Dev Version From Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta4 | [Poggit](https://poggit.pmmp.io/r/125306/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.2.0-beta4.zip) | 3.16.0^ | 7.4 |
 | 1.2.0-beta3 | [Poggit](https://poggit.pmmp.io/r/122470/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.2.0-beta3.zip) | 3.16.0^ | 7.4 |
 | 1.2.0-beta2 | [Poggit](https://poggit.pmmp.io/r/62312/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/41b127a689d523683f8cd3c5e3704688073a818f.zip) | 3.x.x | 7.0 |
 | 1.2.0-beta1 | [Poggit](https://poggit.pmmp.io/r/55728/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/648661f756b8bd8c89582e637ee864f9411763a2.zip) | 3.x.x | 7.0 |
