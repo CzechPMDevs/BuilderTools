@@ -32,4 +32,9 @@ interface BlockIdentifierList {
      * in the list
      */
     public function containsBlock(int $id, int $meta): bool;
+
+    /**
+     * Returns if the id is on the list
+     */
+    public function containsBlockId(int $id): bool;
 }

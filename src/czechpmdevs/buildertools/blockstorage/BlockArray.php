@@ -34,15 +34,12 @@ use function array_combine;
 use function array_keys;
 use function array_reverse;
 use function array_slice;
-use function array_unique;
 use function array_values;
 use function count;
 use function in_array;
 use function is_string;
-use function microtime;
 use function pack;
 use function unpack;
-use const SORT_REGULAR;
 
 class BlockArray implements UpdateLevelData, Serializable {
 

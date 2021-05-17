@@ -45,6 +45,10 @@ class SingleBlockIdentifier implements BlockIdentifierList {
         return $id == $this->id && $meta == $this->meta;
     }
 
+    public function containsBlockId(int $id): bool {
+        return $this->id == $id;
+    }
+
     public static function airIdentifier(): SingleBlockIdentifier {
         return new SingleBlockIdentifier(0);
     }

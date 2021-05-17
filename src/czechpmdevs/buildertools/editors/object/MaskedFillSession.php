@@ -38,16 +38,24 @@ class MaskedFillSession extends FillSession {
      * @param int $y 0-255
      */
     public function setBlockAt(int $x, int $y, int $z, int $id, int $meta): void {
-        if(!$this->moveTo($x, $y, $z)) {
+        if (!$this->moveTo($x, $y, $z)) {
             return;
         }
 
-        if($this->mask !== null && !$this->mask->containsBlock(
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf)
-        )) {
+        if ($this->mask !== null && (
+                !$this->mask->containsBlock(
+                    /** @phpstan-ignore-next-line */
+                    $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
+                    /** @phpstan-ignore-next-line */
+                    $this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf)
+                )
+            ) && (
+                !$this->mask->containsBlockId(
+                    /** @phpstan-ignore-next-line */
+                    $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
+                )
+            )
+        ) {
             return;
         }
 
