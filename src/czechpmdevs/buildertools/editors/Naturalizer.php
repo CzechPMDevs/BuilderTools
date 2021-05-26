@@ -65,9 +65,11 @@ class Naturalizer {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);

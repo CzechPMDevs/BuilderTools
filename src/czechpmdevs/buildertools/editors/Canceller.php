@@ -56,15 +56,19 @@ class Canceller {
         $startTime = microtime(true);
         $fillSession = new FillSession($undoAction->getWorld(), true, true);
 
+        $undoAction->load();
         while ($undoAction->hasNext()) {
             $undoAction->readNext($x, $y, $z, $id, $meta);
             $fillSession->setBlockAt($x, $y, $z, $id, $meta);
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $updates */
         $updates = $fillSession->getChanges();
+        $updates->save();
+
         Canceller::getInstance()->addRedo($player, $updates);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -95,15 +99,19 @@ class Canceller {
         $startTime = microtime(true);
         $fillSession = new FillSession($redoAction->getWorld(), true, true);
 
+        $redoAction->load();
         while ($redoAction->hasNext()) {
             $redoAction->readNext($x, $y, $z, $id, $meta);
             $fillSession->setBlockAt($x, $y, $z, $id, $meta);
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $updates */
         $updates = $fillSession->getChanges();
+        $updates->save();
+
         Canceller::getInstance()->addStep($player, $updates);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);

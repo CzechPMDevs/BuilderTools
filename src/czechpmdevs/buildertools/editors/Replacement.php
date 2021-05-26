@@ -38,10 +38,10 @@ class Replacement {
     public function directReplace(Player $player, Vector3 $pos1, Vector3 $pos2, string $blocks, string $replace): EditorResult {
         $startTime = microtime(true);
 
-        $mask = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
+        $mask = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand(), false);
         $stringToBlockDecoder = new StringToBlockDecoder($replace, $player->getInventory()->getItemInHand());
 
-        if(!$mask->isValid()) { // Nothing to replace
+        if(!$mask->isValid(false)) { // Nothing to replace
             return EditorResult::success(0, microtime(true) - $startTime);
         }
         if(!$stringToBlockDecoder->isValid()) {
@@ -69,9 +69,11 @@ class Replacement {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true)-$startTime);

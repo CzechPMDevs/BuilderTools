@@ -26,7 +26,10 @@ use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use function array_key_exists;
 use function basename;
+use function in_array;
+use function is_dir;
 
 class WorldFixUtil {
 
@@ -35,11 +38,11 @@ class WorldFixUtil {
 
     /** @noinspection PhpUnusedParameterInspection */
     public static function fixWorld(CommandSender $sender, string $worldName): void {
-        if(self::isInWorldFixQueue($worldName)) {
+        if(WorldFixUtil::isInWorldFixQueue($worldName)) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cServer is already fixing this world!");
             return;
         }
-        if(in_array($sender->getName(), self::$worldFixQueue)) {
+        if(in_array($sender->getName(), WorldFixUtil::$worldFixQueue)) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix more than one world at the same time!");
             return;
         }
@@ -55,7 +58,7 @@ class WorldFixUtil {
             return;
         }
 
-        self::$worldFixQueue[$worldName] = $sender->getName();
+        WorldFixUtil::$worldFixQueue[$worldName] = $sender->getName();
 
         if(Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
             /** @phpstan-ignore-next-line */
@@ -71,10 +74,14 @@ class WorldFixUtil {
         /** @var ClosureTask $task */
         $task = null;
 
-        BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function (int $currentTick) use ($asyncTask, $sender, &$task): void {
-            if($sender instanceof Player && !$sender->isOnline()) {
-                $asyncTask->forceStop = true;
-                goto finish;
+        BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function (int $currentTick) use ($worldName, $asyncTask, $sender, &$task): void {
+            if($sender instanceof Player) {
+                if($sender->isOnline()) {
+                    $sender->sendTip("§aWorld $worldName is fixed from $asyncTask->percent%.");
+                } else {
+                    $asyncTask->forceStop = true;
+                    goto finish;
+                }
             }
 
             if($asyncTask->error != "") {
@@ -89,13 +96,13 @@ class WorldFixUtil {
                 $task->getHandler()->cancel(); // TODO - Check if it's cancelled right
                 WorldFixUtil::finishWorldFixTask($asyncTask);
             }
-        }), 1, 2);
+        }), 60, 2);
 
         $sender->sendMessage(BuilderTools::getPrefix() . "§aFixing the world...");
     }
 
     public static function isInWorldFixQueue(string $levelName): bool {
-        return isset(self::$worldFixQueue[$levelName]);
+        return array_key_exists($levelName, WorldFixUtil::$worldFixQueue);
     }
 
     /**
@@ -104,8 +111,6 @@ class WorldFixUtil {
      * @param WorldFixTask<mixed> $task
      */
     public static function finishWorldFixTask(WorldFixTask $task): void {
-        if(isset(self::$worldFixQueue[basename($task->worldPath)])) {
-            unset(self::$worldFixQueue[basename($task->worldPath)]);
-        }
+        unset(WorldFixUtil::$worldFixQueue[basename($task->worldPath)]);
     }
 }

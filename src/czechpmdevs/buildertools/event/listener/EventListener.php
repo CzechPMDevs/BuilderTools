@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
@@ -43,6 +43,7 @@ class EventListener implements Listener {
     /** @var float[] */
     private array $blockInfoClicks = [];
 
+    /** @noinspection PhpUnused */
     public function onAirClick(PlayerInteractEvent $event): void {
         if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) {
             return;

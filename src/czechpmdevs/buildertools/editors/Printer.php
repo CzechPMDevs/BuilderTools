@@ -66,32 +66,33 @@ class Printer {
             $level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block);
         };
 
-        if($mode == self::CUBE) {
+        if($mode == Printer::CUBE) {
             foreach (BlockGenerator::generateCube($brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::SPHERE) {
+        } elseif($mode == Printer::SPHERE) {
             foreach (BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::CYLINDER) {
+        } elseif($mode == Printer::CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::HOLLOW_CUBE) {
+        } elseif($mode == Printer::HOLLOW_CUBE) {
             foreach (BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::HOLLOW_SPHERE) {
+        } elseif($mode == Printer::HOLLOW_SPHERE) {
             foreach (BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
-        } elseif($mode == self::HOLLOW_CYLINDER) {
+        } elseif($mode == Printer::HOLLOW_CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush,true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
         }
 
+        $undoList->save();
         Canceller::getInstance()->addStep($player, $undoList);
     }
 
@@ -186,11 +187,15 @@ class Printer {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
-        
+        $undoList->removeDuplicates();
+        $undoList->save();
+
         Canceller::getInstance()->addStep($player, $undoList);
+
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
@@ -241,7 +246,6 @@ class Printer {
                     if($z == 0) {
                         break 2;
                     }
-
                     break;
                 }
 
@@ -269,11 +273,15 @@ class Printer {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
+        $undoList->removeDuplicates();
+        $undoList->save();
 
         Canceller::getInstance()->addStep($player, $undoList);
+
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 
@@ -310,17 +318,18 @@ class Printer {
                     if($floorY + $y < 0 || $floorY + $y > 255) {
                         continue;
                     }
-                    $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt($x, $y, $z, $id, $meta);
 
                     $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt(-$x, $y, $z, $id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 
                     $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt($x, $y, -$z, $id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $id, $meta);
 
                     $stringToBlockDecoder->nextBlock($id, $meta);
-                    $fillSession->setBlockAt(-$x, $y, -$z, $id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $id, $meta);
                 }
             }
             $currentLevelHeight--;
@@ -332,11 +341,15 @@ class Printer {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $undoList */
         $undoList = $fillSession->getChanges();
+        $undoList->removeDuplicates();
+        $undoList->save();
 
         Canceller::getInstance()->addStep($player, $undoList);
+
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 

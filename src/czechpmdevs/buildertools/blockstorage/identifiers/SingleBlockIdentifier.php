@@ -43,6 +43,10 @@ class SingleBlockIdentifier implements BlockIdentifierList {
         return isset($this->meta) ? $blockHash == ($this->id << 4 | $this->meta) : $blockHash >> 4 == $this->id;
     }
 
+    public function containsBlockId(int $id): bool {
+        return $this->id == $id;
+    }
+
     public static function airIdentifier(): SingleBlockIdentifier {
         return new SingleBlockIdentifier(0);
     }

@@ -56,8 +56,6 @@ interface Schematic {
     /**
      * This function is used to validate format from raw data
      * - Should not throw any errors neither exceptions
-     *
-     * @return bool
      */
     public static function validate(string $rawData): bool;
 }

@@ -72,9 +72,12 @@ class Filler {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
+
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -103,9 +106,12 @@ class Filler {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
+
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -147,6 +153,8 @@ class Filler {
         if($saveUndo || $saveRedo) {
             /** @var BlockArray $updates */
             $updates = $fillSession->getChanges();
+            $updates->save();
+
             if($saveUndo) {
                 Canceller::getInstance()->addStep($player, $updates);
             }

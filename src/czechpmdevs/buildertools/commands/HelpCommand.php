@@ -35,7 +35,7 @@ class HelpCommand extends BuilderToolsCommand {
     }
 
     public static function buildPages(): void {
-        $commandsPerList = self::COMMANDS_PER_PAGE;
+        $commandsPerList = HelpCommand::COMMANDS_PER_PAGE;
 
         $count = (int)(count(BuilderTools::getAllCommands()) / $commandsPerList);
         $list = 1;
@@ -59,9 +59,9 @@ class HelpCommand extends BuilderToolsCommand {
             }
 
             $text .= "\n§2/$name: §f" . BuilderTools::getAllCommands()[$index]->getDescription();
-            if($command == self::COMMANDS_PER_PAGE || (count(BuilderTools::getAllCommands()) == $all)) {
+            if($command == HelpCommand::COMMANDS_PER_PAGE || (count(BuilderTools::getAllCommands()) == $all)) {
                 $command = 1;
-                self::$pages[$list] = $text;
+                HelpCommand::$pages[$list] = $text;
                 $list++;
             } else {
                 $command++;
@@ -73,10 +73,10 @@ class HelpCommand extends BuilderToolsCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         if(!$this->testPermission($sender)) return;
         $page = 1;
-        if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands())/self::COMMANDS_PER_PAGE))) {
+        if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands())/HelpCommand::COMMANDS_PER_PAGE))) {
             $page = (int)$args[0];
         }
 
-        $sender->sendMessage(self::$pages[$page]);
+        $sender->sendMessage(HelpCommand::$pages[$page]);
     }
 }

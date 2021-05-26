@@ -16,25 +16,14 @@
  * limitations under the License.
  */
 
+
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\blockstorage\identifiers;
+namespace czechpmdevs\buildertools\utils;
 
-interface BlockIdentifierList {
+interface Axis {
 
-    /**
-     * Function which outputs next random block
-     */
-    public function nextBlock(?int &$id, ?int &$meta): void;
-
-    /**
-     * Function which returns if the block
-     * in the list
-     */
-    public function containsBlock(int $blockHash): bool;
-
-    /**
-     * Returns if the id is on the list
-     */
-    public function containsBlockId(int $id): bool;
+    public const X_AXIS = 0x0;
+    public const Y_AXIS = 0x1;
+    public const Z_AXIS = 0x2;
 }

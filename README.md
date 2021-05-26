@@ -24,7 +24,7 @@
     <br>  
     ✔️ Using Sub Chunk Iterator to make block placing faster
     <br>  
-    ✔️ Supports schematics  
+    ✔️ Supports schematics
     <br>  
     ✔️ Minecraft: Java Version maps world fixer  
     <br>  
@@ -32,23 +32,21 @@
     <br><br>  
 </p>  
   
-## 👍 1.2.0-beta3 Update:  
-> - Plugin cleanup
-> - Memory & CPU optimization
-> - Schematics are now created & saved asynchronously
-> - MCStructure schematic format is now supported
-> - Bug fixes
-> - New commands (`//wals`, `//cut`, `//center`, `//d`)
-> - Changed permissions prefix from `bt` to `buildertools`
-> - `//fix` command now fixes whole world asynchronously
-> - Dropped support for php 7.3 & PocketMine api versions lower than 3.16.0
-> - When you select both positions, you see how many blocks is in the selection
+## 👍 1.2.0-beta4 Update:  
+> - Bug fixes (#132, #142, #143, #146, #147, #148, #152)
+> - New //biome and //flip commands
+> - Fixed accuracy on //copy & //paste commands
+> - Fixed parent permission wasn't working
+> - New option in config (for compressing clipboards, cleaning player cache and for removing duplicate blocks)
+> - Fixed //undo wasn't working properly with some shapes
   
 ## ⬇️ Downloads:  
   
 | Version | Phar Download | Zip Download | API | Min php version |
 | --- | --- | --- | --- | --- |
-| 1.2.0-beta3 | [Try latest dev version from Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta5 | [Try Latest Dev Version From Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools) | --- | 3.16.0^ | 7.4 |
+| 1.2.0-beta4 | [Poggit](https://poggit.pmmp.io/r/125306/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.2.0-beta4.zip) | 3.16.0^ | 7.4 |
+| 1.2.0-beta3 | [Poggit](https://poggit.pmmp.io/r/122470/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.2.0-beta3.zip) | 3.16.0^ | 7.4 |
 | 1.2.0-beta2 | [Poggit](https://poggit.pmmp.io/r/62312/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/41b127a689d523683f8cd3c5e3704688073a818f.zip) | 3.x.x | 7.0 |
 | 1.2.0-beta1 | [Poggit](https://poggit.pmmp.io/r/55728/BuilderTools.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/648661f756b8bd8c89582e637ee864f9411763a2.zip) | 3.x.x | 7.0 |
 | 1.1.0 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0) | 3.x.x | 7.0 |
@@ -85,6 +83,7 @@
 | **Command** | **Description** |  
 | --- | --- |  
 | **//commands** | **Displays list BuilderTools commands** <br><br> Alias: `//commands`, `/buildertools` <br>Usage: `//commands <page: 1-4>`|  
+| **//biome** | **Changes biome in selected area** <br><br> Usage: `//biome list` OR `//biome <biomeId>` |
 | **//blockinfo** | **Switch block info mode** <br><br>Usage: `//blockinfo`<br>Alias: `//bi`<br><br>In blockinfo mode you can get information about block by touching it.  |  
 | **//clearinventory** | **Clears inventory** <br><br>Usage: `//clearinventory`<br>Alias: `//ci`  |  
 | **//center** | **Finds center of the selection** <br><br> Usage: `//center` <br><br> Bedrock will appear in the middle of the selection |  
@@ -95,6 +94,7 @@
 | **//draw** | **Draws with blocks** <br><br>Usage: `//draw <cube|sphere|off> [brush: 1-6] [fall = false]` <br><br> We recommend to use this command while creating big mountains. Draw mode is turned on by typing `//draw <cube|sphere>` and can be turned of typing `//draw off`. |  
 | **//fill** | **Fill selected area** <br><br> Aliases: `//set`, `//change` <br> Usage: `//fill <id1:dmg1,id2,...>` <br><br> First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
 | **//fix** | **Fixes block in world from Minecraft: Java Edition** <br><br> Usage: `//fix <world>` |  
+| **//flip** | **Flips selection** <br><br>Usage `//flip x` OR `//flip y` OR `//flip z`<br><br>The argument represents axis to flip the selection through. |
 | **//hcube** | **Creates hollow cube** <br><br>Usage: `//hcube <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cube at your position.  |  
 | **//hcylinder** | **Creates hollow cylinder** <br><br>Usage: `//hcyl <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow cylinder at your position.  |  
 | **//hpyramid** | **Creates hollow pyramid** <br><br>Usage: `//hpyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates hollow pyramid at your position.  |  
@@ -110,7 +110,7 @@
 | **//pyramid** | **Creates pyramid** <br><br>Usage: `//pyramid <id1:dmg1,id2,...> <radius>`<br><br>Creates pyramid in your position.  |  
 | **//redo** | **Re-do BuilderTools action** <br><br> Usage: `//redo` |
 | **//replace** | **Replace blocks in selected area** <br><br> Usage: `//replace <blocksToReplace: id1,id2> <blocks: id1:dmg1,id2,...>` <br><br> Replace blocks in selected area. First you must create area using `//pos1`, `//pos2` or by `//wand`. |  
-| **//rotate** | **Rotate copied area** <br><br>Usage: `//rotate` <br><br> When rotating an object, you must rotate to the side to which you want to rotate the object, and then write the `confirm` to the chat. If you want to cancel rotation, type `cancel` into the chat.|  
+| **//rotate** | **Rotate copied area** <br><br>Usage: `//rotate <y> [x] [z]` <br><br> Y, X or Z is axis you can rotate object around. Use degrees as unit. Example: `//rotate 90` |  
 | **//schematic** | **Manage with schematics** <br><br>Usage: `//schem <reload OR load OR list OR paste> [filename]`<br><br>Manage with schematics (reload - loads all schematics to memory; load - loads schematics for //schem paste; list - displays list of loaded schematics.  |  
 | **//sphere** | **Creates sphere** <br><br> Usage: `//sphere <id1:dmg1,id2,...> <radius>` <br><br> Creates a sphere in your position. |  
 | **//stack** | **Stacks copied area** <br><br>Usage: `//stack <count> [side|up|down]`<br><br>Stacks blocks in line.  |  
@@ -153,6 +153,7 @@
 | Permission | Command | Operator Permissions required |  
 | --- | --- | --- |  
 | buildertools.command.help | `//commands` | ✔️ |  
+| buildertools.command.biome | `//biome` | ✔️ |  
 | buildertools.command.blockinfo | `//blockinfo` | ✔️ |  
 | buildertools.command.clearinventory | `//clearinventory` | ✔️ |  
 | buildertools.command.copy | `//copy` | ✔️ |  
@@ -190,18 +191,33 @@
 - Default configuration:
 
 ```yaml  
----
-# Do not change this!
-config-version: 1.2.1    
+# BuilderTools configuration file
+# Target BuilderTools version: 1.2.0-beta4
 
- items:    
-  wand-axe:    
-    enabled: true    
-    name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"    
-  blockinfo-stick:    
-    enabled: false    
-    name: "§r§fDebug Stick\n§7§oTouch block for info"    
-...  
+# Do not change this line.
+config-version: 1.2.0.2
+
+# This is format which will be used for creating schematics
+# Supported formats: 'mcedit', 'mcstructure'
+output-schematics-format: 'mcedit'
+
+# Option for compressing clipboards. This will make the actions
+# slower, but reduces RAM usage.
+clipboard-compression: false
+
+# BuilderTools saves player's clipboard, undo & redo stuff when player
+# leaves server to disk. This cache should be cleaned after restart (to
+# avoid unexpected bugs). This  option is to disable removing those files.
+clean-cache: true
+
+# PowerItems settings:
+items:
+  wand-axe:
+    enabled: true
+    name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"
+  blockinfo-stick:
+    enabled: false
+    name: "§r§fDebug Stick\n§7§oTouch block for info"
 ```
 
 <br>

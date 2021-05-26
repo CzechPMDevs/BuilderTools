@@ -50,6 +50,9 @@ class WorldFixTask extends AsyncTask {
     /** @var bool */
     public bool $done = false;
 
+    /** @var int */
+    public int $percent = 0;
+
     /** @var float */
     public float $time = 0.0;
     /** @var int */
@@ -140,16 +143,15 @@ class WorldFixTask extends AsyncTask {
             $timePerRegion = (microtime(true) - $startTime) / $regionsFixed;
             $expectedTime = gmdate("H:i:s", (int)ceil($timePerRegion * ($regionCount - $regionsFixed)));
 
-//            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
+            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
 
+            $this->percent = (int)$percent;
             $provider->doGarbageCollection();
         }
 
         $this->time = round(microtime(true) - $startTime);
-//        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
+        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
 
-
-//        MainLogger::getLogger()->debug("[BuilderTools] World fixed in " . round(microtime(true)-$startTime) .", affected " .count($chunksToFix). " chunks!");
         $this->done = true;
         $this->chunkCount = $chunksFixed;
     }
@@ -178,7 +180,7 @@ class WorldFixTask extends AsyncTask {
             try {
                 $region->open();
             } catch (CorruptedRegionException $e) {
-//                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 4 << 5) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
+                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
                 continue;
             }
 

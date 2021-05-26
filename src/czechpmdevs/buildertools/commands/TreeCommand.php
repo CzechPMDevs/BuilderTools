@@ -24,6 +24,8 @@ use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\Random;
+use function strtolower;
+use function time;
 use pocketmine\world\generator\object\BirchTree;
 use pocketmine\world\generator\object\JungleTree;
 use pocketmine\world\generator\object\OakTree;

@@ -16,25 +16,23 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\utils\Axis;
 use pocketmine\command\CommandSender;
-use pocketmine\data\bedrock\EnchantmentIdMap;
-use pocketmine\item\enchantment\EnchantmentInstance;
-use pocketmine\item\VanillaItems;
-use pocketmine\player\Player;
-use pocketmine\item\Item;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\ByteTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\Player;
+use function microtime;
+use function round;
+use function strtolower;
 
-class WandCommand extends BuilderToolsCommand {
+class FlipCommand extends BuilderToolsCommand {
 
     public function __construct() {
-        parent::__construct("/wand", "Switch wand tool", null, []);
+        parent::__construct("/flip", "Flips selected area", null, []);
     }
 
     /** @noinspection PhpUnused */
@@ -45,18 +43,29 @@ class WandCommand extends BuilderToolsCommand {
             return;
         }
 
-        if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
-            $item = VanillaItems::WOODEN_AXE();
-            $item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
-            /** @phpstan-ignore-next-line */
-            $item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
-            $sender->getInventory()->addItem($item);
-            $sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
+        if(!isset($args[0])) {
+            $sender->sendMessage("§cUsage: §7//flip <axis: x|y|z>");
             return;
         }
 
-        Selectors::switchWandSelector($sender);
-        $switch = Selectors::isWandSelector($sender) ? "ON" : "OFF";
-        $sender->sendMessage(BuilderTools::getPrefix()."§aWand tool turned $switch!");
+        if(strtolower($args[0]) == "x") {
+            $axis = Axis::X_AXIS;
+        } else if(strtolower($args[0]) == "y") {
+            $axis = Axis::Y_AXIS;
+        } else if(strtolower($args[0]) == "z") {
+            $axis = Axis::Z_AXIS;
+        } else {
+            $sender->sendMessage(BuilderTools::getPrefix() . "§cUnknown axis '$args[0]'. You can use only 'X', 'Y' and 'Z' axis.");
+            return;
+        }
+
+        $startTime = microtime(true);
+
+        $copier = Copier::getInstance();
+        $copier->flip($sender, $axis);
+
+        $time = round(microtime(true)-$startTime, 3);
+
+        $sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
     }
 }

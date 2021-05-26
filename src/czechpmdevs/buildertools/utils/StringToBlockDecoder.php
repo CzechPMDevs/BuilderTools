@@ -47,22 +47,22 @@ final class StringToBlockDecoder implements BlockIdentifierList {
     /** @var int[] */
     private array $blockMap = [];
 
-    public function __construct(string $string, ?Item $handItem = null) {
+    public function __construct(string $string, ?Item $handItem = null, bool $mixBlockIds = true) {
         $this->string = $string;
 
         if($handItem !== null) {
             $this->itemInHand = "{$handItem->getId()}:{$handItem->getMeta()}";
         }
 
-        $this->decode();
+        $this->decode($mixBlockIds);
     }
 
     /**
      * @return bool Returns if the string contains
      * any valid blocks
      */
-    public function isValid(): bool {
-        return count($this->blockMap) != 0;
+    public function isValid(bool $requireBlockMap = true): bool {
+        return count($this->blockMap) != 0 || (!$requireBlockMap && count($this->blockIdMap) != 0);
     }
 
     /**
@@ -90,7 +90,11 @@ final class StringToBlockDecoder implements BlockIdentifierList {
         return in_array($id, $this->blockIdMap);
     }
 
-    public function decode(): void {
+    /**
+     * @param bool $mixBlockIds If enabled, block ids will be saved
+     * to both block and blockId maps
+     */
+    public function decode(bool $mixBlockIds = true): void {
         if($this->itemInHand !== null) {
             $this->string = str_replace("hand", $this->itemInHand, $this->string);
         }
@@ -121,7 +125,20 @@ final class StringToBlockDecoder implements BlockIdentifierList {
                 continue;
             }
 
-            for($i = 0; $i < $count; $i++) {
+            if(!$mixBlockIds) {
+                if(strpos($entry, ":") !== false) { // Meta is specified
+                    for($i = 0; $i < $count; ++$i) {
+                        $this->blockMap[] = $class->getId() << 4 | $class->getDamage();
+                    }
+                } else {
+                    for($i = 0; $i < $count; ++$i) {
+                        $this->blockIdMap[] = $class->getId();
+                    }
+                }
+                continue;
+            }
+
+            for($i = 0; $i < $count; ++$i) {
                 $this->blockIdMap[] = $class->getId();
                 $this->blockMap[] = $class->getId() << 4 | $class->getMeta();
             }

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
+use czechpmdevs\buildertools\BuilderTools;
 use InvalidStateException;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNbtSerializer;
@@ -30,6 +31,9 @@ use pocketmine\nbt\TreeRoot;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\World;
 use Serializable;
+use function array_combine;
+use function array_keys;
+use function array_reverse;
 use function array_slice;
 use function array_values;
 use function count;
@@ -50,8 +54,16 @@ class BlockArray implements UpdateLevelData, Serializable {
     /** @var int[] */
     public array $coords = [];
 
+    /** @var BlockArraySizeData|null */
+    protected ?BlockArraySizeData $sizeData = null;
+    /** @var ChunkManager|null */
+    protected ?ChunkManager $world = null;
+
+    /** @var bool */
+    protected bool $isCompressed = false;
     /** @var string */
     public string $compressedCoords;
+
     /** @var string */
     public string $compressedBlocks;
 
@@ -68,11 +80,6 @@ class BlockArray implements UpdateLevelData, Serializable {
     public function __construct(bool $detectDuplicates = false) {
         $this->detectDuplicates = $detectDuplicates;
     }
-
-    /** @var BlockArraySizeData|null */
-    protected ?BlockArraySizeData $sizeData = null;
-    /** @var ChunkManager|null */
-    protected ?ChunkManager $world = null;
 
     /**
      * Adds block to the block array
@@ -187,6 +194,35 @@ class BlockArray implements UpdateLevelData, Serializable {
         return $this->coords;
     }
 
+    public function removeDuplicates(): void {
+        if(!(BuilderTools::getConfiguration()["remove-duplicate-blocks"] ?? true)) {
+            return;
+        }
+
+        // TODO - Optimize this
+        $blocks = array_combine(array_reverse($this->coords, true), array_reverse($this->blocks, true));
+        if($blocks === false) {
+            return;
+        }
+
+        $this->coords = array_keys($blocks);
+        $this->blocks = array_values($blocks);
+    }
+
+    public function save(): void {
+        if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+            $this->compress();
+            $this->isCompressed = true;
+        }
+    }
+
+    public function load(): void {
+        if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+            $this->decompress();
+            $this->isCompressed = false;
+        }
+    }
+
     public function compress(bool $cleanDecompressed = true): void {
         /** @phpstan-var string|false $coords */
         $coords = pack("q*", ...$this->coords);
@@ -223,6 +259,10 @@ class BlockArray implements UpdateLevelData, Serializable {
             unset($this->compressedCoords);
             unset($this->compressedBlocks);
         }
+    }
+
+    public function isCompressed(): bool {
+        return $this->isCompressed;
     }
 
     /**

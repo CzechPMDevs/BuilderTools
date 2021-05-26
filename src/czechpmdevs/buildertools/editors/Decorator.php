@@ -67,6 +67,7 @@ class Decorator {
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);

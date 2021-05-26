@@ -31,7 +31,7 @@ use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\math\Vector3;
-use pocketmine\player\Player;
+use pocketmine\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
@@ -45,7 +45,7 @@ class Copier {
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->subtract(0.5, 0, 0.5)->ceil());
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -62,6 +62,7 @@ class Copier {
             }
         }
 
+        $clipboard->save();
         ClipboardManager::saveClipboard($player, $clipboard);
 
         return EditorResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
@@ -70,13 +71,13 @@ class Copier {
     public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->subtract(0.5, 0, 0.5)->ceil());
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $fillSession = new FillSession($player->getWorld(), false);
+        $fillSession = new FillSession($player->getLevelNonNull(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        $fillSession->loadChunks($player->getWorld());
+        $fillSession->loadChunks($player->getLevelNonNull());
 
         for($x = $minX; $x <= $maxX; ++$x) {
             for ($z = $minZ; $z <= $maxZ; ++$z) {
@@ -90,7 +91,16 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
+
+        $clipboard->save();
         ClipboardManager::saveClipboard($player, $clipboard);
+
+        /** @var BlockArray $changes */
+        $changes = $fillSession->getChanges();
+        $changes->save();
+
+        Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
@@ -105,15 +115,18 @@ class Copier {
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
         $clipboard->setWorld($player->getWorld());
+        $clipboard->load();
 
         /** @phpstan-var Vector3 $relativePosition */
         $relativePosition = $clipboard->getPlayerPosition();
 
         $fillSession = new MaskedFillSession($player->getWorld(), true, true, SingleBlockIdentifier::airIdentifier());
 
-        $floorX = $player->getPosition()->getFloorX() - $relativePosition->getFloorX();
-        $floorY = $player->getPosition()->getFloorY() - $relativePosition->getFloorY();
-        $floorZ = $player->getPosition()->getFloorZ() - $relativePosition->getFloorZ();
+        $motion = $player->getPosition()->add(0.5, 0, 0.5)->subtract($relativePosition);
+
+        $floorX = $motion->getFloorX();
+        $floorY = $motion->getFloorY();
+        $floorZ = $motion->getFloorZ();
 
         while ($clipboard->hasNext()) {
             $clipboard->readNext($x, $y, $z, $id, $meta);
@@ -121,9 +134,11 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -139,15 +154,18 @@ class Copier {
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
         $clipboard->setWorld($player->getWorld());
+        $clipboard->load();
 
         /** @phpstan-var Vector3 $relativePosition */
         $relativePosition = $clipboard->getPlayerPosition();
 
         $fillSession = new FillSession($player->getWorld(), true, true);
 
-        $floorX = $player->getPosition()->getFloorX() - $relativePosition->getFloorX();
-        $floorY = $player->getPosition()->getFloorY() - $relativePosition->getFloorY();
-        $floorZ = $player->getPosition()->getFloorZ() - $relativePosition->getFloorZ();
+        $motion = $player->getPosition()->add(0.5, 0, 0.5)->subtract($relativePosition);
+
+        $floorX = $motion->getFloorX();
+        $floorY = $motion->getFloorY();
+        $floorZ = $motion->getFloorZ();
 
         while ($clipboard->hasNext()) {
             $clipboard->readNext($x, $y, $z, $id, $meta);
@@ -155,9 +173,12 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
+
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -171,7 +192,28 @@ class Copier {
 
         /** @phpstan-var SelectionData $clipboard */
         $clipboard = ClipboardManager::getClipboard($player);
-        ClipboardManager::saveClipboard($player, RotationUtil::rotate($clipboard, $axis, $rotation));
+        $clipboard->load();
+
+        $clipboard = RotationUtil::rotate($clipboard, $axis, $rotation);
+        $clipboard->save();
+
+        ClipboardManager::saveClipboard($player, $clipboard);
+    }
+
+    public function flip(Player $player, int $axis): void {
+        if(!ClipboardManager::hasClipboardCopied($player)) {
+            $player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+            return;
+        }
+
+        /** @phpstan-var SelectionData $clipboard */
+        $clipboard = ClipboardManager::getClipboard($player);
+        $clipboard->load();
+
+        $clipboard = FlipUtil::flip($clipboard, $axis);
+        $clipboard->save();
+
+        ClipboardManager::saveClipboard($player, $clipboard);
     }
 
     public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER): EditorResult {
@@ -226,7 +268,7 @@ class Copier {
                     $zSize = -$zSize;
                 }
 
-                $fillSession->loadChunks($player->getWorld());
+                $fillSession->loadChunks($player->getLevelNonNull());
 
                 for($i = 1; $i < $pasteCount; ++$i) {
                     $j = $i * $zSize;
@@ -243,7 +285,7 @@ class Copier {
             $ySize = ($maxY - $minY) + 1;
 
             $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-            if($mode == self::DIRECTION_DOWN) {
+            if($mode == Copier::DIRECTION_DOWN) {
                 $ySize = -$ySize;
             }
 
@@ -264,9 +306,11 @@ class Copier {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
+        $changes->save();
         Canceller::getInstance()->addStep($player, $changes);
 
         return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);

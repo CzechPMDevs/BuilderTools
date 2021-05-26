@@ -70,6 +70,9 @@ class FillSession {
         }
     }
 
+    /**
+     * Requests block coordinates (not chunk ones)
+     */
     public function setDimensions(int $minX, int $maxX, int $minZ, int $maxZ): void {
         $this->minX = $minX;
         $this->maxX = $maxX;
@@ -134,6 +137,16 @@ class FillSession {
         $this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
 
         $id = $this->lastHash >> 4;
+    }
+
+    public function setBiomeAt(int $x, int $z, int $id): void {
+        if(!$this->explorer->moveTo($x, 0, $z)) {
+            return;
+        }
+
+        /** @phpstan-ignore-next-line */
+        $this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
+        $this->blocksChanged++;
     }
 
     public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
@@ -233,5 +246,9 @@ class FillSession {
             /** @phpstan-ignore-next-line */
             $this->changes->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
         }
+    }
+
+    public function close(): void {
+        $this->explorer->invalidate();
     }
 }

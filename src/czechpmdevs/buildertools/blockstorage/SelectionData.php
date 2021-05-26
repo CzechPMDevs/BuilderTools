@@ -88,4 +88,14 @@ class SelectionData extends BlockArray {
         World::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z); // poggit...
         $this->playerPosition = new Vector3($x, $y, $z);
     }
+
+    public static function fromBlockArray(BlockArray $blockArray, Vector3 $playerPosition): SelectionData {
+        $selectionData = new SelectionData();
+        $selectionData->setPlayerPosition($playerPosition);
+        $selectionData->setLevel($blockArray->getLevel());
+        $selectionData->blocks = $blockArray->getBlockArray();
+        $selectionData->coords = $blockArray->getCoordsArray();
+
+        return $selectionData;
+    }
 }

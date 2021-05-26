@@ -57,13 +57,13 @@ class SchematicsManager {
     private static array $loadedSchematics = [];
 
     public static function lazyInit(): void {
-        if(!empty(self::$registeredTypes)) {
+        if(!empty(SchematicsManager::$registeredTypes)) {
             return;
         }
 
-        self::$registeredTypes[] = BuilderToolsSchematic::class;
-        self::$registeredTypes[] = MCEditSchematic::class;
-        self::$registeredTypes[] = MCStructureSchematic::class;
+        SchematicsManager::$registeredTypes[] = BuilderToolsSchematic::class;
+        SchematicsManager::$registeredTypes[] = MCEditSchematic::class;
+        SchematicsManager::$registeredTypes[] = MCStructureSchematic::class;
     }
 
     /**
@@ -73,7 +73,7 @@ class SchematicsManager {
         $startTime = microtime(true);
 
         $file = $schematic;
-        if(!self::findSchematicFile($file)) {
+        if(!SchematicsManager::findSchematicFile($file)) {
             $callback(SchematicActionResult::error("Could not find file for $schematic"));
             return;
         }
@@ -91,18 +91,18 @@ class SchematicsManager {
                 $callback(SchematicActionResult::error("Error whilst reading object from another thread."));
             }
 
-            self::$loadedSchematics[$task->name] = $blockArray;
+            SchematicsManager::$loadedSchematics[$task->name] = $blockArray;
 
             $callback(SchematicActionResult::success(microtime(true) - $startTime));
         });
     }
 
     public static function unloadSchematic(string $schematic): bool {
-        if(!isset(self::$loadedSchematics[$schematic])) {
+        if(!isset(SchematicsManager::$loadedSchematics[$schematic])) {
             return false;
         }
 
-        unset(self::$loadedSchematics[$schematic]);
+        unset(SchematicsManager::$loadedSchematics[$schematic]);
         return true;
     }
 
@@ -110,7 +110,7 @@ class SchematicsManager {
      * @return string[]
      */
     public static function getLoadedSchematics(): array {
-        return array_keys(self::$loadedSchematics);
+        return array_keys(SchematicsManager::$loadedSchematics);
     }
 
     /**
@@ -119,7 +119,7 @@ class SchematicsManager {
     public static function createSchematic(Player $player, Vector3 $pos1, Vector3 $pos2, string $schematicName, Closure $callback): void {
         $startTime = microtime(true);
 
-        $format = self::getSchematicByExtension(BuilderTools::getConfiguration()["output-schematics-format"] ?? "");
+        $format = SchematicsManager::getSchematicByExtension(BuilderTools::getConfiguration()["output-schematics-format"] ?? "");
         BuilderTools::getInstance()->getLogger()->debug("Using $format format to create schematic...");
 
         /** @noinspection ALL */
@@ -157,11 +157,11 @@ class SchematicsManager {
     public static function pasteSchematic(Player $player, string $schematicName): EditorResult {
         $startTime = microtime(true);
 
-        if(!isset(self::$loadedSchematics[$schematicName])) {
+        if(!isset(SchematicsManager::$loadedSchematics[$schematicName])) {
             return EditorResult::error("Schematic $schematicName is not loaded.");
         }
 
-        $schematic = clone self::$loadedSchematics[$schematicName];
+        $schematic = clone SchematicsManager::$loadedSchematics[$schematicName];
 
         $fillSession = new FillSession($player->getWorld(), true, true);
 
@@ -180,6 +180,7 @@ class SchematicsManager {
         }
 
         $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
 
         /** @phpstan-var BlockArray $changes */
         $changes = $fillSession->getChanges();
@@ -190,7 +191,7 @@ class SchematicsManager {
 
     private static function findSchematicFile(string &$file): bool {
         $dataFolder = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR;
-        $allowedExtensions = array_unique(array_map(fn(Schematic $schematic) => $schematic::getFileExtension(), self::$registeredTypes));
+        $allowedExtensions = array_unique(array_map(fn(string $schematic) => $schematic::getFileExtension(), SchematicsManager::$registeredTypes));
         $ext = pathinfo($file, PATHINFO_EXTENSION);
         if(in_array($ext, $allowedExtensions)) {
             if(file_exists($dataFolder . $file)) {
@@ -213,7 +214,7 @@ class SchematicsManager {
      * @return class-string<Schematic>|null
      */
     public static function getSchematicFormat(string $rawData): ?string {
-        foreach (self::$registeredTypes as $class) {
+        foreach (SchematicsManager::$registeredTypes as $class) {
             if($class::validate($rawData)) {
                 return $class;
             }
@@ -228,7 +229,7 @@ class SchematicsManager {
     public static function getSchematicByExtension(string $extension): string {
         $extension = trim(strtolower($extension));
 
-        foreach (self::$registeredTypes as $class) {
+        foreach (SchematicsManager::$registeredTypes as $class) {
             if(strtolower($class::getFileExtension()) == $extension) {
                 return $class;
             }

@@ -28,46 +28,46 @@ use function array_pop;
 class ClipboardManager {
 
     /** @var SelectionData[] */
-    public static array $clipboards;
+    public static array $clipboards = [];
 
     /** @var BlockArray[][] */
-    public static array $undoData;
+    public static array $undoData = [];
     /** @var BlockArray[][] */
-    public static array $redoData;
+    public static array $redoData = [];
 
     public static function getClipboard(Player $player): ?SelectionData {
-        return clone self::$clipboards[$player->getName()] ?? null;
+        return clone ClipboardManager::$clipboards[$player->getName()] ?? null;
     }
 
     public static function hasClipboardCopied(Player $player): bool {
-        return isset(self::$clipboards[$player->getName()]);
+        return array_key_exists($player->getName(), ClipboardManager::$clipboards);
     }
 
     public static function saveClipboard(Player $player, SelectionData $data): void {
-        self::$clipboards[$player->getName()] = $data;
+        ClipboardManager::$clipboards[$player->getName()] = $data;
     }
     
     public static function getNextUndoAction(Player $player): ?BlockArray {
-        return array_pop(self::$undoData[$player->getName()]);
+        return array_pop(ClipboardManager::$undoData[$player->getName()]);
     }
     
     public static function hasActionToUndo(Player $player): bool {
-        return isset(self::$undoData[$player->getName()]) && !empty(self::$undoData[$player->getName()]);
+        return array_key_exists($player->getName(), ClipboardManager::$undoData) && !empty(ClipboardManager::$undoData[$player->getName()]);
     }
     
     public static function saveUndo(Player $player, BlockArray $array): void {
-        self::$undoData[$player->getName()][] = $array;
+        ClipboardManager::$undoData[$player->getName()][] = $array;
     }
     
     public static function getNextRedoAction(Player $player): ?BlockArray {
-        return array_pop(self::$redoData[$player->getName()]);
+        return array_pop(ClipboardManager::$redoData[$player->getName()]);
     }
     
     public static function hasActionToRedo(Player $player): bool {
-        return isset(self::$redoData[$player->getName()]) && !empty(self::$redoData[$player->getName()]);
+        return array_key_exists($player->getName(), ClipboardManager::$redoData) && !empty(ClipboardManager::$redoData[$player->getName()]);
     }
     
     public static function saveRedo(Player $player, BlockArray $array): void {
-        self::$redoData[$player->getName()][] = $array;
+        ClipboardManager::$redoData[$player->getName()][] = $array;
     }
 }

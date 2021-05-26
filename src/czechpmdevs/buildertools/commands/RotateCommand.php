@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\utils\Axis;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -29,7 +30,7 @@ use pocketmine\player\Player;
 class RotateCommand extends BuilderToolsCommand {
 
     public function __construct() {
-        parent::__construct("/rotate", "Rotate selected area", null, []);
+        parent::__construct("/rotate", "Rotates selected area", null, []);
     }
 
     /** @noinspection PhpUnused */
@@ -63,13 +64,13 @@ class RotateCommand extends BuilderToolsCommand {
 
         foreach ($args as $i => $arg) {
             if($i === 0) {
-                $copier->rotate($sender, RotationUtil::Y_AXIS, RotationUtil::getRotation((int)$arg));
+                $copier->rotate($sender, Axis::Y_AXIS, RotationUtil::getRotation((int)$arg));
             }
             elseif($i === 1) {
-                $copier->rotate($sender, RotationUtil::X_AXIS, RotationUtil::getRotation((int)$arg));
+                $copier->rotate($sender, Axis::X_AXIS, RotationUtil::getRotation((int)$arg));
             }
             elseif ($i === 2) {
-                $copier->rotate($sender, RotationUtil::Z_AXIS, RotationUtil::getRotation((int)$arg));
+                $copier->rotate($sender, Axis::Z_AXIS, RotationUtil::getRotation((int)$arg));
             }
         }
 
