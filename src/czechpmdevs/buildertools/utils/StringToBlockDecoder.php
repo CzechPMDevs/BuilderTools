@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
@@ -128,7 +128,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
             if(!$mixBlockIds) {
                 if(strpos($entry, ":") !== false) { // Meta is specified
                     for($i = 0; $i < $count; ++$i) {
-                        $this->blockMap[] = $class->getId() << 4 | $class->getDamage();
+                        $this->blockMap[] = $class->getId() << 4 | $class->getMeta();
                     }
                 } else {
                     for($i = 0; $i < $count; ++$i) {

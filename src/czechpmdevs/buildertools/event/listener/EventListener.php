@@ -25,7 +25,6 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\Selectors;
 use czechpmdevs\buildertools\utils\WorldFixUtil;
-use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -33,6 +32,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\item\ItemIds;
+use pocketmine\nbt\tag\ByteTag;
 use pocketmine\Server;
 use function microtime;
 
@@ -61,7 +61,7 @@ class EventListener implements Listener {
     }
 
     public function onBlockBreak(BlockBreakEvent $event): void {
-        if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(50)))) {
+        if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
             $size = Selectors::addSelector($player, 1, $position = $event->getBlock()->getPos());
             $player->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
             $event->cancel();
@@ -70,7 +70,7 @@ class EventListener implements Listener {
 
     public function onBlockTouch(PlayerInteractEvent $event): void {
         if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
-        if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(50)))) {
+        if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
             // antispam ._.
             if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) {
                 return;
@@ -82,7 +82,7 @@ class EventListener implements Listener {
             $event->cancel();
         }
 
-        if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::STICK && $event->getItem()->hasEnchantment(EnchantmentIdMap::getInstance()->fromId(50)))) {
+        if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::STICK && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
             // antispam ._.
             if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true)-$this->blockInfoClicks[$player->getName()] < 0.5) {
                 return;

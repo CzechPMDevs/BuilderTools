@@ -299,9 +299,13 @@ class BlockArray implements UpdateLevelData, Serializable {
             return;
         }
 
+        if(!($data = zlib_decode($data))) {
+            return;
+        }
+
         /** @var CompoundTag $nbt */
-        $nbt = (new BigEndianNbtSerializer())->read(zlib_decode($data))->getTag();
-        if(!$nbt->hasTag("Coords", ByteArrayTag::class) || !$nbt->hasTag("Blocks", ByteArrayTag::class) || !$nbt->hasTag("DuplicateDetection", ByteTag::class)) {
+        $nbt = (new BigEndianNbtSerializer())->read($data)->getTag();
+        if(!$nbt->getTag("Coords") instanceof ByteArrayTag || !$nbt->getTag("Blocks") instanceof ByteArrayTag || !$nbt->getTag("DuplicateDetection") instanceof ByteTag) {
             return;
         }
 

@@ -222,7 +222,7 @@ class FillSession {
         if($this->explorer->currentSubChunk === null) {
             try {
                 /** @phpstan-ignore-next-line */
-                $this->explorer->world->getChunk($x >> 4, $z >> 4)->getSubChunk($y >> 4);
+                $this->explorer->currentSubChunk = $this->explorer->currentChunk->getSubChunk($y >> 4);
             } catch (Error $exception) { // For the case if chunk is null
                 $this->error = true;
                 return false;
@@ -241,8 +241,8 @@ class FillSession {
 
     protected function saveChanges(int $x, int $y, int $z): void {
         if($this->saveChanges) {
+            /** @phpstan-ignore-next-line */
             $this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-
             /** @phpstan-ignore-next-line */
             $this->changes->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
         }

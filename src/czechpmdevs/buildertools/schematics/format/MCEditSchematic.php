@@ -47,6 +47,7 @@ class MCEditSchematic implements Schematic {
      * @throws SchematicException
      */
     public function load(string $rawData): BlockArray {
+        /** @phpstan-ignore-next-line */
         $nbt = (new BigEndianNbtSerializer())->read(zlib_decode($rawData))->getTag();
         if(!$nbt instanceof CompoundTag) {
             throw new SchematicException("NBT root must be compound tag");
@@ -87,9 +88,9 @@ class MCEditSchematic implements Schematic {
      */
     private function readDimensions(CompoundTag $nbt, ?int &$xSize, ?int &$ySize, ?int &$zSize): void {
         if(
-            !$nbt->hasTag("Width", ShortTag::class) ||
-            !$nbt->hasTag("Height", ShortTag::class) ||
-            !$nbt->hasTag("Length", ShortTag::class)
+            !$nbt->getTag("Width") instanceof ShortTag ||
+            !$nbt->getTag("Height") instanceof ShortTag ||
+            !$nbt->getTag("Length") instanceof ShortTag
         ) {
             throw new SchematicException("NBT does not contain Dimension vector");
         }
@@ -104,8 +105,8 @@ class MCEditSchematic implements Schematic {
      */
     private function readBlockData(CompoundTag $nbt, ?string &$blocks, ?string &$data): void {
         if(
-            !$nbt->hasTag("Blocks", ByteArrayTag::class) ||
-            !$nbt->hasTag("Data", ByteArrayTag::class)
+            !$nbt->getTag("Blocks") instanceof ByteArrayTag ||
+            !$nbt->getTag("Data") instanceof ByteArrayTag
         ) {
             throw new SchematicException("NBT does not contains Block information");
         }
@@ -186,18 +187,23 @@ class MCEditSchematic implements Schematic {
 
     public static function validate(string $rawData): bool {
         try {
-            $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+            $rawData = zlib_decode($rawData);
+            if($rawData === false) {
+                return false;
+            }
+
+            $nbt = (new BigEndianNbtSerializer())->read($rawData)->getTag();
             if(!$nbt instanceof CompoundTag) {
                 return false;
             }
 
             // MCEdit
             if(
-                $nbt->hasTag("Width", ShortTag::class) &&
-                $nbt->hasTag("Height", ShortTag::class) &&
-                $nbt->hasTag("Length", ShortTag::class) &&
-                $nbt->hasTag("Blocks", ByteArrayTag::class) &&
-                $nbt->hasTag("Data", ByteArrayTag::class)
+                $nbt->getTag("Width") instanceof ShortTag &&
+                $nbt->getTag("Height") instanceof ShortTag &&
+                $nbt->getTag("Length") instanceof ShortTag &&
+                $nbt->getTag("Blocks") instanceof ByteArrayTag &&
+                $nbt->getTag("Data") instanceof ByteArrayTag
             ) {
                 return true;
             }

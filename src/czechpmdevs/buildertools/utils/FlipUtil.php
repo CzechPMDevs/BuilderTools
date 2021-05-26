@@ -26,7 +26,7 @@ class FlipUtil {
 
     public static function flip(SelectionData $selection, int $axis = Axis::Y_AXIS, int $motion = 0): SelectionData {
         $modifiedSelection = new SelectionData();
-        $modifiedSelection->setLevel($selection->getLevel());
+        $modifiedSelection->setWorld($selection->getWorld());
         $modifiedSelection->setPlayerPosition($selection->getPlayerPosition());
 
         $sizeData = $selection->getSizeData();

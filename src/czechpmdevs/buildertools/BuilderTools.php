@@ -60,7 +60,6 @@ use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
-use pocketmine\item\enchantment\Enchantment;
 use pocketmine\plugin\PluginBase;
 use function array_key_exists;
 use function glob;
@@ -140,10 +139,6 @@ class BuilderTools extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener(), $this);
     }
 
-    private function registerEnchantment(): void {
-        EnchantmentIdMap::getInstance()->register(50, new Enchantment(50, "BuilderTools", Rarity::COMMON, 0, 0, 1));
-    }
-
     private function registerCommands(): void {
         $map = $this->getServer()->getCommandMap();
         BuilderTools::$commands = [
@@ -194,7 +189,7 @@ class BuilderTools extends PluginBase {
     }
 
     public function sendWarnings(): void {
-        if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
+        if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") != 0) {
             $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
         }
     }

@@ -24,9 +24,12 @@ use czechpmdevs\buildertools\editors\Fixer;
 use Error;
 use Generator;
 use pocketmine\scheduler\AsyncTask;
+use pocketmine\utils\MainLogger;
+use pocketmine\world\format\io\BaseWorldProvider;
 use pocketmine\world\format\io\exception\CorruptedChunkException;
 use pocketmine\world\format\io\region\Anvil;
 use pocketmine\world\format\io\region\CorruptedRegionException;
+use pocketmine\world\format\io\region\McRegion;
 use pocketmine\world\format\io\region\RegionLoader;
 use pocketmine\world\format\io\WorldProvider;
 use pocketmine\world\format\io\WorldProviderManager;
@@ -40,6 +43,7 @@ use function is_dir;
 use function microtime;
 use function round;
 
+// TODO
 class WorldFixTask extends AsyncTask {
     
     /** @var string */
@@ -175,10 +179,8 @@ class WorldFixTask extends AsyncTask {
             $regionX = (int)$split[1];
             $regionZ = (int)$split[2];
 
-            $region = new RegionLoader($regionFilePath);
-
             try {
-                $region->open();
+                $region = new McRegion($regionFilePath);
             } catch (CorruptedRegionException $e) {
                 MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
                 continue;
@@ -186,7 +188,7 @@ class WorldFixTask extends AsyncTask {
 
             for($x = 0; $x < 32; ++$x) {
                 for($z = 0; $z < 32; ++$z) {
-                    if($region->chunkExists($x, $z)) {
+                    if($region->loadChunk($x, $z) !== null) {
                         $chunks[] = [($regionX << 5) + $x, ($regionZ << 5) + $z];
                     }
                 }

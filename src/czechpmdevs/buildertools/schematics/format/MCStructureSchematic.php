@@ -280,7 +280,7 @@ class MCStructureSchematic implements Schematic {
             // Test if block indexes exists
             $nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0)->getValue(); // @phpstan-ignore-line (Errors are caught)
 
-            return $nbt->hasTag("size", ListTag::class) && $nbt->getListTag("size")->count() == 3; // @phpstan-ignore-line (Errors are caught)
+            return (!($nbt->getTag("size") instanceof ListTag)) && $nbt->getListTag("size")->count() == 3; // @phpstan-ignore-line (Errors are caught)
         }
         catch (Throwable $ignore) {
             return false;

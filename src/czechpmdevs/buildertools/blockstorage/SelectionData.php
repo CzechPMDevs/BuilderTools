@@ -92,7 +92,7 @@ class SelectionData extends BlockArray {
     public static function fromBlockArray(BlockArray $blockArray, Vector3 $playerPosition): SelectionData {
         $selectionData = new SelectionData();
         $selectionData->setPlayerPosition($playerPosition);
-        $selectionData->setLevel($blockArray->getLevel());
+        $selectionData->setWorld($blockArray->getWorld());
         $selectionData->blocks = $blockArray->getBlockArray();
         $selectionData->coords = $blockArray->getCoordsArray();
 

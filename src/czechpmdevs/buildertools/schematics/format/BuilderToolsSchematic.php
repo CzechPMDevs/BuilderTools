@@ -22,12 +22,13 @@ namespace czechpmdevs\buildertools\schematics\format;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\schematics\SchematicException;
+use Error;
+use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\BigEndianNBTStream;
-use pocketmine\nbt\tag\ByteArrayTag;
-use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use function serialize;
 use function unserialize;
+use function zlib_decode;
 
 /**
  * Experimental schematic format
@@ -55,11 +56,20 @@ class BuilderToolsSchematic implements Schematic {
     }
 
     public static function validate(string $rawData): bool {
-        /** @var CompoundTag $nbt */
-        $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+        try {
+            $rawData = zlib_decode($rawData);
+            if($rawData === false) {
+                return false;
+            }
 
-        return $nbt->hasTag("Coords", ByteArrayTag::class) &&
-            $nbt->hasTag("Blocks", ByteArrayTag::class) &&
-            $nbt->hasTag("DuplicateDetection", ByteTag::class);
+            /** @var CompoundTag $nbt */
+            $nbt = (new BigEndianNbtSerializer())->read($rawData)->getTag();
+
+            return $nbt->getByteArray("Coords") !== "" &&
+                $nbt->getByteArray("Blocks") !== "" &&
+                $nbt->getByte("DuplicateDetection") !== null;
+        } catch (Error $error) {
+            return false;
+        }
     }
 }

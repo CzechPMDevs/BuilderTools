@@ -62,8 +62,7 @@ final class OfflineSession {
         }
 
         file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP));
-
-        unset($stream, $nbt);
+        unset($nbt);
 
         BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 ** 2), 3) . "Mb ram)");
     }
@@ -78,16 +77,17 @@ final class OfflineSession {
             return;
         }
 
-        /** @phpstan-var CompoundTag $nbt */
-        $nbt = (new BigEndianNbtSerializer())->read(zlib_decode($buffer));
+        if(!($buffer = zlib_decode($buffer))) {
+            return;
+        }
 
+        $nbt = (new BigEndianNbtSerializer())->read($buffer)->getTag();
         if(!$nbt instanceof CompoundTag) {
             return;
         }
 
         // Clipboard
-        if($nbt->hasTag("Clipboard")) {
-            /** @phpstan-var CompoundTag $clipboardTag */
+        if($nbt->getTag("Clipboard") instanceof CompoundTag) {
             $clipboardTag = $nbt->getCompoundTag("Clipboard");
 
             $clipboard = new SelectionData();

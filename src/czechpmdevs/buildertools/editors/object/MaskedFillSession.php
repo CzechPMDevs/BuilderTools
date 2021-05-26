@@ -46,14 +46,12 @@ class MaskedFillSession extends FillSession {
         if ($this->mask !== null && (
                 !$this->mask->containsBlock(
                     /** @phpstan-ignore-next-line */
-                    $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
-                    /** @phpstan-ignore-next-line */
-                    $this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf)
+                    $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf)
                 )
             ) && (
                 !$this->mask->containsBlockId(
                     /** @phpstan-ignore-next-line */
-                    $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
+                    $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf) << 4
                 )
             )
         ) {
@@ -75,7 +73,10 @@ class MaskedFillSession extends FillSession {
             return;
         }
 
-        if($this->mask !== null && !$this->mask->containsBlock($this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf))) {
+        if($this->mask !== null && !$this->mask->containsBlock(
+            /** @phpstan-ignore-next-line */
+            $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf)
+        )) {
             return;
         }
 

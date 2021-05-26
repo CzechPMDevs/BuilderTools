@@ -63,7 +63,8 @@ class Printer {
             $fullBlock = $level->getBlock($vector3);
             $undoList->addBlock($vector3, $fullBlock->getId(), $fullBlock->getMeta());
 
-            $level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block);
+            /** @phpstan-ignore-next-line */
+            $level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block); // We provide valid values
         };
 
         if($mode == Printer::CUBE) {

@@ -29,9 +29,10 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\utils\FlipUtil;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
@@ -45,7 +46,7 @@ class Copier {
     public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->subtract(0.5, 0, 0.5)->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->ceil());
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -71,13 +72,13 @@ class Copier {
     public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
         $startTime = microtime(true);
 
-        $clipboard = (new SelectionData())->setPlayerPosition($player->subtract(0.5, 0, 0.5)->ceil());
+        $clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->ceil());
 
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
+        $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        $fillSession->loadChunks($player->getLevelNonNull());
+        $fillSession->loadChunks($player->getWorld());
 
         for($x = $minX; $x <= $maxX; ++$x) {
             for ($z = $minZ; $z <= $maxZ; ++$z) {
@@ -122,7 +123,7 @@ class Copier {
 
         $fillSession = new MaskedFillSession($player->getWorld(), true, true, SingleBlockIdentifier::airIdentifier());
 
-        $motion = $player->getPosition()->add(0.5, 0, 0.5)->subtract($relativePosition);
+        $motion = $player->getPosition()->add(0.5, 0, 0.5)->subtractVector($relativePosition);
 
         $floorX = $motion->getFloorX();
         $floorY = $motion->getFloorY();
@@ -161,7 +162,7 @@ class Copier {
 
         $fillSession = new FillSession($player->getWorld(), true, true);
 
-        $motion = $player->getPosition()->add(0.5, 0, 0.5)->subtract($relativePosition);
+        $motion = $player->getPosition()->add(0.5, 0, 0.5)->subtractVector($relativePosition);
 
         $floorX = $motion->getFloorX();
         $floorY = $motion->getFloorY();
@@ -234,7 +235,7 @@ class Copier {
             }
         }
 
-        $direction = $player->getDirectionPlane(); // TODO!!!
+        $direction = Math::getPlayerDirection($player);
         if($mode == self::DIRECTION_PLAYER) {
             if($direction == 0 || $direction == 2) { // Moving along x axis (z = const)
                 $xSize = ($maxX - $minX) + 1;
@@ -268,7 +269,7 @@ class Copier {
                     $zSize = -$zSize;
                 }
 
-                $fillSession->loadChunks($player->getLevelNonNull());
+                $fillSession->loadChunks($player->getWorld());
 
                 for($i = 1; $i < $pasteCount; ++$i) {
                     $j = $i * $zSize;

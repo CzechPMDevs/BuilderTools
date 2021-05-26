@@ -25,10 +25,6 @@ use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
-use pocketmine\item\Item;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\ByteTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\Player;
 
 class WandCommand extends BuilderToolsCommand {
