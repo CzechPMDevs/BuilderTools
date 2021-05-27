@@ -23,6 +23,13 @@ namespace czechpmdevs\buildertools\utils;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
+use function atan2;
+use function cos;
+use function fmod;
+use function in_array;
+use function round;
+use function sin;
+use function sqrt;
 
 class RotationUtil {
 
@@ -39,6 +46,7 @@ class RotationUtil {
             return $blockArray;
         }
 
+        $deg = $degrees % 360;
         $rad = deg2rad($degrees % 360);
 
         /** @var Vector3 $diff */
@@ -49,13 +57,14 @@ class RotationUtil {
             case Axis::Y_AXIS:
                 while ($blockArray->hasNext()) {
                     $blockArray->readNext($x, $y, $z, $id, $meta);
-                    RotationHelper::rotate($degrees, $id, $meta);
+                    RotationHelper::rotate($deg, $id, $meta);
 
                     $dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $z - $diff->getZ()));
                     $alfa = fmod(atan2($z - $diff->getZ(), $x - $diff->getX()) + $rad, Math::PI_360);
                     $modifiedBlockArray->addBlock(new Vector3((int)round($dist * cos($alfa)) + $diff->getX(), $y, (int)round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
                 }
 
+                $blockArray->blocks = $modifiedBlockArray->blocks;
                 $blockArray->coords = $modifiedBlockArray->coords;
                 $blockArray->offset = 0;
                 return $blockArray;
