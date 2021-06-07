@@ -28,6 +28,7 @@ use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerItemUseEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\world\WorldLoadEvent;
@@ -44,17 +45,17 @@ class EventListener implements Listener {
     private array $blockInfoClicks = [];
 
     /** @noinspection PhpUnused */
-    public function onAirClick(PlayerInteractEvent $event): void {
-        if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) {
-            return;
-        }
+	public function onAirClick(PlayerItemUseEvent $event) : void{
+		if(!Selectors::isDrawingPlayer($player = $event->getPlayer())){
+			return;
+		}
 
-        $targetBlock = $player->getTargetBlock(64);
-        if($targetBlock === null) {
-            return;
-        }
+		$targetBlock = $player->getTargetBlock(64);
+		if($targetBlock === null){
+			return;
+		}
 
-        $position = $targetBlock->getPos();
+		$position = $targetBlock->getPos();
 
         Printer::getInstance()->draw($player, $position, $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerBrush($player), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player));
         $event->cancel();
