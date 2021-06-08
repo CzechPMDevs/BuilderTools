@@ -115,6 +115,16 @@ permissions:
   buildertools.command.wand:
     description: Permissions for //wand
     default: op
+  buildertools.command.biome:
+    default: op
+  buildertools.command.center:
+    default: op
+  buildertools.command.flip:
+    default: op
+  buildertools.command.hpyramid:
+    default: op
+  buildertools.command.pyramid:
+    default: op
 
 
 
