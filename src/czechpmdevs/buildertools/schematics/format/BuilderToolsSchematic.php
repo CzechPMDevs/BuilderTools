@@ -24,7 +24,6 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use Error;
 use pocketmine\nbt\BigEndianNbtSerializer;
-use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use function serialize;
 use function unserialize;

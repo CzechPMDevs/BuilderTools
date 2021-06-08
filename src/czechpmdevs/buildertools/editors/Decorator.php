@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;

@@ -33,7 +33,6 @@ use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\format\BuilderToolsSchematic;
 use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
 use czechpmdevs\buildertools\schematics\format\MCStructureSchematic;
-use czechpmdevs\buildertools\schematics\format\Schematic;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use function array_keys;
