@@ -27,7 +27,7 @@ use pocketmine\item\Item;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\ListTag;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\VanillaItems;
@@ -48,11 +48,12 @@ class BlockInfoCommand extends BuilderToolsCommand {
         if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
             $item = VanillaItems::STICK();
             $item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
-            $item->setNamedTagEntry(new ListTag(Item::TAG_ENCH, [], NBT::TAG_Compound));
-            $item->setNamedTagEntry(new ByteTag("buildertools", 1));
+            $nbt = $item->getNamedTag();
+            $nbt->setByte("buildertools", 1);
+            $nbt->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
+            $item->setNamedTag($nbt);
+            /*$item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));*/
 
-            /** @phpstan-ignore-next-line */
-            $item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
             $sender->getInventory()->addItem($item);
             $sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
             return;

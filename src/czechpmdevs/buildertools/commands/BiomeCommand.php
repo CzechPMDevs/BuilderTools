@@ -25,7 +25,7 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use function array_key_exists;
 use function array_keys;
 use function implode;
@@ -82,7 +82,7 @@ class BiomeCommand extends BuilderToolsCommand {
 
         Math::calculateMinAndMaxValues($firstPos, $secondPos, false, $minX, $maxX, $_, $_, $minZ, $maxZ);
 
-        $fillSession = new FillSession($sender->getLevelNonNull(), false, false);
+        $fillSession = new FillSession($sender->getWorld(), false, false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
         for($x = $minX; $x <= $maxX; ++$x) {
             for($z = $minZ; $z <= $maxZ; ++$z) {
@@ -92,7 +92,7 @@ class BiomeCommand extends BuilderToolsCommand {
 
         $result = EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 
-        $fillSession->reloadChunks($sender->getLevelNonNull());
+        $fillSession->reloadChunks($sender->getWorld());
         $sender->sendMessage(BuilderTools::getPrefix() . "§aBiomes updated, {$result->getBlocksChanged()} blocks affected in {$result->getProcessTime()}");
     }
 }
