@@ -24,10 +24,8 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\ItemFlags;
 use pocketmine\item\enchantment\Rarity;
 
-class CustomEnchantment extends Enchantment
-{
-	public function __construct()
-	{
+class CustomEnchantment extends Enchantment {
+	public function __construct() {
 		parent::__construct(50, "%enchantment.buildertools.custom", Rarity::MYTHIC, ItemFlags::NONE, ItemFlags::ALL, 1);
 	}
 }
