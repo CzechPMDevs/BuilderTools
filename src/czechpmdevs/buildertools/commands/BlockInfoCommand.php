@@ -44,11 +44,11 @@ class BlockInfoCommand extends BuilderToolsCommand {
         if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
             $item = VanillaItems::STICK();
             $item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
-            $nbt = $item->getNamedTag();
-            $nbt->setByte("buildertools", 1);
-            $item->setNamedTag($nbt);
+			$nbt = $item->getNamedTag();
+			$nbt->setByte("buildertools", 1);
+			$item->setNamedTag($nbt);
+			/** @phpstan-ignore-next-line */
             $item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
-
             $sender->getInventory()->addItem($item);
             $sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
             return;

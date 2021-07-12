@@ -46,6 +46,7 @@ class WandCommand extends BuilderToolsCommand {
 			$nbt = $item->getNamedTag();
 			$nbt->setByte("buildertools", 1);
 			$item->setNamedTag($nbt);
+			/** @phpstan-ignore-next-line */
             $item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
             $sender->getInventory()->addItem($item);
             $sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
