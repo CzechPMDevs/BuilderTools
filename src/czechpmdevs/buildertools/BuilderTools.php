@@ -57,9 +57,11 @@ use czechpmdevs\buildertools\commands\TreeCommand;
 use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WallsCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
+use czechpmdevs\buildertools\enchantment\CustomEnchantment;
 use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
+use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\plugin\PluginBase;
 use function array_key_exists;
 use function glob;
@@ -95,6 +97,7 @@ class BuilderTools extends PluginBase {
         $this->initListener();
         $this->sendWarnings();
         $this->loadSchematicsManager();
+        $this->registerEnchantment();
     }
 
     /** @noinspection PhpUnused */
@@ -187,6 +190,10 @@ class BuilderTools extends PluginBase {
 
         HelpCommand::buildPages();
     }
+
+    public function registerEnchantment(): void {
+		EnchantmentIdMap::getInstance()->register(50, new CustomEnchantment());
+	}
 
     public function sendWarnings(): void {
         if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") != 0) {
