@@ -43,10 +43,10 @@ class WandCommand extends BuilderToolsCommand {
         if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
             $item = VanillaItems::WOODEN_AXE();
             $item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
-			$nbt = $item->getNamedTag();
-			$nbt->setByte("buildertools", 1);
-			$item->setNamedTag($nbt);
-			/** @phpstan-ignore-next-line */
+	    $nbt = $item->getNamedTag();
+	    $nbt->setByte("buildertools", 1);
+	    $item->setNamedTag($nbt);
+	    /** @phpstan-ignore-next-line */
             $item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
             $sender->getInventory()->addItem($item);
             $sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
