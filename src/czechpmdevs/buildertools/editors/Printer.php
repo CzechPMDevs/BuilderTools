@@ -77,10 +77,12 @@ class Printer {
             foreach (BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         } elseif($mode == Printer::CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         } elseif($mode == Printer::HOLLOW_CUBE) {
             foreach (BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
@@ -89,10 +91,12 @@ class Printer {
             foreach (BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         } elseif($mode == Printer::HOLLOW_CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush,true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         }
 
         $undoList->save();

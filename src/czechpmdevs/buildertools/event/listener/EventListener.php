@@ -93,9 +93,10 @@ class EventListener implements Listener {
             $this->blockInfoClicks[$player->getName()] = microtime(true);
 
             $player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getDamage() . "\n" .
-            "§aName: §7" . $block->getName() . "\n" .
-            "§aPosition: §7" . $block->getX() . ", " . $block->getY() . ", " . $block->getZ() . "\n" .
-            "§aLevel: §7" . $block->getLevelNonNull()->getName());
+                "§aName: §7" . $block->getName() . "\n" .
+                "§aPosition: §7" . $block->getX() . ";" . $block->getY() . ";" . $block->getZ() . " (" . ($block->getFloorX() >> 4) . ";" . ($block->getFloorZ() >> 4) . ")\n" .
+                "§aLevel: §7" . $block->getLevelNonNull()->getName() . "\n" .
+                "§aBiome: §7" . $block->getLevelNonNull()->getBiomeId($block->getFloorX(), $block->getFloorZ()) . " (" . $block->getLevelNonNull()->getBiome($block->getFloorX(), $block->getFloorZ())->getName() . ")");
         }
     }
 
