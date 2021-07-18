@@ -70,7 +70,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
      * @throws ArrayOutOfBoundsException if string is not valid.
      */
     public function nextBlock(?int &$id, ?int &$meta): void {
-        $hash = $this->blockMap[array_rand($this->blockMap)];
+        $hash = count($this->blockMap) != 0 ? $this->blockMap[array_rand($this->blockMap)] : 0;
 
         $id = $hash >> 4;
         $meta = $hash & 0xf;
