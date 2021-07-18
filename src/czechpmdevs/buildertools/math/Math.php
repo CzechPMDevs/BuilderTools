@@ -31,10 +31,6 @@ class Math {
 
     public const PI_360 = M_PI * 2;
 
-    public static function ceilPosition(Position $position): Position {
-        return Position::fromObject($position->ceil(), $position->getLevel());
-    }
-
     /**
      * Returns distance^2 between (0, 0) and (x, y)
      *

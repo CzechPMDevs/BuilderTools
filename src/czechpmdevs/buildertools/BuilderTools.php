@@ -40,6 +40,7 @@ use czechpmdevs\buildertools\commands\HollowCylinderCommand;
 use czechpmdevs\buildertools\commands\HollowPyramidCommand;
 use czechpmdevs\buildertools\commands\HollowSphereCommand;
 use czechpmdevs\buildertools\commands\IdCommand;
+use czechpmdevs\buildertools\commands\IslandCommand;
 use czechpmdevs\buildertools\commands\MergeCommand;
 use czechpmdevs\buildertools\commands\MoveCommand;
 use czechpmdevs\buildertools\commands\NaturalizeCommand;
@@ -162,6 +163,7 @@ class BuilderTools extends PluginBase {
             new HollowPyramidCommand,
             new HollowSphereCommand,
             new IdCommand,
+            new IslandCommand,
             new MergeCommand,
             new MoveCommand,
             new NaturalizeCommand,
