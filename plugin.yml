@@ -2,7 +2,7 @@ name: BuilderTools
 api: [3.16.0]
 author: CzechPMDevs
 authors: [VixikHD]
-version: 1.2.0-beta5
+version: 1.2.0
 main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
 
@@ -68,6 +68,9 @@ permissions:
       buildertools.command.id:
         description: Permissions for //id
         default: op
+      buildertools.command.island:
+        description: Permissions for //island
+        default: op
       buildertools.command.merge:
         description: Permissions for //merge
         default: op
@@ -119,20 +122,3 @@ permissions:
       buildertools.command.wand:
         description: Permissions for //wand
         default: op
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
