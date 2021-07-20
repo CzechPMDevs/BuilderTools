@@ -99,7 +99,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
             $this->string = str_replace("hand", $this->itemInHand, $this->string);
         }
 
-        $split = explode(",", $this->string);
+        $split = explode(",", str_replace(";", ",", $this->string));
         foreach ($split as $entry) {
             $count = 1;
             $block = $entry;
