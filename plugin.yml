@@ -20,6 +20,9 @@ permissions:
       buildertools.command.blockinfo:
         description: Permissions for //blockinfo
         default: op
+      buildertools.command.center:
+        description: Permissions for //center
+        default: op
       buildertools.command.clearinventory:
         description: Permissions for //clearinventory
         default: op
@@ -49,6 +52,9 @@ permissions:
         default: op
       buildertools.command.fix:
         descripion: Permissions for //fix
+        default: op
+      buildertools.command.flip:
+        descripion: Permissions for //flip
         default: op
       buildertools.command.help:
         description: Permissions for //commands
