@@ -39,6 +39,11 @@ use const ZLIB_ENCODING_GZIP;
 final class OfflineSession {
 
     public static function savePlayerSession(Player $player): void {
+        if(BuilderTools::getConfiguration()["discard-sessions"] ?? false) {
+            unset(ClipboardManager::$clipboards[$player->getName()]);
+            return;
+        }
+
         $time = microtime(true);
         $memory = memory_get_usage();
 
@@ -61,6 +66,7 @@ final class OfflineSession {
             unset(ClipboardManager::$clipboards[$player->getName()]);
         }
 
+        // TODO - Undo / Redo data
         file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP));
         unset($nbt);
 

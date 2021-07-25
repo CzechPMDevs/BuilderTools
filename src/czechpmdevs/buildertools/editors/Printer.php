@@ -75,10 +75,12 @@ class Printer {
             foreach (BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         } elseif($mode == Printer::CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         } elseif($mode == Printer::HOLLOW_CUBE) {
             foreach (BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
@@ -87,10 +89,12 @@ class Printer {
             foreach (BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         } elseif($mode == Printer::HOLLOW_CYLINDER) {
             foreach (BlockGenerator::generateCylinder($brush, $brush,true) as [$x, $y, $z]) {
                 $placeBlock($center->add($x, $y, $z));
             }
+            $undoList->removeDuplicates();
         }
 
         $undoList->save();
@@ -112,7 +116,7 @@ class Printer {
 
     public function makeSphere(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
-        $center = Position::fromObject($center->ceil(), $center->getWorld());
+        $center = Position::fromObject($center->floor(), $center->getWorld());
         $radius = abs($radius);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
@@ -206,7 +210,7 @@ class Printer {
 
     public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
-        $center = Position::fromObject($center->ceil(), $center->getWorld());
+        $center = Position::fromObject($center->floor(), $center->getWorld());
 
         $radius = abs($radius);
 
@@ -292,7 +296,7 @@ class Printer {
 
     public function makePyramid(Player $player, Position $center, int $size, string $blocks, bool $hollow = false): EditorResult {
         $startTime = microtime(true);
-        $center = Position::fromObject($center->ceil(), $center->getWorld());
+        $center = Position::fromObject($center->floor(), $center->getWorld());
 
         $size = abs($size);
 
@@ -336,11 +340,6 @@ class Printer {
             $currentLevelHeight--;
         }
 
-        foreach (BlockGenerator::generatePyramid($size, $hollow) as [$x, $y, $z]) {
-            $stringToBlockDecoder->nextBlock($id, $meta);
-            $fillSession->setBlockAt($x + $floorX, $y + $floorY, $z + $floorZ, $id, $meta);
-        }
-
         $fillSession->reloadChunks($player->getWorld());
         $fillSession->close();
 
@@ -359,10 +358,10 @@ class Printer {
     }
 
     public function makeCube(Player $player, Position $center, int $radius, string $blocks, bool $hollow = false): EditorResult {
-        $center = Position::fromObject($center->ceil(), $center->getWorld());
+        $center = Position::fromObject($center->floor(), $center->getWorld());
         $radius = abs($radius);
 
-        if($player->getPosition()->getY() - $radius < 0 || $player->getPosition()->getY() + $radius > World::Y_MAX) {
+        if($player->getY() - $radius < 0 || $player->getY() + $radius > World::Y_MAX) {
             return EditorResult::error("Shape is outside of the map!");
         }
 
@@ -376,5 +375,82 @@ class Printer {
 
     public function makeHollowCube(Player $player, Position $center, int $radius, string $blocks): EditorResult {
         return $this->makeCube($player, $center, $radius, $blocks, true);
+    }
+
+    public function makeIsland(Player $player, Position $center, int $radius, int $step, string $blocks): EditorResult {
+        $startTime = microtime(true);
+        $center = Position::fromObject($center->floor(), $center->getWorld());
+
+        $radius = abs($radius);
+
+        $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
+        if(!$stringToBlockDecoder->isValid()) {
+            return EditorResult::error("0 blocks found");
+        }
+
+        $floorY = $center->getFloorY();
+        if($floorY < 0) {
+            return EditorResult::error("It is not possible to create island here");
+        }
+
+        $floorX = $center->getFloorX();
+        $floorZ = $center->getFloorZ();
+
+        $fillSession = new FillSession($player->getWorld(), false);
+        $fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
+        $fillSession->loadChunks($player->getWorld());
+
+        $currentRadius = (float)$radius;
+        $step = 1 / $step;
+        $y = $floorY;
+        while ($currentRadius > 0.8) {
+            $incDivX = 0;
+            for($x = 0; $x <= $currentRadius; ++$x) {
+                $divX = $incDivX;
+                $incDivX = ($x + 1) / $currentRadius;
+                $incDivZ = 0;
+                for($z = 0; $z <= $currentRadius; ++$z) {
+                    $divZ = $incDivZ;
+                    $incDivZ = ($z + 1) / $currentRadius;
+
+                    $lengthSquared = Math::lengthSquared2d($divX, $divZ);
+                    if($lengthSquared > 1) {
+                        if($z == 0) {
+                            break 2;
+                        }
+                        break;
+                    }
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $id, $meta);
+
+                    $stringToBlockDecoder->nextBlock($id, $meta);
+                    $fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $id, $meta);
+                }
+            }
+
+            $currentRadius -= $step;
+
+            if(--$y < 0) {
+                break;
+            }
+        }
+
+        $fillSession->reloadChunks($player->getWorld());
+        $fillSession->close();
+
+        /** @var BlockArray $undoList */
+        $undoList = $fillSession->getChanges();
+        $undoList->removeDuplicates();
+        $undoList->save();
+        Canceller::getInstance()->addStep($player, $undoList);
+
+        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
     }
 }

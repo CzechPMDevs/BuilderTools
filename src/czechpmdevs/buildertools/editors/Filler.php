@@ -42,6 +42,9 @@ class Filler {
         Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
         $stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
+        if(!$stringToBlockDecoder->isValid()) {
+            return EditorResult::error("No blocks specified in string {$blockArgs}");
+        }
 
         $fillSession = new FillSession($player->getWorld(), false);
         $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);

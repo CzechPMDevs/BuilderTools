@@ -1,9 +1,9 @@
 ---
 # BuilderTools configuration file
-# Target BuilderTools version: 1.2.0-beta4
+# Target BuilderTools version: 1.2.1
 
 # Do not change this line.
-config-version: 1.2.0.3
+config-version: 1.2.1.0
 
 # This is format which will be used for creating schematics
 # Supported formats: 'mcedit', 'mcstructure', 'buildertools'
@@ -23,6 +23,13 @@ remove-duplicate-blocks: true
 # leaves server to disk. This cache should be cleaned after restart (to
 # avoid unexpected bugs). This  option is to disable removing those files.
 clean-cache: true
+
+# When player leaves the server, player's session is saved, even if player did not
+# do any action with BuilderTools. If you enable this, player's sessions will not
+# be saved and when player joins the server again, his clipboard data will be lost
+# This option is good when BuilderTools is only used as api plugin on server with
+# high amount of players.
+discard-sessions: false
 
 # PowerItems settings:
 items:

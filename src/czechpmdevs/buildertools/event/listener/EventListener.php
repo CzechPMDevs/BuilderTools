@@ -61,6 +61,7 @@ class EventListener implements Listener {
         $event->cancel();
     }
 
+    /** @noinspection PhpUnused */
     public function onBlockBreak(BlockBreakEvent $event): void {
         if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
             $size = Selectors::addSelector($player, 1, $position = $event->getBlock()->getPos());
@@ -69,6 +70,7 @@ class EventListener implements Listener {
         }
     }
 
+    /** @noinspection PhpUnused */
     public function onBlockTouch(PlayerInteractEvent $event): void {
         if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
         if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
@@ -95,22 +97,26 @@ class EventListener implements Listener {
             $world = $block->getPos()->getWorld();
 
             $player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" .
-            "§aName: §7" . $block->getName() . "\n" .
-            "§aPosition: §7" . $block->getPos()->getFloorX() . ", " . $block->getPos()->getFloorY() . ", " . $block->getPos()->getFloorZ() . "\n" .
-            "§World: §7" . $world->getDisplayName());
+                "§aName: §7" . $block->getName() . "\n" .
+                "§aPosition: §7" . $block->getPos()->getFloorX() . ";" . $block->getPos()->getFloorY() . ";" . $block->getPos()->getFloorZ() . " (" . ($block->getFloorX() >> 4) . ";" . ($block->getFloorZ() >> 4) . ")\n" .
+                "§World: §7" . $world->getDisplayName() . "\n" .
+                "§aBiome: §7" . $block->getLevelNonNull()->getBiomeId($block->getFloorX(), $block->getFloorZ()) . " (" . $block->getLevelNonNull()->getBiome($block->getFloorX(), $block->getFloorZ())->getName() . ")");
         }
     }
 
+    /** @noinspection PhpUnused */
     public function onLevelLoad(WorldLoadEvent $event): void {
         if(WorldFixUtil::isInWorldFixQueue($event->getWorld()->getFolderName())) {
             Server::getInstance()->getWorldManager()->unloadWorld($event->getWorld(), true);
         }
     }
 
+    /** @noinspection PhpUnused */
     public function onJoin(PlayerJoinEvent $event): void {
         OfflineSession::loadPlayerSession($event->getPlayer());
     }
 
+    /** @noinspection PhpUnused */
     public function onQuit(PlayerQuitEvent $event): void {
         OfflineSession::savePlayerSession($event->getPlayer());
         Selectors::unloadPlayer($event->getPlayer());
