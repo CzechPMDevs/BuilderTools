@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3112879bc2af7d6e4f6e68239999041",
+    "content-hash": "3dad4ef525607fc4c7b3d2ad746c554a",
     "packages": [],
     "packages-dev": [
         {
@@ -194,82 +194,6 @@
             "time": "2021-04-24T19:01:55+00:00"
         },
         {
-            "name": "mdanter/ecc",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpecc/phpecc.git",
-                "reference": "34e2eec096bf3dcda814e8f66dd91ae87a2db7cd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpecc/phpecc/zipball/34e2eec096bf3dcda814e8f66dd91ae87a2db7cd",
-                "reference": "34e2eec096bf3dcda814e8f66dd91ae87a2db7cd",
-                "shasum": ""
-            },
-            "require": {
-                "ext-gmp": "*",
-                "fgrosse/phpasn1": "^2.0",
-                "php": "^7.0||^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.0||^8.0||^9.0",
-                "squizlabs/php_codesniffer": "^2.0",
-                "symfony/yaml": "^2.6|^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Mdanter\\Ecc\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Matyas Danter",
-                    "homepage": "http://matejdanter.com/",
-                    "role": "Author"
-                },
-                {
-                    "name": "Thibaud Fabre",
-                    "email": "thibaud@aztech.io",
-                    "homepage": "http://aztech.io",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "Thomas Kerin",
-                    "email": "afk11@users.noreply.github.com",
-                    "role": "Maintainer"
-                }
-            ],
-            "description": "PHP Elliptic Curve Cryptography library",
-            "homepage": "https://github.com/phpecc/phpecc",
-            "keywords": [
-                "Diffie",
-                "ECDSA",
-                "Hellman",
-                "curve",
-                "ecdh",
-                "elliptic",
-                "nistp192",
-                "nistp224",
-                "nistp256",
-                "nistp384",
-                "nistp521",
-                "phpecc",
-                "secp256k1",
-                "secp256r1"
-            ],
-            "support": {
-                "issues": "https://github.com/phpecc/phpecc/issues",
-                "source": "https://github.com/phpecc/phpecc/tree/v1.0.0"
-            },
-            "time": "2021-01-16T19:42:14+00:00"
-        },
-        {
             "name": "netresearch/jsonmapper",
             "version": "v4.0.0",
             "source": {
@@ -322,16 +246,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.88",
+            "version": "0.12.89",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "464d1a81af49409c41074aa6640ed0c4cbd9bb68"
+                "reference": "54c0f5a6c30511b77128d58b6369f718df250542"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/464d1a81af49409c41074aa6640ed0c4cbd9bb68",
-                "reference": "464d1a81af49409c41074aa6640ed0c4cbd9bb68",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/54c0f5a6c30511b77128d58b6369f718df250542",
+                "reference": "54c0f5a6c30511b77128d58b6369f718df250542",
                 "shasum": ""
             },
             "require": {
@@ -362,11 +286,15 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.88"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.89"
             },
             "funding": [
                 {
                     "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
                     "type": "github"
                 },
                 {
@@ -378,20 +306,68 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-17T12:24:49+00:00"
+            "time": "2021-06-09T20:23:49+00:00"
         },
         {
-            "name": "pocketmine/binaryutils",
-            "version": "0.2.0",
+            "name": "pocketmine/bedrock-protocol",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pmmp/BinaryUtils.git",
-                "reference": "595c4ca4b8056777729c8cc5db9614c731eaf63b"
+                "url": "https://github.com/pmmp/BedrockProtocol.git",
+                "reference": "ceb4cc3635f18c8f99ddb51c21d6a2ef66dc555a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BinaryUtils/zipball/595c4ca4b8056777729c8cc5db9614c731eaf63b",
-                "reference": "595c4ca4b8056777729c8cc5db9614c731eaf63b",
+                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/ceb4cc3635f18c8f99ddb51c21d6a2ef66dc555a",
+                "reference": "ceb4cc3635f18c8f99ddb51c21d6a2ef66dc555a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "netresearch/jsonmapper": "^4.0",
+                "php": "^7.4 || ^8.0",
+                "pocketmine/binaryutils": "^0.2.0",
+                "pocketmine/color": "^0.2.0",
+                "pocketmine/math": "^0.3.0",
+                "pocketmine/nbt": "^0.3.0",
+                "ramsey/uuid": "^4.1"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "0.12.93",
+                "phpstan/phpstan-phpunit": "^0.12.21",
+                "phpstan/phpstan-strict-rules": "^0.12.10",
+                "phpunit/phpunit": "^9.5"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "pocketmine\\network\\mcpe\\protocol\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "description": "An implementation of the Minecraft: Bedrock Edition protocol in PHP",
+            "support": {
+                "issues": "https://github.com/pmmp/BedrockProtocol/issues",
+                "source": "https://github.com/pmmp/BedrockProtocol/tree/master"
+            },
+            "time": "2021-07-23T22:10:41+00:00"
+        },
+        {
+            "name": "pocketmine/binaryutils",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pmmp/BinaryUtils.git",
+                "reference": "8cd078e2426f8100331f2d73bef10f481dad6cde"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pmmp/BinaryUtils/zipball/8cd078e2426f8100331f2d73bef10f481dad6cde",
+                "reference": "8cd078e2426f8100331f2d73bef10f481dad6cde",
                 "shasum": ""
             },
             "require": {
@@ -416,9 +392,9 @@
             "description": "Classes and methods for conveniently handling binary data",
             "support": {
                 "issues": "https://github.com/pmmp/BinaryUtils/issues",
-                "source": "https://github.com/pmmp/BinaryUtils/tree/0.2.0"
+                "source": "https://github.com/pmmp/BinaryUtils/tree/0.2.1"
             },
-            "time": "2021-05-18T15:23:45+00:00"
+            "time": "2021-05-30T19:42:57+00:00"
         },
         {
             "name": "pocketmine/callback-validator",
@@ -476,12 +452,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/ClassLoader.git",
-                "reference": "ba70cbabc53d6a36c5d179776e99bc059f21b4a9"
+                "reference": "80226e0917be79ac3230606113e25134a31e6a85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/ClassLoader/zipball/ba70cbabc53d6a36c5d179776e99bc059f21b4a9",
-                "reference": "ba70cbabc53d6a36c5d179776e99bc059f21b4a9",
+                "url": "https://api.github.com/repos/pmmp/ClassLoader/zipball/80226e0917be79ac3230606113e25134a31e6a85",
+                "reference": "80226e0917be79ac3230606113e25134a31e6a85",
                 "shasum": ""
             },
             "require": {
@@ -513,7 +489,7 @@
                 "issues": "https://github.com/pmmp/ClassLoader/issues",
                 "source": "https://github.com/pmmp/ClassLoader/tree/master"
             },
-            "time": "2021-04-21T22:05:17+00:00"
+            "time": "2021-05-29T23:09:32+00:00"
         },
         {
             "name": "pocketmine/color",
@@ -678,26 +654,26 @@
         },
         {
             "name": "pocketmine/math",
-            "version": "dev-master",
+            "version": "0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/Math.git",
-                "reference": "4595b5ee90627e817317839519a7d482c809effb"
+                "reference": "83ec067b12c066fc61d9fb129daf7e61ef3b1d63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/Math/zipball/4595b5ee90627e817317839519a7d482c809effb",
-                "reference": "4595b5ee90627e817317839519a7d482c809effb",
+                "url": "https://api.github.com/repos/pmmp/Math/zipball/83ec067b12c066fc61d9fb129daf7e61ef3b1d63",
+                "reference": "83ec067b12c066fc61d9fb129daf7e61ef3b1d63",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2 || ^8.0",
+                "php": "^7.4 || ^8.0",
                 "php-64bit": "*"
             },
             "require-dev": {
                 "irstea/phpunit-shim": "^8.5 || ^9.5",
                 "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "0.12.80",
+                "phpstan/phpstan": "0.12.90",
                 "phpstan/phpstan-strict-rules": "^0.12.4"
             },
             "type": "library",
@@ -713,9 +689,9 @@
             "description": "PHP library containing math related code used in PocketMine-MP",
             "support": {
                 "issues": "https://github.com/pmmp/Math/issues",
-                "source": "https://github.com/pmmp/Math/tree/master"
+                "source": "https://github.com/pmmp/Math/tree/0.3.0"
             },
-            "time": "2021-05-10T10:44:46+00:00"
+            "time": "2021-07-14T18:39:31+00:00"
         },
         {
             "name": "pocketmine/nbt",
@@ -765,12 +741,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "f68b9e79e1ebadf6b80641292a14208f6d2919a0"
+                "reference": "1afda04620606e49cd4a8eeb04d08ff3908f2da4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/f68b9e79e1ebadf6b80641292a14208f6d2919a0",
-                "reference": "f68b9e79e1ebadf6b80641292a14208f6d2919a0",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/1afda04620606e49cd4a8eeb04d08ff3908f2da4",
+                "reference": "1afda04620606e49cd4a8eeb04d08ff3908f2da4",
                 "shasum": ""
             },
             "require": {
@@ -799,28 +775,30 @@
                 "ext-yaml": ">=2.0.0",
                 "ext-zip": "*",
                 "ext-zlib": ">=1.2.11",
-                "mdanter/ecc": "^1.0",
+                "fgrosse/phpasn1": "^2.3",
                 "netresearch/jsonmapper": "^4.0",
                 "php": "^7.4 || ^8.0",
                 "php-64bit": "*",
-                "pocketmine/binaryutils": "^0.2.0",
+                "pocketmine/bedrock-protocol": "dev-master#88ae308a03e8e61ccfdddd42623efabe9e772b42",
+                "pocketmine/binaryutils": "^0.2.1",
                 "pocketmine/callback-validator": "^1.0.2",
                 "pocketmine/classloader": "dev-master",
                 "pocketmine/color": "^0.2.0",
                 "pocketmine/errorhandler": "^0.3.0",
                 "pocketmine/log": "^0.3.0",
                 "pocketmine/log-pthreads": "^0.2.0",
-                "pocketmine/math": "dev-master",
+                "pocketmine/math": "^0.3.0",
                 "pocketmine/nbt": "^0.3.0",
                 "pocketmine/raklib": "^0.13.1",
                 "pocketmine/raklib-ipc": "^0.1.0",
-                "pocketmine/snooze": "^0.1.0",
+                "pocketmine/snooze": "^0.3.0",
                 "pocketmine/spl": "dev-master",
                 "ramsey/uuid": "^4.1",
-                "respect/validation": "^2.0"
+                "respect/validation": "^2.0",
+                "webmozart/path-util": "^2.3"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.88",
+                "phpstan/phpstan": "0.12.92",
                 "phpstan/phpstan-phpunit": "^0.12.6",
                 "phpstan/phpstan-strict-rules": "^0.12.2",
                 "phpunit/phpunit": "^9.2"
@@ -854,7 +832,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-05-22T22:52:31+00:00"
+            "time": "2021-07-25T11:27:25+00:00"
         },
         {
             "name": "pocketmine/raklib",
@@ -942,25 +920,25 @@
         },
         {
             "name": "pocketmine/snooze",
-            "version": "0.1.5",
+            "version": "0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/Snooze.git",
-                "reference": "70b5e7937a06878dd321a3182ceb76d56298f2cd"
+                "reference": "fe5b1dbf0d6267da882d1f67924772bd93db833d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/Snooze/zipball/70b5e7937a06878dd321a3182ceb76d56298f2cd",
-                "reference": "70b5e7937a06878dd321a3182ceb76d56298f2cd",
+                "url": "https://api.github.com/repos/pmmp/Snooze/zipball/fe5b1dbf0d6267da882d1f67924772bd93db833d",
+                "reference": "fe5b1dbf0d6267da882d1f67924772bd93db833d",
                 "shasum": ""
             },
             "require": {
                 "ext-pthreads": ">=3.1.7dev",
-                "php-64bit": "^7.2 || ^8.0"
+                "php-64bit": "^7.3 || ^8.0"
             },
             "require-dev": {
                 "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "0.12.76",
+                "phpstan/phpstan": "0.12.88",
                 "phpstan/phpstan-strict-rules": "^0.12.4"
             },
             "type": "library",
@@ -976,9 +954,9 @@
             "description": "Thread notification management library for code using the pthreads extension",
             "support": {
                 "issues": "https://github.com/pmmp/Snooze/issues",
-                "source": "https://github.com/pmmp/Snooze/tree/0.1.5"
+                "source": "https://github.com/pmmp/Snooze/tree/0.3.0"
             },
-            "time": "2021-02-22T16:16:12+00:00"
+            "time": "2021-06-13T13:57:47+00:00"
         },
         {
             "name": "pocketmine/spl",
@@ -1375,7 +1353,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/main"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.23.0"
             },
             "funding": [
                 {
@@ -1399,12 +1377,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "9ad2f3c9de0273812c616fdf96070a129c3defcb"
+                "reference": "9174a3d80210dca8daa7f31fec659150bbeabfc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/9ad2f3c9de0273812c616fdf96070a129c3defcb",
-                "reference": "9ad2f3c9de0273812c616fdf96070a129c3defcb",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/9174a3d80210dca8daa7f31fec659150bbeabfc6",
+                "reference": "9174a3d80210dca8daa7f31fec659150bbeabfc6",
                 "shasum": ""
             },
             "require": {
@@ -1472,7 +1450,117 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-04-23T08:04:02+00:00"
+            "time": "2021-05-27T12:26:48+00:00"
+        },
+        {
+            "name": "webmozart/assert",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webmozarts/assert.git",
+                "reference": "b419d648592b0b8911cbbe10d450fe314f4fd262"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/b419d648592b0b8911cbbe10d450fe314f4fd262",
+                "reference": "b419d648592b0b8911cbbe10d450fe314f4fd262",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0",
+                "symfony/polyfill-ctype": "^1.8"
+            },
+            "conflict": {
+                "phpstan/phpstan": "<0.12.20",
+                "vimeo/psalm": "<4.6.1 || 4.6.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5.13"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.10-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webmozart\\Assert\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bernhard Schussek",
+                    "email": "bschussek@gmail.com"
+                }
+            ],
+            "description": "Assertions to validate method input/output with nice error messages.",
+            "keywords": [
+                "assert",
+                "check",
+                "validate"
+            ],
+            "support": {
+                "issues": "https://github.com/webmozarts/assert/issues",
+                "source": "https://github.com/webmozarts/assert/tree/master"
+            },
+            "time": "2021-06-19T13:45:26+00:00"
+        },
+        {
+            "name": "webmozart/path-util",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webmozart/path-util.git",
+                "reference": "95a8f7ad150c2a3773ff3c3d04f557a24c99cfd2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webmozart/path-util/zipball/95a8f7ad150c2a3773ff3c3d04f557a24c99cfd2",
+                "reference": "95a8f7ad150c2a3773ff3c3d04f557a24c99cfd2",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.3|^7.0",
+                "webmozart/assert": "~1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.6",
+                "sebastian/version": "^1.0.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webmozart\\PathUtil\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bernhard Schussek",
+                    "email": "bschussek@gmail.com"
+                }
+            ],
+            "description": "A robust cross-platform utility for normalizing, comparing and modifying file paths.",
+            "support": {
+                "issues": "https://github.com/webmozart/path-util/issues",
+                "source": "https://github.com/webmozart/path-util/tree/master"
+            },
+            "time": "2016-08-15T15:31:42+00:00"
         }
     ],
     "aliases": [],

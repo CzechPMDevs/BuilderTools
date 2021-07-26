@@ -88,11 +88,7 @@ class Selectors {
             return null;
         }
 
-        if($pos1->getWorld() === null || $pos2->getWorld() === null) {
-            return null;
-        }
-
-        if($pos1->getWorld()->isClosed() || $pos2->getWorld()->isClosed()) {
+        if(!$pos1->getWorld()->isLoaded() || !$pos2->getWorld()->isLoaded()) {
             return null;
         }
 

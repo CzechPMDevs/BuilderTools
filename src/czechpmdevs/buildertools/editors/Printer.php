@@ -48,7 +48,7 @@ class Printer {
     public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false): void {
         $undoList = new BlockArray();
         $undoList->setWorld($center->getWorld());
-        $center = Math::ceilPosition($center);
+        $center = Position::fromObject($center->floor(), $center->getWorld());
 
         $level = $center->getWorld();
 
@@ -361,7 +361,7 @@ class Printer {
         $center = Position::fromObject($center->floor(), $center->getWorld());
         $radius = abs($radius);
 
-        if($player->getY() - $radius < 0 || $player->getY() + $radius > World::Y_MAX) {
+        if($player->getPosition()->getY() - $radius < 0 || $player->getPosition()->getY() + $radius > World::Y_MAX) {
             return EditorResult::error("Shape is outside of the map!");
         }
 

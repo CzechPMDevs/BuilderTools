@@ -25,7 +25,6 @@ use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
-use pocketmine\Player;
 
 class WandCommand extends BuilderToolsCommand {
 

@@ -94,6 +94,7 @@ final class OfflineSession {
 
         // Clipboard
         if($nbt->getTag("Clipboard") instanceof CompoundTag) {
+            /** @var CompoundTag $clipboardTag */
             $clipboardTag = $nbt->getCompoundTag("Clipboard");
 
             $clipboard = new SelectionData();

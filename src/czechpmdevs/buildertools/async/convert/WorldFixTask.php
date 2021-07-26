@@ -24,21 +24,16 @@ use czechpmdevs\buildertools\editors\Fixer;
 use Error;
 use Generator;
 use pocketmine\scheduler\AsyncTask;
-use pocketmine\utils\MainLogger;
-use pocketmine\world\format\io\BaseWorldProvider;
 use pocketmine\world\format\io\exception\CorruptedChunkException;
 use pocketmine\world\format\io\region\Anvil;
 use pocketmine\world\format\io\region\CorruptedRegionException;
 use pocketmine\world\format\io\region\McRegion;
-use pocketmine\world\format\io\region\RegionLoader;
 use pocketmine\world\format\io\WorldProvider;
 use pocketmine\world\format\io\WorldProviderManager;
 use function basename;
-use function ceil;
 use function count;
 use function explode;
 use function glob;
-use function gmdate;
 use function is_dir;
 use function microtime;
 use function round;
@@ -96,12 +91,7 @@ class WorldFixTask extends AsyncTask {
             return;
         }
 
-        if((!$provider instanceof Anvil)) { // TODO - LevelDB
-            if($provider === null) {
-                $this->error = "Unknown world provider.";
-                return;
-            }
-
+        if((!$provider instanceof Anvil)) { // TODO -
             $this->error = "BuilderTools does not support fixing chunks with " . get_class($provider) . " provider.";
             return;
         }
@@ -131,9 +121,7 @@ class WorldFixTask extends AsyncTask {
                     continue;
                 }
 
-                if($fixer->convertJavaToBedrockChunk($chunk, $maxY)) {
-                    $provider->saveChunk($chunkX, $chunkZ, $chunk);
-                }
+                $fixer->convertJavaToBedrockChunk($chunk, $maxY);
 
                 $chunksFixed++;
 
@@ -143,18 +131,18 @@ class WorldFixTask extends AsyncTask {
             }
 
             $percent = round(((++$regionsFixed) * 100) / $regionCount, 3);
-            $timePerChunk = round((microtime(true) - $startTime) / $chunksFixed, 3);
-            $timePerRegion = (microtime(true) - $startTime) / $regionsFixed;
-            $expectedTime = gmdate("H:i:s", (int)ceil($timePerRegion * ($regionCount - $regionsFixed)));
+//            $timePerChunk = round((microtime(true) - $startTime) / $chunksFixed, 3);
+//            $timePerRegion = (microtime(true) - $startTime) / $regionsFixed;
+//            $expectedTime = gmdate("H:i:s", (int)ceil($timePerRegion * ($regionCount - $regionsFixed)));
 
-            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
+//            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
 
             $this->percent = (int)$percent;
             $provider->doGarbageCollection();
         }
 
         $this->time = round(microtime(true) - $startTime);
-        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
+//        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
 
         $this->done = true;
         $this->chunkCount = $chunksFixed;
@@ -182,7 +170,7 @@ class WorldFixTask extends AsyncTask {
             try {
                 $region = new McRegion($regionFilePath);
             } catch (CorruptedRegionException $e) {
-                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
+//                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
                 continue;
             }
 

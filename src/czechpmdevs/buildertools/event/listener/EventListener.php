@@ -98,9 +98,9 @@ class EventListener implements Listener {
 
             $player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" .
                 "§aName: §7" . $block->getName() . "\n" .
-                "§aPosition: §7" . $block->getPos()->getFloorX() . ";" . $block->getPos()->getFloorY() . ";" . $block->getPos()->getFloorZ() . " (" . ($block->getFloorX() >> 4) . ";" . ($block->getFloorZ() >> 4) . ")\n" .
+                "§aPosition: §7" . $block->getPos()->getFloorX() . ";" . $block->getPos()->getFloorY() . ";" . $block->getPos()->getFloorZ() . " (" . ($block->getPos()->getFloorX() >> 4) . ";" . ($block->getPos()->getFloorZ() >> 4) . ")\n" .
                 "§World: §7" . $world->getDisplayName() . "\n" .
-                "§aBiome: §7" . $block->getLevelNonNull()->getBiomeId($block->getFloorX(), $block->getFloorZ()) . " (" . $block->getLevelNonNull()->getBiome($block->getFloorX(), $block->getFloorZ())->getName() . ")");
+                "§aBiome: §7" . $block->getPos()->getWorld()->getBiomeId($block->getPos()->getFloorX(), $block->getPos()->getFloorZ()) . " (" . $block->getPos()->getWorld()->getBiome($block->getPos()->getFloorX(), $block->getPos()->getFloorZ())->getName() . ")");
         }
     }
 

@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class IslandCommand extends BuilderToolsCommand {
 
@@ -45,7 +45,7 @@ class IslandCommand extends BuilderToolsCommand {
         $radius = isset($args[1]) ? (int)($args[1]) : 5;
         $step = isset($args[2]) ? (int)($args[2]) : 3;
 
-        $result = Printer::getInstance()->makeIsland($sender, $sender, $radius, $step, $args[0]);
+        $result = Printer::getInstance()->makeIsland($sender, $sender->getPosition(), $radius, $step, $args[0]);
         if(!$result->successful()) {
             $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making an island: {$result->getErrorMessage()}");
             return;
