@@ -25,22 +25,23 @@ use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
+use function is_int;
 
 class SecondPositionCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/pos2", "Select second position", null, ["/2"]);
-    }
+	public function __construct() {
+		parent::__construct("/pos2", "Select second position", null, ["/2"]);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
 
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        $size = Selectors::addSelector($sender, 2, $position = new Position((int)$sender->getPosition()->getX(), (int)$sender->getPosition()->getY(), (int)$sender->getPosition()->getZ(), $sender->getWorld()));
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
-    }
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		$size = Selectors::addSelector($sender, 2, $position = new Position((int) $sender->getPosition()->getX(), (int) $sender->getPosition()->getY(), (int) $sender->getPosition()->getZ(), $sender->getWorld()));
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
+	}
 }

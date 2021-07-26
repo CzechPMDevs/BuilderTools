@@ -23,36 +23,35 @@ namespace czechpmdevs\buildertools\async;
 use Closure;
 use pocketmine\Server;
 use function spl_object_hash;
-use function array_key_exists;
 
 class AsyncQueue {
 
-    /** @var Closure[] */
-    private static array $queue = [];
+	/** @var Closure[] */
+	private static array $queue = [];
 
-    /**
-     * @phpstan-param BuilderToolsAsyncTask<mixed> $task
-     * @phpstan-param Closure(BuilderToolsAsyncTask<mixed> $task): void $callback
-     */
-    public static function submitTask(BuilderToolsAsyncTask $task, ?Closure $callback = null): void {
-        Server::getInstance()->getAsyncPool()->submitTask($task);
+	/**
+	 * @phpstan-param BuilderToolsAsyncTask<mixed> $task
+	 * @phpstan-param Closure(BuilderToolsAsyncTask<mixed> $task): void $callback
+	 */
+	public static function submitTask(BuilderToolsAsyncTask $task, ?Closure $callback = null): void {
+		Server::getInstance()->getAsyncPool()->submitTask($task);
 
-        if($callback !== null) {
-            self::$queue[spl_object_hash($task)] = $callback;
-        }
-    }
+		if($callback !== null) {
+			self::$queue[spl_object_hash($task)] = $callback;
+		}
+	}
 
-    /**
-     * @internal
-     *
-     * @phpstan-param BuilderToolsAsyncTask<mixed> $task
-     */
-    public static function callCallback(BuilderToolsAsyncTask $task): void {
-        if(!isset(self::$queue[spl_object_hash($task)])) {
-            return;
-        }
+	/**
+	 * @internal
+	 *
+	 * @phpstan-param BuilderToolsAsyncTask<mixed> $task
+	 */
+	public static function callCallback(BuilderToolsAsyncTask $task): void {
+		if(!isset(self::$queue[spl_object_hash($task)])) {
+			return;
+		}
 
-        $callback = self::$queue[spl_object_hash($task)];
-        $callback($task);
-    }
+		$callback = self::$queue[spl_object_hash($task)];
+		$callback($task);
+	}
 }

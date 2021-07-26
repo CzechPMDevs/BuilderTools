@@ -30,225 +30,216 @@ use pocketmine\world\World;
 
 class FillSession {
 
-    /** @var SubChunkExplorer */
-    protected SubChunkExplorer $explorer;
+	protected SubChunkExplorer $explorer;
 
-    /** @var bool */
-    protected bool $calculateDimensions;
-    /** @var bool */
-    protected bool $saveChanges;
+	protected bool $calculateDimensions;
 
-    /** @var BlockArray|null */
-    protected ?BlockArray $changes = null;
+	protected bool $saveChanges;
 
-    /** @var int */
-    protected int $minX, $maxX;
-    /** @var int */
-    protected int $minZ, $maxZ;
+	protected ?BlockArray $changes = null;
 
-    /** @var int */
-    protected int $blocksChanged = 0;
+	protected int $minX, $maxX;
 
-    /** @var bool */
-    protected bool $error = false;
+	protected int $minZ, $maxZ;
 
-    /**
-     * @var int
-     *
-     * Variable to avoid re-allocating memory all the time
-     */
-    protected int $lastHash;
+	protected int $blocksChanged = 0;
 
-    public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true) {
-        $this->explorer = new SubChunkExplorer($world);
+	protected bool $error = false;
 
-        $this->calculateDimensions = $calculateDimensions;
-        $this->saveChanges = $saveChanges;
+	/**
+	 * @var int
+	 *
+	 * Variable to avoid re-allocating memory all the time
+	 */
+	protected int $lastHash;
 
-        if($this->saveChanges) {
-            $this->changes = (new BlockArray())->setWorld($world);
-        }
-    }
+	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true) {
+		$this->explorer = new SubChunkExplorer($world);
 
-    /**
-     * Requests block coordinates (not chunk ones)
-     */
-    public function setDimensions(int $minX, int $maxX, int $minZ, int $maxZ): void {
-        $this->minX = $minX;
-        $this->maxX = $maxX;
-        $this->minZ = $minZ;
-        $this->maxZ = $maxZ;
-    }
+		$this->calculateDimensions = $calculateDimensions;
+		$this->saveChanges = $saveChanges;
 
-    /**
-     * @param int $y 0-255
-     */
-    public function setBlockAt(int $x, int $y, int $z, int $id, int $meta): void {
-        if(!$this->moveTo($x, $y, $z)) {
-            return;
-        }
+		if($this->saveChanges) {
+			$this->changes = (new BlockArray())->setWorld($world);
+		}
+	}
 
-        $this->saveChanges($x, $y, $z);
+	/**
+	 * Requests block coordinates (not chunk ones)
+	 */
+	public function setDimensions(int $minX, int $maxX, int $minZ, int $maxZ): void {
+		$this->minX = $minX;
+		$this->maxX = $maxX;
+		$this->minZ = $minZ;
+		$this->maxZ = $maxZ;
+	}
 
-        /** @phpstan-ignore-next-line */
-        $this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4 | $meta);
-        $this->blocksChanged++;
-    }
+	/**
+	 * @param int $y 0-255
+	 */
+	public function setBlockAt(int $x, int $y, int $z, int $id, int $meta): void {
+		if(!$this->moveTo($x, $y, $z)) {
+			return;
+		}
 
-    /**
-     * @param int $y 0-255
-     */
-    public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
-        if(!$this->moveTo($x, $y, $z)) {
-            return;
-        }
+		$this->saveChanges($x, $y, $z);
 
-        $this->saveChanges($x, $y, $z);
+		/** @phpstan-ignore-next-line */
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4 | $meta);
+		$this->blocksChanged++;
+	}
 
-        /** @phpstan-ignore-next-line */
-        $this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
-        $this->blocksChanged++;
-    }
+	/**
+	 * @param int $y 0-255
+	 */
+	public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
+		if(!$this->moveTo($x, $y, $z)) {
+			return;
+		}
 
-    /**
-     * @param int $y 0-255
-     */
-    public function getBlockAt(int $x, int $y, int $z, ?int &$id, ?int &$meta): void {
-        if(!$this->moveTo($x, $y, $z)) {
-            return;
-        }
+		$this->saveChanges($x, $y, $z);
 
-        /** @phpstan-ignore-next-line */
-        $this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+		/** @phpstan-ignore-next-line */
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
+		$this->blocksChanged++;
+	}
 
-        $id = $this->lastHash >> 4;
-        $meta = $this->lastHash & 0xf;
-    }
+	/**
+	 * @param int $y 0-255
+	 */
+	public function getBlockAt(int $x, int $y, int $z, ?int &$id, ?int &$meta): void {
+		if(!$this->moveTo($x, $y, $z)) {
+			return;
+		}
 
-    /**
-     * @param int $y 0-255
-     */
-    public function getBlockIdAt(int $x, int $y, int $z, ?int &$id): void {
-        if(!$this->moveTo($x, $y, $z)) {
-            return;
-        }
+		/** @phpstan-ignore-next-line */
+		$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
 
-        /** @phpstan-ignore-next-line */
-        $this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+		$id = $this->lastHash >> 4;
+		$meta = $this->lastHash & 0xf;
+	}
 
-        $id = $this->lastHash >> 4;
-    }
+	/**
+	 * @param int $y 0-255
+	 */
+	public function getBlockIdAt(int $x, int $y, int $z, ?int &$id): void {
+		if(!$this->moveTo($x, $y, $z)) {
+			return;
+		}
 
-    public function setBiomeAt(int $x, int $z, int $id): void {
-        if(!$this->explorer->moveTo($x, 0, $z)) {
-            return;
-        }
+		/** @phpstan-ignore-next-line */
+		$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
 
-        /** @phpstan-ignore-next-line */
-        $this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
-        $this->blocksChanged++;
-    }
+		$id = $this->lastHash >> 4;
+	}
 
-    public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
-        for($y = 255; $y >= 0; --$y) {
-            $this->explorer->moveTo($x, $y, $z);
+	public function setBiomeAt(int $x, int $z, int $id): void {
+		if(!$this->explorer->moveTo($x, 0, $z)) {
+			return;
+		}
 
-            /** @phpstan-ignore-next-line */
-            $id = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-            if($id >> 4 != 0) {
-                if(BlockFactory::getInstance()->get($id >> 4, $id & 0xf)->isSolid()) {
-                    $y++;
-                    return true;
-                }
+		/** @phpstan-ignore-next-line */
+		$this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
+		$this->blocksChanged++;
+	}
 
-                return false;
-            }
-        }
-        return false;
-    }
+	public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
+		for($y = 255; $y >= 0; --$y) {
+			$this->explorer->moveTo($x, $y, $z);
 
-    public function getChanges(): ?BlockArray {
-        return $this->changes;
-    }
+			/** @phpstan-ignore-next-line */
+			$id = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+			if($id >> 4 != 0) {
+				if(BlockFactory::getInstance()->get($id >> 4, $id & 0xf)->isSolid()) {
+					$y++;
+					return true;
+				}
 
-    /**
-     * @return int
-     */
-    public function getBlocksChanged(): int {
-        return $this->blocksChanged;
-    }
+				return false;
+			}
+		}
+		return false;
+	}
 
-    public function loadChunks(World $world): void {
-        $minX = $this->minX >> 4;
-        $maxX = $this->maxX >> 4;
-        $minZ = $this->minZ >> 4;
-        $maxZ = $this->maxZ >> 4;
+	public function getChanges(): ?BlockArray {
+		return $this->changes;
+	}
 
-        for($x = $minX; $x <= $maxX; $x++) {
-            for($z = $minZ; $z <= $maxZ; $z++) {
-                $chunk = $world->getChunk($x, $z);
-                if($chunk === null) {
-                    $world->loadChunk($x, $z);
-                }
-            }
-        }
-    }
+	public function getBlocksChanged(): int {
+		return $this->blocksChanged;
+	}
 
-    public function reloadChunks(World $world): void {
-        if($this->error) {
-            BuilderTools::getInstance()->getLogger()->notice("Some chunks were not found");
-        }
+	public function loadChunks(World $world): void {
+		$minX = $this->minX >> 4;
+		$maxX = $this->maxX >> 4;
+		$minZ = $this->minZ >> 4;
+		$maxZ = $this->maxZ >> 4;
 
-        $minX = $this->minX >> 4;
-        $maxX = $this->maxX >> 4;
-        $minZ = $this->minZ >> 4;
-        $maxZ = $this->maxZ >> 4;
+		for($x = $minX; $x <= $maxX; $x++) {
+			for($z = $minZ; $z <= $maxZ; $z++) {
+				$chunk = $world->getChunk($x, $z);
+				if($chunk === null) {
+					$world->loadChunk($x, $z);
+				}
+			}
+		}
+	}
 
-        for($x = $minX; $x <= $maxX; ++$x) {
-            for($z = $minZ; $z <= $maxZ; ++$z) {
-                $chunk = $world->getChunk($x, $z);
-                if($chunk === null) {
-                    continue;
-                }
+	public function reloadChunks(World $world): void {
+		if($this->error) {
+			BuilderTools::getInstance()->getLogger()->notice("Some chunks were not found");
+		}
 
-                $world->setChunk($x, $z, $chunk);
-            }
-        }
-    }
+		$minX = $this->minX >> 4;
+		$maxX = $this->maxX >> 4;
+		$minZ = $this->minZ >> 4;
+		$maxZ = $this->maxZ >> 4;
 
-    protected function moveTo(int $x, int $y, int $z): bool {
-        $this->explorer->moveTo($x, $y, $z);
+		for($x = $minX; $x <= $maxX; ++$x) {
+			for($z = $minZ; $z <= $maxZ; ++$z) {
+				$chunk = $world->getChunk($x, $z);
+				if($chunk === null) {
+					continue;
+				}
 
-        if($this->explorer->currentSubChunk === null) {
-            try {
-                /** @phpstan-ignore-next-line */
-                $this->explorer->currentSubChunk = $this->explorer->currentChunk->getSubChunk($y >> 4);
-            } catch (Error $exception) { // For the case if chunk is null
-                $this->error = true;
-                return false;
-            }
-        }
+				$world->setChunk($x, $z, $chunk);
+			}
+		}
+	}
 
-        if($this->calculateDimensions) {
-            if((!isset($this->minX)) || $x < $this->minX) $this->minX = $x;
-            if((!isset($this->minZ)) || $z < $this->minZ) $this->minZ = $z;
-            if((!isset($this->maxX)) || $x > $this->maxX) $this->maxX = $x;
-            if((!isset($this->maxZ)) || $z > $this->maxZ) $this->maxZ = $z;
-        }
+	protected function moveTo(int $x, int $y, int $z): bool {
+		$this->explorer->moveTo($x, $y, $z);
 
-        return true;
-    }
+		if($this->explorer->currentSubChunk === null) {
+			try {
+				/** @phpstan-ignore-next-line */
+				$this->explorer->currentSubChunk = $this->explorer->currentChunk->getSubChunk($y >> 4);
+			} catch (Error $exception) { // For the case if chunk is null
+				$this->error = true;
+				return false;
+			}
+		}
 
-    protected function saveChanges(int $x, int $y, int $z): void {
-        if($this->saveChanges) {
-            /** @phpstan-ignore-next-line */
-            $this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-            /** @phpstan-ignore-next-line */
-            $this->changes->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
-        }
-    }
+		if($this->calculateDimensions) {
+			if((!isset($this->minX)) || $x < $this->minX) $this->minX = $x;
+			if((!isset($this->minZ)) || $z < $this->minZ) $this->minZ = $z;
+			if((!isset($this->maxX)) || $x > $this->maxX) $this->maxX = $x;
+			if((!isset($this->maxZ)) || $z > $this->maxZ) $this->maxZ = $z;
+		}
 
-    public function close(): void {
-        $this->explorer->invalidate();
-    }
+		return true;
+	}
+
+	protected function saveChanges(int $x, int $y, int $z): void {
+		if($this->saveChanges) {
+			/** @phpstan-ignore-next-line */
+			$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+			/** @phpstan-ignore-next-line */
+			$this->changes->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
+		}
+	}
+
+	public function close(): void {
+		$this->explorer->invalidate();
+	}
 }

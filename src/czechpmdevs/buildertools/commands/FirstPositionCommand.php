@@ -25,22 +25,23 @@ use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
+use function is_int;
 
 class FirstPositionCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/pos1", "Select first position", null, ["/1"]);
-    }
+	public function __construct() {
+		parent::__construct("/pos1", "Select first position", null, ["/1"]);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        $size = Selectors::addSelector($sender, 1, $position = Position::fromObject($sender->getPosition()->ceil(), $sender->getWorld()));
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
-    }
+		$size = Selectors::addSelector($sender, 1, $position = Position::fromObject($sender->getPosition()->ceil(), $sender->getWorld()));
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
+	}
 }

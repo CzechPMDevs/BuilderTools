@@ -31,45 +31,45 @@ use function microtime;
 use function mt_rand;
 
 class Decorator {
-    use SingletonTrait;
+	use SingletonTrait;
 
-    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): EditorResult {
-        $startTime = microtime(true);
+	public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): EditorResult {
+		$startTime = microtime(true);
 
-        $fillSession = new FillSession($center->getWorld(), false, true);
+		$fillSession = new FillSession($center->getWorld(), false, true);
 
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks);
+		$stringToBlockDecoder = new StringToBlockDecoder($blocks);
 
-        $minX = $center->getFloorX() - $radius;
-        $maxX = $center->getFloorX() + $radius;
-        $minZ = $center->getFloorZ() - $radius;
-        $maxZ = $center->getFloorZ() + $radius;
+		$minX = $center->getFloorX() - $radius;
+		$maxX = $center->getFloorX() + $radius;
+		$minZ = $center->getFloorZ() - $radius;
+		$maxZ = $center->getFloorZ() + $radius;
 
-        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        
-        for ($x = $minX; $x <= $maxX; ++$x) {
-            /** @var int $x */
-            for ($z = $minZ; $z <= $maxZ; ++$z) {
-                if(mt_rand(1, 100) > $percentage) {
-                    continue;
-                }
+		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
-                if(!$fillSession->getHighestBlockAt($x, $z, $y)) {
-                    continue;
-                }
+		for ($x = $minX; $x <= $maxX; ++$x) {
+			/** @var int $x */
+			for ($z = $minZ; $z <= $maxZ; ++$z) {
+				if(mt_rand(1, 100) > $percentage) {
+					continue;
+				}
 
-                $stringToBlockDecoder->nextBlock($id, $meta);
-                $fillSession->setBlockAt($x, $y, $z, $id, $meta);
-            }
-        }
+				if(!$fillSession->getHighestBlockAt($x, $z, $y)) {
+					continue;
+				}
 
-        $fillSession->reloadChunks($center->getWorld());
+				$stringToBlockDecoder->nextBlock($id, $meta);
+				$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+			}
+		}
 
-        /** @phpstan-var BlockArray $changes */
-        $changes = $fillSession->getChanges();
-        $changes->save();
-        Canceller::getInstance()->addStep($player, $changes);
+		$fillSession->reloadChunks($center->getWorld());
 
-        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-    }
+		/** @phpstan-var BlockArray $changes */
+		$changes = $fillSession->getChanges();
+		$changes->save();
+		Canceller::getInstance()->addStep($player, $changes);
+
+		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+	}
 }

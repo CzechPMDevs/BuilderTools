@@ -24,7 +24,6 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use Error;
 use pocketmine\nbt\BigEndianNbtSerializer;
-use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use function serialize;
 use function unserialize;
@@ -38,38 +37,38 @@ use function zlib_decode;
  */
 class BuilderToolsSchematic implements Schematic {
 
-    public function load(string $rawData): BlockArray {
-        $blockArray = unserialize($rawData);
-        if(!$blockArray instanceof BlockArray) {
-            throw new SchematicException("Invalid data provided");
-        }
+	public function load(string $rawData): BlockArray {
+		$blockArray = unserialize($rawData);
+		if(!$blockArray instanceof BlockArray) {
+			throw new SchematicException("Invalid data provided");
+		}
 
-        return $blockArray;
-    }
+		return $blockArray;
+	}
 
-    public function save(BlockArray $blockArray): string {
-        return serialize($blockArray);
-    }
+	public function save(BlockArray $blockArray): string {
+		return serialize($blockArray);
+	}
 
-    public static function getFileExtension(): string {
-        return ".btschematics";
-    }
+	public static function getFileExtension(): string {
+		return ".btschematics";
+	}
 
-    public static function validate(string $rawData): bool {
-        try {
-            $rawData = zlib_decode($rawData);
-            if($rawData === false) {
-                return false;
-            }
+	public static function validate(string $rawData): bool {
+		try {
+			$rawData = zlib_decode($rawData);
+			if($rawData === false) {
+				return false;
+			}
 
-            /** @var CompoundTag $nbt */
-            $nbt = (new BigEndianNbtSerializer())->read($rawData)->getTag();
+			/** @var CompoundTag $nbt */
+			$nbt = (new BigEndianNbtSerializer())->read($rawData)->getTag();
 
-            return $nbt->getByteArray("Coords") !== "" &&
-                $nbt->getByteArray("Blocks") !== "" &&
-                $nbt->getByte("DuplicateDetection") !== null;
-        } catch (Error $error) {
-            return false;
-        }
-    }
+			return $nbt->getByteArray("Coords") !== "" &&
+				$nbt->getByteArray("Blocks") !== "" &&
+				$nbt->getByte("DuplicateDetection") !== null;
+		} catch (Error $error) {
+			return false;
+		}
+	}
 }

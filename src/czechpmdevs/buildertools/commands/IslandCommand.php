@@ -27,30 +27,30 @@ use pocketmine\player\Player;
 
 class IslandCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/island", "Create island");
-    }
+	public function __construct() {
+		parent::__construct("/island", "Create island");
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//island <id1:dmg1,id2:dmg2:,...> [radius] [step]");
-            return;
-        }
-        $radius = isset($args[1]) ? (int)($args[1]) : 5;
-        $step = isset($args[2]) ? (int)($args[2]) : 3;
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//island <id1:dmg1,id2:dmg2:,...> [radius] [step]");
+			return;
+		}
+		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
+		$step = isset($args[2]) ? (int) ($args[2]) : 3;
 
-        $result = Printer::getInstance()->makeIsland($sender, $sender->getPosition(), $radius, $step, $args[0]);
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making an island: {$result->getErrorMessage()}");
-            return;
-        }
+		$result = Printer::getInstance()->makeIsland($sender, $sender->getPosition(), $radius, $step, $args[0]);
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making an island: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aIsland created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aIsland created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
+	}
 }

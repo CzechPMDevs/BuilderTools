@@ -24,18 +24,18 @@ use pocketmine\world\ChunkManager;
 
 interface UpdateLevelData {
 
-    /**
-     * @return bool Returns if it is possible read next blocks
-     */
-    public function hasNext(): bool;
+	/**
+	 * @return bool Returns if it is possible read next blocks
+	 */
+	public function hasNext(): bool;
 
-    /**
-     * Reads next block from the array
-     */
-    public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
+	/**
+	 * Reads next block from the array
+	 */
+	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
 
-    /**
-     * Should not be null when used in filler
-     */
-    public function getWorld(): ?ChunkManager;
+	/**
+	 * Should not be null when used in filler
+	 */
+	public function getWorld(): ?ChunkManager;
 }

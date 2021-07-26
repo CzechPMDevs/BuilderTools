@@ -37,111 +37,110 @@ use function substr;
 
 final class StringToBlockDecoder implements BlockIdentifierList {
 
-    /** @var string */
-    private string $string;
-    /** @var string|null */
-    private ?string $itemInHand;
+	private string $string;
 
-    /** @var int[] */
-    private array $blockIdMap = [];
-    /** @var int[] */
-    private array $blockMap = [];
+	private ?string $itemInHand;
 
-    public function __construct(string $string, ?Item $handItem = null, bool $mixBlockIds = true) {
-        $this->string = $string;
+	/** @var int[] */
+	private array $blockIdMap = [];
+	/** @var int[] */
+	private array $blockMap = [];
 
-        if($handItem !== null) {
-            $this->itemInHand = "{$handItem->getId()}:{$handItem->getMeta()}";
-        }
+	public function __construct(string $string, ?Item $handItem = null, bool $mixBlockIds = true) {
+		$this->string = $string;
 
-        $this->decode($mixBlockIds);
-    }
+		if($handItem !== null) {
+			$this->itemInHand = "{$handItem->getId()}:{$handItem->getMeta()}";
+		}
 
-    /**
-     * @return bool Returns if the string contains
-     * any valid blocks
-     */
-    public function isValid(bool $requireBlockMap = true): bool {
-        return count($this->blockMap) != 0 || (!$requireBlockMap && count($this->blockIdMap) != 0);
-    }
+		$this->decode($mixBlockIds);
+	}
 
-    /**
-     * Reads next block from the string,
-     * @throws OutOfBoundsException if string is not valid.
-     */
-    public function nextBlock(?int &$id, ?int &$meta): void {
-        $hash = $this->blockMap[array_rand($this->blockMap)];
+	/**
+	 * @return bool Returns if the string contains
+	 * any valid blocks
+	 */
+	public function isValid(bool $requireBlockMap = true): bool {
+		return count($this->blockMap) != 0 || (!$requireBlockMap && count($this->blockIdMap) != 0);
+	}
 
-        $id = $hash >> 4;
-        $meta = $hash & 0xf;
-    }
+	/**
+	 * Reads next block from the string,
+	 * @throws OutOfBoundsException if string is not valid.
+	 */
+	public function nextBlock(?int &$id, ?int &$meta): void {
+		$hash = $this->blockMap[array_rand($this->blockMap)];
 
-    /**
-     * @return bool Returns if the block is in the array
-     */
-    public function containsBlock(int $blockHash): bool {
-        return in_array($blockHash, $this->blockMap);
-    }
+		$id = $hash >> 4;
+		$meta = $hash & 0xf;
+	}
 
-    /**
-     * @return bool Returns if block id is in the array
-     */
-    public function containsBlockId(int $id): bool {
-        return in_array($id, $this->blockIdMap);
-    }
+	/**
+	 * @return bool Returns if the block is in the array
+	 */
+	public function containsBlock(int $blockHash): bool {
+		return in_array($blockHash, $this->blockMap, true);
+	}
 
-    /**
-     * @param bool $mixBlockIds If enabled, block ids will be saved
-     * to both block and blockId maps
-     */
-    public function decode(bool $mixBlockIds = true): void {
-        if($this->itemInHand !== null) {
-            $this->string = str_replace("hand", $this->itemInHand, $this->string);
-        }
+	/**
+	 * @return bool Returns if block id is in the array
+	 */
+	public function containsBlockId(int $id): bool {
+		return in_array($id, $this->blockIdMap, true);
+	}
 
-        $split = explode(",", str_replace(";", ",", $this->string));
-        foreach ($split as $entry) {
-            $count = 1;
-            $block = $entry;
-            if(strpos($entry, "%") !== false) {
-                $p = substr($entry, 0, $pos = strpos($entry, "%"));
-                if(!is_numeric($p)) {
-                    continue;
-                }
+	/**
+	 * @param bool $mixBlockIds If enabled, block ids will be saved
+	 * to both block and blockId maps
+	 */
+	public function decode(bool $mixBlockIds = true): void {
+		if($this->itemInHand !== null) {
+			$this->string = str_replace("hand", $this->itemInHand, $this->string);
+		}
 
-                $count = min(100, (int)$p);
-                $block = substr($entry, $pos + 1);
-            }
+		$split = explode(",", str_replace(";", ",", $this->string));
+		foreach ($split as $entry) {
+			$count = 1;
+			$block = $entry;
+			if(strpos($entry, "%") !== false) {
+				$p = substr($entry, 0, $pos = strpos($entry, "%"));
+				if(!is_numeric($p)) {
+					continue;
+				}
 
-            try {
-                $item = LegacyStringToItemParser::getInstance()->parse($block);
-            }
-            catch (InvalidArgumentException $ignore) {
-                continue; // Item not found
-            }
+				$count = min(100, (int) $p);
+				$block = substr($entry, $pos + 1);
+			}
 
-            $class = $item->getBlock();
-            if($class->getId() == 0 && $item->getId() != 0) {
-                continue;
-            }
+			try {
+				$item = LegacyStringToItemParser::getInstance()->parse($block);
+			}
+			catch (InvalidArgumentException $ignore) {
+				continue; // Item not found
+			}
 
-            if(!$mixBlockIds) {
-                if(strpos($entry, ":") !== false) { // Meta is specified
-                    for($i = 0; $i < $count; ++$i) {
-                        $this->blockMap[] = $class->getId() << 4 | $class->getMeta();
-                    }
-                } else {
-                    for($i = 0; $i < $count; ++$i) {
-                        $this->blockIdMap[] = $class->getId();
-                    }
-                }
-                continue;
-            }
+			$class = $item->getBlock();
+			if($class->getId() == 0 && $item->getId() != 0) {
+				continue;
+			}
 
-            for($i = 0; $i < $count; ++$i) {
-                $this->blockIdMap[] = $class->getId();
-                $this->blockMap[] = $class->getId() << 4 | $class->getMeta();
-            }
-        }
-    }
+			if(!$mixBlockIds) {
+				if(strpos($entry, ":") !== false) { // Meta is specified
+					for($i = 0; $i < $count; ++$i) {
+						$this->blockMap[] = $class->getId() << 4 | $class->getMeta();
+					}
+				} else {
+					for($i = 0; $i < $count; ++$i) {
+						$this->blockIdMap[] = $class->getId();
+					}
+				}
+				continue;
+			}
+
+			for($i = 0; $i < $count; ++$i) {
+				$this->blockIdMap[] = $class->getId();
+				$this->blockMap[] = $class->getId() << 4 | $class->getMeta();
+			}
+		}
+	}
 }

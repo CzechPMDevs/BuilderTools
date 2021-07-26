@@ -22,19 +22,19 @@ namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
 interface BlockIdentifierList {
 
-    /**
-     * Function which outputs next random block
-     */
-    public function nextBlock(?int &$id, ?int &$meta): void;
+	/**
+	 * Function which outputs next random block
+	 */
+	public function nextBlock(?int &$id, ?int &$meta): void;
 
-    /**
-     * Function which returns if the block
-     * in the list
-     */
-    public function containsBlock(int $blockHash): bool;
+	/**
+	 * Function which returns if the block
+	 * in the list
+	 */
+	public function containsBlock(int $blockHash): bool;
 
-    /**
-     * Returns if the id is on the list
-     */
-    public function containsBlockId(int $id): bool;
+	/**
+	 * Returns if the id is on the list
+	 */
+	public function containsBlockId(int $id): bool;
 }

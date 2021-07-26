@@ -27,31 +27,31 @@ use pocketmine\player\Player;
 
 class HollowSphereCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/hsphere", "Create hollow sphere", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/hsphere", "Create hollow sphere", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//hsphere <id1:dmg1,id2:dmg2:,...> [radius]");
-            return;
-        }
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//hsphere <id1:dmg1,id2:dmg2:,...> [radius]");
+			return;
+		}
 
-        $radius = isset($args[1]) ? (int)($args[1]) : 5;
+		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
 
-        $result = Printer::getInstance()->makeHollowSphere($sender, $sender->getPosition(), $radius, $args[0]);
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow sphere: {$result->getErrorMessage()}");
-            return;
-        }
+		$result = Printer::getInstance()->makeHollowSphere($sender, $sender->getPosition(), $radius, $args[0]);
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow sphere: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow sphere created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aHollow sphere created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
+	}
 }

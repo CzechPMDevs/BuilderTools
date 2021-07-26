@@ -24,43 +24,44 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Decorator;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use function count;
 use function is_numeric;
 use function str_replace;
 
 class DecorationCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/decoration", "Decoration commands", null, ["/d"]);
-    }
+	public function __construct() {
+		parent::__construct("/decoration", "Decoration commands", null, ["/d"]);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(count($args) <= 2) {
-            $sender->sendMessage("§cUsage: §7//d <decoration: id1:dmg1,id2,...> <radius> [percentage: 90%]");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(count($args) <= 2) {
+			$sender->sendMessage("§cUsage: §7//d <decoration: id1:dmg1,id2,...> <radius> [percentage: 90%]");
+			return;
+		}
 
-        if(!is_numeric($args[1])) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cUse integer for radius!");
-            return;
-        }
+		if(!is_numeric($args[1])) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cUse integer for radius!");
+			return;
+		}
 
-        $percentage = 90;
-        if(isset($args[2]) && is_numeric(str_replace("%", "", $args[2]))) {
-            $percentage = (int)($args[2]);
-        }
+		$percentage = 90;
+		if(isset($args[2]) && is_numeric(str_replace("%", "", $args[2]))) {
+			$percentage = (int) ($args[2]);
+		}
 
-        $result = Decorator::getInstance()->addDecoration($sender->getPosition(), $args[0], (int)($args[1]), $percentage, $sender);
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cAn error occurred whilst adding decoration: {$result->getErrorMessage()}");
-            return;
-        }
+		$result = Decorator::getInstance()->addDecoration($sender->getPosition(), $args[0], (int) ($args[1]), $percentage, $sender);
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cAn error occurred whilst adding decoration: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aDecoration placed!");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aDecoration placed!");
+	}
 }

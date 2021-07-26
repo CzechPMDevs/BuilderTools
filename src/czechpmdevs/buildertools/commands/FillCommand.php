@@ -27,32 +27,32 @@ use pocketmine\player\Player;
 
 class FillCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
-    }
+	public function __construct() {
+		parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!isset($args[0])) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!isset($args[0])) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cUsage: §7//fill <id1:meta1,id2:meta2,...>");
+			return;
+		}
 
-        if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-            return;
-        }
+		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+			return;
+		}
 
-        $result = Filler::getInstance()->directFill($sender, $firstPos, $secondPos, $args[0], false);
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
-            return;
-        }
+		$result = Filler::getInstance()->directFill($sender, $firstPos, $secondPos, $args[0], false);
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+	}
 }

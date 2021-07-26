@@ -27,23 +27,23 @@ use pocketmine\player\Player;
 
 class ClearInventoryCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/clearinventory", "Clear inventory", null, ["/ci"]);
-    }
+	public function __construct() {
+		parent::__construct("/clearinventory", "Clear inventory", null, ["/ci"]);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        $removed = 0;
-        foreach ($sender->getInventory()->getContents() as $index => $item) {
-            $sender->getInventory()->setItem($index, ItemFactory::air());
-            $removed++;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		$removed = 0;
+		foreach ($sender->getInventory()->getContents() as $index => $item) {
+			$sender->getInventory()->setItem($index, ItemFactory::air());
+			$removed++;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aInventory cleared, $removed items removed.");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aInventory cleared, $removed items removed.");
+	}
 }

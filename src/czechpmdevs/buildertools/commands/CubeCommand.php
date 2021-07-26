@@ -27,24 +27,24 @@ use pocketmine\player\Player;
 
 class CubeCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/cube", "Create cube", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/cube", "Create cube", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!isset($args[0])) {
-            $sender->sendMessage("§7Usage: §c//cube <id1:dmg1,id2:dmg2,...> <radius>");
-            return;
-        }
-        $radius = isset($args[1]) ? (int)$args[1] : 5;
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!isset($args[0])) {
+			$sender->sendMessage("§7Usage: §c//cube <id1:dmg1,id2:dmg2,...> <radius>");
+			return;
+		}
+		$radius = isset($args[1]) ? (int) $args[1] : 5;
 
-        $result = Printer::getInstance()->makeCube($sender, $sender->getPosition(), $radius, (string)$args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aCube created, {$result->getBlocksChanged()} block changed (Took {$result->getProcessTime()} seconds)!");
-    }
+		$result = Printer::getInstance()->makeCube($sender, $sender->getPosition(), $radius, (string) $args[0]);
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aCube created, {$result->getBlocksChanged()} block changed (Took {$result->getProcessTime()} seconds)!");
+	}
 }

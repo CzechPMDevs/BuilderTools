@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
  *
@@ -28,30 +30,30 @@ use pocketmine\player\Player;
 
 class WandCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/wand", "Switch wand tool", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/wand", "Switch wand tool", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
-            $item = VanillaItems::WOODEN_AXE();
-            $item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
-            /** @phpstan-ignore-next-line */
-            $item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
-            $sender->getInventory()->addItem($item);
-            $sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
-            return;
-        }
+		if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
+			$item = VanillaItems::WOODEN_AXE();
+			$item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
+			/** @phpstan-ignore-next-line */
+			$item->addEnchantment(new EnchantmentInstance(EnchantmentIdMap::getInstance()->fromId(50), 1));
+			$sender->getInventory()->addItem($item);
+			$sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
+			return;
+		}
 
-        Selectors::switchWandSelector($sender);
-        $switch = Selectors::isWandSelector($sender) ? "ON" : "OFF";
-        $sender->sendMessage(BuilderTools::getPrefix()."§aWand tool turned $switch!");
-    }
+		Selectors::switchWandSelector($sender);
+		$switch = Selectors::isWandSelector($sender) ? "ON" : "OFF";
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aWand tool turned $switch!");
+	}
 }

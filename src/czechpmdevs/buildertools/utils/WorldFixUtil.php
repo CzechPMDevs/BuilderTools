@@ -33,86 +33,86 @@ use function is_dir;
 
 class WorldFixUtil {
 
-    /** @var string[] */
-    private static array $worldFixQueue = [];
+	/** @var string[] */
+	private static array $worldFixQueue = [];
 
-    public static function fixWorld(CommandSender $sender, string $worldName): void {
-        if(WorldFixUtil::isInWorldFixQueue($worldName)) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cServer is already fixing this world!");
-            return;
-        }
-        if(in_array($sender->getName(), WorldFixUtil::$worldFixQueue)) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix more than one world at the same time!");
-            return;
-        }
+	public static function fixWorld(CommandSender $sender, string $worldName): void {
+		if(WorldFixUtil::isInWorldFixQueue($worldName)) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cServer is already fixing this world!");
+			return;
+		}
+		if(in_array($sender->getName(), WorldFixUtil::$worldFixQueue, true)) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix more than one world at the same time!");
+			return;
+		}
 
-        if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld() == $worldName) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
-            return;
-        }
+		if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld() == $worldName) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
+			return;
+		}
 
-        $path = Server::getInstance()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $worldName;
-        if(!is_dir($path)) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cLevel not found.");
-            return;
-        }
+		$path = Server::getInstance()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $worldName;
+		if(!is_dir($path)) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cLevel not found.");
+			return;
+		}
 
-        WorldFixUtil::$worldFixQueue[$worldName] = $sender->getName();
+		WorldFixUtil::$worldFixQueue[$worldName] = $sender->getName();
 
-        if(Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
-            /** @phpstan-ignore-next-line */
-            Server::getInstance()->getWorldManager()->unloadWorld(Server::getInstance()->getWorldManager()->getWorldByName($worldName), true);
-        }
+		if(Server::getInstance()->getWorldManager()->isWorldLoaded($worldName)) {
+			/** @phpstan-ignore-next-line */
+			Server::getInstance()->getWorldManager()->unloadWorld(Server::getInstance()->getWorldManager()->getWorldByName($worldName), true);
+		}
 
-        $asyncTask = new WorldFixTask($path);
+		$asyncTask = new WorldFixTask($path);
 
-        BuilderTools::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($asyncTask): void { // Delay until the world will be fully saved
-            Server::getInstance()->getAsyncPool()->submitTask($asyncTask);
-        }), 60);
+		BuilderTools::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($asyncTask): void { // Delay until the world will be fully saved
+			Server::getInstance()->getAsyncPool()->submitTask($asyncTask);
+		}), 60);
 
-        /** @var ClosureTask $task */
-        $task = null;
+		/** @var ClosureTask $task */
+		$task = null;
 
-        BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function () use ($worldName, $asyncTask, $sender, &$task): void {
-            if($sender instanceof Player) {
-                if($sender->isOnline()) {
-                    $sender->sendTip("§aWorld $worldName is fixed from $asyncTask->percent%.");
-                } else {
-                    $asyncTask->forceStop = true;
-                    goto finish;
-                }
-            }
+		BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function () use ($worldName, $asyncTask, $sender, &$task): void {
+			if($sender instanceof Player) {
+				if($sender->isOnline()) {
+					$sender->sendTip("§aWorld $worldName is fixed from $asyncTask->percent%.");
+				} else {
+					$asyncTask->forceStop = true;
+					goto finish;
+				}
+			}
 
-            if($asyncTask->error != "") {
-                $sender->sendMessage(BuilderTools::getPrefix() . "§c" . $asyncTask->error);
-                goto finish;
-            }
+			if($asyncTask->error != "") {
+				$sender->sendMessage(BuilderTools::getPrefix() . "§c" . $asyncTask->error);
+				goto finish;
+			}
 
-            if($asyncTask->done) {
-                $sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time seconds, ($asyncTask->chunkCount chunks updated)!");
+			if($asyncTask->done) {
+				$sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time seconds, ($asyncTask->chunkCount chunks updated)!");
 
-                finish:
-                $handler = $task->getHandler();
-                if($handler !== null) {
-                    $handler->cancel(); // TODO - Check if it's cancelled right
-                }
-                WorldFixUtil::finishWorldFixTask($asyncTask);
-            }
-        }), 60, 2);
+				finish:
+				$handler = $task->getHandler();
+				if($handler !== null) {
+					$handler->cancel(); // TODO - Check if it's cancelled right
+				}
+				WorldFixUtil::finishWorldFixTask($asyncTask);
+			}
+		}), 60, 2);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aFixing the world...");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aFixing the world...");
+	}
 
-    public static function isInWorldFixQueue(string $levelName): bool {
-        return array_key_exists($levelName, WorldFixUtil::$worldFixQueue);
-    }
+	public static function isInWorldFixQueue(string $levelName): bool {
+		return array_key_exists($levelName, WorldFixUtil::$worldFixQueue);
+	}
 
-    /**
-     * @internal
-     *
-     * @param WorldFixTask<mixed> $task
-     */
-    public static function finishWorldFixTask(WorldFixTask $task): void {
-        unset(WorldFixUtil::$worldFixQueue[basename($task->worldPath)]);
-    }
+	/**
+	 * @internal
+	 *
+	 * @param WorldFixTask<mixed> $task
+	 */
+	public static function finishWorldFixTask(WorldFixTask $task): void {
+		unset(WorldFixUtil::$worldFixQueue[basename($task->worldPath)]);
+	}
 }

@@ -31,6 +31,7 @@ use function file_get_contents;
 use function file_put_contents;
 use function memory_get_usage;
 use function microtime;
+use function round;
 use function unlink;
 use function zlib_decode;
 use function zlib_encode;
@@ -38,73 +39,72 @@ use const ZLIB_ENCODING_GZIP;
 
 final class OfflineSession {
 
-    public static function savePlayerSession(Player $player): void {
-        if(BuilderTools::getConfiguration()["discard-sessions"] ?? false) {
-            unset(ClipboardManager::$clipboards[$player->getName()]);
-            return;
-        }
+	public static function savePlayerSession(Player $player): void {
+		if(BuilderTools::getConfiguration()["discard-sessions"] ?? false) {
+			unset(ClipboardManager::$clipboards[$player->getName()]);
+			return;
+		}
 
-        $time = microtime(true);
-        $memory = memory_get_usage();
+		$time = microtime(true);
+		$memory = memory_get_usage();
 
-        $nbt = new CompoundTag();
+		$nbt = new CompoundTag();
 
-        // Clipboard
-        if(ClipboardManager::hasClipboardCopied($player)) {
-            /** @phpstan-var SelectionData $clipboard */
-            $clipboard = ClipboardManager::getClipboard($player);
+		// Clipboard
+		if(ClipboardManager::hasClipboardCopied($player)) {
+			/** @phpstan-var SelectionData $clipboard */
+			$clipboard = ClipboardManager::getClipboard($player);
 
-            $clipboard->compress();
+			$clipboard->compress();
 
-            $nbt->setTag("Clipboard", (new CompoundTag())
-                ->setByteArray("Coordinates", $clipboard->compressedCoords)
-                ->setByteArray("Blocks", $clipboard->compressedBlocks)
-                ->setByteArray("RelativePosition", $clipboard->compressedPlayerPosition)
-            );
+			$nbt->setTag("Clipboard", (new CompoundTag())
+				->setByteArray("Coordinates", $clipboard->compressedCoords)
+				->setByteArray("Blocks", $clipboard->compressedBlocks)
+				->setByteArray("RelativePosition", $clipboard->compressedPlayerPosition)
+			);
 
+			unset(ClipboardManager::$clipboards[$player->getName()]);
+		}
 
-            unset(ClipboardManager::$clipboards[$player->getName()]);
-        }
+		// TODO - Undo / Redo data
+		file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP));
+		unset($nbt);
 
-        // TODO - Undo / Redo data
-        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP));
-        unset($nbt);
+		BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 ** 2), 3) . "Mb ram)");
+	}
 
-        BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 ** 2), 3) . "Mb ram)");
-    }
+	public static function loadPlayerSession(Player $player): void {
+		if(!file_exists($path = BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat")) {
+			return;
+		}
 
-    public static function loadPlayerSession(Player $player): void {
-        if(!file_exists($path = BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat")) {
-            return;
-        }
+		$buffer = file_get_contents($path);
+		if(!$buffer || !@unlink($path)) {
+			return;
+		}
 
-        $buffer = file_get_contents($path);
-        if(!$buffer || !@unlink($path)) {
-            return;
-        }
+		if(!($buffer = zlib_decode($buffer))) {
+			return;
+		}
 
-        if(!($buffer = zlib_decode($buffer))) {
-            return;
-        }
+		$nbt = (new BigEndianNbtSerializer())->read($buffer)->getTag();
+		if(!$nbt instanceof CompoundTag) {
+			return;
+		}
 
-        $nbt = (new BigEndianNbtSerializer())->read($buffer)->getTag();
-        if(!$nbt instanceof CompoundTag) {
-            return;
-        }
+		// Clipboard
+		if($nbt->getTag("Clipboard") instanceof CompoundTag) {
+			/** @var CompoundTag $clipboardTag */
+			$clipboardTag = $nbt->getCompoundTag("Clipboard");
 
-        // Clipboard
-        if($nbt->getTag("Clipboard") instanceof CompoundTag) {
-            /** @var CompoundTag $clipboardTag */
-            $clipboardTag = $nbt->getCompoundTag("Clipboard");
+			$clipboard = new SelectionData();
+			$clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
+			$clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
+			$clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
 
-            $clipboard = new SelectionData();
-            $clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
-            $clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
-            $clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
+			$clipboard->decompress();
 
-            $clipboard->decompress();
-
-            ClipboardManager::saveClipboard($player, $clipboard);
-        }
-    }
+			ClipboardManager::saveClipboard($player, $clipboard);
+		}
+	}
 }

@@ -30,73 +30,73 @@ use const M_PI;
 
 class Math {
 
-    public const PI_360 = M_PI * 2;
+	public const PI_360 = M_PI * 2;
 
-    /**
-     * Returns distance^2 between (0, 0) and (x, y)
-     *
-     * @param int|float $x
-     * @param int|float $y
-     *
-     * @return int|float
-     */
-    public static function lengthSquared2d($x, $y) {
-        return ($x ** 2) + ($y ** 2);
-    }
+	/**
+	 * Returns distance^2 between (0, 0) and (x, y)
+	 *
+	 * @param int|float $x
+	 * @param int|float $y
+	 *
+	 * @return int|float
+	 */
+	public static function lengthSquared2d($x, $y) {
+		return ($x ** 2) + ($y ** 2);
+	}
 
-    /**
-     * Returns distance^2 between (0, 0, 0) and (x, y, z)
-     *
-     * @param int|float $x
-     * @param int|float $y
-     * @param int|float $z
-     *
-     * @return int|float
-     */
-    public static function lengthSquared3d($x, $y, $z) {
-        return ($x ** 2) + ($y ** 2) + ($z ** 2);
-    }
+	/**
+	 * Returns distance^2 between (0, 0, 0) and (x, y, z)
+	 *
+	 * @param int|float $x
+	 * @param int|float $y
+	 * @param int|float $z
+	 *
+	 * @return int|float
+	 */
+	public static function lengthSquared3d($x, $y, $z) {
+		return ($x ** 2) + ($y ** 2) + ($z ** 2);
+	}
 
-    /**
-     * Same as function Player->getDirection() from PocketMine-MP 3.x
-     * @link https://github.com/pmmp/PocketMine-MP/blob/92fd2d35a4e11fbd1228d5691f0897cc0914aeb1/src/pocketmine/entity/Entity.php#L1313
-     */
-    public static function getPlayerDirection(Player $player): int {
-        $rotation = fmod($player->getLocation()->getYaw() - 90, 360);
-        if($rotation < 0){
-            $rotation += 360.0;
-        }
-        if((0 <= $rotation and $rotation < 45) or (315 <= $rotation and $rotation < 360)){
-            return 2; //North
-        }elseif(45 <= $rotation and $rotation < 135){
-            return 3; //East
-        }elseif(135 <= $rotation and $rotation < 225){
-            return 0; //South
-        }elseif(225 <= $rotation and $rotation < 315){
-            return 1; //West
-        }else{
-            return -1;
-        }
-    }
+	/**
+	 * Same as function Player->getDirection() from PocketMine-MP 3.x
+	 * @link https://github.com/pmmp/PocketMine-MP/blob/92fd2d35a4e11fbd1228d5691f0897cc0914aeb1/src/pocketmine/entity/Entity.php#L1313
+	 */
+	public static function getPlayerDirection(Player $player): int {
+		$rotation = fmod($player->getLocation()->getYaw() - 90, 360);
+		if($rotation < 0){
+			$rotation += 360.0;
+		}
+		if((0 <= $rotation and $rotation < 45) or (315 <= $rotation and $rotation < 360)){
+			return 2; //North
+		}elseif(45 <= $rotation and $rotation < 135){
+			return 3; //East
+		}elseif(135 <= $rotation and $rotation < 225){
+			return 0; //South
+		}elseif(225 <= $rotation and $rotation < 315){
+			return 1; //West
+		}else{
+			return -1;
+		}
+	}
 
-    public static function calculateMinAndMaxValues(Vector3 $pos1, Vector3 $pos2, bool $clampY, ?int &$minX, ?int &$maxX, ?int &$minY, ?int &$maxY, ?int &$minZ, ?int &$maxZ): void {
-        $minX = (int)min($pos1->getX(), $pos2->getX());
-        $maxX = (int)max($pos1->getX(), $pos2->getX());
-        $minZ = (int)min($pos1->getZ(), $pos2->getZ());
-        $maxZ = (int)max($pos1->getZ(), $pos2->getZ());
+	public static function calculateMinAndMaxValues(Vector3 $pos1, Vector3 $pos2, bool $clampY, ?int &$minX, ?int &$maxX, ?int &$minY, ?int &$maxY, ?int &$minZ, ?int &$maxZ): void {
+		$minX = (int) min($pos1->getX(), $pos2->getX());
+		$maxX = (int) max($pos1->getX(), $pos2->getX());
+		$minZ = (int) min($pos1->getZ(), $pos2->getZ());
+		$maxZ = (int) max($pos1->getZ(), $pos2->getZ());
 
-        if($clampY) {
-            $minY = (int)max(min($pos1->getY(), $pos2->getY(), World::Y_MAX), 0);
-            $maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX);
-        } else {
-            $minY = (int)min($pos1->getY(), $pos2->getY());
-            $maxY = (int)max($pos1->getY(), $pos2->getY());
-        }
-    }
+		if($clampY) {
+			$minY = (int) max(min($pos1->getY(), $pos2->getY(), World::Y_MAX), 0);
+			$maxY = (int) min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX);
+		} else {
+			$minY = (int) min($pos1->getY(), $pos2->getY());
+			$maxY = (int) max($pos1->getY(), $pos2->getY());
+		}
+	}
 
-    public static function selectionSize(Vector3 $pos1, Vector3 $pos2): int {
-        Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+	public static function selectionSize(Vector3 $pos1, Vector3 $pos2): int {
+		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        return (($maxX - $minX) + 1) * (($maxY - $minY) + 1) * (($maxZ - $minZ) + 1);
-    }
+		return (($maxX - $minX) + 1) * (($maxY - $minY) + 1) * (($maxZ - $minZ) + 1);
+	}
 }

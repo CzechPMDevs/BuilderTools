@@ -22,32 +22,31 @@ namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
 class SingleBlockIdentifier implements BlockIdentifierList {
 
-    /** @var int */
-    protected int $id;
-    /** @var int  */
-    protected int $meta;
+	protected int $id;
 
-    public function __construct(int $id, ?int $meta = null) {
-        $this->id = $id;
-        if($meta !== null) {
-            $this->meta = $meta;
-        }
-    }
+	protected int $meta;
 
-    public function nextBlock(?int &$id, ?int &$meta): void {
-        $id = $this->id;
-        $meta = $this->meta;
-    }
+	public function __construct(int $id, ?int $meta = null) {
+		$this->id = $id;
+		if($meta !== null) {
+			$this->meta = $meta;
+		}
+	}
 
-    public function containsBlock(int $blockHash): bool {
-        return isset($this->meta) ? $blockHash == ($this->id << 4 | $this->meta) : $blockHash >> 4 == $this->id;
-    }
+	public function nextBlock(?int &$id, ?int &$meta): void {
+		$id = $this->id;
+		$meta = $this->meta;
+	}
 
-    public function containsBlockId(int $id): bool {
-        return $this->id == $id;
-    }
+	public function containsBlock(int $blockHash): bool {
+		return isset($this->meta) ? $blockHash == ($this->id << 4 | $this->meta) : $blockHash >> 4 == $this->id;
+	}
 
-    public static function airIdentifier(): SingleBlockIdentifier {
-        return new SingleBlockIdentifier(0);
-    }
+	public function containsBlockId(int $id): bool {
+		return $this->id == $id;
+	}
+
+	public static function airIdentifier(): SingleBlockIdentifier {
+		return new SingleBlockIdentifier(0);
+	}
 }

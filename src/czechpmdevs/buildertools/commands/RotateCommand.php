@@ -26,56 +26,59 @@ use czechpmdevs\buildertools\utils\Axis;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use function is_numeric;
+use function microtime;
+use function round;
 
 class RotateCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/rotate", "Rotates selected area", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/rotate", "Rotates selected area", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
-            return;
-        }
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
+			return;
+		}
 
-        foreach ($args as $arg) {
-            if(!is_numeric($arg)) {
-                $sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
-                return;
-            }
+		foreach ($args as $arg) {
+			if(!is_numeric($arg)) {
+				$sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
+				return;
+			}
 
-            if(!RotationUtil::areDegreesValid((int)$arg)) {
-                $sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid degrees. You can rotate just about 90, 180 and 270 (-90) degrees!");
-                return;
-            }
-        }
+			if(!RotationUtil::areDegreesValid((int) $arg)) {
+				$sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid degrees. You can rotate just about 90, 180 and 270 (-90) degrees!");
+				return;
+			}
+		}
 
-        $startTime = microtime(true);
+		$startTime = microtime(true);
 
-        $copier = Copier::getInstance();
+		$copier = Copier::getInstance();
 
-        foreach ($args as $i => $arg) {
-            if($i === 0) {
-                $copier->rotate($sender, Axis::Y_AXIS, RotationUtil::getRotation((int)$arg));
-            }
-            elseif($i === 1) {
-                $copier->rotate($sender, Axis::X_AXIS, RotationUtil::getRotation((int)$arg));
-            }
-            elseif ($i === 2) {
-                $copier->rotate($sender, Axis::Z_AXIS, RotationUtil::getRotation((int)$arg));
-            }
-        }
+		foreach ($args as $i => $arg) {
+			if($i === 0) {
+				$copier->rotate($sender, Axis::Y_AXIS, RotationUtil::getRotation((int) $arg));
+			}
+			elseif($i === 1) {
+				$copier->rotate($sender, Axis::X_AXIS, RotationUtil::getRotation((int) $arg));
+			}
+			elseif ($i === 2) {
+				$copier->rotate($sender, Axis::Z_AXIS, RotationUtil::getRotation((int) $arg));
+			}
+		}
 
-        $time = round(microtime(true)-$startTime, 3);
+		$time = round(microtime(true)-$startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
+	}
 }

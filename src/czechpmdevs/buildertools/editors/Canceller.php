@@ -29,91 +29,91 @@ use pocketmine\utils\SingletonTrait;
 use function microtime;
 
 class Canceller {
-    use SingletonTrait;
+	use SingletonTrait;
 
-    public function addStep(Player $player, BlockArray $blocks): void {
-        ClipboardManager::saveUndo($player, $blocks);
-    }
+	public function addStep(Player $player, BlockArray $blocks): void {
+		ClipboardManager::saveUndo($player, $blocks);
+	}
 
-    public function undo(Player $player): EditorResult {
-        $error = function (): EditorResult {
-            return EditorResult::error("There are not any actions to undo");
-        };
+	public function undo(Player $player): EditorResult {
+		$error = function (): EditorResult {
+			return EditorResult::error("There are not any actions to undo");
+		};
 
-        if(!ClipboardManager::hasActionToUndo($player)) {
-            return $error();
-        }
+		if(!ClipboardManager::hasActionToUndo($player)) {
+			return $error();
+		}
 
-        $undoAction = ClipboardManager::getNextUndoAction($player);
-        if($undoAction === null) {
-            return $error();
-        }
+		$undoAction = ClipboardManager::getNextUndoAction($player);
+		if($undoAction === null) {
+			return $error();
+		}
 
-        if($undoAction->getWorld() === null) {
-            return EditorResult::error("Could not find world to process updates on.");
-        }
+		if($undoAction->getWorld() === null) {
+			return EditorResult::error("Could not find world to process updates on.");
+		}
 
-        $startTime = microtime(true);
-        $fillSession = new FillSession($undoAction->getWorld(), true, true);
+		$startTime = microtime(true);
+		$fillSession = new FillSession($undoAction->getWorld(), true, true);
 
-        $undoAction->load();
-        while ($undoAction->hasNext()) {
-            $undoAction->readNext($x, $y, $z, $id, $meta);
-            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
-        }
+		$undoAction->load();
+		while ($undoAction->hasNext()) {
+			$undoAction->readNext($x, $y, $z, $id, $meta);
+			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+		}
 
-        $fillSession->reloadChunks($player->getWorld());
-        $fillSession->close();
+		$fillSession->reloadChunks($player->getWorld());
+		$fillSession->close();
 
-        /** @var BlockArray $updates */
-        $updates = $fillSession->getChanges();
-        $updates->save();
+		/** @var BlockArray $updates */
+		$updates = $fillSession->getChanges();
+		$updates->save();
 
-        Canceller::getInstance()->addRedo($player, $updates);
+		Canceller::getInstance()->addRedo($player, $updates);
 
-        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-    }
+		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+	}
 
-    public function addRedo(Player $player, BlockArray $blocks): void {
-        ClipboardManager::saveRedo($player, $blocks);
-    }
+	public function addRedo(Player $player, BlockArray $blocks): void {
+		ClipboardManager::saveRedo($player, $blocks);
+	}
 
-    public function redo(Player $player): EditorResult {
-        $error = function (): EditorResult {
-            return EditorResult::error("There are not any actions to undo");
-        };
+	public function redo(Player $player): EditorResult {
+		$error = function (): EditorResult {
+			return EditorResult::error("There are not any actions to undo");
+		};
 
-        if(!ClipboardManager::hasActionToRedo($player)) {
-            return $error();
-        }
+		if(!ClipboardManager::hasActionToRedo($player)) {
+			return $error();
+		}
 
-        $redoAction = ClipboardManager::getNextRedoAction($player);
-        if($redoAction === null) {
-            return $error();
-        }
+		$redoAction = ClipboardManager::getNextRedoAction($player);
+		if($redoAction === null) {
+			return $error();
+		}
 
-        if($redoAction->getWorld() === null) {
-            return EditorResult::error("Could not find world to process updates on.");
-        }
+		if($redoAction->getWorld() === null) {
+			return EditorResult::error("Could not find world to process updates on.");
+		}
 
-        $startTime = microtime(true);
-        $fillSession = new FillSession($redoAction->getWorld(), true, true);
+		$startTime = microtime(true);
+		$fillSession = new FillSession($redoAction->getWorld(), true, true);
 
-        $redoAction->load();
-        while ($redoAction->hasNext()) {
-            $redoAction->readNext($x, $y, $z, $id, $meta);
-            $fillSession->setBlockAt($x, $y, $z, $id, $meta);
-        }
+		$redoAction->load();
+		while ($redoAction->hasNext()) {
+			$redoAction->readNext($x, $y, $z, $id, $meta);
+			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+		}
 
-        $fillSession->reloadChunks($player->getWorld());
-        $fillSession->close();
+		$fillSession->reloadChunks($player->getWorld());
+		$fillSession->close();
 
-        /** @var BlockArray $updates */
-        $updates = $fillSession->getChanges();
-        $updates->save();
+		/** @var BlockArray $updates */
+		$updates = $fillSession->getChanges();
+		$updates->save();
 
-        Canceller::getInstance()->addStep($player, $updates);
+		Canceller::getInstance()->addStep($player, $updates);
 
-        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-    }
+		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+	}
 }

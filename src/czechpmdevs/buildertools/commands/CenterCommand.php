@@ -27,46 +27,46 @@ use pocketmine\player\Player;
 
 class CenterCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/center", "Makes pattern blocks in the middle of selection");
-    }
+	public function __construct() {
+		parent::__construct("/center", "Makes pattern blocks in the middle of selection");
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-            return;
-        }
+		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+			return;
+		}
 
-        $center = $firstPos->add($secondPos)->divide(2);
+		$center = $firstPos->add($secondPos)->divide(2);
 
-        $min = $center->ceil();
-        $max = $center->ceil();
+		$min = $center->ceil();
+		$max = $center->ceil();
 
-        if($center->getX() != $center->getFloorX()) {
-            $max->x = $center->getFloorX() + 1;
-        }
-        if($center->getY() != $center->getFloorY()) {
-            $max->y = $center->getFloorY() + 1;
-        }
-        if($center->getZ() != $center->getFloorZ()) {
-            $max->z = $center->getFloorZ() + 1;
-        }
+		if($center->getX() != $center->getFloorX()) {
+			$max->x = $center->getFloorX() + 1;
+		}
+		if($center->getY() != $center->getFloorY()) {
+			$max->y = $center->getFloorY() + 1;
+		}
+		if($center->getZ() != $center->getFloorZ()) {
+			$max->z = $center->getFloorZ() + 1;
+		}
 
-        for($x = $min->getFloorX(); $x <= $max->getFloorX(); ++$x) {
-            for($y = $min->getFloorY(); $y <= $max->getFloorY(); ++$y) {
-                for($z = $min->getFloorZ(); $z <= $max->getFloorZ(); ++$z) {
-                    $firstPos->getLevelNonNull()->setBlockIdAt($x, $y, $z, BlockLegacyIds::BEDROCK);
-                    $firstPos->getLevelNonNull()->setBlockDataAt($x, $y, $z, 0);
-                }
-            }
-        }
+		for($x = $min->getFloorX(); $x <= $max->getFloorX(); ++$x) {
+			for($y = $min->getFloorY(); $y <= $max->getFloorY(); ++$y) {
+				for($z = $min->getFloorZ(); $z <= $max->getFloorZ(); ++$z) {
+					$firstPos->getLevelNonNull()->setBlockIdAt($x, $y, $z, BlockLegacyIds::BEDROCK);
+					$firstPos->getLevelNonNull()->setBlockDataAt($x, $y, $z, 0);
+				}
+			}
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "Center of the selection found at {$center->getX()}, {$center->getY()}, {$center->getZ()}");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "Center of the selection found at {$center->getX()}, {$center->getY()}, {$center->getZ()}");
+	}
 }

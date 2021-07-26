@@ -23,51 +23,52 @@ namespace czechpmdevs\buildertools;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use pocketmine\player\Player;
+use function array_key_exists;
 use function array_pop;
 
 class ClipboardManager {
 
-    /** @var SelectionData[] */
-    public static array $clipboards = [];
+	/** @var SelectionData[] */
+	public static array $clipboards = [];
 
-    /** @var BlockArray[][] */
-    public static array $undoData = [];
-    /** @var BlockArray[][] */
-    public static array $redoData = [];
+	/** @var BlockArray[][] */
+	public static array $undoData = [];
+	/** @var BlockArray[][] */
+	public static array $redoData = [];
 
-    public static function getClipboard(Player $player): ?SelectionData {
-        return clone ClipboardManager::$clipboards[$player->getName()] ?? null;
-    }
+	public static function getClipboard(Player $player): ?SelectionData {
+		return clone ClipboardManager::$clipboards[$player->getName()] ?? null;
+	}
 
-    public static function hasClipboardCopied(Player $player): bool {
-        return array_key_exists($player->getName(), ClipboardManager::$clipboards);
-    }
+	public static function hasClipboardCopied(Player $player): bool {
+		return array_key_exists($player->getName(), ClipboardManager::$clipboards);
+	}
 
-    public static function saveClipboard(Player $player, SelectionData $data): void {
-        ClipboardManager::$clipboards[$player->getName()] = $data;
-    }
-    
-    public static function getNextUndoAction(Player $player): ?BlockArray {
-        return array_pop(ClipboardManager::$undoData[$player->getName()]);
-    }
-    
-    public static function hasActionToUndo(Player $player): bool {
-        return array_key_exists($player->getName(), ClipboardManager::$undoData) && !empty(ClipboardManager::$undoData[$player->getName()]);
-    }
-    
-    public static function saveUndo(Player $player, BlockArray $array): void {
-        ClipboardManager::$undoData[$player->getName()][] = $array;
-    }
-    
-    public static function getNextRedoAction(Player $player): ?BlockArray {
-        return array_pop(ClipboardManager::$redoData[$player->getName()]);
-    }
-    
-    public static function hasActionToRedo(Player $player): bool {
-        return array_key_exists($player->getName(), ClipboardManager::$redoData) && !empty(ClipboardManager::$redoData[$player->getName()]);
-    }
-    
-    public static function saveRedo(Player $player, BlockArray $array): void {
-        ClipboardManager::$redoData[$player->getName()][] = $array;
-    }
+	public static function saveClipboard(Player $player, SelectionData $data): void {
+		ClipboardManager::$clipboards[$player->getName()] = $data;
+	}
+
+	public static function getNextUndoAction(Player $player): ?BlockArray {
+		return array_pop(ClipboardManager::$undoData[$player->getName()]);
+	}
+
+	public static function hasActionToUndo(Player $player): bool {
+		return array_key_exists($player->getName(), ClipboardManager::$undoData) && !empty(ClipboardManager::$undoData[$player->getName()]);
+	}
+
+	public static function saveUndo(Player $player, BlockArray $array): void {
+		ClipboardManager::$undoData[$player->getName()][] = $array;
+	}
+
+	public static function getNextRedoAction(Player $player): ?BlockArray {
+		return array_pop(ClipboardManager::$redoData[$player->getName()]);
+	}
+
+	public static function hasActionToRedo(Player $player): bool {
+		return array_key_exists($player->getName(), ClipboardManager::$redoData) && !empty(ClipboardManager::$redoData[$player->getName()]);
+	}
+
+	public static function saveRedo(Player $player, BlockArray $array): void {
+		ClipboardManager::$redoData[$player->getName()][] = $array;
+	}
 }

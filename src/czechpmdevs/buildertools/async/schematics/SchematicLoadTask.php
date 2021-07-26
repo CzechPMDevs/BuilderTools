@@ -31,54 +31,51 @@ use function serialize;
 
 class SchematicLoadTask extends BuilderToolsAsyncTask {
 
-    /** @var string */
-    public string $file;
+	public string $file;
 
-    /** @var string */
-    public string $name;
-    /** @var string */
-    public string $blockArray;
+	public string $name;
 
-    /** @var string|null */
-    public ?string $error = null;
+	public string $blockArray;
 
-    public function __construct(string $file) {
-        $this->file = $file;
-    }
+	public ?string $error = null;
 
-    /** @noinspection PhpUnused */
-    public function onRun(): void {
-        if(!file_exists($this->file)) {
-            $this->error = "File not found.";
-            return;
-        }
+	public function __construct(string $file) {
+		$this->file = $file;
+	}
 
-        $rawData = file_get_contents($this->file);
-        if($rawData === false) {
-            $this->error = "Could not read file $this->file";
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function onRun(): void {
+		if(!file_exists($this->file)) {
+			$this->error = "File not found.";
+			return;
+		}
 
-        SchematicsManager::lazyInit();
+		$rawData = file_get_contents($this->file);
+		if($rawData === false) {
+			$this->error = "Could not read file $this->file";
+			return;
+		}
 
-        $format = SchematicsManager::getSchematicFormat($rawData);
-        if($format === null) {
-            $this->error = "Unrecognised format";
-            return;
-        }
+		SchematicsManager::lazyInit();
 
-        /** @var Schematic $schematic */
-        $schematic = new $format;
+		$format = SchematicsManager::getSchematicFormat($rawData);
+		if($format === null) {
+			$this->error = "Unrecognised format";
+			return;
+		}
 
-        try {
-            $blockArray = $schematic->load($rawData);
-        }
-        catch (SchematicException $exception) {
-            $this->error = $exception->getMessage();
-            return;
-        }
+		/** @var Schematic $schematic */
+		$schematic = new $format;
 
-        $this->name = basename($this->file, "." . $schematic::getFileExtension());
-        $this->blockArray = serialize($blockArray);
-    }
+		try {
+			$blockArray = $schematic->load($rawData);
+		}
+		catch (SchematicException $exception) {
+			$this->error = $exception->getMessage();
+			return;
+		}
+
+		$this->name = basename($this->file, "." . $schematic::getFileExtension());
+		$this->blockArray = serialize($blockArray);
+	}
 }
