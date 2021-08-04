@@ -13,8 +13,14 @@ permissions:
   buildertools.command:
     default: op
     description: Permissions for all BuilderTools commands
+  buildertools.command.biome:
+    description: Permissions for //blockinfo
+    default: op
   buildertools.command.blockinfo:
     description: Permissions for //blockinfo
+    default: op
+  buildertools.command.center:
+    description: Permissions for //center
     default: op
   buildertools.command.clearinventory:
     description: Permissions for //clearinventory
@@ -46,6 +52,9 @@ permissions:
   buildertools.command.fix:
     descripion: Permissions for //fix
     default: op
+  buildertools.command.flip:
+    descripion: Permissions for //flip
+    default: op
   buildertools.command.help:
     description: Permissions for //commands
     default: op
@@ -55,7 +64,7 @@ permissions:
   buildertools.command.hcylinder:
     description: Permission for //hcylinder
     default: op
-  buildertools.command.hpyrdamid:
+  buildertools.command.hpyramid:
     description: Permission for //hpyramid
     default: op
   buildertools.command.hsphere:
@@ -63,6 +72,9 @@ permissions:
     default: op
   buildertools.command.id:
     description: Permissions for //id
+    default: op
+  buildertools.command.island:
+    description: Permissions for //island
     default: op
   buildertools.command.merge:
     description: Permissions for //merge
@@ -79,7 +91,7 @@ permissions:
   buildertools.command.paste:
     description: Permissions for //paste
     default: op
-  buildertools.command.pyrdamid:
+  buildertools.command.pyramid:
     description: Permission for //pyramid
     default: op
   buildertools.command.redo:
