@@ -45,8 +45,8 @@ class CenterCommand extends BuilderToolsCommand {
 
 		$center = $firstPos->add($secondPos)->divide(2);
 
-		$min = $center->ceil();
-		$max = $center->ceil();
+		$min = $center->floor();
+		$max = $center->floor();
 
 		if($center->getX() != $center->getFloorX()) {
 			$max->x = $center->getFloorX() + 1;

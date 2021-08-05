@@ -36,7 +36,7 @@ class SelectionData extends BlockArray {
 	 * @param bool $modifyBuffer If it's false, only relative position will be changed.
 	 */
 	public function addVector3(Vector3 $vector3, bool $modifyBuffer = false): BlockArray {
-		if(!$vector3->ceil()->equals($vector3)) {
+		if(!$vector3->floor()->equals($vector3)) {
 			throw new InvalidArgumentException("Vector3 coordinates must be integer.");
 		}
 
@@ -59,7 +59,7 @@ class SelectionData extends BlockArray {
 	 * @return $this
 	 */
 	public function setPlayerPosition(?Vector3 $playerPosition): SelectionData {
-		$this->playerPosition = $playerPosition === null ? null : $playerPosition->ceil();
+		$this->playerPosition = $playerPosition === null ? null : $playerPosition->floor();
 
 		return $this;
 	}

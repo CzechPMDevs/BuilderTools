@@ -49,13 +49,13 @@ class RotateCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		foreach ($args as $arg) {
-			if(!is_numeric($arg)) {
+		foreach ($args as $argument) {
+			if(!is_numeric($argument)) {
 				$sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
 				return;
 			}
 
-			if(!RotationUtil::areDegreesValid((int) $arg)) {
+			if(!RotationUtil::isDegreeValueValid((int) $argument)) {
 				$sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid degrees. You can rotate just about 90, 180 and 270 (-90) degrees!");
 				return;
 			}

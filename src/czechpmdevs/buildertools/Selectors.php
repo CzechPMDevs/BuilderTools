@@ -72,7 +72,7 @@ class Selectors {
 		if($pos != 1 && $pos != 2) {
 			throw new InvalidArgumentException("Player can select only two positions");
 		}
-		if(!$position->equals($position->ceil())) {
+		if(!$position->equals($position->floor())) {
 			throw new InvalidArgumentException("Position coordinates must be integer type.");
 		}
 

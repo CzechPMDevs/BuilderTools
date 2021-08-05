@@ -24,12 +24,10 @@ use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
 use function atan2;
-use function cos;
 use function deg2rad;
 use function fmod;
 use function in_array;
 use function round;
-use function sin;
 use function sqrt;
 
 class RotationUtil {
@@ -61,8 +59,8 @@ class RotationUtil {
 					RotationHelper::rotate($deg, $id, $meta);
 
 					$dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $z - $diff->getZ()));
-					$alfa = fmod(atan2($z - $diff->getZ(), $x - $diff->getX()) + $rad, Math::PI_360);
-					$modifiedBlockArray->addBlock(new Vector3((int) round($dist * cos($alfa)) + $diff->getX(), $y, (int) round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
+					$alfa = atan2($z - $diff->getZ(), $x - $diff->getX()) + $rad;
+					$modifiedBlockArray->addBlock(new Vector3((int) round($dist * Math::cos($alfa)) + $diff->getX(), $y, (int) round($dist * Math::sin($alfa)) + $diff->getZ()), $id, $meta);
 				}
 
 				$blockArray->blocks = $modifiedBlockArray->blocks;
@@ -74,12 +72,13 @@ class RotationUtil {
 					$blockArray->readNext($x, $y, $z, $id, $meta);
 
 					$dist = sqrt(Math::lengthSquared2d($y - $diff->getY(), $z - $diff->getZ()));
-					$alfa = fmod(atan2($y - $diff->getY(), $z - $diff->getZ()) + $rad, Math::PI_360);
-					$y = (int) round($dist * cos($alfa)) + $diff->getX();
+					$alfa = atan2($y - $diff->getY(), $z - $diff->getZ()) + $rad;
+					$y = (int) round($dist * Math::cos($alfa)) + $diff->getX();
 					if($y < 0) {
 						continue;
 					}
-					$blockArray->addBlock(new Vector3($x, $y, (int) round($dist * sin($alfa)) + $diff->getZ()), $id, $meta);
+
+					$modifiedBlockArray->addBlock(new Vector3($x, $y, (int) round($dist * Math::sin($alfa)) + $diff->getZ()), $id, $meta);
 				}
 
 				$blockArray->coords = $modifiedBlockArray->coords;
@@ -90,12 +89,12 @@ class RotationUtil {
 					$blockArray->readNext($x, $y, $z, $id, $meta);
 
 					$dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $y - $diff->getY()));
-					$alfa = fmod(atan2($x - $diff->getX(), $y - $diff->getY()) + $rad, Math::PI_360);
-					$y = (int) round($dist * sin($alfa));
+					$alfa = atan2($x - $diff->getX(), $y - $diff->getY()) + $rad;
+					$y = (int) round($dist * Math::sin($alfa));
 					if($y < 0) {
 						continue;
 					}
-					$modifiedBlockArray->addBlock(new Vector3((int) round($dist * cos($alfa)), $y, $z), $id, $meta);
+					$modifiedBlockArray->addBlock(new Vector3((int) round($dist * Math::cos($alfa)), $y, $z), $id, $meta);
 				}
 
 				$blockArray->coords = $modifiedBlockArray->coords;
@@ -106,8 +105,8 @@ class RotationUtil {
 		}
 	}
 
-	public static function areDegreesValid(int $degrees): bool {
-		$degrees = fmod($degrees, 360);
+	public static function isDegreeValueValid(int $degrees): bool {
+		$degrees = (int) fmod($degrees, 360);
 
 		return in_array($degrees, RotationUtil::VALID_DEGREES, true);
 	}

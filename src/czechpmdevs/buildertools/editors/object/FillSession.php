@@ -33,17 +33,14 @@ class FillSession {
 	protected SubChunkExplorer $explorer;
 
 	protected bool $calculateDimensions;
-
 	protected bool $saveChanges;
 
 	protected ?BlockArray $changes = null;
 
 	protected int $minX, $maxX;
-
 	protected int $minZ, $maxZ;
 
 	protected int $blocksChanged = 0;
-
 	protected bool $error = false;
 
 	/**
@@ -202,7 +199,10 @@ class FillSession {
 					continue;
 				}
 
-				$world->setChunk($x, $z, $chunk);
+				$world->setChunk($x, $z, $chunk, false);
+				foreach ($world->getChunkPlayers($x, $z) as $player) {
+				    $player->doChunkRequests();
+                }
 			}
 		}
 	}

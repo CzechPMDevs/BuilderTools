@@ -59,6 +59,7 @@ use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WallsCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
+use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
 use pocketmine\plugin\PluginBase;
@@ -91,6 +92,7 @@ class BuilderTools extends PluginBase {
 		$this->initConfig();
 		$this->cleanCache();
 		$this->registerCommands();
+		$this->initMath();
 		$this->initListener();
 		$this->sendWarnings();
 		$this->loadSchematicsManager();
@@ -136,6 +138,10 @@ class BuilderTools extends PluginBase {
 
 	private function initListener(): void {
 		$this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener(), $this);
+	}
+
+	private function initMath(): void {
+		Math::init();
 	}
 
 	private function registerCommands(): void {

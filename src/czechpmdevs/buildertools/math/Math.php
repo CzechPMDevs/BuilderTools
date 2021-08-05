@@ -26,11 +26,29 @@ use pocketmine\world\World;
 use function fmod;
 use function max;
 use function min;
+use function sin;
 use const M_PI;
 
 class Math {
 
 	public const PI_360 = M_PI * 2;
+
+	/** @var float[] */
+	private static array $sinTable = [];
+
+	public static function init(): void {
+		for($i = 0; $i < 65536; ++$i) {
+			self::$sinTable[$i] = sin((float) $i * M_PI * 2.0 / 65536.0);
+		}
+	}
+
+	public static function sin(float $num): float {
+		return self::$sinTable[(int) ($num * 10430.378) & 0xffff];
+	}
+
+	public static function cos(float $num): float {
+		return self::$sinTable[(int) ($num * 10430.378 + 16384.0) & 0xffff];
+	}
 
 	/**
 	 * Returns distance^2 between (0, 0) and (x, y)

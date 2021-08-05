@@ -48,7 +48,7 @@ class Copier {
 	public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
 		$startTime = microtime(true);
 
-		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->ceil());
+		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -74,7 +74,7 @@ class Copier {
 	public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
 		$startTime = microtime(true);
 
-		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->ceil());
+		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
