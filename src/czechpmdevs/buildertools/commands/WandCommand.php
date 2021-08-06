@@ -23,8 +23,6 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
-use pocketmine\data\bedrock\EnchantmentIdMap;
-use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
 use pocketmine\nbt\NBT;
@@ -48,8 +46,8 @@ class WandCommand extends BuilderToolsCommand {
 		if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
 			$item = VanillaItems::WOODEN_AXE();
 			$item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
-            $item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
-            $item->getNamedTag()->setByte("buildertools", 1);
+			$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
+			$item->getNamedTag()->setByte("buildertools", 1);
 
 			$sender->getInventory()->addItem($item);
 			$sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");

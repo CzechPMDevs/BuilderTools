@@ -7,7 +7,7 @@ main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
 
 extensions:
-  Core: '>=7.4'
+  Core: '>=8.0'
 
 permissions:
   buildertools.command:

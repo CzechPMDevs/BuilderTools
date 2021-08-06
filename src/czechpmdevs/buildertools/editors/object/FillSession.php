@@ -201,8 +201,8 @@ class FillSession {
 
 				$world->setChunk($x, $z, $chunk, false);
 				foreach ($world->getChunkPlayers($x, $z) as $player) {
-				    $player->doChunkRequests();
-                }
+					$player->doChunkRequests();
+				}
 			}
 		}
 	}

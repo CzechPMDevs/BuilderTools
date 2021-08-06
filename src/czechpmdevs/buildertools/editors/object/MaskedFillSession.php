@@ -50,7 +50,7 @@ class MaskedFillSession extends FillSession {
 			) && (
 				!$this->mask->containsBlockId(
 					/** @phpstan-ignore-next-line */
-					$this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf) << 4
+					$this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf) >> 4
 				)
 			)
 		) {
