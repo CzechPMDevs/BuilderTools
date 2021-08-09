@@ -118,6 +118,9 @@ class Printer {
 		$startTime = microtime(true);
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 		$radius = abs($radius);
+		if($radius == 0) {
+			return EditorResult::error("Radius could not be 0");
+		}
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
@@ -213,6 +216,9 @@ class Printer {
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$radius = abs($radius);
+		if($radius == 0) {
+			return EditorResult::error("Radius could not be 0");
+		}
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
@@ -403,7 +409,7 @@ class Printer {
 		$currentRadius = (float) $radius;
 		$step = 1 / $step;
 		$y = $floorY;
-		while ($currentRadius > 0.8) {
+		while ($currentRadius > 0.1) {
 			$incDivX = 0;
 			for($x = 0; $x <= $currentRadius; ++$x) {
 				$divX = $incDivX;

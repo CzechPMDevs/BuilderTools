@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpUnused */
-
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
  *
@@ -30,7 +28,6 @@ final class BlockArraySizeData {
 	private BlockArray $blockArray;
 
 	public ?int $maxX = null, $maxY = null, $maxZ = null;
-
 	public ?int $minX = null, $minY = null, $minZ = null;
 
 	public function __construct(BlockArray $blockArray) {

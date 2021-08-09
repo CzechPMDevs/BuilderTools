@@ -31,14 +31,14 @@ use const M_PI;
 
 class Math {
 
-	public const PI_360 = M_PI * 2;
+	public const PI_360 = M_PI * 2.0;
 
 	/** @var float[] */
 	private static array $sinTable = [];
 
 	public static function init(): void {
 		for($i = 0; $i < 65536; ++$i) {
-			self::$sinTable[$i] = sin((float) $i * M_PI * 2.0 / 65536.0);
+			self::$sinTable[$i] = sin((float) $i * self::PI_360 / 65536.0);
 		}
 	}
 
@@ -100,16 +100,17 @@ class Math {
 	public static function calculateMinAndMaxValues(Vector3 $pos1, Vector3 $pos2, bool $clampY, ?int &$minX, ?int &$maxX, ?int &$minY, ?int &$maxY, ?int &$minZ, ?int &$maxZ): void {
 		$minX = (int) min($pos1->getX(), $pos2->getX());
 		$maxX = (int) max($pos1->getX(), $pos2->getX());
+		$minY = (int) min($pos1->getY(), $pos2->getY());
+		$maxY = (int) max($pos1->getY(), $pos2->getY());
 		$minZ = (int) min($pos1->getZ(), $pos2->getZ());
 		$maxZ = (int) max($pos1->getZ(), $pos2->getZ());
 
-		if($clampY) {
-			$minY = (int) max(min($pos1->getY(), $pos2->getY(), World::Y_MAX), 0);
-			$maxY = (int) min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX);
-		} else {
-			$minY = (int) min($pos1->getY(), $pos2->getY());
-			$maxY = (int) max($pos1->getY(), $pos2->getY());
+		if(!$clampY) {
+			return;
 		}
+
+		$minY = min(World::Y_MAX, max(World::Y_MIN, $minY));
+		$maxY = min(World::Y_MAX, max(World::Y_MIN, $maxX));
 	}
 
 	public static function selectionSize(Vector3 $pos1, Vector3 $pos2): int {

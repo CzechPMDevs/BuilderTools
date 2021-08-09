@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\utils;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
+use pocketmine\world\World;
 use function atan2;
 use function deg2rad;
 use function fmod;
@@ -74,7 +75,7 @@ class RotationUtil {
 					$dist = sqrt(Math::lengthSquared2d($y - $diff->getY(), $z - $diff->getZ()));
 					$alfa = atan2($y - $diff->getY(), $z - $diff->getZ()) + $rad;
 					$y = (int) round($dist * Math::cos($alfa)) + $diff->getX();
-					if($y < 0) {
+					if($y < World::Y_MIN || $y > World::Y_MAX) {
 						continue;
 					}
 
@@ -91,7 +92,7 @@ class RotationUtil {
 					$dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $y - $diff->getY()));
 					$alfa = atan2($x - $diff->getX(), $y - $diff->getY()) + $rad;
 					$y = (int) round($dist * Math::sin($alfa));
-					if($y < 0) {
+					if($y < World::Y_MIN || $y > World::Y_MAX) {
 						continue;
 					}
 					$modifiedBlockArray->addBlock(new Vector3((int) round($dist * Math::cos($alfa)), $y, $z), $id, $meta);

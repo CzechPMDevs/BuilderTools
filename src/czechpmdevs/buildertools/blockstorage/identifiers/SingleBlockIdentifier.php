@@ -23,7 +23,6 @@ namespace czechpmdevs\buildertools\blockstorage\identifiers;
 class SingleBlockIdentifier implements BlockIdentifierList {
 
 	protected int $id;
-
 	protected int $meta;
 
 	public function __construct(int $id, ?int $meta = null) {

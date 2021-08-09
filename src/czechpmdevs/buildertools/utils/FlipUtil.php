@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\utils;
 
 use czechpmdevs\buildertools\blockstorage\SelectionData;
+use pocketmine\world\World;
 
 class FlipUtil {
 
@@ -39,8 +40,12 @@ class FlipUtil {
 		} elseif($axis == Axis::Y_AXIS) { // x & z const
 			while ($selection->hasNext()) {
 				$selection->readNext($x, $y, $z, $id, $meta);
+				$y = (($sizeData->minY + $sizeData->maxY) - $y) + $motion;
+				if($y < World::Y_MIN || $y > World::Y_MAX) {
+					continue;
+				}
 				FlipHelper::flip($axis, $id, $meta);
-				$modifiedSelection->addBlockAt($x, (($sizeData->minY + $sizeData->maxY) - $y) + $motion, $z, $id, $meta);
+				$modifiedSelection->addBlockAt($x, $y, $z, $id, $meta);
 			}
 		} else {
 			while ($selection->hasNext()) { // x & y const

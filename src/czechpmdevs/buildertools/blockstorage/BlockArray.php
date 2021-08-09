@@ -47,8 +47,6 @@ use const ZLIB_ENCODING_GZIP;
 
 class BlockArray implements UpdateLevelData, Serializable {
 
-	protected bool $detectDuplicates;
-
 	/** @var int[] */
 	public array $blocks = [];
 	/** @var int[] */
@@ -58,11 +56,12 @@ class BlockArray implements UpdateLevelData, Serializable {
 
 	protected ?ChunkManager $world = null;
 
+	protected bool $detectDuplicates;
+
 	protected bool $isCompressed = false;
 
-	public string $compressedCoords;
-
 	public string $compressedBlocks;
+	public string $compressedCoords;
 
 	public int $offset = 0;
 
@@ -197,9 +196,6 @@ class BlockArray implements UpdateLevelData, Serializable {
 
 		// TODO - Optimize this
 		$blocks = array_combine(array_reverse($this->coords, true), array_reverse($this->blocks, true));
-		if($blocks === false) {
-			return;
-		}
 
 		$this->coords = array_keys($blocks);
 		$this->blocks = array_values($blocks);
