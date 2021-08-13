@@ -35,76 +35,76 @@ use function unlink;
 
 final class OfflineSession {
 
-    public static function savePlayerSession(Player $player): void {
-        if(BuilderTools::getConfiguration()["discard-sessions"] ?? false) {
-            unset(ClipboardManager::$clipboards[$player->getName()]);
-            return;
-        }
+	public static function savePlayerSession(Player $player): void {
+		if(BuilderTools::getConfiguration()["discard-sessions"] ?? false) {
+			unset(ClipboardManager::$clipboards[$player->getName()]);
+			return;
+		}
 
-        $time = microtime(true);
-        $memory = memory_get_usage();
+		$time = microtime(true);
+		$memory = memory_get_usage();
 
-        $nbt = new CompoundTag();
+		$nbt = new CompoundTag();
 
-        // Clipboard
-        if(ClipboardManager::hasClipboardCopied($player)) {
-            /** @phpstan-var SelectionData $clipboard */
-            $clipboard = ClipboardManager::getClipboard($player);
+		// Clipboard
+		if(ClipboardManager::hasClipboardCopied($player)) {
+			/** @phpstan-var SelectionData $clipboard */
+			$clipboard = ClipboardManager::getClipboard($player);
 
-            $clipboard->compress();
+			$clipboard->compress();
 
-            $nbt->setTag(new CompoundTag("Clipboard", [
-                new ByteArrayTag("Coordinates", $clipboard->compressedCoords),
-                new ByteArrayTag("Blocks", $clipboard->compressedBlocks),
-                new ByteArrayTag("RelativePosition", $clipboard->compressedPlayerPosition)
-                ]
-            ));
+			$nbt->setTag(new CompoundTag("Clipboard", [
+				new ByteArrayTag("Coordinates", $clipboard->compressedCoords),
+				new ByteArrayTag("Blocks", $clipboard->compressedBlocks),
+				new ByteArrayTag("RelativePosition", $clipboard->compressedPlayerPosition)
+			]
+			));
 
-            unset(ClipboardManager::$clipboards[$player->getName()]);
-        }
+			unset(ClipboardManager::$clipboards[$player->getName()]);
+		}
 
-        // TODO - Undo / Redo data
+		// TODO - Undo / Redo data
 
-        $stream = new BigEndianNBTStream();
-        file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $stream->writeCompressed($nbt));
+		$stream = new BigEndianNBTStream();
+		file_put_contents(BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat", $stream->writeCompressed($nbt));
 
-        unset($stream, $nbt);
+		unset($stream, $nbt);
 
-        BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 ** 2), 3) . "Mb ram)");
-    }
+		BuilderTools::getInstance()->getLogger()->debug("Session for {$player->getName()} saved in " . round(microtime(true) - $time , 3) . " seconds (Saved " . round((memory_get_usage() - $memory) / (1024 ** 2), 3) . "Mb ram)");
+	}
 
-    public static function loadPlayerSession(Player $player): void {
-        if(!file_exists($path = BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat")) {
-            return;
-        }
+	public static function loadPlayerSession(Player $player): void {
+		if(!file_exists($path = BuilderTools::getInstance()->getDataFolder() . "sessions/{$player->getName()}.dat")) {
+			return;
+		}
 
-        $stream = new BigEndianNBTStream();
+		$stream = new BigEndianNBTStream();
 
-        $buffer = file_get_contents($path);
-        if(!$buffer || !@unlink($path)) {
-            return;
-        }
+		$buffer = file_get_contents($path);
+		if(!$buffer || !@unlink($path)) {
+			return;
+		}
 
-        /** @phpstan-var CompoundTag|null $nbt */
-        $nbt = $stream->readCompressed($buffer);
+		/** @phpstan-var CompoundTag|null $nbt */
+		$nbt = $stream->readCompressed($buffer);
 
-        if($nbt === null) {
-            return;
-        }
+		if($nbt === null) {
+			return;
+		}
 
-        // Clipboard
-        if($nbt->hasTag("Clipboard")) {
-            /** @phpstan-var CompoundTag $clipboardTag */
-            $clipboardTag = $nbt->getCompoundTag("Clipboard");
+		// Clipboard
+		if($nbt->hasTag("Clipboard")) {
+			/** @phpstan-var CompoundTag $clipboardTag */
+			$clipboardTag = $nbt->getCompoundTag("Clipboard");
 
-            $clipboard = new SelectionData();
-            $clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
-            $clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
-            $clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
+			$clipboard = new SelectionData();
+			$clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
+			$clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
+			$clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
 
-            $clipboard->decompress();
+			$clipboard->decompress();
 
-            ClipboardManager::saveClipboard($player, $clipboard);
-        }
-    }
+			ClipboardManager::saveClipboard($player, $clipboard);
+		}
+	}
 }

@@ -22,40 +22,38 @@ namespace czechpmdevs\buildertools\schematics;
 
 class SchematicActionResult {
 
-    /** @var bool */
-    protected bool $loaded = true;
-    /** @var string */
-    protected string $errorMessage = "";
+	protected bool $loaded = true;
 
-    /** @var float */
-    protected float $processTime = 0;
+	protected string $errorMessage = "";
 
-    private function __construct() {}
+	protected float $processTime = 0;
 
-    public function successful(): bool {
-        return $this->loaded;
-    }
+	private function __construct() {}
 
-    public function getErrorMessage(): string {
-        return $this->errorMessage;
-    }
+	public function successful(): bool {
+		return $this->loaded;
+	}
 
-    public function getProcessTime(): float {
-        return $this->processTime;
-    }
+	public function getErrorMessage(): string {
+		return $this->errorMessage;
+	}
 
-    public static function success(float $processTime): SchematicActionResult {
-        $result = new SchematicActionResult();
-        $result->processTime = round($processTime, 3);
+	public function getProcessTime(): float {
+		return $this->processTime;
+	}
 
-        return $result;
-    }
+	public static function success(float $processTime): SchematicActionResult {
+		$result = new SchematicActionResult();
+		$result->processTime = round($processTime, 3);
 
-    public static function error(string $errorMessage): SchematicActionResult {
-        $result = new SchematicActionResult();
-        $result->loaded = false;
-        $result->errorMessage = $errorMessage;
+		return $result;
+	}
 
-        return $result;
-    }
+	public static function error(string $errorMessage): SchematicActionResult {
+		$result = new SchematicActionResult();
+		$result->loaded = false;
+		$result->errorMessage = $errorMessage;
+
+		return $result;
+	}
 }

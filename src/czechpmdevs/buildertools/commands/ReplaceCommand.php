@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
  *
@@ -25,32 +27,32 @@ use pocketmine\Player;
 
 class ReplaceCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/replace", "Replace selected blocks", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/replace", "Replace selected blocks", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!isset($args[0]) || !isset($args[1])) {
-            $sender->sendMessage("§cUsage: §7//replace <BlocksToReplace - id1:meta1,id2:meta2,...> <Blocks - id1:meta1,id2:meta2,...>");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!isset($args[0]) || !isset($args[1])) {
+			$sender->sendMessage("§cUsage: §7//replace <BlocksToReplace - id1:meta1,id2:meta2,...> <Blocks - id1:meta1,id2:meta2,...>");
+			return;
+		}
 
-        if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-            return;
-        }
+		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+			return;
+		}
 
-        $result = Replacement::getInstance()->directReplace($sender, $firstPos, $secondPos, $args[0], $args[1]);
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst processing the command: {$result->getErrorMessage()}");
-            return;
-        }
+		$result = Replacement::getInstance()->directReplace($sender, $firstPos, $secondPos, $args[0], $args[1]);
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst processing the command: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aReplaced {$result->getBlocksChanged()} blocks (Took {$result->getProcessTime()} seconds)!");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aReplaced {$result->getBlocksChanged()} blocks (Took {$result->getProcessTime()} seconds)!");
+	}
 }

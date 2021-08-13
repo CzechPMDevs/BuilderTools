@@ -37,29 +37,29 @@ use function unserialize;
  */
 class BuilderToolsSchematic implements Schematic {
 
-    public function load(string $rawData): BlockArray {
-        $blockArray = unserialize($rawData);
-        if(!$blockArray instanceof BlockArray) {
-            throw new SchematicException("Invalid data provided");
-        }
+	public function load(string $rawData): BlockArray {
+		$blockArray = unserialize($rawData);
+		if(!$blockArray instanceof BlockArray) {
+			throw new SchematicException("Invalid data provided");
+		}
 
-        return $blockArray;
-    }
+		return $blockArray;
+	}
 
-    public function save(BlockArray $blockArray): string {
-        return serialize($blockArray);
-    }
+	public function save(BlockArray $blockArray): string {
+		return serialize($blockArray);
+	}
 
-    public static function getFileExtension(): string {
-        return ".btschematics";
-    }
+	public static function getFileExtension(): string {
+		return ".btschematics";
+	}
 
-    public static function validate(string $rawData): bool {
-        /** @var CompoundTag $nbt */
-        $nbt = (new BigEndianNBTStream())->readCompressed($rawData);
+	public static function validate(string $rawData): bool {
+		/** @var CompoundTag $nbt */
+		$nbt = (new BigEndianNBTStream())->readCompressed($rawData);
 
-        return $nbt->hasTag("Coords", ByteArrayTag::class) &&
-            $nbt->hasTag("Blocks", ByteArrayTag::class) &&
-            $nbt->hasTag("DuplicateDetection", ByteTag::class);
-    }
+		return $nbt->hasTag("Coords", ByteArrayTag::class) &&
+			$nbt->hasTag("Blocks", ByteArrayTag::class) &&
+			$nbt->hasTag("DuplicateDetection", ByteTag::class);
+	}
 }

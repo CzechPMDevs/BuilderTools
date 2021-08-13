@@ -26,35 +26,35 @@ use function array_key_exists;
 
 class AsyncQueue {
 
-    /** @var Closure[] */
-    private static array $queue = [];
+	/** @var Closure[] */
+	private static array $queue = [];
 
-    /**
-     * @phpstan-param BuilderToolsAsyncTask<mixed> $task
-     * @phpstan-param Closure(BuilderToolsAsyncTask<mixed> $task): void $callback
-     */
-    public static function submitTask(BuilderToolsAsyncTask $task, ?Closure $callback = null): void {
-        Server::getInstance()->getAsyncPool()->submitTask($task);
+	/**
+	 * @phpstan-param BuilderToolsAsyncTask<mixed> $task
+	 * @phpstan-param Closure(BuilderToolsAsyncTask<mixed> $task): void $callback
+	 */
+	public static function submitTask(BuilderToolsAsyncTask $task, ?Closure $callback = null): void {
+		Server::getInstance()->getAsyncPool()->submitTask($task);
 
-        if($callback !== null) {
-            AsyncQueue::$queue[$task->getTaskId()] = $callback;
-        }
-    }
+		if($callback !== null) {
+			AsyncQueue::$queue[$task->getTaskId()] = $callback;
+		}
+	}
 
-    /**
-     * @internal
-     *
-     * @phpstan-param BuilderToolsAsyncTask<mixed> $task
-     */
-    public static function callCallback(BuilderToolsAsyncTask $task): void {
-        if($task->getTaskId() === null) {
-            return;
-        }
-        if(!array_key_exists($task->getTaskId(), AsyncQueue::$queue)) {
-            return;
-        }
+	/**
+	 * @internal
+	 *
+	 * @phpstan-param BuilderToolsAsyncTask<mixed> $task
+	 */
+	public static function callCallback(BuilderToolsAsyncTask $task): void {
+		if($task->getTaskId() === null) {
+			return;
+		}
+		if(!array_key_exists($task->getTaskId(), AsyncQueue::$queue)) {
+			return;
+		}
 
-        $callback = AsyncQueue::$queue[$task->getTaskId()];
-        $callback($task);
-    }
+		$callback = AsyncQueue::$queue[$task->getTaskId()];
+		$callback($task);
+	}
 }

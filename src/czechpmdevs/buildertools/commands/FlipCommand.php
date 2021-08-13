@@ -31,41 +31,41 @@ use function strtolower;
 
 class FlipCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/flip", "Flips selected area", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/flip", "Flips selected area", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//flip <axis: x|y|z>");
-            return;
-        }
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//flip <axis: x|y|z>");
+			return;
+		}
 
-        if(strtolower($args[0]) == "x") {
-            $axis = Axis::X_AXIS;
-        } else if(strtolower($args[0]) == "y") {
-            $axis = Axis::Y_AXIS;
-        } else if(strtolower($args[0]) == "z") {
-            $axis = Axis::Z_AXIS;
-        } else {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cUnknown axis '$args[0]'. You can use only 'X', 'Y' and 'Z' axis.");
-            return;
-        }
+		if(strtolower($args[0]) == "x") {
+			$axis = Axis::X_AXIS;
+		} elseif(strtolower($args[0]) == "y") {
+			$axis = Axis::Y_AXIS;
+		} elseif(strtolower($args[0]) == "z") {
+			$axis = Axis::Z_AXIS;
+		} else {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cUnknown axis '$args[0]'. You can use only 'X', 'Y' and 'Z' axis.");
+			return;
+		}
 
-        $startTime = microtime(true);
+		$startTime = microtime(true);
 
-        $copier = Copier::getInstance();
-        $copier->flip($sender, $axis);
+		$copier = Copier::getInstance();
+		$copier->flip($sender, $axis);
 
-        $time = round(microtime(true)-$startTime, 3);
+		$time = round(microtime(true)-$startTime, 3);
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
+	}
 }

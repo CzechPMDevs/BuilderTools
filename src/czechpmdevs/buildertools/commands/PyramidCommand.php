@@ -27,25 +27,25 @@ use pocketmine\Player;
 
 class PyramidCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/pyramid", "Create pyramid", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/pyramid", "Create pyramid", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//pyramid <id1:dmg1,id2:dmg2:,...> [size]");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//pyramid <id1:dmg1,id2:dmg2:,...> [size]");
+			return;
+		}
 
-        $size = isset($args[1]) ? (int)($args[1]) : 5;
+		$size = isset($args[1]) ? (int) ($args[1]) : 5;
 
-        $result = Printer::getInstance()->makePyramid($sender, $sender, $size, $args[0]);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aPyramid created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
-    }
+		$result = Printer::getInstance()->makePyramid($sender, $sender, $size, $args[0]);
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aPyramid created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
+	}
 }

@@ -31,45 +31,45 @@ use function microtime;
 use function mt_rand;
 
 class Decorator {
-    use SingletonTrait;
+	use SingletonTrait;
 
-    public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): EditorResult {
-        $startTime = microtime(true);
-        
-        $fillSession = new FillSession($center->getLevelNonNull(), false, true);
-        
-        $stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
+	public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): EditorResult {
+		$startTime = microtime(true);
 
-        $minX = $center->getFloorX() - $radius;
-        $maxX = $center->getFloorX() + $radius;
-        $minZ = $center->getFloorZ() - $radius;
-        $maxZ = $center->getFloorZ() + $radius;
+		$fillSession = new FillSession($center->getLevelNonNull(), false, true);
 
-        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-        
-        for ($x = $minX; $x <= $maxX; ++$x) {
-            /** @var int $x */
-            for ($z = $minZ; $z <= $maxZ; ++$z) {
-                if(mt_rand(1, 100) > $percentage) {
-                    continue;
-                }
+		$stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
 
-                if(!$fillSession->getHighestBlockAt($x, $z, $y)) {
-                    continue;
-                }
+		$minX = $center->getFloorX() - $radius;
+		$maxX = $center->getFloorX() + $radius;
+		$minZ = $center->getFloorZ() - $radius;
+		$maxZ = $center->getFloorZ() + $radius;
 
-                $stringToBlockDecoder->nextBlock($id, $meta);
-                $fillSession->setBlockAt($x, $y, $z, $id, $meta);
-            }
-        }
+		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
-        $fillSession->reloadChunks($center->getLevelNonNull());
+		for ($x = $minX; $x <= $maxX; ++$x) {
+			/** @var int $x */
+			for ($z = $minZ; $z <= $maxZ; ++$z) {
+				if(mt_rand(1, 100) > $percentage) {
+					continue;
+				}
 
-        /** @phpstan-var BlockArray $changes */
-        $changes = $fillSession->getChanges();
-        $changes->save();
-        Canceller::getInstance()->addStep($player, $changes);
+				if(!$fillSession->getHighestBlockAt($x, $z, $y)) {
+					continue;
+				}
 
-        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-    }
+				$stringToBlockDecoder->nextBlock($id, $meta);
+				$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+			}
+		}
+
+		$fillSession->reloadChunks($center->getLevelNonNull());
+
+		/** @phpstan-var BlockArray $changes */
+		$changes = $fillSession->getChanges();
+		$changes->save();
+		Canceller::getInstance()->addStep($player, $changes);
+
+		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+	}
 }

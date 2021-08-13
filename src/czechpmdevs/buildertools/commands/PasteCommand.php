@@ -27,25 +27,25 @@ use pocketmine\Player;
 
 class PasteCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/paste", "Paste copied area", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/paste", "Paste copied area", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        $result = Copier::getInstance()->paste($sender);
+		$result = Copier::getInstance()->paste($sender);
 
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cCould not paste clipboard: {$result->getErrorMessage()}");
-            return;
-        }
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cCould not paste clipboard: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully pasted, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully pasted, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+	}
 }

@@ -29,33 +29,33 @@ use pocketmine\Player;
 
 class CopyCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/copy", "Copy selected area", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/copy", "Copy selected area", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!Selectors::isSelected(1, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
-            return;
-        }
-        if(!Selectors::isSelected(2, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!Selectors::isSelected(1, $sender)) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the first position.");
+			return;
+		}
+		if(!Selectors::isSelected(2, $sender)) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the second position.");
+			return;
+		}
 
-        /** @var Vector3 $pos1 */
-        $pos1 = Selectors::getPosition($sender, 1);
-        /** @var Vector3 $pos2 */
-        $pos2 = Selectors::getPosition($sender, 2);
+		/** @var Vector3 $pos1 */
+		$pos1 = Selectors::getPosition($sender, 1);
+		/** @var Vector3 $pos2 */
+		$pos2 = Selectors::getPosition($sender, 2);
 
-        $result = Copier::getInstance()->copy($pos1, $pos2, $sender);
+		$result = Copier::getInstance()->copy($pos1, $pos2, $sender);
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§a{$result->getBlocksChanged()} blocks copied to clipboard (Took {$result->getProcessTime()} seconds)! Use //paste to paste");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§a{$result->getBlocksChanged()} blocks copied to clipboard (Took {$result->getProcessTime()} seconds)! Use //paste to paste");
+	}
 }

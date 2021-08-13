@@ -24,44 +24,42 @@ use function round;
 
 class EditorResult {
 
-    /** @var int $blocksChanged */
-    protected int $blocksChanged = 0;
-    /** @var float $processTime */
-    protected float $processTime = 0.0;
+	protected int $blocksChanged = 0;
 
-    /** @var string|null */
-    protected ?string $errorMessage = null;
+	protected float $processTime = 0.0;
 
-    protected function __construct() {}
+	protected ?string $errorMessage = null;
 
-    public function getBlocksChanged(): int {
-        return $this->blocksChanged;
-    }
+	protected function __construct() {}
 
-    public function getProcessTime(): float {
-        return $this->processTime;
-    }
+	public function getBlocksChanged(): int {
+		return $this->blocksChanged;
+	}
 
-    public function successful(): bool {
-        return $this->errorMessage === null;
-    }
+	public function getProcessTime(): float {
+		return $this->processTime;
+	}
 
-    public function getErrorMessage(): ?string {
-        return $this->errorMessage;
-    }
+	public function successful(): bool {
+		return $this->errorMessage === null;
+	}
 
-    public static function success(int $blocksChanged, float $processTime): EditorResult {
-        $result = new EditorResult();
-        $result->blocksChanged = $blocksChanged;
-        $result->processTime = round($processTime, 3);
+	public function getErrorMessage(): ?string {
+		return $this->errorMessage;
+	}
 
-        return $result;
-    }
+	public static function success(int $blocksChanged, float $processTime): EditorResult {
+		$result = new EditorResult();
+		$result->blocksChanged = $blocksChanged;
+		$result->processTime = round($processTime, 3);
 
-    public static function error(string $message): EditorResult {
-        $result = new EditorResult();
-        $result->errorMessage = $message;
+		return $result;
+	}
 
-        return $result;
-    }
+	public static function error(string $message): EditorResult {
+		$result = new EditorResult();
+		$result->errorMessage = $message;
+
+		return $result;
+	}
 }

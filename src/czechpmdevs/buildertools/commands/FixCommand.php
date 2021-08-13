@@ -25,19 +25,19 @@ use pocketmine\command\CommandSender;
 
 class FixCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/fix", "Fixes world");
-    }
+	public function __construct() {
+		parent::__construct("/fix", "Fixes world");
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
 
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//fix <world>");
-            return;
-        }
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//fix <world>");
+			return;
+		}
 
-        WorldFixUtil::fixWorld($sender, $args[0]);
-    }
+		WorldFixUtil::fixWorld($sender, $args[0]);
+	}
 }

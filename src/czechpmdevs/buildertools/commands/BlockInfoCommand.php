@@ -31,28 +31,28 @@ use pocketmine\Player;
 
 class BlockInfoCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi", "/debug"]);
-    }
+	public function __construct() {
+		parent::__construct("/blockinfo", "Switch block info mode", null, ["/bi", "/debug"]);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
-            $item = Item::get(Item::STICK);
-            $item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
-            $item->setNamedTagEntry(new ListTag(Item::TAG_ENCH, [], NBT::TAG_Compound));
-            $item->setNamedTagEntry(new ByteTag("buildertools", 1));
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
+			$item = Item::get(Item::STICK);
+			$item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
+			$item->setNamedTagEntry(new ListTag(Item::TAG_ENCH, [], NBT::TAG_Compound));
+			$item->setNamedTagEntry(new ByteTag("buildertools", 1));
 
-            $sender->getInventory()->addItem($item);
-            $sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
-            return;
-        }
-        Selectors::switchBlockInfoSelector($sender);
-        $sender->sendMessage(BuilderTools::getPrefix() . "Block info mode turned " . (Selectors::isBlockInfoPlayer($sender) ? "on" : "off") . "!");
-    }
+			$sender->getInventory()->addItem($item);
+			$sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
+			return;
+		}
+		Selectors::switchBlockInfoSelector($sender);
+		$sender->sendMessage(BuilderTools::getPrefix() . "Block info mode turned " . (Selectors::isBlockInfoPlayer($sender) ? "on" : "off") . "!");
+	}
 }

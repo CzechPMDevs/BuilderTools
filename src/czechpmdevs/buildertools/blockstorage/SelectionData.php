@@ -28,74 +28,72 @@ use function unpack;
 
 class SelectionData extends BlockArray {
 
-    /** @var Vector3|null */
-    protected ?Vector3 $playerPosition = null;
+	protected ?Vector3 $playerPosition = null;
 
-    /** @var string */
-    public string $compressedPlayerPosition;
+	public string $compressedPlayerPosition;
 
-    /**
-     * @param bool $modifyBuffer If it's false, only relative position will be changed.
-     */
-    public function addVector3(Vector3 $vector3, bool $modifyBuffer = false): BlockArray {
-        if(!$vector3->ceil()->equals($vector3)) {
-            throw new InvalidArgumentException("Vector3 coordinates must be integer.");
-        }
+	/**
+	 * @param bool $modifyBuffer If it's false, only relative position will be changed.
+	 */
+	public function addVector3(Vector3 $vector3, bool $modifyBuffer = false): BlockArray {
+		if(!$vector3->ceil()->equals($vector3)) {
+			throw new InvalidArgumentException("Vector3 coordinates must be integer.");
+		}
 
-        if($this->playerPosition !== null) {
-            $clipboard = clone $this;
-            /** @phpstan-ignore-next-line */
-            $clipboard->playerPosition->add($vector3);
+		if($this->playerPosition !== null) {
+			$clipboard = clone $this;
+			/** @phpstan-ignore-next-line */
+			$clipboard->playerPosition->add($vector3);
 
-            return $clipboard;
-        }
+			return $clipboard;
+		}
 
-        return parent::addVector3($vector3);
-    }
+		return parent::addVector3($vector3);
+	}
 
-    public function getPlayerPosition(): ?Vector3 {
-        return $this->playerPosition;
-    }
+	public function getPlayerPosition(): ?Vector3 {
+		return $this->playerPosition;
+	}
 
-    /**
-     * @return $this
-     */
-    public function setPlayerPosition(?Vector3 $playerPosition): SelectionData {
-        $this->playerPosition = $playerPosition === null ? null : $playerPosition->ceil();
+	/**
+	 * @return $this
+	 */
+	public function setPlayerPosition(?Vector3 $playerPosition): SelectionData {
+		$this->playerPosition = $playerPosition === null ? null : $playerPosition->ceil();
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function compress(bool $cleanDecompressed = true): void {
-        parent::compress($cleanDecompressed);
+	public function compress(bool $cleanDecompressed = true): void {
+		parent::compress($cleanDecompressed);
 
-        $vector3 = $this->getPlayerPosition();
-        if($vector3 === null) {
-            return;
-        }
+		$vector3 = $this->getPlayerPosition();
+		if($vector3 === null) {
+			return;
+		}
 
-        $this->compressedPlayerPosition = pack("q", Level::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
-    }
+		$this->compressedPlayerPosition = pack("q", Level::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
+	}
 
-    public function decompress(bool $cleanCompressed = true): void {
-        parent::decompress($cleanCompressed);
+	public function decompress(bool $cleanCompressed = true): void {
+		parent::decompress($cleanCompressed);
 
-        if(!isset($this->compressedPlayerPosition)) {
-            return;
-        }
+		if(!isset($this->compressedPlayerPosition)) {
+			return;
+		}
 
-        /** @phpstan-ignore-next-line */
-        Level::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z);
-        $this->playerPosition = new Vector3($x, $y, $z);
-    }
+		/** @phpstan-ignore-next-line */
+		Level::getBlockXYZ((int) (unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z);
+		$this->playerPosition = new Vector3($x, $y, $z);
+	}
 
-    public static function fromBlockArray(BlockArray $blockArray, Vector3 $playerPosition): SelectionData {
-        $selectionData = new SelectionData();
-        $selectionData->setPlayerPosition($playerPosition);
-        $selectionData->setLevel($blockArray->getLevel());
-        $selectionData->blocks = $blockArray->getBlockArray();
-        $selectionData->coords = $blockArray->getCoordsArray();
+	public static function fromBlockArray(BlockArray $blockArray, Vector3 $playerPosition): SelectionData {
+		$selectionData = new SelectionData();
+		$selectionData->setPlayerPosition($playerPosition);
+		$selectionData->setLevel($blockArray->getLevel());
+		$selectionData->blocks = $blockArray->getBlockArray();
+		$selectionData->coords = $blockArray->getCoordsArray();
 
-        return $selectionData;
-    }
+		return $selectionData;
+	}
 }

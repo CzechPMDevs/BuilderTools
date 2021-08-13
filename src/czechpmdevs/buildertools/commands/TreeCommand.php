@@ -33,51 +33,51 @@ use function time;
 
 class TreeCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/tree", "Place tree object", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/tree", "Place tree object", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7/tree <list|treeType>");
-            return;
-        }
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7/tree <list|treeType>");
+			return;
+		}
 
-        if(strtolower($args[0]) == "list") {
-            $sender->sendMessage(BuilderTools::getPrefix()."§aTree list: Birch, Oak, Jungle, Spruce");
-            return;
-        }
+		if(strtolower($args[0]) == "list") {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§aTree list: Birch, Oak, Jungle, Spruce");
+			return;
+		}
 
-        $object = null;
+		$object = null;
 
-        switch (strtolower($args[0])) {
-            case "oak":
-                $object = new OakTree;
-                break;
-            case "birch":
-                $object = new BirchTree;
-                break;
-            case "jungle":
-                $object = new JungleTree;
-                break;
-            case "spruce":
-                $object = new SpruceTree;
-                break;
-        }
+		switch (strtolower($args[0])) {
+			case "oak":
+				$object = new OakTree;
+				break;
+			case "birch":
+				$object = new BirchTree;
+				break;
+			case "jungle":
+				$object = new JungleTree;
+				break;
+			case "spruce":
+				$object = new SpruceTree;
+				break;
+		}
 
-        if($object === null) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cObject $args[0] does not found!");
-            return;
-        }
+		if($object === null) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cObject $args[0] does not found!");
+			return;
+		}
 
-        $object->placeObject($sender->getLevelNonNull(), $sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), new Random(time()));
-        $sender->sendMessage(BuilderTools::getPrefix()."§aObject $args[0] placed!");
-    }
+		$object->placeObject($sender->getLevelNonNull(), $sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), new Random(time()));
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aObject $args[0] placed!");
+	}
 }

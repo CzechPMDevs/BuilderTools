@@ -3,3 +3,4 @@ build.php
 vendor
 out
 composer.phar
+.php-cs-fixer.cache

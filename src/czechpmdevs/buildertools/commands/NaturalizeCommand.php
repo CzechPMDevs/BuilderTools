@@ -27,23 +27,23 @@ use pocketmine\Player;
 
 class NaturalizeCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/naturalize", "Naturalize selected area.", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/naturalize", "Naturalize selected area.", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
-        if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-            return;
-        }
+		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+			return;
+		}
 
-        $result = Naturalizer::getInstance()->naturalize($firstPos, $secondPos, $sender);
-        $sender->sendMessage(BuilderTools::getPrefix()."§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
-    }
+		$result = Naturalizer::getInstance()->naturalize($firstPos, $secondPos, $sender);
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+	}
 }

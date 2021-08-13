@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-
 declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\utils;
 
 interface Axis {
 
-    public const X_AXIS = 0x0;
-    public const Y_AXIS = 0x1;
-    public const Z_AXIS = 0x2;
+	public const X_AXIS = 0x0;
+	public const Y_AXIS = 0x1;
+	public const Z_AXIS = 0x2;
 }

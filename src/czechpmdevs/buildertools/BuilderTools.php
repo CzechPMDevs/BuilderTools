@@ -73,169 +73,167 @@ use function version_compare;
 
 class BuilderTools extends PluginBase {
 
-    public const CURRENT_CONFIG_VERSION = "1.2.0.3";
+	public const CURRENT_CONFIG_VERSION = "1.2.0.3";
 
-    /** @var BuilderTools */
-    private static BuilderTools $instance;
-    /** @var string */
-    private static string $prefix = "§7[BuilderTools] §a";
+	private static BuilderTools $instance;
 
-    /** @var EventListener */
-    private static EventListener $listener;
+	private static string $prefix = "§7[BuilderTools] §a";
 
-    /** @var Command[] */
-    private static array $commands = [];
+	private static EventListener $listener;
 
-    /** @noinspection PhpUnused */
-    public function onEnable() {
-        BuilderTools::$instance = $this;
+	/** @var Command[] */
+	private static array $commands = [];
 
-        $this->initConfig();
-        $this->cleanCache();
-        $this->registerCommands();
-        $this->initListener();
-        $this->sendWarnings();
-        $this->loadSchematicsManager();
-    }
+	/** @noinspection PhpUnused */
+	public function onEnable() {
+		BuilderTools::$instance = $this;
 
-    /** @noinspection PhpUnused */
-    public function onDisable() {
-        $this->cleanCache();
-    }
+		$this->initConfig();
+		$this->cleanCache();
+		$this->registerCommands();
+		$this->initListener();
+		$this->sendWarnings();
+		$this->loadSchematicsManager();
+	}
 
-    private function initConfig(): void {
-        if(!is_dir($this->getDataFolder() . "schematics")) {
-            @mkdir($this->getDataFolder() . "schematics");
-        }
-        if(!is_dir($this->getDataFolder() . "sessions")) {
-            @mkdir($this->getDataFolder() . "sessions");
-        }
-        if(!is_dir($this->getDataFolder() . "data")) {
-            @mkdir($this->getDataFolder() . "data");
-        }
-        if(!is_file($this->getDataFolder() . "data/internalId2StatesMap.serialized")) {
-            $this->saveResource("data/internalId2StatesMap.serialized");
-        }
-        if(!is_file($this->getDataFolder() . "data/states2InternalIdMap.serialized")) {
-            $this->saveResource("data/states2InternalIdMap.serialized");
-        }
+	/** @noinspection PhpUnused */
+	public function onDisable() {
+		$this->cleanCache();
+	}
 
-        $configuration = $this->getConfig()->getAll();
-        if(
-            !array_key_exists("config-version", $configuration) ||
-            version_compare((string)$configuration["config-version"], BuilderTools::CURRENT_CONFIG_VERSION) < 0
-        ) {
-            // Update is required
-            @unlink($this->getDataFolder() . "config.yml.old");
-            @rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
+	private function initConfig(): void {
+		if(!is_dir($this->getDataFolder() . "schematics")) {
+			@mkdir($this->getDataFolder() . "schematics");
+		}
+		if(!is_dir($this->getDataFolder() . "sessions")) {
+			@mkdir($this->getDataFolder() . "sessions");
+		}
+		if(!is_dir($this->getDataFolder() . "data")) {
+			@mkdir($this->getDataFolder() . "data");
+		}
+		if(!is_file($this->getDataFolder() . "data/internalId2StatesMap.serialized")) {
+			$this->saveResource("data/internalId2StatesMap.serialized");
+		}
+		if(!is_file($this->getDataFolder() . "data/states2InternalIdMap.serialized")) {
+			$this->saveResource("data/states2InternalIdMap.serialized");
+		}
 
-            $this->saveResource("config.yml", true);
-            $this->getConfig()->reload();
+		$configuration = $this->getConfig()->getAll();
+		if(
+			!array_key_exists("config-version", $configuration) ||
+			version_compare((string) $configuration["config-version"], BuilderTools::CURRENT_CONFIG_VERSION) < 0
+		) {
+			// Update is required
+			@unlink($this->getDataFolder() . "config.yml.old");
+			@rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
 
-            $this->getLogger()->notice("Config updated. Old config was renamed to 'config.yml.old'.");
-        }
-    }
+			$this->saveResource("config.yml", true);
+			$this->getConfig()->reload();
 
-    private function initListener(): void {
-        $this->getServer()->getPluginManager()->registerEvents(BuilderTools::$listener = new EventListener(), $this);
-    }
+			$this->getLogger()->notice("Config updated. Old config was renamed to 'config.yml.old'.");
+		}
+	}
 
-    private function registerCommands(): void {
-        $map = $this->getServer()->getCommandMap();
-        BuilderTools::$commands = [
-            new BiomeCommand,
-            new BlockInfoCommand,
-            new CenterCommand,
-            new ClearInventoryCommand,
-            new CopyCommand,
-            new CubeCommand,
-            new CutCommand,
-            new CylinderCommand,
-            new DecorationCommand,
-            new DrawCommand,
-            new FillCommand,
-            new FirstPositionCommand,
-            new FixCommand,
-            new FlipCommand,
-            new HelpCommand,
-            new HollowCubeCommand,
-            new HollowCylinderCommand,
-            new HollowPyramidCommand,
-            new HollowSphereCommand,
-            new IdCommand,
-            new IslandCommand,
-            new MergeCommand,
-            new MoveCommand,
-            new NaturalizeCommand,
-            new OutlineCommand,
-            new PasteCommand,
-            new PyramidCommand,
-            new RedoCommand,
-            new ReplaceCommand,
-            new RotateCommand,
-            new SchematicCommand,
-            new SecondPositionCommand,
-            new SphereCommand,
-            new StackCommand,
-            new TreeCommand,
-            new UndoCommand,
-            new WallsCommand,
-            new WandCommand
-        ];
+	private function initListener(): void {
+		$this->getServer()->getPluginManager()->registerEvents(BuilderTools::$listener = new EventListener(), $this);
+	}
 
-        foreach (BuilderTools::$commands as $command) {
-            $map->register("BuilderTools", $command);
-        }
+	private function registerCommands(): void {
+		$map = $this->getServer()->getCommandMap();
+		BuilderTools::$commands = [
+			new BiomeCommand,
+			new BlockInfoCommand,
+			new CenterCommand,
+			new ClearInventoryCommand,
+			new CopyCommand,
+			new CubeCommand,
+			new CutCommand,
+			new CylinderCommand,
+			new DecorationCommand,
+			new DrawCommand,
+			new FillCommand,
+			new FirstPositionCommand,
+			new FixCommand,
+			new FlipCommand,
+			new HelpCommand,
+			new HollowCubeCommand,
+			new HollowCylinderCommand,
+			new HollowPyramidCommand,
+			new HollowSphereCommand,
+			new IdCommand,
+			new IslandCommand,
+			new MergeCommand,
+			new MoveCommand,
+			new NaturalizeCommand,
+			new OutlineCommand,
+			new PasteCommand,
+			new PyramidCommand,
+			new RedoCommand,
+			new ReplaceCommand,
+			new RotateCommand,
+			new SchematicCommand,
+			new SecondPositionCommand,
+			new SphereCommand,
+			new StackCommand,
+			new TreeCommand,
+			new UndoCommand,
+			new WallsCommand,
+			new WandCommand
+		];
 
-        HelpCommand::buildPages();
-    }
+		foreach (BuilderTools::$commands as $command) {
+			$map->register("BuilderTools", $command);
+		}
 
-    public function sendWarnings(): void {
-        if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
-            $this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
-        }
-    }
+		HelpCommand::buildPages();
+	}
 
-    public function loadSchematicsManager(): void {
-        SchematicsManager::lazyInit();
-    }
+	public function sendWarnings(): void {
+		if($this->getServer()->getProperty("memory.async-worker-hard-limit") != 0) {
+			$this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
+		}
+	}
 
-    public function cleanCache(): void {
-        if(BuilderTools::getConfiguration()["clean-cache"] ?? false) {
-            return;
-        }
+	public function loadSchematicsManager(): void {
+		SchematicsManager::lazyInit();
+	}
 
-        $files = glob($this->getDataFolder() . "sessions/*.dat");
-        if($files === false) {
-            return;
-        }
+	public function cleanCache(): void {
+		if(BuilderTools::getConfiguration()["clean-cache"] ?? false) {
+			return;
+		}
 
-        /** @var string $offlineSession */
-        foreach ($files as $offlineSession) {
-            unlink($offlineSession);
-        }
-    }
+		$files = glob($this->getDataFolder() . "sessions/*.dat");
+		if($files === false) {
+			return;
+		}
 
-    /**
-     * @return Command[]
-     */
-    public static function getAllCommands(): array {
-        return BuilderTools::$commands;
-    }
+		/** @var string $offlineSession */
+		foreach ($files as $offlineSession) {
+			unlink($offlineSession);
+		}
+	}
 
-    public static function getPrefix(): string {
-        return BuilderTools::$prefix;
-    }
+	/**
+	 * @return Command[]
+	 */
+	public static function getAllCommands(): array {
+		return BuilderTools::$commands;
+	}
 
-    /**
-     * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
-     * @phpstan-return mixed[]
-     */
-    public static function getConfiguration(): array {
-        return BuilderTools::$instance->getConfig()->getAll();
-    }
+	public static function getPrefix(): string {
+		return BuilderTools::$prefix;
+	}
 
-    public static function getInstance(): BuilderTools {
-        return BuilderTools::$instance;
-    }
+	/**
+	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
+	 * @phpstan-return mixed[]
+	 */
+	public static function getConfiguration(): array {
+		return BuilderTools::$instance->getConfig()->getAll();
+	}
+
+	public static function getInstance(): BuilderTools {
+		return BuilderTools::$instance;
+	}
 }

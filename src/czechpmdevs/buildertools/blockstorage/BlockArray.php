@@ -43,261 +43,256 @@ use function unpack;
 
 class BlockArray implements UpdateLevelData, Serializable {
 
-    /** @var bool */
-    protected bool $detectDuplicates;
+	protected bool $detectDuplicates;
 
-    /** @var int[] */
-    public array $coords = [];
-    /** @var int[] */
-    public array $blocks = [];
+	/** @var int[] */
+	public array $coords = [];
+	/** @var int[] */
+	public array $blocks = [];
 
-    /** @var BlockArraySizeData|null */
-    protected ?BlockArraySizeData $sizeData = null;
-    /** @var ChunkManager|null */
-    protected ?ChunkManager $level = null;
+	protected ?BlockArraySizeData $sizeData = null;
 
-    /** @var bool */
-    protected bool $isCompressed = false;
-    /** @var string */
-    public string $compressedCoords;
+	protected ?ChunkManager $level = null;
 
-    /** @var string */
-    public string $compressedBlocks;
+	protected bool $isCompressed = false;
 
-    /** @var int */
-    public int $offset = 0;
+	public string $compressedCoords;
 
-    /**
-     * Fields to avoid allocating memory every time
-     * when writing or reading block from the
-     * array
-     */
-    protected int $lastHash, $lastBlockHash;
+	public string $compressedBlocks;
 
-    public function __construct(bool $detectDuplicates = false) {
-        $this->detectDuplicates = $detectDuplicates;
-    }
+	public int $offset = 0;
 
-    /**
-     * Adds block to the block array
-     *
-     * @return $this
-     */
-    public function addBlock(Vector3 $vector3, int $id, int $meta): BlockArray {
-        return $this->addBlockAt($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ(), $id, $meta);
-    }
+	/**
+	 * Fields to avoid allocating memory every time
+	 * when writing or reading block from the
+	 * array
+	 */
+	protected int $lastHash, $lastBlockHash;
 
-    /**
-     * Adds block to the block array
-     *
-     * @return $this
-     */
-    public function addBlockAt(int $x, int $y, int $z, int $id, int $meta): BlockArray {
-        $this->lastHash = Level::blockHash($x, $y, $z);
+	public function __construct(bool $detectDuplicates = false) {
+		$this->detectDuplicates = $detectDuplicates;
+	}
 
-        if($this->detectDuplicates && in_array($this->lastHash, $this->coords)) {
-            return $this;
-        }
+	/**
+	 * Adds block to the block array
+	 *
+	 * @return $this
+	 */
+	public function addBlock(Vector3 $vector3, int $id, int $meta): BlockArray {
+		return $this->addBlockAt($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ(), $id, $meta);
+	}
 
-        $this->coords[] = $this->lastHash;
-        $this->blocks[] = $id << 4 | $meta;
+	/**
+	 * Adds block to the block array
+	 *
+	 * @return $this
+	 */
+	public function addBlockAt(int $x, int $y, int $z, int $id, int $meta): BlockArray {
+		$this->lastHash = Level::blockHash($x, $y, $z);
 
-        return $this;
-    }
+		if($this->detectDuplicates && in_array($this->lastHash, $this->coords, true)) {
+			return $this;
+		}
 
-    /**
-     * Returns if it is possible read next block from the array
-     */
-    public function hasNext(): bool {
-        return $this->offset < count($this->blocks);
-    }
+		$this->coords[] = $this->lastHash;
+		$this->blocks[] = $id << 4 | $meta;
 
-    /**
-     * Reads next block in the array
-     */
-    public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void {
-        $this->lastHash = $this->coords[$this->offset];
-        $this->lastBlockHash = $this->blocks[$this->offset++];
+		return $this;
+	}
 
-        Level::getBlockXYZ($this->lastHash, $x, $y, $z);
-        $id = $this->lastBlockHash >> 4; $meta = $this->lastBlockHash & 0xf;
-    }
+	/**
+	 * Returns if it is possible read next block from the array
+	 */
+	public function hasNext(): bool {
+		return $this->offset < count($this->blocks);
+	}
 
-    /**
-     * Adds Vector3 to all the blocks in BlockArray
-     */
-    public function addVector3(Vector3 $vector3): BlockArray {
-        $floorX = $vector3->getFloorX();
-        $floorY = $vector3->getFloorY();
-        $floorZ = $vector3->getFloorZ();
+	/**
+	 * Reads next block in the array
+	 */
+	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void {
+		$this->lastHash = $this->coords[$this->offset];
+		$this->lastBlockHash = $this->blocks[$this->offset++];
 
-        $blockArray = new BlockArray();
-        $blockArray->blocks = $this->blocks;
+		Level::getBlockXYZ($this->lastHash, $x, $y, $z);
+		$id = $this->lastBlockHash >> 4; $meta = $this->lastBlockHash & 0xf;
+	}
 
-        foreach ($this->coords as $hash) {
-            Level::getBlockXYZ($hash, $x, $y, $z);
-            $blockArray->coords[] = Level::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
-        }
+	/**
+	 * Adds Vector3 to all the blocks in BlockArray
+	 */
+	public function addVector3(Vector3 $vector3): BlockArray {
+		$floorX = $vector3->getFloorX();
+		$floorY = $vector3->getFloorY();
+		$floorZ = $vector3->getFloorZ();
 
-        return $blockArray;
-    }
+		$blockArray = new BlockArray();
+		$blockArray->blocks = $this->blocks;
 
-    /**
-     * Subtracts Vector3 from all the blocks in BlockArray
-     */
-    public function subtractVector3(Vector3 $vector3): BlockArray {
-        return $this->addVector3($vector3->multiply(-1));
-    }
+		foreach ($this->coords as $hash) {
+			Level::getBlockXYZ($hash, $x, $y, $z);
+			$blockArray->coords[] = Level::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
+		}
 
-    /**
-     * @return BlockArraySizeData is used for calculating dimensions
-     */
-    public function getSizeData(): BlockArraySizeData {
-        if($this->sizeData === null) {
-            $this->sizeData = new BlockArraySizeData($this);
-        }
+		return $blockArray;
+	}
 
-        return $this->sizeData;
-    }
+	/**
+	 * Subtracts Vector3 from all the blocks in BlockArray
+	 */
+	public function subtractVector3(Vector3 $vector3): BlockArray {
+		return $this->addVector3($vector3->multiply(-1));
+	}
 
-    public function setLevel(?ChunkManager $level): self {
-        $this->level = $level;
+	/**
+	 * @return BlockArraySizeData is used for calculating dimensions
+	 */
+	public function getSizeData(): BlockArraySizeData {
+		if($this->sizeData === null) {
+			$this->sizeData = new BlockArraySizeData($this);
+		}
 
-        return $this;
-    }
+		return $this->sizeData;
+	}
 
-    public function getLevel(): ?ChunkManager {
-        return $this->level;
-    }
+	public function setLevel(?ChunkManager $level): self {
+		$this->level = $level;
 
-    /**
-     * @return int[]
-     */
-    public function getBlockArray(): array {
-        return $this->blocks;
-    }
+		return $this;
+	}
 
-    /**
-     * @return int[]
-     */
-    public function getCoordsArray(): array {
-        return $this->coords;
-    }
+	public function getLevel(): ?ChunkManager {
+		return $this->level;
+	}
 
-    public function removeDuplicates(): void {
-        if(!(BuilderTools::getConfiguration()["remove-duplicate-blocks"] ?? true)) {
-            return;
-        }
+	/**
+	 * @return int[]
+	 */
+	public function getBlockArray(): array {
+		return $this->blocks;
+	}
 
-        // TODO - Optimize this
-        $blocks = array_combine(array_reverse($this->coords, true), array_reverse($this->blocks, true));
-        if($blocks === false) {
-            return;
-        }
+	/**
+	 * @return int[]
+	 */
+	public function getCoordsArray(): array {
+		return $this->coords;
+	}
 
-        $this->coords = array_keys($blocks);
-        $this->blocks = array_values($blocks);
-    }
+	public function removeDuplicates(): void {
+		if(!(BuilderTools::getConfiguration()["remove-duplicate-blocks"] ?? true)) {
+			return;
+		}
 
-    public function save(): void {
-        if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
-            $this->compress();
-            $this->isCompressed = true;
-        }
-    }
+		// TODO - Optimize this
+		$blocks = array_combine(array_reverse($this->coords, true), array_reverse($this->blocks, true));
+		if($blocks === false) {
+			return;
+		}
 
-    public function load(): void {
-        if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
-            $this->decompress();
-            $this->isCompressed = false;
-        }
-    }
+		$this->coords = array_keys($blocks);
+		$this->blocks = array_values($blocks);
+	}
 
-    public function compress(bool $cleanDecompressed = true): void {
-        /** @phpstan-var string|false $coords */
-        $coords = pack("q*", ...$this->coords);
-        /** @phpstan-var string|false $blocks */
-        $blocks = pack("N*", ...$this->blocks);
+	public function save(): void {
+		if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+			$this->compress();
+			$this->isCompressed = true;
+		}
+	}
 
-        if($coords === false || $blocks === false) {
-            throw new InvalidStateException("Error whilst compressing");
-        }
+	public function load(): void {
+		if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+			$this->decompress();
+			$this->isCompressed = false;
+		}
+	}
 
-        $this->compressedCoords = $coords;
-        $this->compressedBlocks = $blocks;
+	public function compress(bool $cleanDecompressed = true): void {
+		/** @phpstan-var string|false $coords */
+		$coords = pack("q*", ...$this->coords);
+		/** @phpstan-var string|false $blocks */
+		$blocks = pack("N*", ...$this->blocks);
 
-        if($cleanDecompressed) {
-            $this->coords = [];
-            $this->blocks = [];
-        }
-    }
+		if($coords === false || $blocks === false) {
+			throw new InvalidStateException("Error whilst compressing");
+		}
 
-    public function decompress(bool $cleanCompressed = true): void {
-        /** @phpstan-var int[]|false $coords */
-        $coords = unpack("q*", $this->compressedCoords);
-        /** @phpstan-var int[]|false $coords */
-        $blocks = unpack("N*", $this->compressedBlocks);
+		$this->compressedCoords = $coords;
+		$this->compressedBlocks = $blocks;
 
-        if($coords === false || $blocks === false) {
-            throw new InvalidStateException("Error whilst decompressing");
-        }
+		if($cleanDecompressed) {
+			$this->coords = [];
+			$this->blocks = [];
+		}
+	}
 
-        $this->coords = array_values($coords);
-        $this->blocks = array_values($blocks);
+	public function decompress(bool $cleanCompressed = true): void {
+		/** @phpstan-var int[]|false $coords */
+		$coords = unpack("q*", $this->compressedCoords);
+		/** @phpstan-var int[]|false $coords */
+		$blocks = unpack("N*", $this->compressedBlocks);
 
-        if($cleanCompressed) {
-            unset($this->compressedCoords);
-            unset($this->compressedBlocks);
-        }
-    }
+		if($coords === false || $blocks === false) {
+			throw new InvalidStateException("Error whilst decompressing");
+		}
 
-    public function isCompressed(): bool {
-        return $this->isCompressed;
-    }
+		$this->coords = array_values($coords);
+		$this->blocks = array_values($blocks);
 
-    /**
-     * Removes all the blocks whose were checked already
-     */
-    public function cleanGarbage(): void {
-        $this->coords = array_slice($this->coords, $this->offset);
-        $this->blocks = array_slice($this->blocks, $this->offset);
+		if($cleanCompressed) {
+			unset($this->compressedCoords);
+			unset($this->compressedBlocks);
+		}
+	}
 
-        $this->offset = 0;
-    }
+	public function isCompressed(): bool {
+		return $this->isCompressed;
+	}
 
-    public function serialize(): ?string {
-        $this->compress();
+	/**
+	 * Removes all the blocks whose were checked already
+	 */
+	public function cleanGarbage(): void {
+		$this->coords = array_slice($this->coords, $this->offset);
+		$this->blocks = array_slice($this->blocks, $this->offset);
 
-        $nbt = new CompoundTag("BlockArray");
-        $nbt->setByteArray("Coords", $this->compressedCoords);
-        $nbt->setByteArray("Blocks", $this->compressedBlocks);
-        $nbt->setByte("DuplicateDetection", $this->detectDuplicates ? 1 : 0);
+		$this->offset = 0;
+	}
 
-        $stream = new BigEndianNBTStream();
-        $buffer = $stream->writeCompressed($nbt);
+	public function serialize(): ?string {
+		$this->compress();
 
-        if($buffer === false) {
-            return null;
-        }
+		$nbt = new CompoundTag("BlockArray");
+		$nbt->setByteArray("Coords", $this->compressedCoords);
+		$nbt->setByteArray("Blocks", $this->compressedBlocks);
+		$nbt->setByte("DuplicateDetection", $this->detectDuplicates ? 1 : 0);
 
-        return $buffer;
-    }
+		$stream = new BigEndianNBTStream();
+		$buffer = $stream->writeCompressed($nbt);
 
-    public function unserialize($data): void {
-        if(!is_string($data)) {
-            return;
-        }
+		if($buffer === false) {
+			return null;
+		}
 
-        /** @var CompoundTag $nbt */
-        $nbt = (new BigEndianNBTStream())->readCompressed($data);
-        if(!$nbt->hasTag("Coords", ByteArrayTag::class) || !$nbt->hasTag("Blocks", ByteArrayTag::class) || !$nbt->hasTag("DuplicateDetection", ByteTag::class)) {
-            return;
-        }
+		return $buffer;
+	}
 
-        $this->compressedCoords = $nbt->getByteArray("Coords");
-        $this->compressedBlocks = $nbt->getByteArray("Blocks");
-        $this->detectDuplicates = $nbt->getByte("DuplicateDetection") == 1;
+	public function unserialize($data): void {
+		if(!is_string($data)) {
+			return;
+		}
 
-        $this->decompress();
-    }
+		/** @var CompoundTag $nbt */
+		$nbt = (new BigEndianNBTStream())->readCompressed($data);
+		if(!$nbt->hasTag("Coords", ByteArrayTag::class) || !$nbt->hasTag("Blocks", ByteArrayTag::class) || !$nbt->hasTag("DuplicateDetection", ByteTag::class)) {
+			return;
+		}
+
+		$this->compressedCoords = $nbt->getByteArray("Coords");
+		$this->compressedBlocks = $nbt->getByteArray("Blocks");
+		$this->detectDuplicates = $nbt->getByte("DuplicateDetection") == 1;
+
+		$this->decompress();
+	}
 }

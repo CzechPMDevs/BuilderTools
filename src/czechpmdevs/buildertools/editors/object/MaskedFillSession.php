@@ -25,68 +25,67 @@ use pocketmine\level\ChunkManager;
 
 class MaskedFillSession extends FillSession {
 
-    /** @var BlockIdentifierList|null */
-    protected ?BlockIdentifierList $mask;
+	protected ?BlockIdentifierList $mask;
 
-    public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true, ?BlockIdentifierList $mask = null) {
-        parent::__construct($world, $calculateDimensions, $saveChanges);
+	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true, ?BlockIdentifierList $mask = null) {
+		parent::__construct($world, $calculateDimensions, $saveChanges);
 
-        $this->mask = $mask;
-    }
+		$this->mask = $mask;
+	}
 
-    /**
-     * @param int $y 0-255
-     */
-    public function setBlockAt(int $x, int $y, int $z, int $id, int $meta): void {
-        if (!$this->moveTo($x, $y, $z)) {
-            return;
-        }
+	/**
+	 * @param int $y 0-255
+	 */
+	public function setBlockAt(int $x, int $y, int $z, int $id, int $meta): void {
+		if (!$this->moveTo($x, $y, $z)) {
+			return;
+		}
 
-        if ($this->mask !== null && (
-                !$this->mask->containsBlock(
-                    /** @phpstan-ignore-next-line */
-                    $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
-                    /** @phpstan-ignore-next-line */
-                    $this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf)
-                )
-            ) && (
-                !$this->mask->containsBlockId(
-                    /** @phpstan-ignore-next-line */
-                    $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
-                )
-            )
-        ) {
-            return;
-        }
+		if ($this->mask !== null && (
+				!$this->mask->containsBlock(
+					/** @phpstan-ignore-next-line */
+					$this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
+					/** @phpstan-ignore-next-line */
+					$this->iterator->currentSubChunk->getBlockData($x & 0xf, $y & 0xf, $z & 0xf)
+				)
+			) && (
+				!$this->mask->containsBlockId(
+					/** @phpstan-ignore-next-line */
+					$this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
+				)
+			)
+		) {
+			return;
+		}
 
-        $this->saveChanges($x, $y, $z);
+		$this->saveChanges($x, $y, $z);
 
-        /** @phpstan-ignore-next-line */
-        $this->iterator->currentSubChunk->setBlock($x & 0xf, $y & 0xf, $z & 0xf, $id, $meta);
-        $this->blocksChanged++;
-    }
+		/** @phpstan-ignore-next-line */
+		$this->iterator->currentSubChunk->setBlock($x & 0xf, $y & 0xf, $z & 0xf, $id, $meta);
+		$this->blocksChanged++;
+	}
 
-    /**
-     * @param int $y 0-255
-     */
-    public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
-        if(!$this->moveTo($x, $y, $z)) {
-            return;
-        }
+	/**
+	 * @param int $y 0-255
+	 */
+	public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
+		if(!$this->moveTo($x, $y, $z)) {
+			return;
+		}
 
-        if($this->mask !== null && !$this->mask->containsBlock(
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
-            /** @phpstan-ignore-next-line */
-            $this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
-        )) {
-            return;
-        }
+		if($this->mask !== null && !$this->mask->containsBlock(
+			/** @phpstan-ignore-next-line */
+			$this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf),
+			/** @phpstan-ignore-next-line */
+			$this->iterator->currentSubChunk->getBlockId($x & 0xf, $y & 0xf, $z & 0xf)
+		)) {
+			return;
+		}
 
-        $this->saveChanges($x, $y, $z);
+		$this->saveChanges($x, $y, $z);
 
-        /** @phpstan-ignore-next-line */
-        $this->iterator->currentSubChunk->setBlockId($x & 0xf, $y & 0xf, $z & 0xf, $id);
-        $this->blocksChanged++;
-    }
+		/** @phpstan-ignore-next-line */
+		$this->iterator->currentSubChunk->setBlockId($x & 0xf, $y & 0xf, $z & 0xf, $id);
+		$this->blocksChanged++;
+	}
 }

@@ -24,33 +24,33 @@ use czechpmdevs\buildertools\blockstorage\SelectionData;
 
 class FlipUtil {
 
-    public static function flip(SelectionData $selection, int $axis = Axis::Y_AXIS, int $motion = 0): SelectionData {
-        $modifiedSelection = new SelectionData();
-        $modifiedSelection->setLevel($selection->getLevel());
-        $modifiedSelection->setPlayerPosition($selection->getPlayerPosition());
+	public static function flip(SelectionData $selection, int $axis = Axis::Y_AXIS, int $motion = 0): SelectionData {
+		$modifiedSelection = new SelectionData();
+		$modifiedSelection->setLevel($selection->getLevel());
+		$modifiedSelection->setPlayerPosition($selection->getPlayerPosition());
 
-        $sizeData = $selection->getSizeData();
-        if($axis == Axis::X_AXIS) { // y & z const
-            while ($selection->hasNext()) {
-                $selection->readNext($x, $y, $z, $id, $meta);
-                FlipHelper::flip($axis, $id, $meta);
-                $modifiedSelection->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $id, $meta);
-            }
-        } elseif($axis == Axis::Y_AXIS) { // x & z const
-            while ($selection->hasNext()) {
-                $selection->readNext($x, $y, $z, $id, $meta);
-                FlipHelper::flip($axis, $id, $meta);
-                $modifiedSelection->addBlockAt($x, (($sizeData->minY + $sizeData->maxY) - $y) + $motion, $z, $id, $meta);
-            }
-        } else {
-            while ($selection->hasNext()) { // x & y const
-                $selection->readNext($x, $y, $z, $id, $meta);
-                FlipHelper::flip($axis, $id, $meta);
-                $modifiedSelection->addBlockAt($x, $y, (($sizeData->minZ + $sizeData->maxZ) - $z) + $motion, $id, $meta);
-            }
-        }
-        $selection->offset = 0;
+		$sizeData = $selection->getSizeData();
+		if($axis == Axis::X_AXIS) { // y & z const
+			while ($selection->hasNext()) {
+				$selection->readNext($x, $y, $z, $id, $meta);
+				FlipHelper::flip($axis, $id, $meta);
+				$modifiedSelection->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $id, $meta);
+			}
+		} elseif($axis == Axis::Y_AXIS) { // x & z const
+			while ($selection->hasNext()) {
+				$selection->readNext($x, $y, $z, $id, $meta);
+				FlipHelper::flip($axis, $id, $meta);
+				$modifiedSelection->addBlockAt($x, (($sizeData->minY + $sizeData->maxY) - $y) + $motion, $z, $id, $meta);
+			}
+		} else {
+			while ($selection->hasNext()) { // x & y const
+				$selection->readNext($x, $y, $z, $id, $meta);
+				FlipHelper::flip($axis, $id, $meta);
+				$modifiedSelection->addBlockAt($x, $y, (($sizeData->minZ + $sizeData->maxZ) - $z) + $motion, $id, $meta);
+			}
+		}
+		$selection->offset = 0;
 
-        return $modifiedSelection;
-    }
+		return $modifiedSelection;
+	}
 }

@@ -52,191 +52,191 @@ use const PATHINFO_EXTENSION;
 
 class SchematicsManager {
 
-    /** @phpstan-var array<class-string<Schematic>> */
-    private static array $registeredTypes = [];
-    /** @var BlockArray[] */
-    private static array $loadedSchematics = [];
+	/** @phpstan-var array<class-string<Schematic>> */
+	private static array $registeredTypes = [];
+	/** @var BlockArray[] */
+	private static array $loadedSchematics = [];
 
-    public static function lazyInit(): void {
-        if(!empty(SchematicsManager::$registeredTypes)) {
-            return;
-        }
+	public static function lazyInit(): void {
+		if(!empty(SchematicsManager::$registeredTypes)) {
+			return;
+		}
 
-        SchematicsManager::$registeredTypes[] = BuilderToolsSchematic::class;
-        SchematicsManager::$registeredTypes[] = MCEditSchematic::class;
-        SchematicsManager::$registeredTypes[] = MCStructureSchematic::class;
-    }
+		SchematicsManager::$registeredTypes[] = BuilderToolsSchematic::class;
+		SchematicsManager::$registeredTypes[] = MCEditSchematic::class;
+		SchematicsManager::$registeredTypes[] = MCStructureSchematic::class;
+	}
 
-    /**
-     * @phpstan-param Closure(SchematicActionResult $result): void $callback
-     */
-    public static function loadSchematic(string $schematic, Closure $callback): void {
-        $startTime = microtime(true);
+	/**
+	 * @phpstan-param Closure(SchematicActionResult $result): void $callback
+	 */
+	public static function loadSchematic(string $schematic, Closure $callback): void {
+		$startTime = microtime(true);
 
-        $file = $schematic;
-        if(!SchematicsManager::findSchematicFile($file)) {
-            $callback(SchematicActionResult::error("Could not find file for $schematic"));
-            return;
-        }
+		$file = $schematic;
+		if(!SchematicsManager::findSchematicFile($file)) {
+			$callback(SchematicActionResult::error("Could not find file for $schematic"));
+			return;
+		}
 
-        /** @phpstan-ignore-next-line */
-        AsyncQueue::submitTask(new SchematicLoadTask($file), function (SchematicLoadTask $task) use ($startTime, $schematic, $callback): void {
-            if($task->error !== null) {
-                $callback(SchematicActionResult::error($task->error));
-                return;
-            }
+		/** @phpstan-ignore-next-line */
+		AsyncQueue::submitTask(new SchematicLoadTask($file), function (SchematicLoadTask $task) use ($startTime, $schematic, $callback): void {
+			if($task->error !== null) {
+				$callback(SchematicActionResult::error($task->error));
+				return;
+			}
 
-            $blockArray = unserialize($task->blockArray);
+			$blockArray = unserialize($task->blockArray);
 
-            if(!$blockArray instanceof BlockArray) {
-                $callback(SchematicActionResult::error("Error whilst reading object from another thread."));
-            }
+			if(!$blockArray instanceof BlockArray) {
+				$callback(SchematicActionResult::error("Error whilst reading object from another thread."));
+			}
 
-            SchematicsManager::$loadedSchematics[$task->name] = $blockArray;
+			SchematicsManager::$loadedSchematics[$task->name] = $blockArray;
 
-            $callback(SchematicActionResult::success(microtime(true) - $startTime));
-        });
-    }
+			$callback(SchematicActionResult::success(microtime(true) - $startTime));
+		});
+	}
 
-    public static function unloadSchematic(string $schematic): bool {
-        if(!isset(SchematicsManager::$loadedSchematics[$schematic])) {
-            return false;
-        }
+	public static function unloadSchematic(string $schematic): bool {
+		if(!isset(SchematicsManager::$loadedSchematics[$schematic])) {
+			return false;
+		}
 
-        unset(SchematicsManager::$loadedSchematics[$schematic]);
-        return true;
-    }
+		unset(SchematicsManager::$loadedSchematics[$schematic]);
+		return true;
+	}
 
-    /**
-     * @return string[]
-     */
-    public static function getLoadedSchematics(): array {
-        return array_keys(SchematicsManager::$loadedSchematics);
-    }
+	/**
+	 * @return string[]
+	 */
+	public static function getLoadedSchematics(): array {
+		return array_keys(SchematicsManager::$loadedSchematics);
+	}
 
-    /**
-     * @phpstan-param Closure(SchematicActionResult $result): void $callback
-     */
-    public static function createSchematic(Player $player, Vector3 $pos1, Vector3 $pos2, string $schematicName, Closure $callback): void {
-        $startTime = microtime(true);
+	/**
+	 * @phpstan-param Closure(SchematicActionResult $result): void $callback
+	 */
+	public static function createSchematic(Player $player, Vector3 $pos1, Vector3 $pos2, string $schematicName, Closure $callback): void {
+		$startTime = microtime(true);
 
-        $format = SchematicsManager::getSchematicByExtension(BuilderTools::getConfiguration()["output-schematics-format"] ?? "");
-        BuilderTools::getInstance()->getLogger()->debug("Using $format format to create schematic...");
+		$format = SchematicsManager::getSchematicByExtension(BuilderTools::getConfiguration()["output-schematics-format"] ?? "");
+		BuilderTools::getInstance()->getLogger()->debug("Using $format format to create schematic...");
 
-        /** @noinspection ALL */
-        $targetFile = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR . basename($schematicName, ".schematic") . "." . $format::getFileExtension();
-        if(!@touch($targetFile)) {
-            $callback(SchematicActionResult::error("Could not access target file"));
-            return;
-        }
+		/** @noinspection ALL */
+		$targetFile = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR . basename($schematicName, ".schematic") . "." . $format::getFileExtension();
+		if(!@touch($targetFile)) {
+			$callback(SchematicActionResult::error("Could not access target file"));
+			return;
+		}
 
-        $fillSession = new FillSession($player->getLevelNonNull());
-        $blocks = new BlockArray();
+		$fillSession = new FillSession($player->getLevelNonNull());
+		$blocks = new BlockArray();
 
-        Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        for($y = $minY; $y <= $maxY; ++$y) {
-            for($x = $minX; $x <= $maxX; ++$x) {
-                for($z = $minZ; $z <= $maxZ; ++$z) {
-                    $fillSession->getBlockAt($x, $y, $z, $id, $meta);
-                    $blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $id, $meta);
-                }
-            }
-        }
+		for($y = $minY; $y <= $maxY; ++$y) {
+			for($x = $minX; $x <= $maxX; ++$x) {
+				for($z = $minZ; $z <= $maxZ; ++$z) {
+					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
+					$blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $id, $meta);
+				}
+			}
+		}
 
-        /** @phpstan-ignore-next-line */
-        AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function (SchematicCreateTask $task) use ($callback, $startTime): void {
-            if($task->error !== null) {
-                $callback(SchematicActionResult::error($task->error));
-                return;
-            }
+		/** @phpstan-ignore-next-line */
+		AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function (SchematicCreateTask $task) use ($callback, $startTime): void {
+			if($task->error !== null) {
+				$callback(SchematicActionResult::error($task->error));
+				return;
+			}
 
-            $callback(SchematicActionResult::success(microtime(true) - $startTime));
-        });
-    }
+			$callback(SchematicActionResult::success(microtime(true) - $startTime));
+		});
+	}
 
-    public static function pasteSchematic(Player $player, string $schematicName): EditorResult {
-        $startTime = microtime(true);
+	public static function pasteSchematic(Player $player, string $schematicName): EditorResult {
+		$startTime = microtime(true);
 
-        if(!isset(SchematicsManager::$loadedSchematics[$schematicName])) {
-            return EditorResult::error("Schematic $schematicName is not loaded.");
-        }
+		if(!isset(SchematicsManager::$loadedSchematics[$schematicName])) {
+			return EditorResult::error("Schematic $schematicName is not loaded.");
+		}
 
-        $schematic = clone SchematicsManager::$loadedSchematics[$schematicName];
+		$schematic = clone SchematicsManager::$loadedSchematics[$schematicName];
 
-        $fillSession = new FillSession($player->getLevelNonNull(), true, true);
+		$fillSession = new FillSession($player->getLevelNonNull(), true, true);
 
-        $floorX = $player->getFloorX();
-        $floorY = $player->getFloorY();
-        $floorZ = $player->getFloorZ();
+		$floorX = $player->getFloorX();
+		$floorY = $player->getFloorY();
+		$floorZ = $player->getFloorZ();
 
-        while ($schematic->hasNext()) {
-            $schematic->readNext($x, $y, $z, $id, $meta);
-            if($id != 0)
-                $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
-        }
+		while ($schematic->hasNext()) {
+			$schematic->readNext($x, $y, $z, $id, $meta);
+			if($id != 0)
+				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+		}
 
-        if($fillSession->getBlocksChanged() == 0) {
-            return EditorResult::error("0 blocks changed");
-        }
+		if($fillSession->getBlocksChanged() == 0) {
+			return EditorResult::error("0 blocks changed");
+		}
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
-        $fillSession->close();
+		$fillSession->reloadChunks($player->getLevelNonNull());
+		$fillSession->close();
 
-        /** @phpstan-var BlockArray $changes */
-        $changes = $fillSession->getChanges();
-        Canceller::getInstance()->addStep($player, $changes);
+		/** @phpstan-var BlockArray $changes */
+		$changes = $fillSession->getChanges();
+		Canceller::getInstance()->addStep($player, $changes);
 
-        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-    }
+		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+	}
 
-    private static function findSchematicFile(string &$file): bool {
-        $dataFolder = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR;
-        $allowedExtensions = array_unique(array_map(fn(string $schematic) => $schematic::getFileExtension(), SchematicsManager::$registeredTypes));
-        $ext = pathinfo($file, PATHINFO_EXTENSION);
-        if(in_array($ext, $allowedExtensions)) {
-            if(file_exists($dataFolder . $file)) {
-                $file = $dataFolder . $file;
-                return true;
-            }
-        }
+	private static function findSchematicFile(string &$file): bool {
+		$dataFolder = BuilderTools::getInstance()->getDataFolder() . "schematics" . DIRECTORY_SEPARATOR;
+		$allowedExtensions = array_unique(array_map(fn(string $schematic) => $schematic::getFileExtension(), SchematicsManager::$registeredTypes));
+		$ext = pathinfo($file, PATHINFO_EXTENSION);
+		if(in_array($ext, $allowedExtensions, true)) {
+			if(file_exists($dataFolder . $file)) {
+				$file = $dataFolder . $file;
+				return true;
+			}
+		}
 
-        foreach ($allowedExtensions as $extension) {
-            if(file_exists($dataFolder . $file . "." . $extension)) {
-                $file = $dataFolder . $file . "." . $extension;
-                return true;
-            }
-        }
+		foreach ($allowedExtensions as $extension) {
+			if(file_exists($dataFolder . $file . "." . $extension)) {
+				$file = $dataFolder . $file . "." . $extension;
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * @return class-string<Schematic>|null
-     */
-    public static function getSchematicFormat(string $rawData): ?string {
-        foreach (SchematicsManager::$registeredTypes as $class) {
-            if($class::validate($rawData)) {
-                return $class;
-            }
-        }
+	/**
+	 * @return class-string<Schematic>|null
+	 */
+	public static function getSchematicFormat(string $rawData): ?string {
+		foreach (SchematicsManager::$registeredTypes as $class) {
+			if($class::validate($rawData)) {
+				return $class;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * @return class-string<Schematic>
-     */
-    public static function getSchematicByExtension(string $extension): string {
-        $extension = trim(strtolower($extension));
+	/**
+	 * @return class-string<Schematic>
+	 */
+	public static function getSchematicByExtension(string $extension): string {
+		$extension = trim(strtolower($extension));
 
-        foreach (SchematicsManager::$registeredTypes as $class) {
-            if(strtolower($class::getFileExtension()) == $extension) {
-                return $class;
-            }
-        }
+		foreach (SchematicsManager::$registeredTypes as $class) {
+			if(strtolower($class::getFileExtension()) == $extension) {
+				return $class;
+			}
+		}
 
-        BuilderTools::getInstance()->getLogger()->warning("Invalid default schematic format set in config.yml! Using MCEdit...");
-        return MCEditSchematic::class;
-    }
+		BuilderTools::getInstance()->getLogger()->warning("Invalid default schematic format set in config.yml! Using MCEdit...");
+		return MCEditSchematic::class;
+	}
 }

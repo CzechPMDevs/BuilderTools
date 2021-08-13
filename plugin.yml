@@ -5,6 +5,7 @@ authors: [VixikHD]
 version: 1.2.1
 main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
+description: Powerful World Editor plugin for PocketMine servers
 
 extensions:
   Core: '>=7.4'

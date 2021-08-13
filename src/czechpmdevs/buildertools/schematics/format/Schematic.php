@@ -25,37 +25,37 @@ use czechpmdevs\buildertools\schematics\SchematicException;
 
 interface Schematic {
 
-    /**
-     * Function which should be used to load schematics and
-     * convert it to BlockArray.
-     *
-     * - It should be independent on main thread classes if used
-     *   on pmmp server
-     *
-     * @throws SchematicException
-     */
-    public function load(string $rawData): BlockArray;
+	/**
+	 * Function which should be used to load schematics and
+	 * convert it to BlockArray.
+	 *
+	 * - It should be independent on main thread classes if used
+	 *   on pmmp server
+	 *
+	 * @throws SchematicException
+	 */
+	public function load(string $rawData): BlockArray;
 
-    /**
-     * Function which should be used to save schematics from
-     * BlockArray as string.
-     *
-     * - It should be independent on main thread classes if used
-     *   on pmmp server
-     *
-     * @throws SchematicException
-     */
-    public function save(BlockArray $blockArray): string;
+	/**
+	 * Function which should be used to save schematics from
+	 * BlockArray as string.
+	 *
+	 * - It should be independent on main thread classes if used
+	 *   on pmmp server
+	 *
+	 * @throws SchematicException
+	 */
+	public function save(BlockArray $blockArray): string;
 
-    /**
-     * Returns extension of the exported file (mostly
-     * '.schematic')
-     */
-    public static function getFileExtension(): string;
+	/**
+	 * Returns extension of the exported file (mostly
+	 * '.schematic')
+	 */
+	public static function getFileExtension(): string;
 
-    /**
-     * This function is used to validate format from raw data
-     * - Should not throw any errors neither exceptions
-     */
-    public static function validate(string $rawData): bool;
+	/**
+	 * This function is used to validate format from raw data
+	 * - Should not throw any errors neither exceptions
+	 */
+	public static function validate(string $rawData): bool;
 }

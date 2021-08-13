@@ -30,48 +30,48 @@ use pocketmine\utils\SingletonTrait;
 use function microtime;
 
 class Naturalizer {
-    use SingletonTrait;
+	use SingletonTrait;
 
-    public function naturalize(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
-        $startTime = microtime(true);
+	public function naturalize(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
+		$startTime = microtime(true);
 
-        Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-        $fillSession = new FillSession($player->getLevelNonNull(), false);
-        $fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
+		$fillSession = new FillSession($player->getLevelNonNull(), false);
+		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
-        for($x = $minX; $x <= $maxX; ++$x) {
-            for($z = $minZ; $z <= $maxZ; ++$z) {
-                $state = 0;
-                for($y = 255; $y >= 0; --$y) {
-                    $fillSession->getBlockIdAt($x, $y, $z, $id);
-                    if($id == 0) {
-                        $state = 0;
-                    } elseif($state == 0) {
-                        $state = 1;
-                        $fillSession->setBlockAt($x, $y, $z, 2, 0); // Grass
-                    } elseif($state < 5) { // 1 - 3
-                        if($state == 3) {
-                            $state += 2;
-                        } else {
-                            $state++;
-                        }
-                        $fillSession->setBlockAt($x, $y, $z, 3, 0);
-                    } else {
-                        $fillSession->setBlockAt($x, $y, $z, 1, 0);
-                    }
-                }
-            }
-        }
+		for($x = $minX; $x <= $maxX; ++$x) {
+			for($z = $minZ; $z <= $maxZ; ++$z) {
+				$state = 0;
+				for($y = 255; $y >= 0; --$y) {
+					$fillSession->getBlockIdAt($x, $y, $z, $id);
+					if($id == 0) {
+						$state = 0;
+					} elseif($state == 0) {
+						$state = 1;
+						$fillSession->setBlockAt($x, $y, $z, 2, 0); // Grass
+					} elseif($state < 5) { // 1 - 3
+						if($state == 3) {
+							$state += 2;
+						} else {
+							$state++;
+						}
+						$fillSession->setBlockAt($x, $y, $z, 3, 0);
+					} else {
+						$fillSession->setBlockAt($x, $y, $z, 1, 0);
+					}
+				}
+			}
+		}
 
-        $fillSession->reloadChunks($player->getLevelNonNull());
-        $fillSession->close();
+		$fillSession->reloadChunks($player->getLevelNonNull());
+		$fillSession->close();
 
-        /** @phpstan-var BlockArray $changes */
-        $changes = $fillSession->getChanges();
-        $changes->save();
-        Canceller::getInstance()->addStep($player, $changes);
+		/** @phpstan-var BlockArray $changes */
+		$changes = $fillSession->getChanges();
+		$changes->save();
+		Canceller::getInstance()->addStep($player, $changes);
 
-        return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-    }
+		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+	}
 }

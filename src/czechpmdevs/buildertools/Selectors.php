@@ -28,134 +28,134 @@ use function array_key_exists;
 
 class Selectors {
 
-    /** @var Position[] */
-    private static array $pos1 = [];
-    /** @var Position[] */
-    private static array $pos2 = [];
+	/** @var Position[] */
+	private static array $pos1 = [];
+	/** @var Position[] */
+	private static array $pos2 = [];
 
-    /** @var Player[] */
-    private static array $wandSelectors = [];
+	/** @var Player[] */
+	private static array $wandSelectors = [];
 
-    /** @var array[] */
-    private static array $drawingPlayers = [];
-    /** @var Player[] */
-    private static array $blockInfoPlayers = [];
+	/** @var array[] */
+	private static array $drawingPlayers = [];
+	/** @var Player[] */
+	private static array $blockInfoPlayers = [];
 
-    public static function addDrawingPlayer(Player $player, int $brush, int $mode, bool $fall): void {
-        Selectors::$drawingPlayers[$player->getName()] = [$brush, $mode, $fall];
-    }
+	public static function addDrawingPlayer(Player $player, int $brush, int $mode, bool $fall): void {
+		Selectors::$drawingPlayers[$player->getName()] = [$brush, $mode, $fall];
+	}
 
-    public static function removeDrawingPlayer(Player $player): void {
-        unset(Selectors::$drawingPlayers[$player->getName()]);
-    }
+	public static function removeDrawingPlayer(Player $player): void {
+		unset(Selectors::$drawingPlayers[$player->getName()]);
+	}
 
-    public static function getDrawingPlayerBrush(Player $player): int {
-        return Selectors::$drawingPlayers[$player->getName()][0];
-    }
+	public static function getDrawingPlayerBrush(Player $player): int {
+		return Selectors::$drawingPlayers[$player->getName()][0];
+	}
 
-    public static function getDrawingPlayerMode(Player $player): int {
-        return Selectors::$drawingPlayers[$player->getName()][1];
-    }
+	public static function getDrawingPlayerMode(Player $player): int {
+		return Selectors::$drawingPlayers[$player->getName()][1];
+	}
 
-    public static function getDrawingPlayerFall(Player $player): bool {
-        return Selectors::$drawingPlayers[$player->getName()][2];
-    }
+	public static function getDrawingPlayerFall(Player $player): bool {
+		return Selectors::$drawingPlayers[$player->getName()][2];
+	}
 
-    public static function isDrawingPlayer(Player $player): bool {
-        return array_key_exists($player->getName(), Selectors::$drawingPlayers);
-    }
+	public static function isDrawingPlayer(Player $player): bool {
+		return array_key_exists($player->getName(), Selectors::$drawingPlayers);
+	}
 
-    /**
-     * @return int|null If not null, returns count of blocks in selection
-     */
-    public static function addSelector(Player $player, int $pos, Position $position): ?int {
-        if($pos != 1 && $pos != 2) {
-            throw new InvalidArgumentException("Player can select only two positions");
-        }
-        if(!$position->equals($position->ceil())) {
-            throw new InvalidArgumentException("Position coordinates must be integer type.");
-        }
+	/**
+	 * @return int|null If not null, returns count of blocks in selection
+	 */
+	public static function addSelector(Player $player, int $pos, Position $position): ?int {
+		if($pos != 1 && $pos != 2) {
+			throw new InvalidArgumentException("Player can select only two positions");
+		}
+		if(!$position->equals($position->ceil())) {
+			throw new InvalidArgumentException("Position coordinates must be integer type.");
+		}
 
-        if($pos == 1) {
-            Selectors::$pos1[$player->getName()] = $position;
-        } else {
-            Selectors::$pos2[$player->getName()] = $position;
-        }
+		if($pos == 1) {
+			Selectors::$pos1[$player->getName()] = $position;
+		} else {
+			Selectors::$pos2[$player->getName()] = $position;
+		}
 
-        $pos1 = Selectors::$pos1[$player->getName()] ?? null;
-        $pos2 = Selectors::$pos2[$player->getName()] ?? null;
+		$pos1 = Selectors::$pos1[$player->getName()] ?? null;
+		$pos2 = Selectors::$pos2[$player->getName()] ?? null;
 
-        if($pos1 === null || $pos2 === null) {
-            return null;
-        }
+		if($pos1 === null || $pos2 === null) {
+			return null;
+		}
 
-        if($pos1->getLevel() === null || $pos2->getLevel() === null) {
-            return null;
-        }
+		if($pos1->getLevel() === null || $pos2->getLevel() === null) {
+			return null;
+		}
 
-        if($pos1->getLevel()->isClosed() || $pos2->getLevel()->isClosed()) {
-            return null;
-        }
+		if($pos1->getLevel()->isClosed() || $pos2->getLevel()->isClosed()) {
+			return null;
+		}
 
-        if($pos1->getLevel()->getId() != $pos2->getLevel()->getId()) {
-            return null;
-        }
+		if($pos1->getLevel()->getId() != $pos2->getLevel()->getId()) {
+			return null;
+		}
 
-        return Math::selectionSize($pos1, $pos2);
-    }
+		return Math::selectionSize($pos1, $pos2);
+	}
 
-    public static function getPosition(Player $player, int $pos): ?Position {
-        if($pos == 1) {
-            return Selectors::$pos1[$player->getName()];
-        }
-        if($pos == 2) {
-            return Selectors::$pos2[$player->getName()];
-        }
+	public static function getPosition(Player $player, int $pos): ?Position {
+		if($pos == 1) {
+			return Selectors::$pos1[$player->getName()];
+		}
+		if($pos == 2) {
+			return Selectors::$pos2[$player->getName()];
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    public static function isSelected(int $pos, Player $player): bool {
-        if($pos == 1) {
-            return array_key_exists($player->getName(), Selectors::$pos1);
-        }
-        if($pos == 2) {
-            return array_key_exists($player->getName(), Selectors::$pos2);
-        }
+	public static function isSelected(int $pos, Player $player): bool {
+		if($pos == 1) {
+			return array_key_exists($player->getName(), Selectors::$pos1);
+		}
+		if($pos == 2) {
+			return array_key_exists($player->getName(), Selectors::$pos2);
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public static function switchWandSelector(Player $player): void {
-        if(array_key_exists($player->getName(), Selectors::$wandSelectors)) {
-            unset(Selectors::$wandSelectors[$player->getName()]);
-        } else {
-            Selectors::$wandSelectors[$player->getName()] = $player;
-        }
-    }
+	public static function switchWandSelector(Player $player): void {
+		if(array_key_exists($player->getName(), Selectors::$wandSelectors)) {
+			unset(Selectors::$wandSelectors[$player->getName()]);
+		} else {
+			Selectors::$wandSelectors[$player->getName()] = $player;
+		}
+	}
 
-    public static function switchBlockInfoSelector(Player $player): void {
-        if(array_key_exists($player->getName(), Selectors::$blockInfoPlayers)) {
-            unset(Selectors::$blockInfoPlayers[$player->getName()]);
-        } else {
-            Selectors::$blockInfoPlayers[$player->getName()] = $player;
-        }
-    }
+	public static function switchBlockInfoSelector(Player $player): void {
+		if(array_key_exists($player->getName(), Selectors::$blockInfoPlayers)) {
+			unset(Selectors::$blockInfoPlayers[$player->getName()]);
+		} else {
+			Selectors::$blockInfoPlayers[$player->getName()] = $player;
+		}
+	}
 
-    public static function isWandSelector(Player $player): bool {
-        return array_key_exists($player->getName(), Selectors::$wandSelectors);
-    }
+	public static function isWandSelector(Player $player): bool {
+		return array_key_exists($player->getName(), Selectors::$wandSelectors);
+	}
 
-    public static function isBlockInfoPlayer(Player $player): bool {
-        return array_key_exists($player->getName(), Selectors::$blockInfoPlayers);
-    }
+	public static function isBlockInfoPlayer(Player $player): bool {
+		return array_key_exists($player->getName(), Selectors::$blockInfoPlayers);
+	}
 
-    public static function unloadPlayer(Player $player): void {
-        unset(Selectors::$wandSelectors[$player->getName()]);
-        unset(Selectors::$blockInfoPlayers[$player->getName()]);
-        unset(Selectors::$drawingPlayers[$player->getName()]);
+	public static function unloadPlayer(Player $player): void {
+		unset(Selectors::$wandSelectors[$player->getName()]);
+		unset(Selectors::$blockInfoPlayers[$player->getName()]);
+		unset(Selectors::$drawingPlayers[$player->getName()]);
 
-        unset(Selectors::$pos1[$player->getName()]);
-        unset(Selectors::$pos2[$player->getName()]);
-    }
+		unset(Selectors::$pos1[$player->getName()]);
+		unset(Selectors::$pos2[$player->getName()]);
+	}
 }

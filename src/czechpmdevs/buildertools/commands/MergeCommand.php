@@ -28,32 +28,32 @@ use pocketmine\Player;
 
 class MergeCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/merge", "Merge copied area", null, []);
-    }
+	public function __construct() {
+		parent::__construct("/merge", "Merge copied area", null, []);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!Selectors::isSelected(1, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the first position.");
-            return;
-        }
-        if(!Selectors::isSelected(2, $sender)) {
-            $sender->sendMessage(BuilderTools::getPrefix()."§cFirst you need to select the second position.");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!Selectors::isSelected(1, $sender)) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the first position.");
+			return;
+		}
+		if(!Selectors::isSelected(2, $sender)) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the second position.");
+			return;
+		}
 
-        $result = Copier::getInstance()->merge($sender);
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while processing: {$result->getErrorMessage()}");
-            return;
-        }
+		$result = Copier::getInstance()->merge($sender);
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while processing: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully merged, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aCopied area successfully merged, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+	}
 }

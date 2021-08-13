@@ -25,15 +25,15 @@ use pocketmine\Server;
 
 abstract class BuilderToolsAsyncTask extends AsyncTask {
 
-    /**
-     * This function is called on main thread before calling
-     * callback function
-     */
-    public function complete(): void {}
+	/**
+	 * This function is called on main thread before calling
+	 * callback function
+	 */
+	public function complete(): void {}
 
-    /** @noinspection PhpUnused */
-    final public function onCompletion(Server $server) {
-        $this->complete();
-        AsyncQueue::callCallback($this);
-    }
+	/** @noinspection PhpUnused */
+	final public function onCompletion(Server $server) {
+		$this->complete();
+		AsyncQueue::callCallback($this);
+	}
 }

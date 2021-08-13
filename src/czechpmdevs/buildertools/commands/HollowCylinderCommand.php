@@ -27,31 +27,31 @@ use pocketmine\Player;
 
 class HollowCylinderCommand extends BuilderToolsCommand {
 
-    public function __construct() {
-        parent::__construct("/hcylinder", "Create hollow cylinder", null, ["/hcyl"]);
-    }
+	public function __construct() {
+		parent::__construct("/hcylinder", "Create hollow cylinder", null, ["/hcyl"]);
+	}
 
-    /** @noinspection PhpUnused */
-    public function execute(CommandSender $sender, string $commandLabel, array $args) {
-        if(!$this->testPermission($sender)) return;
-        if(!$sender instanceof Player) {
-            $sender->sendMessage("§cThis command can be used only in game!");
-            return;
-        }
-        if(!isset($args[0])) {
-            $sender->sendMessage("§cUsage: §7//hcylinder <id1:dmg1,id2:dmg2:...> [radius] [height]");
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//hcylinder <id1:dmg1,id2:dmg2:...> [radius] [height]");
+			return;
+		}
 
-        $radius = isset($args[1]) ? (int)($args[1]) : 5;
-        $height = isset($args[2]) ? (int)($args[2]) : 8;
+		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
+		$height = isset($args[2]) ? (int) ($args[2]) : 8;
 
-        $result = Printer::getInstance()->makeHollowCylinder($sender, $sender, $radius, $height, $args[0]);
-        if(!$result->successful()) {
-            $sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow cylinder: {$result->getErrorMessage()}");
-            return;
-        }
+		$result = Printer::getInstance()->makeHollowCylinder($sender, $sender, $radius, $height, $args[0]);
+		if(!$result->successful()) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow cylinder: {$result->getErrorMessage()}");
+			return;
+		}
 
-        $sender->sendMessage(BuilderTools::getPrefix()."§aHollow cylinder created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
-    }
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aHollow cylinder created, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)");
+	}
 }

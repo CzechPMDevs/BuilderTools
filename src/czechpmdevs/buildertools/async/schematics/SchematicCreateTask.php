@@ -30,42 +30,40 @@ use function unserialize;
 
 class SchematicCreateTask extends BuilderToolsAsyncTask {
 
-    /** @var string */
-    public string $targetFilePath;
-    /** @var class-string<Schematic> */
-    public string $format;
-    /** @var string */
-    public string $blockArray;
+	public string $targetFilePath;
+	/** @var class-string<Schematic> */
+	public string $format;
 
-    /** @var string|null */
-    public ?string $error = null;
+	public string $blockArray;
 
-    /**
-     * @param class-string<Schematic> $format
-     */
-    public function __construct(string $targetFilePath, string $format, BlockArray $blockArray) {
-        $this->targetFilePath = $targetFilePath;
-        $this->format = $format;
-        $this->blockArray = serialize($blockArray);
-    }
+	public ?string $error = null;
 
-    /** @noinspection PhpUnused */
-    public function onRun() {
-        $blockArray = unserialize($this->blockArray);
-        if(!$blockArray instanceof BlockArray) {
-            $this->error = "Error whilst moving block array on to another thread";
-            return;
-        }
+	/**
+	 * @param class-string<Schematic> $format
+	 */
+	public function __construct(string $targetFilePath, string $format, BlockArray $blockArray) {
+		$this->targetFilePath = $targetFilePath;
+		$this->format = $format;
+		$this->blockArray = serialize($blockArray);
+	}
 
-        try {
-            $schematic = new $this->format;
-            $rawData = $schematic->save($blockArray);
-        }
-        catch (SchematicException $exception) {
-            $this->error = $exception->getMessage();
-            return;
-        }
+	/** @noinspection PhpUnused */
+	public function onRun() {
+		$blockArray = unserialize($this->blockArray);
+		if(!$blockArray instanceof BlockArray) {
+			$this->error = "Error whilst moving block array on to another thread";
+			return;
+		}
 
-        file_put_contents($this->targetFilePath, $rawData);
-    }
+		try {
+			$schematic = new $this->format;
+			$rawData = $schematic->save($blockArray);
+		}
+		catch (SchematicException $exception) {
+			$this->error = $exception->getMessage();
+			return;
+		}
+
+		file_put_contents($this->targetFilePath, $rawData);
+	}
 }
