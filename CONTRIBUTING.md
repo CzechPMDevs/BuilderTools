@@ -16,7 +16,7 @@
 - To express appreciation, objection, confusion or other supported reactions on pull requests, issues or comments on them, use GitHub [reactions](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments) rather than posting an individual comment with an emoji only. This helps keeping the issue/pull request conversation clean and readable.
 
 ## Contributing
-To contribute to the repository, [fork it on GitHub](https://github.com/CzechPmDevs/BuilderTools/fork), create a branch on your fork, and make your changes on your fork. You can then make a [pull request](https://github.com/pmmp/PocketMine-MP/pull/new) to the project to compare your branch to ours and propose your changes to our repository. We use the Pull Request system to allow members of the team to review changes before they are merged.
+To contribute to the repository, [fork it on GitHub](https://github.com/CzechPMDevs/BuilderTools/fork), create a branch on your fork, and make your changes on your fork. You can then make a [pull request](https://github.com/CzechPMDevs/BuilderTools/pull/new) to the project to compare your branch to ours and propose your changes to our repository. We use the Pull Request system to allow members of the team to review changes before they are merged.
 
 ### Licensing
 By proposing a pull request to the project, you agree to your code being distributed within BuilderTools under the [Apache License 2.0](LICENSE).
