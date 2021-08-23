@@ -105,13 +105,13 @@ class RotationUtil {
 	}
 
 	public static function areDegreesValid(int $degrees): bool {
-		$degrees = (int)fmod($degrees, 360);
+		$degrees = (int) fmod($degrees, 360);
 
 		return in_array($degrees, RotationUtil::VALID_DEGREES, true);
 	}
 
 	public static function getRotation(int $degrees): int {
-		$basic = (int)fmod($degrees, 360);
+		$basic = (int) fmod($degrees, 360);
 
 		switch ($basic) {
 			case 0:
