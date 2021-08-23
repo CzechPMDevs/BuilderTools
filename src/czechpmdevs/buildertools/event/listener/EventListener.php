@@ -56,7 +56,7 @@ class EventListener implements Listener {
 			return;
 		}
 
-		$position = $targetBlock->getPos();
+		$position = $targetBlock->getPosition();
 
 		Printer::getInstance()->draw($player, $position, $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerBrush($player), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player));
 		$event->cancel();
@@ -65,7 +65,7 @@ class EventListener implements Listener {
 	/** @noinspection PhpUnused */
 	public function onBlockBreak(BlockBreakEvent $event): void {
 		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
-			$size = Selectors::addSelector($player, 1, $position = $event->getBlock()->getPos());
+			$size = Selectors::addSelector($player, 1, $position = $event->getBlock()->getPosition());
 			$player->sendMessage(BuilderTools::getPrefix() . "§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
 			$event->cancel();
 		}
@@ -81,7 +81,7 @@ class EventListener implements Listener {
 			}
 
 			$this->wandClicks[$player->getName()] = microtime(true);
-			$size = Selectors::addSelector($player, 2, $position = $event->getBlock()->getPos());
+			$size = Selectors::addSelector($player, 2, $position = $event->getBlock()->getPosition());
 			$player->sendMessage(BuilderTools::getPrefix() . "§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
 			$event->cancel();
 		}
@@ -95,13 +95,13 @@ class EventListener implements Listener {
 			$block = $event->getBlock();
 			$this->blockInfoClicks[$player->getName()] = microtime(true);
 
-			$world = $block->getPos()->getWorld();
+			$world = $block->getPosition()->getWorld();
 
 			$player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" .
 				"§aName: §7" . $block->getName() . "\n" .
-				"§aPosition: §7" . $block->getPos()->getFloorX() . ";" . $block->getPos()->getFloorY() . ";" . $block->getPos()->getFloorZ() . " (" . ($block->getPos()->getFloorX() >> 4) . ";" . ($block->getPos()->getFloorZ() >> 4) . ")\n" .
+				"§aPosition: §7" . $block->getPosition()->getFloorX() . ";" . $block->getPosition()->getFloorY() . ";" . $block->getPosition()->getFloorZ() . " (" . ($block->getPosition()->getFloorX() >> 4) . ";" . ($block->getPosition()->getFloorZ() >> 4) . ")\n" .
 				"§World: §7" . $world->getDisplayName() . "\n" .
-				"§aBiome: §7" . $block->getPos()->getWorld()->getBiomeId($block->getPos()->getFloorX(), $block->getPos()->getFloorZ()) . " (" . $block->getPos()->getWorld()->getBiome($block->getPos()->getFloorX(), $block->getPos()->getFloorZ())->getName() . ")");
+				"§aBiome: §7" . $block->getPosition()->getWorld()->getBiomeId($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ()) . " (" . $block->getPosition()->getWorld()->getBiome($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ())->getName() . ")");
 		}
 	}
 
