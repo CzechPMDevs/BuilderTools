@@ -41,7 +41,7 @@ class FlipUtil {
 			while ($selection->hasNext()) {
 				$selection->readNext($x, $y, $z, $id, $meta);
 				$y = (($sizeData->minY + $sizeData->maxY) - $y) + $motion;
-				if($y < World::Y_MIN || $y > World::Y_MAX) {
+				if($y < World::Y_MIN || $y >= World::Y_MAX) {
 					continue;
 				}
 				FlipHelper::flip($axis, $id, $meta);

@@ -249,16 +249,16 @@
         },
         {
             "name": "pocketmine/bedrock-protocol",
-            "version": "dev-master",
+            "version": "1.0.0+bedrock1.17.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/BedrockProtocol.git",
-                "reference": "92a50e865d62d6bf3df37d4967d5e0326c8c99d1"
+                "reference": "2e3bba545dae1774681883fc12a3ee84e553df67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/92a50e865d62d6bf3df37d4967d5e0326c8c99d1",
-                "reference": "92a50e865d62d6bf3df37d4967d5e0326c8c99d1",
+                "url": "https://api.github.com/repos/pmmp/BedrockProtocol/zipball/2e3bba545dae1774681883fc12a3ee84e553df67",
+                "reference": "2e3bba545dae1774681883fc12a3ee84e553df67",
                 "shasum": ""
             },
             "require": {
@@ -272,12 +272,11 @@
                 "ramsey/uuid": "^4.1"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.94",
+                "phpstan/phpstan": "0.12.96",
                 "phpstan/phpstan-phpunit": "^0.12.21",
                 "phpstan/phpstan-strict-rules": "^0.12.10",
                 "phpunit/phpunit": "^9.5"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -291,9 +290,9 @@
             "description": "An implementation of the Minecraft: Bedrock Edition protocol in PHP",
             "support": {
                 "issues": "https://github.com/pmmp/BedrockProtocol/issues",
-                "source": "https://github.com/pmmp/BedrockProtocol/tree/master"
+                "source": "https://github.com/pmmp/BedrockProtocol/tree/1.0.0+bedrock1.17.10"
             },
-            "time": "2021-08-11T16:11:19+00:00"
+            "time": "2021-08-23T14:30:22+00:00"
         },
         {
             "name": "pocketmine/binaryutils",
@@ -680,12 +679,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "2d025bf02f7e64877b8cf8563c75dd52dedb4052"
+                "reference": "2fe03757d503a8f05783cfe3e5b895ed9a7bed9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/2d025bf02f7e64877b8cf8563c75dd52dedb4052",
-                "reference": "2d025bf02f7e64877b8cf8563c75dd52dedb4052",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/2fe03757d503a8f05783cfe3e5b895ed9a7bed9a",
+                "reference": "2fe03757d503a8f05783cfe3e5b895ed9a7bed9a",
                 "shasum": ""
             },
             "require": {
@@ -718,7 +717,7 @@
                 "netresearch/jsonmapper": "^4.0",
                 "php": "^8.0",
                 "php-64bit": "*",
-                "pocketmine/bedrock-protocol": "dev-master#88ae308a03e8e61ccfdddd42623efabe9e772b42",
+                "pocketmine/bedrock-protocol": "1.0.0+bedrock1.17.10",
                 "pocketmine/binaryutils": "^0.2.1",
                 "pocketmine/callback-validator": "^1.0.2",
                 "pocketmine/classloader": "dev-master",
@@ -737,7 +736,7 @@
                 "webmozart/path-util": "^2.3"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.95",
+                "phpstan/phpstan": "0.12.96",
                 "phpstan/phpstan-phpunit": "^0.12.6",
                 "phpstan/phpstan-strict-rules": "^0.12.2",
                 "phpunit/phpunit": "^9.2"
@@ -771,7 +770,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-08-23T13:49:30+00:00"
+            "time": "2021-08-29T23:26:54+00:00"
         },
         {
             "name": "pocketmine/raklib",
@@ -2319,12 +2318,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "1fd7d6a6bfe31c7876f51b4b8ca6ec33f653d890"
+                "reference": "cb2a5f4cca05663d1b7a911c6e4d85e965e45d1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/1fd7d6a6bfe31c7876f51b4b8ca6ec33f653d890",
-                "reference": "1fd7d6a6bfe31c7876f51b4b8ca6ec33f653d890",
+                "url": "https://api.github.com/repos/symfony/console/zipball/cb2a5f4cca05663d1b7a911c6e4d85e965e45d1f",
+                "reference": "cb2a5f4cca05663d1b7a911c6e4d85e965e45d1f",
                 "shasum": ""
             },
             "require": {
@@ -2410,7 +2409,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-23T12:58:54+00:00"
+            "time": "2021-08-25T21:09:35+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -2486,12 +2485,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "e442d4a1cc170f95f16e897bd70743ec33e1c74d"
+                "reference": "ac2f062e33c4bb8338cf01fd981baed0028f46cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/e442d4a1cc170f95f16e897bd70743ec33e1c74d",
-                "reference": "e442d4a1cc170f95f16e897bd70743ec33e1c74d",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/ac2f062e33c4bb8338cf01fd981baed0028f46cb",
+                "reference": "ac2f062e33c4bb8338cf01fd981baed0028f46cb",
                 "shasum": ""
             },
             "require": {
@@ -2563,7 +2562,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-20T10:09:20+00:00"
+            "time": "2021-08-25T22:54:27+00:00"
         },
         {
             "name": "symfony/event-dispatcher-contracts",
@@ -2715,12 +2714,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "5d7d3b68d3685579cd2771b37e347d8819b16ca9"
+                "reference": "982b4a1044ec54a2ad55c8001bf66dbdb3e3c4c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/5d7d3b68d3685579cd2771b37e347d8819b16ca9",
-                "reference": "5d7d3b68d3685579cd2771b37e347d8819b16ca9",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/982b4a1044ec54a2ad55c8001bf66dbdb3e3c4c1",
+                "reference": "982b4a1044ec54a2ad55c8001bf66dbdb3e3c4c1",
                 "shasum": ""
             },
             "require": {
@@ -2770,7 +2769,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-17T14:20:01+00:00"
+            "time": "2021-08-25T15:53:43+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -3324,12 +3323,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "e8749eb40a4743d7cb24507a4ff5db6e3306180c"
+                "reference": "a3ab47968ef2cc5124efc4f1b6b4e7a61b85a543"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/e8749eb40a4743d7cb24507a4ff5db6e3306180c",
-                "reference": "e8749eb40a4743d7cb24507a4ff5db6e3306180c",
+                "url": "https://api.github.com/repos/symfony/process/zipball/a3ab47968ef2cc5124efc4f1b6b4e7a61b85a543",
+                "reference": "a3ab47968ef2cc5124efc4f1b6b4e7a61b85a543",
                 "shasum": ""
             },
             "require": {
@@ -3378,7 +3377,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-17T14:20:01+00:00"
+            "time": "2021-08-24T19:02:39+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -3531,12 +3530,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "51c05cd5d377159808afdbddb7ea6227980ec395"
+                "reference": "cb329fb796b7c0ae00e3a8a262d5b3851774857d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/51c05cd5d377159808afdbddb7ea6227980ec395",
-                "reference": "51c05cd5d377159808afdbddb7ea6227980ec395",
+                "url": "https://api.github.com/repos/symfony/string/zipball/cb329fb796b7c0ae00e3a8a262d5b3851774857d",
+                "reference": "cb329fb796b7c0ae00e3a8a262d5b3851774857d",
                 "shasum": ""
             },
             "require": {
@@ -3608,7 +3607,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-17T15:35:52+00:00"
+            "time": "2021-08-26T08:28:23+00:00"
         }
     ],
     "aliases": [],

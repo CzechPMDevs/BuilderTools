@@ -367,7 +367,7 @@ class Printer {
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 		$radius = abs($radius);
 
-		if($player->getPosition()->getY() - $radius < 0 || $player->getPosition()->getY() + $radius > World::Y_MAX) {
+		if($player->getPosition()->getY() - $radius < 0 || $player->getPosition()->getY() + $radius >= World::Y_MAX) {
 			return EditorResult::error("Shape is outside of the map!");
 		}
 
