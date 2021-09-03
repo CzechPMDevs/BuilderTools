@@ -25,8 +25,9 @@ If applicable, add screenshots to help explain your problem.
 
 **System information (please complete the following information):**
  - OS: [e.g. iOS]
- - php version [e.g. 7.4.11, 8.0]
- - BuilderTools Version [e.g. dev#142, Release 1.2.0-beta3]
+ - php version: [e.g. 7.4.11, 8.0]
+ - BuilderTools Version: [e.g. dev#142, Release 1.2.0-beta3]
+ - Server version: [3.22.1, 4.0.0+dev]
 
 **Additional context**
 Add any other context about the problem here.
