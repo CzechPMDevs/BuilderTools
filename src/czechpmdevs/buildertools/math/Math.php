@@ -110,7 +110,7 @@ class Math {
 		}
 
 		$minY = min(World::Y_MAX - 1, max(World::Y_MIN, $minY));
-		$maxY = min(World::Y_MAX - 1, max(World::Y_MIN, $maxX));
+		$maxY = min(World::Y_MAX - 1, max(World::Y_MIN, $maxY));
 	}
 
 	public static function selectionSize(Vector3 $pos1, Vector3 $pos2): int {
