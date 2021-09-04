@@ -25,6 +25,7 @@ use Error;
 use Generator;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\world\format\io\exception\CorruptedChunkException;
+use pocketmine\world\format\io\leveldb\LevelDB;
 use pocketmine\world\format\io\region\Anvil;
 use pocketmine\world\format\io\region\CorruptedRegionException;
 use pocketmine\world\format\io\region\McRegion;
@@ -87,7 +88,7 @@ class WorldFixTask extends AsyncTask {
 			return;
 		}
 
-		if((!$provider instanceof Anvil)) { // TODO
+		if((!$provider instanceof Anvil) && (!$provider instanceof LevelDB)) {
 			$this->error = "BuilderTools does not support fixing chunks with " . get_class($provider) . " provider.";
 			return;
 		}
