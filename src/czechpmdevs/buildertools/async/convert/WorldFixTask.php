@@ -38,6 +38,7 @@ use function glob;
 use function is_dir;
 use function microtime;
 use function round;
+use const DIRECTORY_SEPARATOR;
 
 // TODO
 class WorldFixTask extends AsyncTask {
@@ -68,26 +69,25 @@ class WorldFixTask extends AsyncTask {
 		}
 
 		$providerManager = new WorldProviderManager(); // TODO
-		$providerClass = null;
-		foreach ($providerManager->getMatchingProviders($this->worldPath) as $providerClass) {
+		$worldProviderManagerEntry = null;
+		foreach ($providerManager->getMatchingProviders($this->worldPath) as $worldProviderManagerEntry) {
 			break;
 		}
 
-		if($providerClass === null) {
+		if($worldProviderManagerEntry === null) {
 			$this->error = "Unknown provider";
 			return;
 		}
 
 		try {
-			/** @var WorldProvider $provider */
-			$provider = new $providerClass($this->worldPath . DIRECTORY_SEPARATOR);
+			$provider = $worldProviderManagerEntry->fromPath($this->worldPath . DIRECTORY_SEPARATOR);
 		}
 		catch (Error $error) {
 			$this->error = "Error while loading provider: {$error->getMessage()}";
 			return;
 		}
 
-		if((!$provider instanceof Anvil)) { // TODO -
+		if((!$provider instanceof Anvil)) { // TODO
 			$this->error = "BuilderTools does not support fixing chunks with " . get_class($provider) . " provider.";
 			return;
 		}
@@ -107,7 +107,7 @@ class WorldFixTask extends AsyncTask {
 			 */
 			foreach ($chunksToFix as [$chunkX, $chunkZ]) {
 				try {
-					$chunk = $provider->loadChunk($chunkX, $chunkZ);
+					$chunk = $provider->loadChunk($chunkX, $chunkZ)?->getChunk();
 				} catch (CorruptedChunkException $e) {
 //                    MainLogger::getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
 					continue;

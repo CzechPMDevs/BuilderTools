@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "25dbb23072631f356a6f263ea76b7183",
+    "content-hash": "afecfc7d2d1cf61cf914051b0fc37b76",
     "packages": [
         {
             "name": "adhocore/json-comment",
@@ -679,12 +679,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pmmp/PocketMine-MP.git",
-                "reference": "2fe03757d503a8f05783cfe3e5b895ed9a7bed9a"
+                "reference": "7d5b9295cbfdb7b8daa79d9385e4622328d1a2f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/2fe03757d503a8f05783cfe3e5b895ed9a7bed9a",
-                "reference": "2fe03757d503a8f05783cfe3e5b895ed9a7bed9a",
+                "url": "https://api.github.com/repos/pmmp/PocketMine-MP/zipball/7d5b9295cbfdb7b8daa79d9385e4622328d1a2f6",
+                "reference": "7d5b9295cbfdb7b8daa79d9385e4622328d1a2f6",
                 "shasum": ""
             },
             "require": {
@@ -736,7 +736,7 @@
                 "webmozart/path-util": "^2.3"
             },
             "require-dev": {
-                "phpstan/phpstan": "0.12.96",
+                "phpstan/phpstan": "0.12.98",
                 "phpstan/phpstan-phpunit": "^0.12.6",
                 "phpstan/phpstan-strict-rules": "^0.12.2",
                 "phpunit/phpunit": "^9.2"
@@ -770,7 +770,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-08-29T23:26:54+00:00"
+            "time": "2021-09-03T20:33:55+00:00"
         },
         {
             "name": "pocketmine/raklib",
@@ -3618,7 +3618,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "ext-yaml": "*",
         "ext-pthreads": "*",
         "ext-chunkutils2": "^0.2.0",
