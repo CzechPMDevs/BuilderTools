@@ -203,6 +203,7 @@ class MCStructureSchematic implements Schematic {
 
 		// Indices
 		$indexes = new ListTag(array_map(fn(int $int) => new IntTag($int), $indexes));
+		/** @phpstan-ignore-next-line */
 		$anotherIndexes = new ListTag(array_fill(0, $indexes->count(), new IntTag(-1))); // Seems Mojang do it same way :D
 
 		$structureNbt->setTag("block_indices", new ListTag([$indexes, $anotherIndexes]));

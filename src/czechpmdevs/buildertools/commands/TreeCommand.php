@@ -77,7 +77,7 @@ class TreeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$object->placeObject($sender->getWorld(), $sender->getPosition()->getFloorX(), $sender->getPosition()->getFloorY(), $sender->getPosition()->getFloorZ(), new Random(time()));
+		$object->getBlockTransaction($sender->getWorld(), $sender->getPosition()->getFloorX(), $sender->getPosition()->getFloorY(), $sender->getPosition()->getFloorZ(), new Random())?->apply();
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aObject $args[0] placed!");
 	}
 }
