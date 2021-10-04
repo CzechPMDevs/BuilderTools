@@ -395,7 +395,7 @@ class Printer {
 		}
 
 		$floorY = $center->getFloorY();
-		if($floorY < 0) {
+		if($floorY < 0 || $floorY > 255) {
 			return EditorResult::error("It is not possible to create island here");
 		}
 
@@ -407,7 +407,7 @@ class Printer {
 		$fillSession->loadChunks($player->getWorld());
 
 		$currentRadius = (float) $radius;
-		$step = 1 / $step;
+		$step = $step > 0 ? 1 / $step : $currentRadius;
 		$y = $floorY;
 		while ($currentRadius > 0.1) {
 			$incDivX = 0;
