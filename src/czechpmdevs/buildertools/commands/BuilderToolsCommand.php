@@ -47,7 +47,7 @@ abstract class BuilderToolsCommand extends Command implements PluginOwned {
 		}
 
 		if(!$sender->hasPermission($permission)) {
-			$sender->sendMessage((string) $this->getPermissionMessage());
+			$sender->sendMessage((string)$this->getPermissionMessage());
 		}
 	}
 

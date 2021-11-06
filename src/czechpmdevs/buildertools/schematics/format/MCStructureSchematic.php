@@ -46,7 +46,7 @@ class MCStructureSchematic implements Schematic {
 
 	/** @var CompoundTag[] */
 	private array $internalId2StatesMap;
-	/** @var array<int[][]|int[][][]>  */
+	/** @var array<int[][]|int[][][]> */
 	private array $states2InternalIdMap;
 
 	public function load(string $rawData): BlockArray {
@@ -113,7 +113,7 @@ class MCStructureSchematic implements Schematic {
 		$paletteData = $nbt->getCompoundTag("structure")->getCompoundTag("palette")->getCompoundTag("default")->getListTag("block_palette")->getAllValues(); // @phpstan-ignore-line (We provide validated values)
 
 		$palette = [];
-		foreach ($paletteData as $i => $entry) {
+		foreach($paletteData as $i => $entry) {
 			$palette[$i] = $this->translateBlockStateToFullBlockId($entry);
 		}
 
@@ -178,14 +178,14 @@ class MCStructureSchematic implements Schematic {
 
 		// Create index table
 		$indexes = [];
-		while ($blockArray->hasNext()) {
+		while($blockArray->hasNext()) {
 			$blockArray->readNext($x, $y, $z, $id, $meta);
 			$indexes[$z + ($length * $y) + ($yz * $x)] = $id << 4 | $meta;
 		}
 
 		// Making Palette
 		$palette = $paletteHelper = [];
-		foreach ($indexes as &$fullId) {
+		foreach($indexes as &$fullId) {
 			$state = $this->internalId2StatesMap[$fullId];
 
 			if(isset($paletteHelper[$state->toString()])) {
@@ -284,8 +284,7 @@ class MCStructureSchematic implements Schematic {
 			$nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0)->getValue(); // @phpstan-ignore-line (Errors are caught)
 
 			return (!($nbt->getTag("size") instanceof ListTag)) && $nbt->getListTag("size")->count() == 3; // @phpstan-ignore-line (Errors are caught)
-		}
-		catch (Throwable $ignore) {
+		} catch(Throwable $ignore) {
 			return false;
 		}
 	}

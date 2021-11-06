@@ -50,7 +50,7 @@ class FlipHelper {
 					$meta = 0;
 				} elseif($meta == 5) {
 					$meta = 4;
-				} elseif ($meta == 4) {
+				} elseif($meta == 4) {
 					$meta = 5;
 				}
 			}
@@ -58,7 +58,7 @@ class FlipHelper {
 			if($id == BlockLegacyIds::LADDER || $id == BlockLegacyIds::FURNACE || $id == BlockLegacyIds::CHEST || $id == BlockLegacyIds::ENDER_CHEST || $id == BlockLegacyIds::TRAPPED_CHEST) {
 				if($meta == 4) {
 					$meta = 5;
-				} elseif ($meta == 5) {
+				} elseif($meta == 5) {
 					$meta = 4;
 				}
 			}
@@ -96,10 +96,10 @@ class FlipHelper {
 				}
 			}
 
-			if($id == BlockLegacyIds::LADDER || $id == BlockLegacyIds::FURNACE  || $id == BlockLegacyIds::CHEST || $id == BlockLegacyIds::ENDER_CHEST || $id == BlockLegacyIds::TRAPPED_CHEST) {
+			if($id == BlockLegacyIds::LADDER || $id == BlockLegacyIds::FURNACE || $id == BlockLegacyIds::CHEST || $id == BlockLegacyIds::ENDER_CHEST || $id == BlockLegacyIds::TRAPPED_CHEST) {
 				if($meta == 2) {
 					$meta = 3;
-				} elseif ($meta == 3) {
+				} elseif($meta == 3) {
 					$meta = 2;
 				}
 			}

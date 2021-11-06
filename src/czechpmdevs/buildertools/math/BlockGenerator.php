@@ -31,8 +31,8 @@ class BlockGenerator {
 	 */
 	public static function generateCube(int $radius, bool $hollow = false): Generator {
 		for($x = -$radius; $x <= $radius; ++$x) {
-			for ($z = -$radius; $z <= $radius; ++$z) {
-				for ($y = -$radius; $y <= $radius; ++$y) {
+			for($z = -$radius; $z <= $radius; ++$z) {
+				for($y = -$radius; $y <= $radius; ++$y) {
 					if($hollow && ($x != $radius && $y != $radius && $z != $radius)) {
 						continue;
 					}
@@ -64,8 +64,8 @@ class BlockGenerator {
 
 					$lengthSquared = Math::lengthSquared3d($divX, $divY, $divZ);
 					if($lengthSquared > 1) { // x**2 + y**2 + z**2 < r**2
-						if ($z == 0) {
-							if ($y == 0) {
+						if($z == 0) {
+							if($y == 0) {
 								break 2;
 							}
 							break;
@@ -112,7 +112,7 @@ class BlockGenerator {
 				}
 
 				for($y = 0; $y < $height; ++$y) {
-					foreach (BlockGenerator::generateMissingBlocks2d($x, $y, $z) as $vector3) {
+					foreach(BlockGenerator::generateMissingBlocks2d($x, $y, $z) as $vector3) {
 						yield $vector3;
 					}
 				}
@@ -132,7 +132,7 @@ class BlockGenerator {
 						continue;
 					}
 
-					foreach (BlockGenerator::generateMissingBlocks2d($x, $y, $z) as $vector3) {
+					foreach(BlockGenerator::generateMissingBlocks2d($x, $y, $z) as $vector3) {
 						yield $vector3;
 					}
 				}

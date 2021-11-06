@@ -41,7 +41,7 @@ class SecondPositionCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cThis command can be used only in game!");
 			return;
 		}
-		$size = Selectors::addSelector($sender, 2, $position = new Position((int) $sender->getPosition()->getX(), (int) $sender->getPosition()->getY(), (int) $sender->getPosition()->getZ(), $sender->getWorld()));
+		$size = Selectors::addSelector($sender, 2, $position = new Position((int)$sender->getPosition()->getX(), (int)$sender->getPosition()->getY(), (int)$sender->getPosition()->getZ(), $sender->getWorld()));
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
 	}
 }

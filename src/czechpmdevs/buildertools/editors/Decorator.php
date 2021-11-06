@@ -47,9 +47,9 @@ class Decorator {
 
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
-		for ($x = $minX; $x <= $maxX; ++$x) {
+		for($x = $minX; $x <= $maxX; ++$x) {
 			/** @var int $x */
-			for ($z = $minZ; $z <= $maxZ; ++$z) {
+			for($z = $minZ; $z <= $maxZ; ++$z) {
 				if(mt_rand(1, 100) > $percentage) {
 					continue;
 				}

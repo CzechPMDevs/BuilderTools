@@ -29,7 +29,6 @@ use pocketmine\world\format\io\leveldb\LevelDB;
 use pocketmine\world\format\io\region\Anvil;
 use pocketmine\world\format\io\region\CorruptedRegionException;
 use pocketmine\world\format\io\region\McRegion;
-use pocketmine\world\format\io\WorldProvider;
 use pocketmine\world\format\io\WorldProviderManager;
 use function basename;
 use function count;
@@ -71,7 +70,7 @@ class WorldFixTask extends AsyncTask {
 
 		$providerManager = new WorldProviderManager(); // TODO
 		$worldProviderManagerEntry = null;
-		foreach ($providerManager->getMatchingProviders($this->worldPath) as $worldProviderManagerEntry) {
+		foreach($providerManager->getMatchingProviders($this->worldPath) as $worldProviderManagerEntry) {
 			break;
 		}
 
@@ -82,8 +81,7 @@ class WorldFixTask extends AsyncTask {
 
 		try {
 			$provider = $worldProviderManagerEntry->fromPath($this->worldPath . DIRECTORY_SEPARATOR);
-		}
-		catch (Error $error) {
+		} catch(Error $error) {
 			$this->error = "Error while loading provider: {$error->getMessage()}";
 			return;
 		}
@@ -100,16 +98,16 @@ class WorldFixTask extends AsyncTask {
 		$maxY = $provider->getWorldMaxY();
 		$chunksFixed = $regionsFixed = 0;
 
-		foreach ($this->getListOfChunksToFix($this->worldPath, $regionCount) as $chunksToFix) {
+		foreach($this->getListOfChunksToFix($this->worldPath, $regionCount) as $chunksToFix) {
 
 			/**
 			 * @var int $chunkX
 			 * @var int $chunkZ
 			 */
-			foreach ($chunksToFix as [$chunkX, $chunkZ]) {
+			foreach($chunksToFix as [$chunkX, $chunkZ]) {
 				try {
 					$chunk = $provider->loadChunk($chunkX, $chunkZ)?->getChunk();
-				} catch (CorruptedChunkException $e) {
+				} catch(CorruptedChunkException $e) {
 //                    MainLogger::getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
 					continue;
 				}
@@ -134,7 +132,7 @@ class WorldFixTask extends AsyncTask {
 
 //            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
 
-			$this->percent = (int) $percent;
+			$this->percent = (int)$percent;
 			$provider->doGarbageCollection();
 		}
 
@@ -159,14 +157,14 @@ class WorldFixTask extends AsyncTask {
 		$regionCount = count($files);
 
 		$chunks = [];
-		foreach ($files as $regionFilePath) {
+		foreach($files as $regionFilePath) {
 			$split = explode(".", basename($regionFilePath));
-			$regionX = (int) $split[1];
-			$regionZ = (int) $split[2];
+			$regionX = (int)$split[1];
+			$regionZ = (int)$split[2];
 
 			try {
 				$region = new McRegion($regionFilePath);
-			} catch (CorruptedRegionException $e) {
+			} catch(CorruptedRegionException $e) {
 //                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
 				continue;
 			}

@@ -43,7 +43,7 @@ class HollowPyramidCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$size = isset($args[1]) ? (int) ($args[1]) : 5;
+		$size = isset($args[1]) ? (int)($args[1]) : 5;
 
 		$result = Printer::getInstance()->makeHollowPyramid($sender, $sender->getPosition(), $size, $args[0]);
 		if(!$result->successful()) {

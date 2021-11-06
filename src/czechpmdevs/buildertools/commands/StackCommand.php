@@ -56,10 +56,10 @@ class StackCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$count = (int) $args[0];
+		$count = (int)$args[0];
 		$mode = Copier::DIRECTION_PLAYER;
 		if(isset($args[1])) {
-			switch (strtolower($args[1])):
+			switch(strtolower($args[1])):
 				case "up":
 					$mode = Copier::DIRECTION_UP;
 					break;

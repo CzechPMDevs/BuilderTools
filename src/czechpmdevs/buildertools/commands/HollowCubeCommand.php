@@ -44,9 +44,9 @@ class HollowCubeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$radius = isset($args[1]) ? (int) $args[1] : 5;
+		$radius = isset($args[1]) ? (int)$args[1] : 5;
 
-		$result = Printer::getInstance()->makeHollowCube($sender, $sender->getPosition(), $radius, (string) $args[0]);
+		$result = Printer::getInstance()->makeHollowCube($sender, $sender->getPosition(), $radius, (string)$args[0]);
 		if(!$result->successful()) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while making hollow cube: {$result->getErrorMessage()}");
 			return;

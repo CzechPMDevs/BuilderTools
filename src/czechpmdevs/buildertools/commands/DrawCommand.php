@@ -54,7 +54,7 @@ class DrawCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cUsage: §7//draw <cube|sphere|cylinder|hcube|hsphere|hcylinder|off> [brush: $this->minBrush-$this->maxBrush]  [fall = false]");
 			return;
 		}
-		if(isset($args[1]) && (!is_numeric($args[1]) || ((int) ($args[1]) > $this->maxBrush || (int) ($args[1]) < $this->minBrush))) {
+		if(isset($args[1]) && (!is_numeric($args[1]) || ((int)($args[1]) > $this->maxBrush || (int)($args[1]) < $this->minBrush))) {
 			$sender->sendMessage("§cBrush #$args[1] wasn't found!");
 			return;
 		}
@@ -66,7 +66,7 @@ class DrawCommand extends BuilderToolsCommand {
 
 		$mode = 0;
 
-		switch ($args[0]) {
+		switch($args[0]) {
 			case "cube":
 				$mode = Printer::CUBE;
 				break;
@@ -89,7 +89,7 @@ class DrawCommand extends BuilderToolsCommand {
 
 		$brush = 1;
 		if(isset($args[1]) && is_numeric($args[1])) {
-			$brush = (int) ($args[1]);
+			$brush = (int)($args[1]);
 		}
 
 		$fall = false;

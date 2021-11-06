@@ -22,4 +22,4 @@ namespace czechpmdevs\buildertools\schematics;
 
 use Exception;
 
-class SchematicException extends Exception {}
+class SchematicException extends Exception { }

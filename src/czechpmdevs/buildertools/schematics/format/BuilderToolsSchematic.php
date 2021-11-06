@@ -22,9 +22,11 @@ namespace czechpmdevs\buildertools\schematics\format;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\schematics\SchematicException;
-use Error;
 use pocketmine\nbt\BigEndianNbtSerializer;
+use pocketmine\nbt\tag\ByteArrayTag;
+use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
+use Throwable;
 use function serialize;
 use function unserialize;
 use function zlib_decode;
@@ -64,10 +66,11 @@ class BuilderToolsSchematic implements Schematic {
 			/** @var CompoundTag $nbt */
 			$nbt = (new BigEndianNbtSerializer())->read($rawData)->getTag();
 
-			return $nbt->getByteArray("Coords") !== "" &&
-				$nbt->getByteArray("Blocks") !== "" &&
-				$nbt->getByte("DuplicateDetection") !== null;
-		} catch (Error $error) {
+			return $nbt->getTag("Coords") instanceof ByteArrayTag &&
+				$nbt->getTag("Blocks") instanceof ByteArrayTag &&
+				$nbt->getTag("DuplicateDetection") instanceof ByteTag;
+
+		} catch(Throwable $ignore) {
 			return false;
 		}
 	}

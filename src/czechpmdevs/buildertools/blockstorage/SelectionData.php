@@ -83,7 +83,7 @@ class SelectionData extends BlockArray {
 		}
 
 		/** @phpstan-ignore-next-line */
-		World::getBlockXYZ((int) (unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z); // poggit...
+		World::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z); // poggit...
 		$this->playerPosition = new Vector3($x, $y, $z);
 	}
 

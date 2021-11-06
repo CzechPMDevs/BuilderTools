@@ -36,7 +36,7 @@ class Canceller {
 	}
 
 	public function undo(Player $player): EditorResult {
-		$error = function (): EditorResult {
+		$error = function(): EditorResult {
 			return EditorResult::error("There are not any actions to undo");
 		};
 
@@ -57,7 +57,7 @@ class Canceller {
 		$fillSession = new FillSession($undoAction->getWorld(), true, true);
 
 		$undoAction->load();
-		while ($undoAction->hasNext()) {
+		while($undoAction->hasNext()) {
 			$undoAction->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
 		}
@@ -79,7 +79,7 @@ class Canceller {
 	}
 
 	public function redo(Player $player): EditorResult {
-		$error = function (): EditorResult {
+		$error = function(): EditorResult {
 			return EditorResult::error("There are not any actions to undo");
 		};
 
@@ -100,7 +100,7 @@ class Canceller {
 		$fillSession = new FillSession($redoAction->getWorld(), true, true);
 
 		$redoAction->load();
-		while ($redoAction->hasNext()) {
+		while($redoAction->hasNext()) {
 			$redoAction->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
 		}

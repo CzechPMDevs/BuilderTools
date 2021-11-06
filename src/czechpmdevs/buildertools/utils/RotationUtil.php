@@ -53,15 +53,15 @@ class RotationUtil {
 		$diff = $blockArray->getPlayerPosition();
 
 		$modifiedBlockArray = new SelectionData();
-		switch ($axis) {
+		switch($axis) {
 			case Axis::Y_AXIS:
-				while ($blockArray->hasNext()) {
+				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $id, $meta);
 					RotationHelper::rotate($deg, $id, $meta);
 
 					$dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $z - $diff->getZ()));
 					$alfa = atan2($z - $diff->getZ(), $x - $diff->getX()) + $rad;
-					$modifiedBlockArray->addBlock(new Vector3((int) round($dist * Math::cos($alfa)) + $diff->getX(), $y, (int) round($dist * Math::sin($alfa)) + $diff->getZ()), $id, $meta);
+					$modifiedBlockArray->addBlock(new Vector3((int)round($dist * Math::cos($alfa)) + $diff->getX(), $y, (int)round($dist * Math::sin($alfa)) + $diff->getZ()), $id, $meta);
 				}
 
 				$blockArray->blocks = $modifiedBlockArray->blocks;
@@ -69,33 +69,33 @@ class RotationUtil {
 				$blockArray->offset = 0;
 				return $blockArray;
 			case Axis::X_AXIS:
-				while ($blockArray->hasNext()) {
+				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $id, $meta);
 
 					$dist = sqrt(Math::lengthSquared2d($y - $diff->getY(), $z - $diff->getZ()));
 					$alfa = atan2($y - $diff->getY(), $z - $diff->getZ()) + $rad;
-					$y = (int) round($dist * Math::cos($alfa)) + $diff->getX();
+					$y = (int)round($dist * Math::cos($alfa)) + $diff->getX();
 					if($y < World::Y_MIN || $y >= World::Y_MAX) {
 						continue;
 					}
 
-					$modifiedBlockArray->addBlock(new Vector3($x, $y, (int) round($dist * Math::sin($alfa)) + $diff->getZ()), $id, $meta);
+					$modifiedBlockArray->addBlock(new Vector3($x, $y, (int)round($dist * Math::sin($alfa)) + $diff->getZ()), $id, $meta);
 				}
 
 				$blockArray->coords = $modifiedBlockArray->coords;
 				$blockArray->offset = 0;
 				return $blockArray;
 			case Axis::Z_AXIS:
-				while ($blockArray->hasNext()) {
+				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $id, $meta);
 
 					$dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $y - $diff->getY()));
 					$alfa = atan2($x - $diff->getX(), $y - $diff->getY()) + $rad;
-					$y = (int) round($dist * Math::sin($alfa));
+					$y = (int)round($dist * Math::sin($alfa));
 					if($y < World::Y_MIN || $y >= World::Y_MAX) {
 						continue;
 					}
-					$modifiedBlockArray->addBlock(new Vector3((int) round($dist * Math::cos($alfa)), $y, $z), $id, $meta);
+					$modifiedBlockArray->addBlock(new Vector3((int)round($dist * Math::cos($alfa)), $y, $z), $id, $meta);
 				}
 
 				$blockArray->coords = $modifiedBlockArray->coords;
@@ -107,7 +107,7 @@ class RotationUtil {
 	}
 
 	public static function isDegreeValueValid(int $degrees): bool {
-		$degrees = (int) fmod($degrees, 360);
+		$degrees = (int)fmod($degrees, 360);
 
 		return in_array($degrees, RotationUtil::VALID_DEGREES, true);
 	}
@@ -115,7 +115,7 @@ class RotationUtil {
 	public static function getRotation(int $degrees): int {
 		$basic = fmod($degrees, 360);
 
-		switch ($basic) {
+		switch($basic) {
 			case 0:
 				return RotationUtil::ROTATE_0;
 			case 90:

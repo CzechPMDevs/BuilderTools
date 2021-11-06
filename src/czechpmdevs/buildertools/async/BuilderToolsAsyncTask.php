@@ -28,7 +28,7 @@ abstract class BuilderToolsAsyncTask extends AsyncTask {
 	 * This function is called on main thread before calling
 	 * callback function
 	 */
-	public function complete(): void {}
+	public function complete(): void { }
 
 	/** @noinspection PhpUnused */
 	final public function onCompletion(): void {

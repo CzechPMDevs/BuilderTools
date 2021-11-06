@@ -44,7 +44,7 @@ class HollowSphereCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
+		$radius = isset($args[1]) ? (int)($args[1]) : 5;
 
 		$result = Printer::getInstance()->makeHollowSphere($sender, $sender->getPosition(), $radius, $args[0]);
 		if(!$result->successful()) {

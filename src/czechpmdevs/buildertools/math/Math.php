@@ -38,16 +38,16 @@ class Math {
 
 	public static function init(): void {
 		for($i = 0; $i < 65536; ++$i) {
-			self::$sinTable[$i] = sin((float) $i * self::PI_360 / 65536.0);
+			self::$sinTable[$i] = sin((float)$i * self::PI_360 / 65536.0);
 		}
 	}
 
 	public static function sin(float $num): float {
-		return self::$sinTable[(int) ($num * 10430.378) & 0xffff];
+		return self::$sinTable[(int)($num * 10430.378) & 0xffff];
 	}
 
 	public static function cos(float $num): float {
-		return self::$sinTable[(int) ($num * 10430.378 + 16384.0) & 0xffff];
+		return self::$sinTable[(int)($num * 10430.378 + 16384.0) & 0xffff];
 	}
 
 	/**
@@ -81,29 +81,29 @@ class Math {
 	 */
 	public static function getPlayerDirection(Player $player): int {
 		$rotation = fmod($player->getLocation()->getYaw() - 90, 360);
-		if($rotation < 0){
+		if($rotation < 0) {
 			$rotation += 360.0;
 		}
-		if((0 <= $rotation and $rotation < 45) or (315 <= $rotation and $rotation < 360)){
+		if((0 <= $rotation and $rotation < 45) or (315 <= $rotation and $rotation < 360)) {
 			return 2; //North
-		}elseif(45 <= $rotation and $rotation < 135){
+		} elseif(45 <= $rotation and $rotation < 135) {
 			return 3; //East
-		}elseif(135 <= $rotation and $rotation < 225){
+		} elseif(135 <= $rotation and $rotation < 225) {
 			return 0; //South
-		}elseif(225 <= $rotation and $rotation < 315){
+		} elseif(225 <= $rotation and $rotation < 315) {
 			return 1; //West
-		}else{
+		} else {
 			return -1;
 		}
 	}
 
 	public static function calculateMinAndMaxValues(Vector3 $pos1, Vector3 $pos2, bool $clampY, ?int &$minX, ?int &$maxX, ?int &$minY, ?int &$maxY, ?int &$minZ, ?int &$maxZ): void {
-		$minX = (int) min($pos1->getX(), $pos2->getX());
-		$maxX = (int) max($pos1->getX(), $pos2->getX());
-		$minY = (int) min($pos1->getY(), $pos2->getY());
-		$maxY = (int) max($pos1->getY(), $pos2->getY());
-		$minZ = (int) min($pos1->getZ(), $pos2->getZ());
-		$maxZ = (int) max($pos1->getZ(), $pos2->getZ());
+		$minX = (int)min($pos1->getX(), $pos2->getX());
+		$maxX = (int)max($pos1->getX(), $pos2->getX());
+		$minY = (int)min($pos1->getY(), $pos2->getY());
+		$maxY = (int)max($pos1->getY(), $pos2->getY());
+		$minZ = (int)min($pos1->getZ(), $pos2->getZ());
+		$maxZ = (int)max($pos1->getZ(), $pos2->getZ());
 
 		if(!$clampY) {
 			return;

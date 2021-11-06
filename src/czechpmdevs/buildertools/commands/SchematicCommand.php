@@ -47,7 +47,7 @@ class SchematicCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		switch ($args[0]):
+		switch($args[0]):
 			case "create":
 				if(!isset($args[1])) {
 					$sender->sendMessage("§cUsage: §7//schem <create> <name>");
@@ -59,7 +59,7 @@ class SchematicCommand extends BuilderToolsCommand {
 				}
 
 				$sender->sendMessage(BuilderTools::getPrefix() . "§6Saving schematic in background...");
-				SchematicsManager::createSchematic($sender, $firstPos, $secondPos, $args[1], function (SchematicActionResult $result) use ($sender): void {
+				SchematicsManager::createSchematic($sender, $firstPos, $secondPos, $args[1], function(SchematicActionResult $result) use ($sender): void {
 					if($result->successful()) {
 						$sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic saved! (Took {$result->getProcessTime()} seconds)");
 						return;
@@ -76,7 +76,7 @@ class SchematicCommand extends BuilderToolsCommand {
 				}
 
 				$sender->sendMessage(BuilderTools::getPrefix() . "§6Loading schematic in background...");
-				SchematicsManager::loadSchematic($args[1], function (SchematicActionResult $result) use ($args, $sender): void {
+				SchematicsManager::loadSchematic($args[1], function(SchematicActionResult $result) use ($args, $sender): void {
 					if($result->successful()) {
 						$sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic loaded in {$result->getProcessTime()} seconds, to paste schematic use §e//schem paste $args[1]§a!");
 						return;
@@ -119,6 +119,7 @@ class SchematicCommand extends BuilderToolsCommand {
 				$loaded = SchematicsManager::getLoadedSchematics();
 				if(count($loaded) == 0) {
 					$sender->sendMessage(BuilderTools::getPrefix() . "§cThere aren't any loaded schematics on the server");
+					break;
 				}
 				$sender->sendMessage(BuilderTools::getPrefix() . count($loaded) . " loaded schematics: " . implode(", ", $loaded));
 				break;

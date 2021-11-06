@@ -42,7 +42,7 @@ class SphereCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cUsage: §7//sphere <id1:dmg1,id2:dmg2:,...> <radius>");
 			return;
 		}
-		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
+		$radius = isset($args[1]) ? (int)($args[1]) : 5;
 
 		$result = Printer::getInstance()->makeSphere($sender, $sender->getPosition(), $radius, $args[0]);
 		if(!$result->successful()) {

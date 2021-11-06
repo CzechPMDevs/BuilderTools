@@ -29,7 +29,6 @@ use pocketmine\world\generator\object\JungleTree;
 use pocketmine\world\generator\object\OakTree;
 use pocketmine\world\generator\object\SpruceTree;
 use function strtolower;
-use function time;
 
 class TreeCommand extends BuilderToolsCommand {
 
@@ -57,7 +56,7 @@ class TreeCommand extends BuilderToolsCommand {
 
 		$object = null;
 
-		switch (strtolower($args[0])) {
+		switch(strtolower($args[0])) {
 			case "oak":
 				$object = new OakTree;
 				break;

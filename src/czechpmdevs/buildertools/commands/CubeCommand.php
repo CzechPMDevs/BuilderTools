@@ -42,9 +42,9 @@ class CubeCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§7Usage: §c//cube <id1:dmg1,id2:dmg2,...> <radius>");
 			return;
 		}
-		$radius = isset($args[1]) ? (int) $args[1] : 5;
+		$radius = isset($args[1]) ? (int)$args[1] : 5;
 
-		$result = Printer::getInstance()->makeCube($sender, $sender->getPosition(), $radius, (string) $args[0]);
+		$result = Printer::getInstance()->makeCube($sender, $sender->getPosition(), $radius, (string)$args[0]);
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aCube created, {$result->getBlocksChanged()} block changed (Took {$result->getProcessTime()} seconds)!");
 	}
 }

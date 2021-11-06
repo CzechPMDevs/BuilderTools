@@ -66,8 +66,8 @@ class BiomeCommand extends BuilderToolsCommand {
 
 		/** @var int|null $id */
 		$id = null;
-		if(is_numeric($args[0]) && (int) $id <= 255 && (int) $id >= 0) {
-			$id = (int) $args[0];
+		if(is_numeric($args[0]) && (int)$id <= 255 && (int)$id >= 0) {
+			$id = (int)$args[0];
 		}
 		if(array_key_exists($args[0], $this->biomeData)) {
 			$id = $this->biomeData[$args[0]];

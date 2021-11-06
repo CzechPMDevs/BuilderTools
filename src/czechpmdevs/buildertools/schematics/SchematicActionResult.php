@@ -30,7 +30,7 @@ class SchematicActionResult {
 
 	protected float $processTime = 0;
 
-	private function __construct() {}
+	private function __construct() { }
 
 	public function successful(): bool {
 		return $this->loaded;

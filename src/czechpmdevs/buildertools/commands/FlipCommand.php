@@ -64,7 +64,7 @@ class FlipCommand extends BuilderToolsCommand {
 		$copier = Copier::getInstance();
 		$copier->flip($sender, $axis);
 
-		$time = round(microtime(true)-$startTime, 3);
+		$time = round(microtime(true) - $startTime, 3);
 
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
 	}

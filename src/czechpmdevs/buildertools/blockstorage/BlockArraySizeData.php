@@ -21,14 +21,13 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use pocketmine\math\Vector3;
-use function is_null;
 
 final class BlockArraySizeData {
 
 	private BlockArray $blockArray;
 
-	public ?int $maxX = null, $maxY = null, $maxZ = null;
-	public ?int $minX = null, $minY = null, $minZ = null;
+	public int $maxX, $maxY, $maxZ;
+	public int $minX, $minY, $minZ;
 
 	public function __construct(BlockArray $blockArray) {
 		$this->blockArray = $blockArray;
@@ -36,28 +35,75 @@ final class BlockArraySizeData {
 	}
 
 	private function calculateSizeData(): void {
-		while ($this->blockArray->hasNext()) {
-			$this->blockArray->readNext($x, $y, $z, $id, $meta);
-			if(is_null($this->maxX) || $this->maxX < $x) {
-				$this->maxX = $x;
-			}
-			if(is_null($this->maxY) || $this->maxY < $y) {
-				$this->maxY = $y;
-			}
-			if(is_null($this->maxZ) || $this->maxZ < $z) {
-				$this->maxZ = $z;
+		if($this->blockArray->size() == 0) {
+			return;
+		}
+
+		$this->blockArray->readNext($x, $y, $z, $id, $meta);
+
+		$minX = $maxX = $x;
+		$minY = $maxY = $y;
+		$minZ = $maxZ = $z;
+
+		if($this->blockArray->size() % 2 == 0) {
+			$this->blockArray->offset = 0;
+		}
+
+		while($this->blockArray->hasNext()) {
+			$this->blockArray->readNext($x1, $y1, $z1, $id, $meta);
+			if(!$this->blockArray->hasNext()) {
+				if($minX > $x1) {
+					$minX = $x1;
+				} else if($maxX < $x1) {
+					$maxX = $x1;
+				}
+				if($minY > $y1) {
+					$minY = $y1;
+				} else if($maxY < $y1) {
+					$maxY = $y1;
+				}
+				if($minZ > $z1) {
+					$minZ = $z1;
+				} else if($maxZ < $z1) {
+					$maxZ = $z1;
+				}
+				break;
 			}
 
-			if(is_null($this->minX) || $this->minX > $x) {
-				$this->minX = $x;
+			$this->blockArray->readNext($x2, $y2, $z2, $id, $meta);
+			if($x1 > $x2) {
+				if($minX > $x2) {
+					$minX = $x2;
+				}
+				if($maxX < $x1) {
+					$maxX = $x1;
+				}
 			}
-			if(is_null($this->minY) || $this->minY > $y) {
-				$this->minY = $y;
+			if($y1 > $y2) {
+				if($minY > $y2) {
+					$minY = $y2;
+				}
+				if($maxY < $y1) {
+					$maxY = $y1;
+				}
 			}
-			if(is_null($this->minZ) || $this->minZ > $z) {
-				$this->minZ = $z;
+			if($z1 > $z2) {
+				if($minZ > $z2) {
+					$minZ = $z2;
+				}
+				if($maxZ < $z1) {
+					$maxZ = $z1;
+				}
 			}
 		}
+
+		$this->minX = $minX;
+		$this->minY = $minY;
+		$this->minZ = $minZ;
+
+		$this->maxX = $maxX;
+		$this->maxY = $maxY;
+		$this->maxZ = $maxZ;
 
 		$this->blockArray->offset = 0;
 	}
@@ -70,13 +116,11 @@ final class BlockArraySizeData {
 	}
 
 	public function getMinimum(): Vector3 {
-		/** @phpstan-ignore-next-line */
-		return new Vector3($this->minX, $this->minY, $this->minZ); // Ignored - we provide non-null values
+		return new Vector3($this->minX, $this->minY, $this->minZ);
 	}
 
 	public function getMaximum(): Vector3 {
-		/** @phpstan-ignore-next-line */
-		return new Vector3($this->maxX, $this->maxY, $this->maxZ); // Ignored - we provide non-null values
+		return new Vector3($this->maxX, $this->maxY, $this->maxZ);
 	}
 
 }

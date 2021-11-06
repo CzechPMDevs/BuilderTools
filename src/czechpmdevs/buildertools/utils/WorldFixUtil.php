@@ -66,14 +66,14 @@ class WorldFixUtil {
 
 		$asyncTask = new WorldFixTask($path);
 
-		BuilderTools::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($asyncTask): void { // Delay until the world will be fully saved
+		BuilderTools::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function() use ($asyncTask): void { // Delay until the world will be fully saved
 			Server::getInstance()->getAsyncPool()->submitTask($asyncTask);
 		}), 60);
 
 		/** @var ClosureTask $task */
 		$task = null;
 
-		BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function () use ($worldName, $asyncTask, $sender, &$task): void {
+		BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function() use ($worldName, $asyncTask, $sender, &$task): void {
 			if($sender instanceof Player) {
 				if($sender->isOnline()) {
 					$sender->sendTip("§aWorld $worldName is fixed from $asyncTask->percent%.");
@@ -108,9 +108,9 @@ class WorldFixUtil {
 	}
 
 	/**
+	 * @param WorldFixTask<mixed> $task
 	 * @internal
 	 *
-	 * @param WorldFixTask<mixed> $task
 	 */
 	public static function finishWorldFixTask(WorldFixTask $task): void {
 		unset(WorldFixUtil::$worldFixQueue[basename($task->worldPath)]);

@@ -200,7 +200,7 @@ class FillSession {
 				}
 
 				$world->setChunk($x, $z, $chunk, false);
-				foreach ($world->getChunkPlayers($x, $z) as $player) {
+				foreach($world->getChunkPlayers($x, $z) as $player) {
 					$player->doChunkRequests();
 				}
 			}
@@ -214,7 +214,7 @@ class FillSession {
 			try {
 				/** @phpstan-ignore-next-line */
 				$this->explorer->currentSubChunk = $this->explorer->currentChunk->getSubChunk($y >> 4);
-			} catch (Error $exception) { // For the case if chunk is null
+			} catch(Error $exception) { // For the case if chunk is null
 				$this->error = true;
 				return false;
 			}

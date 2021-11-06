@@ -39,7 +39,7 @@ class ClearInventoryCommand extends BuilderToolsCommand {
 			return;
 		}
 		$removed = 0;
-		foreach ($sender->getInventory()->getContents() as $index => $item) {
+		foreach($sender->getInventory()->getContents() as $index => $item) {
 			$sender->getInventory()->setItem($index, ItemFactory::air());
 			$removed++;
 		}

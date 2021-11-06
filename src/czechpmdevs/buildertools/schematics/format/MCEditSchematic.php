@@ -75,7 +75,7 @@ class MCEditSchematic implements Schematic {
 		if($materials == MCEditSchematic::MATERIALS_CLASSIC || $materials == MCEditSchematic::MATERIALS_ALPHA) {
 			$fixer = Fixer::getInstance();
 
-			foreach ($blockArray->blocks as &$fullBlock) {
+			foreach($blockArray->blocks as &$fullBlock) {
 				$fixer->convertJavaToBedrockId($fullBlock);
 			}
 		}
@@ -140,7 +140,7 @@ class MCEditSchematic implements Schematic {
 		$totalSize = $xz * $height;
 
 		$blocks = $data = str_repeat(chr(0), $totalSize);
-		while ($blockArray->hasNext()) {
+		while($blockArray->hasNext()) {
 			$blockArray->readNext($x, $y, $z, $id, $meta);
 			$key = $x + ($width * $z) + ($xz * $y);
 
@@ -209,7 +209,7 @@ class MCEditSchematic implements Schematic {
 			}
 
 			return false;
-		} catch (Throwable $ignore) {
+		} catch(Throwable $ignore) {
 			return false;
 		}
 	}

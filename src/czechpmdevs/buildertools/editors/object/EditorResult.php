@@ -30,7 +30,7 @@ class EditorResult {
 
 	protected ?string $errorMessage = null;
 
-	protected function __construct() {}
+	protected function __construct() { }
 
 	public function getBlocksChanged(): int {
 		return $this->blocksChanged;

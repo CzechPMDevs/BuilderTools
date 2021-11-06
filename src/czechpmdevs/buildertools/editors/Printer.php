@@ -52,7 +52,7 @@ class Printer {
 
 		$level = $center->getWorld();
 
-		$placeBlock = function (Vector3 $vector3) use ($level, $undoList, $block, $center, $throwBlock) {
+		$placeBlock = function(Vector3 $vector3) use ($level, $undoList, $block, $center, $throwBlock) {
 			if($throwBlock) {
 				$vector3 = $this->throwBlock(Position::fromObject($vector3, $center->getWorld()));
 			}
@@ -68,30 +68,30 @@ class Printer {
 		};
 
 		if($mode == Printer::CUBE) {
-			foreach (BlockGenerator::generateCube($brush) as [$x, $y, $z]) {
+			foreach(BlockGenerator::generateCube($brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 		} elseif($mode == Printer::SPHERE) {
-			foreach (BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
+			foreach(BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 			$undoList->removeDuplicates();
 		} elseif($mode == Printer::CYLINDER) {
-			foreach (BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
+			foreach(BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 			$undoList->removeDuplicates();
 		} elseif($mode == Printer::HOLLOW_CUBE) {
-			foreach (BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
+			foreach(BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 		} elseif($mode == Printer::HOLLOW_SPHERE) {
-			foreach (BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
+			foreach(BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 			$undoList->removeDuplicates();
 		} elseif($mode == Printer::HOLLOW_CYLINDER) {
-			foreach (BlockGenerator::generateCylinder($brush, $brush,true) as [$x, $y, $z]) {
+			foreach(BlockGenerator::generateCylinder($brush, $brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 			$undoList->removeDuplicates();
@@ -109,7 +109,7 @@ class Printer {
 		$z = $position->getFloorZ();
 
 		/** @noinspection PhpStatementHasEmptyBodyInspection */
-		for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() == 0; $y--);
+		for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() == 0; $y--) ;
 
 		return new Vector3($x, ++$y, $z);
 	}
@@ -151,8 +151,8 @@ class Printer {
 
 					$lengthSquared = Math::lengthSquared3d($divX, $divY, $divZ);
 					if($lengthSquared > 1) { // x**2 + y**2 + z**2 < r**2
-						if ($z == 0) {
-							if ($y == 0) {
+						if($z == 0) {
+							if($y == 0) {
 								break 2;
 							}
 							break;
@@ -239,7 +239,7 @@ class Printer {
 		}
 		$finalHeight = $height + $floorY;
 
-		$fillSession = new FillSession($player->getWorld(), false );
+		$fillSession = new FillSession($player->getWorld(), false);
 		$fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 		$fillSession->loadChunks($player->getWorld());
 
@@ -406,10 +406,10 @@ class Printer {
 		$fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 		$fillSession->loadChunks($player->getWorld());
 
-		$currentRadius = (float) $radius;
+		$currentRadius = (float)$radius;
 		$step = 1 / $step;
 		$y = $floorY;
-		while ($currentRadius > 0.1) {
+		while($currentRadius > 0.1) {
 			$incDivX = 0;
 			for($x = 0; $x <= $currentRadius; ++$x) {
 				$divX = $incDivX;

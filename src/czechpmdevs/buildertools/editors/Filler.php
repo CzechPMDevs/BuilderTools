@@ -138,7 +138,7 @@ class Filler {
 		}
 
 		if($relativePosition === null) {
-			while ($changes->hasNext()) {
+			while($changes->hasNext()) {
 				$changes->readNext($x, $y, $z, $id, $meta);
 				$fillSession->setBlockAt($x, $y, $z, $id, $meta);
 			}
@@ -147,7 +147,7 @@ class Filler {
 			$floorY = $relativePosition->getFloorY();
 			$floorZ = $relativePosition->getFloorZ();
 
-			while ($changes->hasNext()) {
+			while($changes->hasNext()) {
 				$changes->readNext($x, $y, $z, $id, $meta);
 				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 			}

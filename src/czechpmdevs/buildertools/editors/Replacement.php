@@ -48,13 +48,13 @@ class Replacement {
 			return EditorResult::error("Could not read blocks from $blocks");
 		}
 
-		$minX = (int) min($pos1->getX(), $pos2->getX());
-		$maxX = (int) max($pos1->getX(), $pos2->getX());
-		$minZ = (int) min($pos1->getZ(), $pos2->getZ());
-		$maxZ = (int) max($pos1->getZ(), $pos2->getZ());
+		$minX = (int)min($pos1->getX(), $pos2->getX());
+		$maxX = (int)max($pos1->getX(), $pos2->getX());
+		$minZ = (int)min($pos1->getZ(), $pos2->getZ());
+		$maxZ = (int)max($pos1->getZ(), $pos2->getZ());
 
-		$minY = (int) max(min($pos1->getY(), $pos2->getY(), World::Y_MAX - 1), 0);
-		$maxY = (int) min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX - 1);
+		$minY = (int)max(min($pos1->getY(), $pos2->getY(), World::Y_MAX - 1), 0);
+		$maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX - 1);
 
 		$fillSession = new MaskedFillSession($player->getWorld(), false, true, $mask);
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
@@ -76,6 +76,6 @@ class Replacement {
 		$changes->save();
 		Canceller::getInstance()->addStep($player, $changes);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true)-$startTime);
+		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }

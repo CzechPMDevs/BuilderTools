@@ -81,7 +81,7 @@ class SchematicsManager {
 		}
 
 		/** @phpstan-ignore-next-line */
-		AsyncQueue::submitTask(new SchematicLoadTask($file), function (SchematicLoadTask $task) use ($startTime, $schematic, $callback): void {
+		AsyncQueue::submitTask(new SchematicLoadTask($file), function(SchematicLoadTask $task) use ($startTime, $schematic, $callback): void {
 			if($task->error !== null) {
 				$callback(SchematicActionResult::error($task->error));
 				return;
@@ -146,7 +146,7 @@ class SchematicsManager {
 		}
 
 		/** @phpstan-ignore-next-line */
-		AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function (SchematicCreateTask $task) use ($callback, $startTime): void {
+		AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function(SchematicCreateTask $task) use ($callback, $startTime): void {
 			if($task->error !== null) {
 				$callback(SchematicActionResult::error($task->error));
 				return;
@@ -171,7 +171,7 @@ class SchematicsManager {
 		$floorY = $player->getPosition()->getFloorY();
 		$floorZ = $player->getPosition()->getFloorZ();
 
-		while ($schematic->hasNext()) {
+		while($schematic->hasNext()) {
 			$schematic->readNext($x, $y, $z, $id, $meta);
 			if($id != 0)
 				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
@@ -202,7 +202,7 @@ class SchematicsManager {
 			}
 		}
 
-		foreach ($allowedExtensions as $extension) {
+		foreach($allowedExtensions as $extension) {
 			if(file_exists($dataFolder . $file . "." . $extension)) {
 				$file = $dataFolder . $file . "." . $extension;
 				return true;
@@ -216,7 +216,7 @@ class SchematicsManager {
 	 * @return class-string<Schematic>|null
 	 */
 	public static function getSchematicFormat(string $rawData): ?string {
-		foreach (SchematicsManager::$registeredTypes as $class) {
+		foreach(SchematicsManager::$registeredTypes as $class) {
 			if($class::validate($rawData)) {
 				return $class;
 			}
@@ -231,7 +231,7 @@ class SchematicsManager {
 	public static function getSchematicByExtension(string $extension): string {
 		$extension = trim(strtolower($extension));
 
-		foreach (SchematicsManager::$registeredTypes as $class) {
+		foreach(SchematicsManager::$registeredTypes as $class) {
 			if(strtolower($class::getFileExtension()) == $extension) {
 				return $class;
 			}

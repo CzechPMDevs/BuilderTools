@@ -57,8 +57,8 @@ class Copier {
 		$fillSession->loadChunks($player->getWorld());
 
 		for($x = $minX; $x <= $maxX; ++$x) {
-			for ($z = $minZ; $z <= $maxZ; ++$z) {
-				for ($y = $minY; $y <= $maxY; ++$y) {
+			for($z = $minZ; $z <= $maxZ; ++$z) {
+				for($y = $minY; $y <= $maxY; ++$y) {
 					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
 					$clipboard->addBlockAt($x, $y, $z, $id, $meta);
 				}
@@ -83,8 +83,8 @@ class Copier {
 		$fillSession->loadChunks($player->getWorld());
 
 		for($x = $minX; $x <= $maxX; ++$x) {
-			for ($z = $minZ; $z <= $maxZ; ++$z) {
-				for ($y = $minY; $y <= $maxY; ++$y) {
+			for($z = $minZ; $z <= $maxZ; ++$z) {
+				for($y = $minY; $y <= $maxY; ++$y) {
 					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
 					$clipboard->addBlockAt($x, $y, $z, $id, $meta);
 
@@ -131,7 +131,7 @@ class Copier {
 		$floorY = $motion->getFloorY();
 		$floorZ = $motion->getFloorZ();
 
-		while ($clipboard->hasNext()) {
+		while($clipboard->hasNext()) {
 			$clipboard->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 		}
@@ -170,7 +170,7 @@ class Copier {
 		$floorY = $motion->getFloorY();
 		$floorZ = $motion->getFloorZ();
 
-		while ($clipboard->hasNext()) {
+		while($clipboard->hasNext()) {
 			$clipboard->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 		}
@@ -253,7 +253,7 @@ class Copier {
 
 				for($i = 1; $i < $pasteCount; ++$i) {
 					$j = $i * $xSize;
-					while ($temporaryBlockArray->hasNext()) {
+					while($temporaryBlockArray->hasNext()) {
 						$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
 						$fillSession->setBlockAt($x + $j, $y, $z, $id, $meta);
 					}
@@ -275,7 +275,7 @@ class Copier {
 
 				for($i = 1; $i < $pasteCount; ++$i) {
 					$j = $i * $zSize;
-					while ($temporaryBlockArray->hasNext()) {
+					while($temporaryBlockArray->hasNext()) {
 						$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
 						$fillSession->setBlockAt($x, $y, $z + $j, $id, $meta);
 					}
@@ -296,7 +296,7 @@ class Copier {
 
 			for($i = 1; $i < $pasteCount; ++$i) {
 				$j = $i * $ySize;
-				while ($temporaryBlockArray->hasNext()) {
+				while($temporaryBlockArray->hasNext()) {
 					$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
 					if($y >= 0 && $y <= 255) {
 						$fillSession->setBlockAt($x, $y + $j, $z, $id, $meta);

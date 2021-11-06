@@ -42,8 +42,8 @@ class IslandCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cUsage: §7//island <id1:dmg1,id2:dmg2:,...> [radius] [step]");
 			return;
 		}
-		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
-		$step = isset($args[2]) ? (int) ($args[2]) : 3;
+		$radius = isset($args[1]) ? (int)($args[1]) : 5;
+		$step = isset($args[2]) ? (int)($args[2]) : 3;
 
 		$result = Printer::getInstance()->makeIsland($sender, $sender->getPosition(), $radius, $step, $args[0]);
 		if(!$result->successful()) {

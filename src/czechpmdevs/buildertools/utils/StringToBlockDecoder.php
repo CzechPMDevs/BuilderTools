@@ -99,7 +99,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 		}
 
 		$split = explode(",", str_replace(";", ",", $this->string));
-		foreach ($split as $entry) {
+		foreach($split as $entry) {
 			$count = 1;
 			$block = $entry;
 			if(strpos($entry, "%") !== false) {
@@ -108,14 +108,13 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 					continue;
 				}
 
-				$count = min(100, (int) $p);
+				$count = min(100, (int)$p);
 				$block = substr($entry, $pos + 1);
 			}
 
 			try {
 				$item = LegacyStringToItemParser::getInstance()->parse($block);
-			}
-			catch (LegacyStringToItemParserException $ignore) {
+			} catch(LegacyStringToItemParserException $ignore) {
 				continue; // Item not found
 			}
 

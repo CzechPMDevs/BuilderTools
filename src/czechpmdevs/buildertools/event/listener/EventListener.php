@@ -76,7 +76,7 @@ class EventListener implements Listener {
 		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
 		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
 			// antispam ._.
-			if(isset($this->wandClicks[$player->getName()]) && microtime(true)-$this->wandClicks[$player->getName()] < 0.5) {
+			if(isset($this->wandClicks[$player->getName()]) && microtime(true) - $this->wandClicks[$player->getName()] < 0.5) {
 				return;
 			}
 
@@ -88,7 +88,7 @@ class EventListener implements Listener {
 
 		if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::STICK && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
 			// antispam ._.
-			if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true)-$this->blockInfoClicks[$player->getName()] < 0.5) {
+			if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true) - $this->blockInfoClicks[$player->getName()] < 0.5) {
 				return;
 			}
 

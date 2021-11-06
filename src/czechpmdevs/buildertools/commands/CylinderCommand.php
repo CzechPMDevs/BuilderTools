@@ -42,8 +42,8 @@ class CylinderCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cUsage: §7//cylinder <id1:dmg1,id2:dmg2:,...> [radius] [height]");
 			return;
 		}
-		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
-		$height = isset($args[2]) ? (int) ($args[2]) : 8;
+		$radius = isset($args[1]) ? (int)($args[1]) : 5;
+		$height = isset($args[2]) ? (int)($args[2]) : 8;
 
 		$result = Printer::getInstance()->makeCylinder($sender, $sender->getPosition(), $radius, $height, $args[0]);
 		if(!$result->successful()) {

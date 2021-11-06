@@ -123,7 +123,7 @@ class BuilderTools extends PluginBase {
 		$configuration = $this->getConfig()->getAll();
 		if(
 			!array_key_exists("config-version", $configuration) ||
-			version_compare((string) $configuration["config-version"], BuilderTools::CURRENT_CONFIG_VERSION) < 0
+			version_compare((string)$configuration["config-version"], BuilderTools::CURRENT_CONFIG_VERSION) < 0
 		) {
 			// Update is required
 			@unlink($this->getDataFolder() . "config.yml.old");
@@ -187,7 +187,7 @@ class BuilderTools extends PluginBase {
 			new WandCommand
 		];
 
-		foreach (BuilderTools::$commands as $command) {
+		foreach(BuilderTools::$commands as $command) {
 			$map->register("BuilderTools", $command);
 		}
 
@@ -215,7 +215,7 @@ class BuilderTools extends PluginBase {
 		}
 
 		/** @var string $offlineSession */
-		foreach ($files as $offlineSession) {
+		foreach($files as $offlineSession) {
 			unlink($offlineSession);
 		}
 	}

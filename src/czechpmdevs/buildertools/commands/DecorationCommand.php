@@ -53,10 +53,10 @@ class DecorationCommand extends BuilderToolsCommand {
 
 		$percentage = 90;
 		if(isset($args[2]) && is_numeric(str_replace("%", "", $args[2]))) {
-			$percentage = (int) ($args[2]);
+			$percentage = (int)($args[2]);
 		}
 
-		$result = Decorator::getInstance()->addDecoration($sender->getPosition(), $args[0], (int) ($args[1]), $percentage, $sender);
+		$result = Decorator::getInstance()->addDecoration($sender->getPosition(), $args[0], (int)($args[1]), $percentage, $sender);
 		if(!$result->successful()) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cAn error occurred whilst adding decoration: {$result->getErrorMessage()}");
 			return;

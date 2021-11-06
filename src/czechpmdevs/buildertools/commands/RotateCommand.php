@@ -49,13 +49,13 @@ class RotateCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		foreach ($args as $argument) {
+		foreach($args as $argument) {
 			if(!is_numeric($argument)) {
 				$sender->sendMessage("§cUsage: §7//rotate <yAxis> [xAxis] [zAxis]");
 				return;
 			}
 
-			if(!RotationUtil::isDegreeValueValid((int) $argument)) {
+			if(!RotationUtil::isDegreeValueValid((int)$argument)) {
 				$sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid degrees. You can rotate just about 90, 180 and 270 (-90) degrees!");
 				return;
 			}
@@ -64,20 +64,17 @@ class RotateCommand extends BuilderToolsCommand {
 		$startTime = microtime(true);
 
 		$copier = Copier::getInstance();
-
-		foreach ($args as $i => $arg) {
+		foreach($args as $i => $arg) {
 			if($i === 0) {
-				$copier->rotate($sender, Axis::Y_AXIS, RotationUtil::getRotation((int) $arg));
-			}
-			elseif($i === 1) {
-				$copier->rotate($sender, Axis::X_AXIS, RotationUtil::getRotation((int) $arg));
-			}
-			elseif ($i === 2) {
-				$copier->rotate($sender, Axis::Z_AXIS, RotationUtil::getRotation((int) $arg));
+				$copier->rotate($sender, Axis::Y_AXIS, RotationUtil::getRotation((int)$arg));
+			} elseif($i === 1) {
+				$copier->rotate($sender, Axis::X_AXIS, RotationUtil::getRotation((int)$arg));
+			} elseif($i === 2) {
+				$copier->rotate($sender, Axis::Z_AXIS, RotationUtil::getRotation((int)$arg));
 			}
 		}
 
-		$time = round(microtime(true)-$startTime, 3);
+		$time = round(microtime(true) - $startTime, 3);
 
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
 	}

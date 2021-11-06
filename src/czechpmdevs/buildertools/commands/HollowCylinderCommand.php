@@ -43,8 +43,8 @@ class HollowCylinderCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$radius = isset($args[1]) ? (int) ($args[1]) : 5;
-		$height = isset($args[2]) ? (int) ($args[2]) : 8;
+		$radius = isset($args[1]) ? (int)($args[1]) : 5;
+		$height = isset($args[2]) ? (int)($args[2]) : 8;
 
 		$result = Printer::getInstance()->makeHollowCylinder($sender, $sender->getPosition(), $radius, $height, $args[0]);
 		if(!$result->successful()) {

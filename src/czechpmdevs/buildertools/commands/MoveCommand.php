@@ -51,7 +51,7 @@ class MoveCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$result = Copier::getInstance()->move($firstPos, $secondPos, new Vector3((int) $args[0], (int) $args[1], (int) $args[2]), $sender);
+		$result = Copier::getInstance()->move($firstPos, $secondPos, new Vector3((int)$args[0], (int)$args[1], (int)$args[2]), $sender);
 
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area has been successfully moved, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
 	}

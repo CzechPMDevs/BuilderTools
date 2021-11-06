@@ -118,7 +118,8 @@ class BlockArray implements UpdateLevelData, Serializable {
 		$this->lastBlockHash = $this->blocks[$this->offset++];
 
 		World::getBlockXYZ($this->lastHash, $x, $y, $z);
-		$id = $this->lastBlockHash >> 4; $meta = $this->lastBlockHash & 0xf;
+		$id = $this->lastBlockHash >> 4;
+		$meta = $this->lastBlockHash & 0xf;
 	}
 
 	/**
@@ -139,7 +140,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 		$blockArray = new BlockArray();
 		$blockArray->blocks = $this->blocks;
 
-		foreach ($this->coords as $hash) {
+		foreach($this->coords as $hash) {
 			World::getBlockXYZ($hash, $x, $y, $z);
 			$blockArray->coords[] = World::blockHash(($floorX + $x), ($floorY + $y), ($floorZ + $z));
 		}

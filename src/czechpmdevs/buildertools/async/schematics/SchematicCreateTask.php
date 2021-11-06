@@ -58,8 +58,7 @@ class SchematicCreateTask extends BuilderToolsAsyncTask {
 		try {
 			$schematic = new $this->format;
 			$rawData = $schematic->save($blockArray);
-		}
-		catch (SchematicException $exception) {
+		} catch(SchematicException $exception) {
 			$this->error = $exception->getMessage();
 			return;
 		}

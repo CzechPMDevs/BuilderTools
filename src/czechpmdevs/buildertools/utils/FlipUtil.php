@@ -32,13 +32,13 @@ class FlipUtil {
 
 		$sizeData = $selection->getSizeData();
 		if($axis == Axis::X_AXIS) { // y & z const
-			while ($selection->hasNext()) {
+			while($selection->hasNext()) {
 				$selection->readNext($x, $y, $z, $id, $meta);
 				FlipHelper::flip($axis, $id, $meta);
 				$modifiedSelection->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $id, $meta);
 			}
 		} elseif($axis == Axis::Y_AXIS) { // x & z const
-			while ($selection->hasNext()) {
+			while($selection->hasNext()) {
 				$selection->readNext($x, $y, $z, $id, $meta);
 				$y = (($sizeData->minY + $sizeData->maxY) - $y) + $motion;
 				if($y < World::Y_MIN || $y >= World::Y_MAX) {
@@ -48,7 +48,7 @@ class FlipUtil {
 				$modifiedSelection->addBlockAt($x, $y, $z, $id, $meta);
 			}
 		} else {
-			while ($selection->hasNext()) { // x & y const
+			while($selection->hasNext()) { // x & y const
 				$selection->readNext($x, $y, $z, $id, $meta);
 				FlipHelper::flip($axis, $id, $meta);
 				$modifiedSelection->addBlockAt($x, $y, (($sizeData->minZ + $sizeData->maxZ) - $z) + $motion, $id, $meta);

@@ -69,8 +69,7 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 
 		try {
 			$blockArray = $schematic->load($rawData);
-		}
-		catch (SchematicException $exception) {
+		} catch(SchematicException $exception) {
 			$this->error = $exception->getMessage();
 			return;
 		}
