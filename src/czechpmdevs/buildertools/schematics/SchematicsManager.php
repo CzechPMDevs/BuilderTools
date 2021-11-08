@@ -34,6 +34,7 @@ use czechpmdevs\buildertools\schematics\format\BuilderToolsSchematic;
 use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
 use czechpmdevs\buildertools\schematics\format\MCStructureSchematic;
 use czechpmdevs\buildertools\schematics\format\Schematic;
+use czechpmdevs\buildertools\schematics\format\SpongeSchematic;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use function array_keys;
@@ -66,6 +67,7 @@ class SchematicsManager {
 		SchematicsManager::$registeredTypes[] = BuilderToolsSchematic::class;
 		SchematicsManager::$registeredTypes[] = MCEditSchematic::class;
 		SchematicsManager::$registeredTypes[] = MCStructureSchematic::class;
+		SchematicsManager::$registeredTypes[] = SpongeSchematic::class;
 	}
 
 	/**
@@ -88,13 +90,12 @@ class SchematicsManager {
 			}
 
 			$blockArray = unserialize($task->blockArray);
-
 			if(!$blockArray instanceof BlockArray) {
 				$callback(SchematicActionResult::error("Error whilst reading object from another thread."));
+				return;
 			}
 
 			SchematicsManager::$loadedSchematics[$task->name] = $blockArray;
-
 			$callback(SchematicActionResult::success(microtime(true) - $startTime));
 		});
 	}
@@ -184,7 +185,7 @@ class SchematicsManager {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @phpstan-var BlockArray $changes */
+		/** @var BlockArray $changes */
 		$changes = $fillSession->getChanges();
 		Canceller::getInstance()->addStep($player, $changes);
 

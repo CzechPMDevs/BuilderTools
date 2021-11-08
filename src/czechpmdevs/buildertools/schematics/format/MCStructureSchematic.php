@@ -21,21 +21,22 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\schematics\format;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\schematics\ReadonlySchematic;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\LittleEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
-use pocketmine\nbt\TreeRoot;
+use pocketmine\nbt\tag\StringTag;
 use Throwable;
-use function array_fill;
 use function array_map;
-use function count;
 use function file_get_contents;
 use function getcwd;
+use function implode;
+use function intval;
+use function is_array;
 use function is_file;
-use function unserialize;
+use function json_decode;
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -43,14 +44,13 @@ use const DIRECTORY_SEPARATOR;
  * - It should have different extension (.mcstructure instead of .schematic)
  */
 class MCStructureSchematic implements Schematic {
+	use ReadonlySchematic;
 
-	/** @var CompoundTag[] */
-	private array $internalId2StatesMap;
-	/** @var array<int[][]|int[][][]> */
-	private array $states2InternalIdMap;
+	/** @var array<string, int> */
+	private array $bedrockBlockStatesMap = [];
 
 	public function load(string $rawData): BlockArray {
-		$nbt = (new LittleEndianNbtSerializer())->read($rawData)->getTag();
+		$nbt = (new LittleEndianNbtSerializer())->read($rawData)->mustGetCompoundTag();
 		if(!$nbt instanceof CompoundTag) {
 			throw new SchematicException("NBT root must be compound tag");
 		}
@@ -101,20 +101,19 @@ class MCStructureSchematic implements Schematic {
 			throw new SchematicException("List Tag $name was not found.");
 		}
 
-		return new Vector3(...$tag->getAllValues());
+		return new Vector3(...array_map(fn(mixed $val) => intval($val), $tag->getAllValues()));
 	}
 
 	/**
 	 * @return int[]
-	 * @throws SchematicException
 	 */
 	private function readPalette(CompoundTag $nbt): array {
 		/** @var CompoundTag[] $paletteData */
-		$paletteData = $nbt->getCompoundTag("structure")->getCompoundTag("palette")->getCompoundTag("default")->getListTag("block_palette")->getAllValues(); // @phpstan-ignore-line (We provide validated values)
+		$paletteData = $nbt->getCompoundTag("structure")->getCompoundTag("palette")->getCompoundTag("default")->getListTag("block_palette")->getValue(); // @phpstan-ignore-line (We provide validated values)
 
 		$palette = [];
 		foreach($paletteData as $i => $entry) {
-			$palette[$i] = $this->translateBlockStateToFullBlockId($entry);
+			$palette[$i] = $this->getFullBlockIdByState($entry);
 		}
 
 		return $palette;
@@ -128,142 +127,46 @@ class MCStructureSchematic implements Schematic {
 		$listTag = $nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0); // @phpstan-ignore-line (We provide valid values)
 		// TODO : Find out why there is another list tag on index 1 full of -1 values
 
-		return $listTag->getAllValues();
+		/** @var int[] $values */
+		$values = $listTag->getAllValues();
+		return $values;
 	}
 
-	/**
-	 * @throws SchematicException
-	 */
-	private function translateBlockStateToFullBlockId(CompoundTag $blockState): int {
-		$name = $blockState->getString("name");
-		if(!isset($this->states2InternalIdMap[$name])) {
-			throw new SchematicException("Unmapped identifier $name");
-		}
-
-		/** @var array<int[]|int[][]> $data */
-		$data = $this->states2InternalIdMap[$name];
-
-		/** @var int $id */
-		$id = $data["id"];
-		/** @var int $meta */
-		$meta = $data["meta"][$blockState->toString()] ?? 0;
-
-		return $id << 4 | $meta;
-	}
-
-	/**
-	 * Experimental, I am not sure this works
-	 * @throws SchematicException
-	 */
-	public function save(BlockArray $blockArray): string {
-		$nbt = new CompoundTag();
-
-		// Format version
-		$nbt->setInt("format_version", 1);
-
-		$sizeData = $blockArray->getSizeData();
-
-		$width = (($sizeData->maxX - $sizeData->minX) + 1);
-		$height = (($sizeData->maxY - $sizeData->minY) + 1);
-		$length = (($sizeData->maxZ - $sizeData->minZ) + 1);
-
-		// Main information
-		$this->writeVector3($nbt, "structure_world_origin", new Vector3(0, 0, 0)); // TODO: This Vector3 should represent original position in world
-		$this->writeVector3($nbt, "size", new Vector3($width, $height, $length));
-
-		// Palette & indexes
-		$this->loadMapping();
-
-		$yz = $height * $length;
-
-		// Create index table
-		$indexes = [];
-		while($blockArray->hasNext()) {
-			$blockArray->readNext($x, $y, $z, $id, $meta);
-			$indexes[$z + ($length * $y) + ($yz * $x)] = $id << 4 | $meta;
-		}
-
-		// Making Palette
-		$palette = $paletteHelper = [];
-		foreach($indexes as &$fullId) {
-			$state = $this->internalId2StatesMap[$fullId];
-
-			if(isset($paletteHelper[$state->toString()])) {
-				$fullId = $paletteHelper[$state->toString()];
-				continue;
+	private function getFullBlockIdByState(CompoundTag $blockState): int {
+		$index = $blockState->getString("name");
+		if(($states = $blockState->getCompoundTag("states")) !== null && $states->count() != 0) {
+			$data = [];
+			/** @var StringTag $state */
+			foreach($states as $k => $state) {
+				$data[] = "$k={$state->getValue()}";
 			}
-
-			$targetIndex = count($paletteHelper);
-			$paletteHelper[$state->toString()] = $targetIndex;
-			$palette[$targetIndex] = $state;
-			$fullId = $targetIndex;
+			$index .= "[" . implode(",", $data) . "]";
 		}
 
-		$structureNbt = new CompoundTag();
-
-		// Indices
-		$indexes = new ListTag(array_map(fn(int $int) => new IntTag($int), $indexes));
-		/** @phpstan-ignore-next-line */
-		$anotherIndexes = new ListTag(array_fill(0, $indexes->count(), new IntTag(-1))); // Seems Mojang do it same way :D
-
-		$structureNbt->setTag("block_indices", new ListTag([$indexes, $anotherIndexes]));
-
-		// Entities
-		$structureNbt->setTag("entities", new ListTag());
-
-		// Palette
-		$structureNbt->setTag("palette", (new CompoundTag())
-			->setTag("default", (new CompoundTag())
-				->setTag("block_palette", new ListTag($palette)
-				)
-			)
-		);
-
-		$nbt->setTag("structure", $structureNbt);
-
-		return (new LittleEndianNbtSerializer())->write(new TreeRoot($nbt, "structure"));
-	}
-
-	private function writeVector3(CompoundTag $nbt, string $name, Vector3 $vector3): void {
-		$nbt->setTag($name, new ListTag([
-			new IntTag($vector3->getFloorX()),
-			new IntTag($vector3->getFloorY()),
-			new IntTag($vector3->getFloorZ())
-		]));
+		return $this->bedrockBlockStatesMap[$index] ?? (248 >> 4); // Update block id
 	}
 
 	/**
 	 * @throws SchematicException
 	 */
 	private function loadMapping(): void {
-		if(isset($this->blockIdMap)) {
-			return;
-		}
-
 		$dataPath = getcwd() . DIRECTORY_SEPARATOR . "plugin_data" . DIRECTORY_SEPARATOR . "BuilderTools" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR;
 
-		if(!is_file($id2StatesPath = $dataPath . "internalId2StatesMap.serialized")) {
-			throw new SchematicException($dataPath . "internalId2StatesMap.serialized was not found");
-		}
-		if(!is_file($states2IdPath = $dataPath . "states2InternalIdMap.serialized")) {
-			throw new SchematicException($dataPath . "states2InternalIdMap.serialized was not found");
+		if(!is_file($bedrockStatesMapPath = $dataPath . "bedrock_block_states_map.json")) {
+			throw new SchematicException($bedrockStatesMapPath . " was not found");
 		}
 
-		$id2StatesContents = file_get_contents($id2StatesPath);
-		$states2IdContents = file_get_contents($states2IdPath);
-		if($id2StatesContents === false || $states2IdContents === false) {
-			throw new SchematicException("Unable to read files required for mapping");
+		$rawBedrockStatesMap = file_get_contents($bedrockStatesMapPath);
+		if(!$rawBedrockStatesMap) {
+			throw new SchematicException("Could not read from $bedrockStatesMapPath");
 		}
 
-		$reader = new LittleEndianNbtSerializer();
+		$bedrockBlockStatesMap = json_decode($rawBedrockStatesMap, true);
+		if(!is_array($bedrockBlockStatesMap)) {
+			throw new SchematicException("Invalid or corrupted resource given");
+		}
 
-		/** @var CompoundTag[] $id2StatesMap */
-		$id2StatesMap = array_map(fn(string $val) => $reader->read($val)->getTag(), unserialize($id2StatesContents));
-		/** @var array<int[][]|int[][][]> $states2IdMap */
-		$states2IdMap = unserialize($states2IdContents);
-
-		$this->internalId2StatesMap = $id2StatesMap;
-		$this->states2InternalIdMap = $states2IdMap;
+		$this->bedrockBlockStatesMap = $bedrockBlockStatesMap;
 	}
 
 	public static function getFileExtension(): string {
@@ -283,8 +186,8 @@ class MCStructureSchematic implements Schematic {
 			// Test if block indexes exists
 			$nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0)->getValue(); // @phpstan-ignore-line (Errors are caught)
 
-			return (!($nbt->getTag("size") instanceof ListTag)) && $nbt->getListTag("size")->count() == 3; // @phpstan-ignore-line (Errors are caught)
-		} catch(Throwable $ignore) {
+			return $nbt->getTag("size") instanceof ListTag && $nbt->getListTag("size")->count() == 3; // @phpstan-ignore-line (Errors are caught)
+		} catch(Throwable) {
 			return false;
 		}
 	}

@@ -22,13 +22,13 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\Selectors;
-use InvalidStateException;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginOwned;
 use pocketmine\world\Position;
+use RuntimeException;
 use function str_replace;
 use function strtolower;
 
@@ -43,7 +43,7 @@ abstract class BuilderToolsCommand extends Command implements PluginOwned {
 	public function execute(CommandSender $sender, string $commandLabel, array $args) {
 		$permission = $this->getPermission();
 		if($permission === null) {
-			throw new InvalidStateException("Command " . __CLASS__ . " is registered wrong.");
+			throw new RuntimeException("Command " . __CLASS__ . " is registered wrong.");
 		}
 
 		if(!$sender->hasPermission($permission)) {

@@ -36,7 +36,7 @@ class Selectors {
 	/** @var Player[] */
 	private static array $wandSelectors = [];
 
-	/** @var array[] */
+	/** @var array<string, array{0: int, 1: int, 2: bool}> */
 	private static array $drawingPlayers = [];
 	/** @var Player[] */
 	private static array $blockInfoPlayers = [];

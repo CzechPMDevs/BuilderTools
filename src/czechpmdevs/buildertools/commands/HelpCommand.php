@@ -61,7 +61,7 @@ class HelpCommand extends BuilderToolsCommand {
 				$text = "§2--- Showing help page $list of $count ---";
 			}
 
-			$text .= "\n§2/$name: §f" . BuilderTools::getAllCommands()[$index]->getDescription();
+			$text .= "\n§2/$name: §f" . ((string)BuilderTools::getAllCommands()[$index]->getDescription());
 			if($command == HelpCommand::COMMANDS_PER_PAGE || (count(BuilderTools::getAllCommands()) == $all)) {
 				$command = 1;
 				HelpCommand::$pages[$list] = $text;

@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use czechpmdevs\buildertools\BuilderTools;
-use InvalidStateException;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
@@ -30,6 +29,7 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\World;
+use RuntimeException;
 use Serializable;
 use function array_combine;
 use function array_keys;
@@ -223,7 +223,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 		$blocks = pack("N*", ...$this->blocks);
 
 		if($coords === false || $blocks === false) {
-			throw new InvalidStateException("Error whilst compressing");
+			throw new RuntimeException("Error whilst compressing");
 		}
 
 		$this->compressedCoords = $coords;
@@ -242,7 +242,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 		$blocks = unpack("N*", $this->compressedBlocks);
 
 		if($coords === false || $blocks === false) {
-			throw new InvalidStateException("Error whilst decompressing");
+			throw new RuntimeException("Error whilst decompressing");
 		}
 
 		$this->coords = array_values($coords);

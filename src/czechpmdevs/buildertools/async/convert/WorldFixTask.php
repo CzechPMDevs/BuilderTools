@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\async\convert;
 
 use czechpmdevs\buildertools\editors\Fixer;
-use Error;
 use Generator;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\world\format\io\exception\CorruptedChunkException;
@@ -30,6 +29,7 @@ use pocketmine\world\format\io\region\Anvil;
 use pocketmine\world\format\io\region\CorruptedRegionException;
 use pocketmine\world\format\io\region\McRegion;
 use pocketmine\world\format\io\WorldProviderManager;
+use Throwable;
 use function basename;
 use function count;
 use function explode;
@@ -81,7 +81,7 @@ class WorldFixTask extends AsyncTask {
 
 		try {
 			$provider = $worldProviderManagerEntry->fromPath($this->worldPath . DIRECTORY_SEPARATOR);
-		} catch(Error $error) {
+		} catch(Throwable $error) {
 			$this->error = "Error while loading provider: {$error->getMessage()}";
 			return;
 		}

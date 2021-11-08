@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use pocketmine\player\Player;
 use function array_key_exists;
+use function array_key_first;
 use function array_pop;
 
 class ClipboardManager {
@@ -37,38 +38,38 @@ class ClipboardManager {
 	public static array $redoData = [];
 
 	public static function getClipboard(Player $player): ?SelectionData {
-		return clone ClipboardManager::$clipboards[$player->getName()] ?? null;
+		return array_key_exists($player->getName(), self::$clipboards) ? clone self::$clipboards[$player->getName()] : null;
 	}
 
 	public static function hasClipboardCopied(Player $player): bool {
-		return array_key_exists($player->getName(), ClipboardManager::$clipboards);
+		return array_key_exists($player->getName(), self::$clipboards);
 	}
 
 	public static function saveClipboard(Player $player, SelectionData $data): void {
-		ClipboardManager::$clipboards[$player->getName()] = $data;
+		self::$clipboards[$player->getName()] = $data;
 	}
 
 	public static function getNextUndoAction(Player $player): ?BlockArray {
-		return array_pop(ClipboardManager::$undoData[$player->getName()]);
+		return array_pop(self::$undoData[$player->getName()]);
 	}
 
 	public static function hasActionToUndo(Player $player): bool {
-		return array_key_exists($player->getName(), ClipboardManager::$undoData) && !empty(ClipboardManager::$undoData[$player->getName()]);
+		return array_key_exists($player->getName(), self::$undoData) && !empty(self::$undoData[$player->getName()]);
 	}
 
 	public static function saveUndo(Player $player, BlockArray $array): void {
-		ClipboardManager::$undoData[$player->getName()][] = $array;
+		self::$undoData[$player->getName()][] = $array;
 	}
 
 	public static function getNextRedoAction(Player $player): ?BlockArray {
-		return array_pop(ClipboardManager::$redoData[$player->getName()]);
+		return array_pop(self::$redoData[$player->getName()]);
 	}
 
 	public static function hasActionToRedo(Player $player): bool {
-		return array_key_exists($player->getName(), ClipboardManager::$redoData) && !empty(ClipboardManager::$redoData[$player->getName()]);
+		return array_key_exists($player->getName(), self::$redoData) && !empty(self::$redoData[$player->getName()]);
 	}
 
 	public static function saveRedo(Player $player, BlockArray $array): void {
-		ClipboardManager::$redoData[$player->getName()][] = $array;
+		self::$redoData[$player->getName()][] = $array;
 	}
 }

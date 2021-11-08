@@ -1,5 +1,4 @@
 .idea
-build.php
 vendor
 out
 composer.phar

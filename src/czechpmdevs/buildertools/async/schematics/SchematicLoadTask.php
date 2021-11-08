@@ -24,10 +24,17 @@ use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use pocketmine\nbt\BigEndianNbtSerializer;
+use pocketmine\nbt\LittleEndianNbtSerializer;
 use function basename;
 use function file_exists;
 use function file_get_contents;
+use function file_put_contents;
 use function serialize;
+use function zlib_decode;
+use function zlib_encode;
+use const ZLIB_ENCODING_DEFLATE;
+use const ZLIB_ENCODING_GZIP;
 
 class SchematicLoadTask extends BuilderToolsAsyncTask {
 

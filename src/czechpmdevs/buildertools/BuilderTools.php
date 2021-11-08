@@ -80,8 +80,6 @@ class BuilderTools extends PluginBase {
 
 	private static string $prefix = "§7[BuilderTools] §a";
 
-	private static EventListener $listener;
-
 	/** @var Command[] */
 	private static array $commands = [];
 
@@ -113,11 +111,11 @@ class BuilderTools extends PluginBase {
 		if(!is_dir($this->getDataFolder() . "data")) {
 			@mkdir($this->getDataFolder() . "data");
 		}
-		if(!is_file($this->getDataFolder() . "data/internalId2StatesMap.serialized")) {
-			$this->saveResource("data/internalId2StatesMap.serialized");
+		if(!is_file($this->getDataFolder() . "data/bedrock_block_states_map.json")) {
+			$this->saveResource("data/bedrock_block_states_map.json");
 		}
-		if(!is_file($this->getDataFolder() . "data/states2InternalIdMap.serialized")) {
-			$this->saveResource("data/states2InternalIdMap.serialized");
+		if(!is_file($this->getDataFolder() . "data/java_block_states_map.json")) {
+			$this->saveResource("data/java_block_states_map.json");
 		}
 
 		$configuration = $this->getConfig()->getAll();
@@ -137,7 +135,7 @@ class BuilderTools extends PluginBase {
 	}
 
 	private function initListener(): void {
-		$this->getServer()->getPluginManager()->registerEvents(self::$listener = new EventListener(), $this);
+		$this->getServer()->getPluginManager()->registerEvents(new EventListener(), $this);
 	}
 
 	private function initMath(): void {

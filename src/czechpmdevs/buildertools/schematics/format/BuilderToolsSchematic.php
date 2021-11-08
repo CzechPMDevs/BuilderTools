@@ -25,7 +25,6 @@ use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
-use pocketmine\nbt\tag\CompoundTag;
 use Throwable;
 use function serialize;
 use function unserialize;
@@ -63,14 +62,13 @@ class BuilderToolsSchematic implements Schematic {
 				return false;
 			}
 
-			/** @var CompoundTag $nbt */
-			$nbt = (new BigEndianNbtSerializer())->read($rawData)->getTag();
+			$nbt = (new BigEndianNbtSerializer())->read($rawData)->mustGetCompoundTag();
 
 			return $nbt->getTag("Coords") instanceof ByteArrayTag &&
 				$nbt->getTag("Blocks") instanceof ByteArrayTag &&
 				$nbt->getTag("DuplicateDetection") instanceof ByteTag;
 
-		} catch(Throwable $ignore) {
+		} catch(Throwable) {
 			return false;
 		}
 	}
