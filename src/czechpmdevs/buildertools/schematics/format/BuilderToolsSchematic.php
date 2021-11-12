@@ -34,7 +34,7 @@ use function zlib_decode;
  * Experimental schematic format
  *
  * It should be used to transfer schematics between servers with BuilderTools
- * - This format is much faster than other ones.
+ * - This format is a way faster than other ones due to compatibility with internal BlockArray format
  */
 class BuilderToolsSchematic implements Schematic {
 

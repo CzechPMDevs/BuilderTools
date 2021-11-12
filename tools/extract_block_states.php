@@ -74,9 +74,8 @@ while(!$legacyStateMapReader->feof()) {
 		throw new RuntimeException("No legacy ID matches to $id");
 	}
 
-	if($meta > 15) {
-		echo "Skipping $id:$meta (Metadata have more than 4 bits)\n";
-		continue;
+	if($meta > 15) { // Meta > 15 is not supported yet
+		$meta = 0;
 	}
 
 	$bedrockStatesMap[serializeBlockNbt($state)] = $legacyId << 4 | $meta;
@@ -99,7 +98,7 @@ foreach(json_decode($java2BedrockStatesFile, true) as $javaId => $bedrockData) {
 	}
 
 	// Update block
-	$javaStatesMap[$javaId] = 248 >> 4;
+	$javaStatesMap[$javaId] = 248 << 4;
 
 	echo "Bedrock state $state was not found for $javaId\n";
 }

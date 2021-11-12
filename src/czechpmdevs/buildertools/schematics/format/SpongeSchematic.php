@@ -57,7 +57,7 @@ class SpongeSchematic implements Schematic {
 
 		$palette = [];
 		foreach($paletteTag->getValue() as $javaState => $placeholder) {
-			$palette[$placeholder->getValue()] = $this->javaBlockStatesMap[$javaState] ?? 0;
+			$palette[$placeholder->getValue()] = $this->javaBlockStatesMap[$javaState] ?? (248 << 4);
 		}
 
 		$blocks = $nbt->getByteArray("BlockData");
@@ -96,6 +96,9 @@ class SpongeSchematic implements Schematic {
 		$zSize = $nbt->getShort("Length");
 	}
 
+	/**
+	 * @throws SchematicException
+	 */
 	private function loadMapping(): void {
 		$dataPath = getcwd() . DIRECTORY_SEPARATOR . "plugin_data" . DIRECTORY_SEPARATOR . "BuilderTools" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR;
 
@@ -142,7 +145,7 @@ class SpongeSchematic implements Schematic {
 				return true;
 			}
 			return false;
-		} catch(Throwable $ignore) {
+		} catch(Throwable) {
 			return false;
 		}
 	}
