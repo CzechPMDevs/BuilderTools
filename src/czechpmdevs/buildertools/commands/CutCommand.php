@@ -22,9 +22,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
-use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 
 class CutCommand extends BuilderToolsCommand {
@@ -40,19 +38,8 @@ class CutCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cThis command can be used only in game!");
 			return;
 		}
-		if(!Selectors::isSelected(1, $sender)) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the first position.");
-			return;
-		}
-		if(!Selectors::isSelected(2, $sender)) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the second position.");
-			return;
-		}
 
-		/** @var Vector3 $pos1 */
-		$pos1 = Selectors::getPosition($sender, 1);
-		/** @var Vector3 $pos2 */
-		$pos2 = Selectors::getPosition($sender, 2);
+		$this->readPositions($sender, $pos1, $pos2);
 
 		$result = Copier::getInstance()->cut($pos1, $pos2, $sender);
 		if(!$result->successful()) {

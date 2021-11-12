@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use Error;
 use pocketmine\block\BlockFactory;
+use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\World;
@@ -35,7 +36,7 @@ class FillSession {
 	protected bool $calculateDimensions;
 	protected bool $saveChanges;
 
-	protected ?BlockArray $changes = null;
+	protected BlockArray $changes;
 
 	protected int $minX, $maxX;
 	protected int $minZ, $maxZ;
@@ -158,7 +159,11 @@ class FillSession {
 		return false;
 	}
 
-	public function getChanges(): ?BlockArray {
+	public function getChanges(): BlockArray {
+		if(!isset($this->changes)) {
+			throw new AssumptionFailedError("Could not request non-saved changes");
+		}
+
 		return $this->changes;
 	}
 
@@ -234,7 +239,6 @@ class FillSession {
 		if($this->saveChanges) {
 			/** @phpstan-ignore-next-line */
 			$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-			/** @phpstan-ignore-next-line */
 			$this->changes->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
 		}
 	}

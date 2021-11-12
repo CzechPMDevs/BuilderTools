@@ -49,7 +49,6 @@ class RotationUtil {
 		$deg = $degrees % 360;
 		$rad = deg2rad($degrees % 360);
 
-		/** @var Vector3 $diff */
 		$diff = $blockArray->getPlayerPosition();
 
 		$modifiedBlockArray = new SelectionData();

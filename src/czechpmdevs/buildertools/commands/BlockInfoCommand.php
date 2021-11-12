@@ -42,9 +42,9 @@ class BlockInfoCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cThis command can be used only in game!");
 			return;
 		}
-		if(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["enabled"]) {
+		if(BuilderTools::getConfiguration()->getBoolProperty("blockinfo-stick.enabled")) {
 			$item = VanillaItems::STICK();
-			$item->setCustomName(BuilderTools::getConfiguration()["items"]["blockinfo-stick"]["name"]);
+			$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("blockinfo-stick.name"));
 			$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
 			$item->getNamedTag()->setByte("buildertools", 1);
 

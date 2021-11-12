@@ -43,9 +43,9 @@ class WandCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(BuilderTools::getConfiguration()["items"]["wand-axe"]["enabled"]) {
+		if(BuilderTools::getConfiguration()->getBoolProperty("wand-axe.enabled")) {
 			$item = VanillaItems::WOODEN_AXE();
-			$item->setCustomName(BuilderTools::getConfiguration()["items"]["wand-axe"]["name"]);
+			$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("wand-axe.name"));
 			$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
 			$item->getNamedTag()->setByte("buildertools", 1);
 

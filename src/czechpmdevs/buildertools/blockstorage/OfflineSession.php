@@ -40,7 +40,7 @@ use const ZLIB_ENCODING_GZIP;
 final class OfflineSession {
 
 	public static function savePlayerSession(Player $player): void {
-		if(BuilderTools::getConfiguration()["discard-sessions"] ?? false) {
+		if(BuilderTools::getConfiguration()->getBoolProperty("discard-sessions")) {
 			unset(ClipboardManager::$clipboards[$player->getName()]);
 			return;
 		}

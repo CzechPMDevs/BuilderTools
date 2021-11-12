@@ -197,7 +197,6 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $undoList */
 		$undoList = $fillSession->getChanges();
 		$undoList->removeDuplicates();
 		$undoList->save();
@@ -286,7 +285,6 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $undoList */
 		$undoList = $fillSession->getChanges();
 		$undoList->removeDuplicates();
 		$undoList->save();
@@ -349,7 +347,6 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $undoList */
 		$undoList = $fillSession->getChanges();
 		$undoList->removeDuplicates();
 		$undoList->save();
@@ -451,7 +448,6 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $undoList */
 		$undoList = $fillSession->getChanges();
 		$undoList->removeDuplicates();
 		$undoList->save();

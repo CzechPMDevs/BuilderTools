@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\editors\object\EditorResult;
@@ -77,7 +76,6 @@ class Filler {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $changes */
 		$changes = $fillSession->getChanges();
 		$changes->save();
 
@@ -111,7 +109,6 @@ class Filler {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $changes */
 		$changes = $fillSession->getChanges();
 		$changes->save();
 
@@ -154,7 +151,6 @@ class Filler {
 		}
 
 		if($saveUndo || $saveRedo) {
-			/** @var BlockArray $updates */
 			$updates = $fillSession->getChanges();
 			$updates->save();
 

@@ -122,7 +122,7 @@ class SchematicsManager {
 	public static function createSchematic(Player $player, Vector3 $pos1, Vector3 $pos2, string $schematicName, Closure $callback): void {
 		$startTime = microtime(true);
 
-		$format = SchematicsManager::getSchematicByExtension(BuilderTools::getConfiguration()["output-schematics-format"] ?? "");
+		$format = SchematicsManager::getSchematicByExtension(BuilderTools::getConfiguration()->getStringProperty("output-schematics-format"));
 		BuilderTools::getInstance()->getLogger()->debug("Using $format format to create schematic...");
 
 		/** @noinspection ALL */
@@ -185,7 +185,6 @@ class SchematicsManager {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $changes */
 		$changes = $fillSession->getChanges();
 		Canceller::getInstance()->addStep($player, $changes);
 

@@ -28,7 +28,7 @@ use function unpack;
 
 class SelectionData extends BlockArray {
 
-	protected ?Vector3 $playerPosition = null;
+	protected Vector3 $playerPosition;
 
 	public string $compressedPlayerPosition;
 
@@ -40,9 +40,8 @@ class SelectionData extends BlockArray {
 			throw new InvalidArgumentException("Vector3 coordinates must be integer.");
 		}
 
-		if($this->playerPosition !== null) {
+		if(isset($this->playerPosition)) {
 			$clipboard = clone $this;
-			/** @phpstan-ignore-next-line */
 			$clipboard->playerPosition->addVector($vector3);
 
 			return $clipboard;
@@ -51,15 +50,15 @@ class SelectionData extends BlockArray {
 		return parent::addVector3($vector3);
 	}
 
-	public function getPlayerPosition(): ?Vector3 {
+	public function getPlayerPosition(): Vector3 {
 		return $this->playerPosition;
 	}
 
 	/**
 	 * @return $this
 	 */
-	public function setPlayerPosition(?Vector3 $playerPosition): SelectionData {
-		$this->playerPosition = $playerPosition === null ? null : $playerPosition->floor();
+	public function setPlayerPosition(Vector3 $playerPosition): SelectionData {
+		$this->playerPosition = $playerPosition->floor();
 
 		return $this;
 	}
@@ -67,12 +66,14 @@ class SelectionData extends BlockArray {
 	public function compress(bool $cleanDecompressed = true): void {
 		parent::compress($cleanDecompressed);
 
-		$vector3 = $this->getPlayerPosition();
-		if($vector3 === null) {
+		if(!isset($this->playerPosition)) {
 			return;
 		}
 
+		$vector3 = $this->getPlayerPosition();
 		$this->compressedPlayerPosition = pack("q", World::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
+
+		unset($this->playerPosition);
 	}
 
 	public function decompress(bool $cleanCompressed = true): void {
@@ -83,7 +84,7 @@ class SelectionData extends BlockArray {
 		}
 
 		/** @phpstan-ignore-next-line */
-		World::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z); // poggit...
+		World::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z);
 		$this->playerPosition = new Vector3($x, $y, $z);
 	}
 

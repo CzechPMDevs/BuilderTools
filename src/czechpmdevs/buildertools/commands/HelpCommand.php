@@ -25,6 +25,7 @@ use pocketmine\command\CommandSender;
 use function asort;
 use function count;
 use function is_numeric;
+use function is_string;
 
 class HelpCommand extends BuilderToolsCommand {
 
@@ -56,12 +57,13 @@ class HelpCommand extends BuilderToolsCommand {
 		asort($commands);
 
 		foreach($commands as $index => $name) {
-			$all++;
+			++$all;
 			if($command == 1) {
 				$text = "§2--- Showing help page $list of $count ---";
 			}
 
-			$text .= "\n§2/$name: §f" . ((string)BuilderTools::getAllCommands()[$index]->getDescription());
+			$description = BuilderTools::getAllCommands()[$index]->getDescription();
+			$text .= "\n§2/$name: §f" . (is_string($description) ? $description : $description->getText());
 			if($command == HelpCommand::COMMANDS_PER_PAGE || (count(BuilderTools::getAllCommands()) == $all)) {
 				$command = 1;
 				HelpCommand::$pages[$list] = $text;

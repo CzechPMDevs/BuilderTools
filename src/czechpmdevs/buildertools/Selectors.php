@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools;
 use czechpmdevs\buildertools\math\Math;
 use InvalidArgumentException;
 use pocketmine\player\Player;
+use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\Position;
 use function array_key_exists;
 
@@ -100,7 +101,7 @@ class Selectors {
 		return Math::selectionSize($pos1, $pos2);
 	}
 
-	public static function getPosition(Player $player, int $pos): ?Position {
+	public static function getPosition(Player $player, int $pos): Position {
 		if($pos == 1) {
 			return Selectors::$pos1[$player->getName()];
 		}
@@ -108,7 +109,7 @@ class Selectors {
 			return Selectors::$pos2[$player->getName()];
 		}
 
-		return null;
+		throw new AssumptionFailedError("{$player->getDisplayName()} does not have selected required position");
 	}
 
 	public static function isSelected(int $pos, Player $player): bool {

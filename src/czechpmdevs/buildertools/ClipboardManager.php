@@ -24,7 +24,6 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use pocketmine\player\Player;
 use function array_key_exists;
-use function array_key_first;
 use function array_pop;
 
 class ClipboardManager {

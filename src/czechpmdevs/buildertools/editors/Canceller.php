@@ -65,7 +65,7 @@ class Canceller {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $updates */
+
 		$updates = $fillSession->getChanges();
 		$updates->save();
 
@@ -108,7 +108,6 @@ class Canceller {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $updates */
 		$updates = $fillSession->getChanges();
 		$updates->save();
 

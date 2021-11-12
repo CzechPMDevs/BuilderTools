@@ -67,6 +67,7 @@ use function array_key_exists;
 use function glob;
 use function is_dir;
 use function is_file;
+use function is_string;
 use function mkdir;
 use function rename;
 use function unlink;
@@ -74,11 +75,13 @@ use function version_compare;
 
 class BuilderTools extends PluginBase {
 
-	public const CURRENT_CONFIG_VERSION = "1.2.0.3";
+	public const CURRENT_CONFIG_VERSION = "1.3.0.0";
 
 	private static BuilderTools $instance;
 
 	private static string $prefix = "§7[BuilderTools] §a";
+
+	private static Configuration $configuration;
 
 	/** @var Command[] */
 	private static array $commands = [];
@@ -121,7 +124,8 @@ class BuilderTools extends PluginBase {
 		$configuration = $this->getConfig()->getAll();
 		if(
 			!array_key_exists("config-version", $configuration) ||
-			version_compare((string)$configuration["config-version"], BuilderTools::CURRENT_CONFIG_VERSION) < 0
+			!is_string($version = $configuration["config-version"]) ||
+			version_compare($version, BuilderTools::CURRENT_CONFIG_VERSION) < 0
 		) {
 			// Update is required
 			@unlink($this->getDataFolder() . "config.yml.old");
@@ -132,6 +136,8 @@ class BuilderTools extends PluginBase {
 
 			$this->getLogger()->notice("Config updated. Old config was renamed to 'config.yml.old'.");
 		}
+
+		self::$configuration = new Configuration($this->getConfig()->getAll());
 	}
 
 	private function initListener(): void {
@@ -185,7 +191,7 @@ class BuilderTools extends PluginBase {
 			new WandCommand
 		];
 
-		foreach(BuilderTools::$commands as $command) {
+		foreach(self::$commands as $command) {
 			$map->register("BuilderTools", $command);
 		}
 
@@ -203,7 +209,7 @@ class BuilderTools extends PluginBase {
 	}
 
 	public function cleanCache(): void {
-		if(BuilderTools::getConfiguration()["clean-cache"] ?? false) {
+		if(!self::getConfiguration()->getBoolProperty("clean-cache")) {
 			return;
 		}
 
@@ -222,22 +228,18 @@ class BuilderTools extends PluginBase {
 	 * @return Command[]
 	 */
 	public static function getAllCommands(): array {
-		return BuilderTools::$commands;
+		return self::$commands;
 	}
 
 	public static function getPrefix(): string {
-		return BuilderTools::$prefix;
+		return self::$prefix;
 	}
 
-	/**
-	 * @noinspection PhpPluralMixedCanBeReplacedWithArrayInspection
-	 * @phpstan-return mixed[]
-	 */
-	public static function getConfiguration(): array {
-		return BuilderTools::$instance->getConfig()->getAll();
+	public static function getConfiguration(): Configuration {
+		return self::$configuration;
 	}
 
 	public static function getInstance(): BuilderTools {
-		return BuilderTools::$instance;
+		return self::$instance;
 	}
 }

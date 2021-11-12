@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
@@ -71,7 +70,6 @@ class Replacement {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		/** @var BlockArray $changes */
 		$changes = $fillSession->getChanges();
 		$changes->save();
 		Canceller::getInstance()->addStep($player, $changes);

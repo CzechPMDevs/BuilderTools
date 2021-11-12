@@ -61,9 +61,7 @@ abstract class BuilderToolsCommand extends Command implements PluginOwned {
 			return false;
 		}
 
-		/** @var Position $firstPos */
 		$firstPos = Selectors::getPosition($sender, 1);
-		/** @var Position $secondPos */
 		$secondPos = Selectors::getPosition($sender, 2);
 
 		if($firstPos->getWorld()->getId() != $secondPos->getWorld()->getId()) {

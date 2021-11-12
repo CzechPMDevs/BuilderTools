@@ -43,7 +43,10 @@ class BiomeCommand extends BuilderToolsCommand {
 
 	public function __construct() {
 		parent::__construct("/biome", "Updates biome for the selection");
-		$this->biomeData = (array)json_decode(BiomeCommand::BIOME_DATA, true);
+
+		/** @var int[] $biomeData */
+		$biomeData = (array)json_decode(BiomeCommand::BIOME_DATA, true);
+		$this->biomeData = $biomeData;
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args) {

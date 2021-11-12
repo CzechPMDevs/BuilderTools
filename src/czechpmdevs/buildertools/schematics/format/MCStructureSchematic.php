@@ -29,7 +29,6 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\StringTag;
 use Throwable;
-use function array_key_exists;
 use function array_map;
 use function file_get_contents;
 use function getcwd;

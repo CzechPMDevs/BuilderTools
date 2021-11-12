@@ -191,7 +191,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 	}
 
 	public function removeDuplicates(): void {
-		if(!(BuilderTools::getConfiguration()["remove-duplicate-blocks"] ?? true)) {
+		if(!(BuilderTools::getConfiguration()->getBoolProperty("remove-duplicate-blocks"))) {
 			return;
 		}
 
@@ -203,14 +203,14 @@ class BlockArray implements UpdateLevelData, Serializable {
 	}
 
 	public function save(): void {
-		if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+		if(BuilderTools::getConfiguration()->getBoolProperty("clipboard-compression")) {
 			$this->compress();
 			$this->isCompressed = true;
 		}
 	}
 
 	public function load(): void {
-		if(BuilderTools::getConfiguration()["clipboard-compression"] ?? false) {
+		if(BuilderTools::getConfiguration()->getBoolProperty("clipboard-compression")) {
 			$this->decompress();
 			$this->isCompressed = false;
 		}
