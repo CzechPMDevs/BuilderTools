@@ -385,6 +385,13 @@ class Printer {
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$radius = abs($radius);
+		if($radius < 1) {
+			return EditorResult::error("Radius must be at least 1");
+		}
+
+		if($step < 1) {
+			return EditorResult::error("Step must be at least 1");
+		}
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
