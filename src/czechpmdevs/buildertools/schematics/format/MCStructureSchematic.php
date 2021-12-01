@@ -70,6 +70,7 @@ class MCStructureSchematic implements Schematic {
 		$length = $size->getFloorZ();
 
 		$blockArray = new BlockArray();
+		$blockArrayBlocks = $blockArray->getBlocks();
 
 		$i = 0;
 		for($x = 0; $x < $width; ++$x) {
@@ -83,7 +84,7 @@ class MCStructureSchematic implements Schematic {
 						$id = 0;
 					}
 
-					$blockArray->addBlockAt($x, $y, $z, $id, $meta);
+					$blockArrayBlocks->addBlockAt($x, $y, $z, $id, $meta);
 					++$i;
 				}
 			}

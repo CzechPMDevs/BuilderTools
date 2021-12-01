@@ -1,9 +1,9 @@
 ---
 # BuilderTools configuration file
-# Target BuilderTools version: 1.3.0-beta1
+# Target BuilderTools version: 1.3.0-beta2
 
 # Do not change this line.
-config-version: 1.3.0.0
+config-version: 1.3.0.1
 
 # This is format which will be used for creating schematics
 # Supported formats: 'mcedit', 'mcstructure', 'buildertools'
@@ -11,7 +11,7 @@ output-schematics-format: 'mcedit'
 
 # Option for compressing clipboards. This will make the actions
 # slower, but reduces RAM usage.
-clipboard-compression: false
+clipboard-compression: true
 
 # Some shapes are generated with duplicate blocks. This problem causes
 # some blocks are not reverted right when doing //undo. This option

@@ -102,7 +102,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 		foreach($split as $entry) {
 			$count = 1;
 			$block = $entry;
-			if(strpos($entry, "%") !== false) {
+			if(str_contains($entry, "%")) {
 				$p = substr($entry, 0, $pos = strpos($entry, "%"));
 				if(!is_numeric($p)) {
 					continue;
@@ -114,7 +114,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 
 			try {
 				$item = LegacyStringToItemParser::getInstance()->parse($block);
-			} catch(LegacyStringToItemParserException $ignore) {
+			} catch(LegacyStringToItemParserException) {
 				continue; // Item not found
 			}
 
@@ -124,7 +124,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 			}
 
 			if(!$mixBlockIds) {
-				if(strpos($entry, ":") !== false) { // Meta is specified
+				if(str_contains($entry, ":")) { // Meta is specified
 					for($i = 0; $i < $count; ++$i) {
 						$this->blockMap[] = $class->getId() << 4 | $class->getMeta();
 					}

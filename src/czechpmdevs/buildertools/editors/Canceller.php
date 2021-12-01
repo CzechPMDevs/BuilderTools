@@ -49,22 +49,30 @@ class Canceller {
 			return $error();
 		}
 
-		if($undoAction->getWorld() === null) {
-			return EditorResult::error("Could not find world to process updates on.");
-		}
+		$undoAction->load();
+
+		$undoActionBiomes = $undoAction->getBiomes();
+		$undoActionBlocks = $undoAction->getBlocks();
+		$undoActionTiles = $undoAction->getTiles();
 
 		$startTime = microtime(true);
 		$fillSession = new FillSession($undoAction->getWorld(), true, true);
 
-		$undoAction->load();
-		while($undoAction->hasNext()) {
-			$undoAction->readNext($x, $y, $z, $id, $meta);
+		while($undoActionBiomes->hasNext()) {
+			$undoActionBiomes->readNext($x, $z, $id);
+			$fillSession->setBiomeAt($x, $z, $id);
+		}
+		while($undoActionBlocks->hasNext()) {
+			$undoActionBlocks->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+		}
+		while($undoActionTiles->hasNext()) {
+			$undoActionTiles->readNext($x, $y, $z, $nbt);
+
 		}
 
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
-
 
 		$updates = $fillSession->getChanges();
 		$updates->save();
@@ -92,16 +100,14 @@ class Canceller {
 			return $error();
 		}
 
-		if($redoAction->getWorld() === null) {
-			return EditorResult::error("Could not find world to process updates on.");
-		}
+		$redoActionBlocks = $redoAction->getBlocks();
 
 		$startTime = microtime(true);
 		$fillSession = new FillSession($redoAction->getWorld(), true, true);
 
 		$redoAction->load();
-		while($redoAction->hasNext()) {
-			$redoAction->readNext($x, $y, $z, $id, $meta);
+		while($redoActionBlocks->hasNext()) {
+			$redoActionBlocks->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
 		}
 

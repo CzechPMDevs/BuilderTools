@@ -77,13 +77,13 @@ class DrawCommand extends BuilderToolsCommand {
 				$mode = Printer::CYLINDER;
 				break;
 			case "hcube":
-				$mode = Printer::HOLLOW_CUBE;
+				$mode = Printer::H_CUBE;
 				break;
 			case "hsphere":
-				$mode = Printer::HOLLOW_SPHERE;
+				$mode = Printer::H_SPHERE;
 				break;
 			case "hcylinder":
-				$mode = Printer::HOLLOW_CYLINDER;
+				$mode = Printer::H_CYLINDER;
 				break;
 		}
 

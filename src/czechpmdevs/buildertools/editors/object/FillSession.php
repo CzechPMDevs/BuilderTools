@@ -21,13 +21,17 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\type\Biomes;
+use czechpmdevs\buildertools\blockstorage\type\Blocks;
+use czechpmdevs\buildertools\blockstorage\type\Tiles;
 use czechpmdevs\buildertools\BuilderTools;
-use Error;
+use czechpmdevs\buildertools\world\SubChunkExplorer;
 use pocketmine\block\BlockFactory;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\ChunkManager;
-use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\World;
+use Throwable;
 
 class FillSession {
 
@@ -38,18 +42,19 @@ class FillSession {
 
 	protected BlockArray $changes;
 
+	protected Biomes $changedBiomes;
+	protected Blocks $changedBlocks;
+	protected Tiles $changedTiles;
+
 	protected int $minX, $maxX;
 	protected int $minZ, $maxZ;
 
 	protected int $blocksChanged = 0;
 	protected bool $error = false;
 
-	/**
-	 * @var int
-	 *
-	 * Variable to avoid re-allocating memory all the time
-	 */
+	/** Fields to avoid re-allocating memory all the time */
 	protected int $lastHash;
+	protected ?CompoundTag $lastTile;
 
 	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true) {
 		$this->explorer = new SubChunkExplorer($world);
@@ -59,6 +64,10 @@ class FillSession {
 
 		if($this->saveChanges) {
 			$this->changes = (new BlockArray())->setWorld($world);
+
+			$this->changedBiomes = $this->changes->getBiomes();
+			$this->changedBlocks = $this->changes->getBlocks();
+			$this->changedTiles = $this->changes->getTiles();
 		}
 	}
 
@@ -70,6 +79,25 @@ class FillSession {
 		$this->maxX = $maxX;
 		$this->minZ = $minZ;
 		$this->maxZ = $maxZ;
+	}
+
+	public function setBiomeAt(int $x, int $z, int $id): void {
+		if(!$this->explorer->moveToXZ($x, $z)) {
+			return;
+		}
+
+		/** @phpstan-ignore-next-line */
+		$this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
+		$this->blocksChanged++;
+	}
+
+	public function getBiomeAt(int $x, int $z, ?int &$id): void {
+		if(!$this->explorer->moveToXZ($x, $z)) {
+			return;
+		}
+
+		/** @phpstan-ignore-next-line */
+		$id = $this->explorer->currentChunk->getBiomeId($x & 0xf, $z & 0xf);
 	}
 
 	/**
@@ -90,16 +118,15 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
+	public function getBlockIdAt(int $x, int $y, int $z, ?int &$id): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
 
-		$this->saveChanges($x, $y, $z);
-
 		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
-		$this->blocksChanged++;
+		$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+
+		$id = $this->lastHash >> 4;
 	}
 
 	/**
@@ -120,24 +147,15 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function getBlockIdAt(int $x, int $y, int $z, ?int &$id): void {
+	public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
 
-		/** @phpstan-ignore-next-line */
-		$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-
-		$id = $this->lastHash >> 4;
-	}
-
-	public function setBiomeAt(int $x, int $z, int $id): void {
-		if(!$this->explorer->moveTo($x, 0, $z)) {
-			return;
-		}
+		$this->saveChanges($x, $y, $z);
 
 		/** @phpstan-ignore-next-line */
-		$this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
 		$this->blocksChanged++;
 	}
 
@@ -219,7 +237,7 @@ class FillSession {
 			try {
 				/** @phpstan-ignore-next-line */
 				$this->explorer->currentSubChunk = $this->explorer->currentChunk->getSubChunk($y >> 4);
-			} catch(Error $exception) { // For the case if chunk is null
+			} catch(Throwable) { // For the case if chunk is null
 				$this->error = true;
 				return false;
 			}
@@ -239,7 +257,16 @@ class FillSession {
 		if($this->saveChanges) {
 			/** @phpstan-ignore-next-line */
 			$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-			$this->changes->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
+			/** @phpstan-ignore-next-line */
+			$this->lastTile = $this->explorer->currentChunk->getTile($x & 0xf, $y & 0xf, $z & 0xf)?->getCleanedNBT();
+
+			/** @phpstan-ignore-next-line */
+			$this->changedBiomes->addBiomeAt($x, $z, $this->explorer->currentChunk->getBiomeId($x, $z));
+			$this->changedBlocks->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
+
+			if($this->lastTile !== null) {
+				$this->changedTiles->addTileAt($x, $y, $z, $this->lastTile);
+			}
 		}
 	}
 

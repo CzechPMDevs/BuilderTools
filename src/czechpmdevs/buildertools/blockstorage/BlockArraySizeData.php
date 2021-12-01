@@ -20,38 +20,39 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
+use czechpmdevs\buildertools\blockstorage\type\Blocks;
 use pocketmine\math\Vector3;
 
 final class BlockArraySizeData {
 
-	private BlockArray $blockArray;
+	private Blocks $blocks;
 
 	public int $maxX, $maxY, $maxZ;
 	public int $minX, $minY, $minZ;
 
 	public function __construct(BlockArray $blockArray) {
-		$this->blockArray = $blockArray;
+		$this->blocks = $blockArray->getBlocks();
 		$this->calculateSizeData();
 	}
 
 	private function calculateSizeData(): void {
-		if($this->blockArray->size() == 0) {
+		if($this->blocks->size() == 0) {
 			return;
 		}
 
-		$this->blockArray->readNext($x, $y, $z, $id, $meta);
+		$this->blocks->readNext($x, $y, $z, $id, $meta);
 
 		$minX = $maxX = $x;
 		$minY = $maxY = $y;
 		$minZ = $maxZ = $z;
 
-		if($this->blockArray->size() % 2 == 0) {
-			$this->blockArray->offset = 0;
+		if($this->blocks->size() % 2 == 0) {
+			$this->blocks->resetOffset();
 		}
 
-		while($this->blockArray->hasNext()) {
-			$this->blockArray->readNext($x1, $y1, $z1, $id, $meta);
-			if(!$this->blockArray->hasNext()) {
+		while($this->blocks->hasNext()) {
+			$this->blocks->readNext($x1, $y1, $z1, $id, $meta);
+			if(!$this->blocks->hasNext()) {
 				if($minX > $x1) {
 					$minX = $x1;
 				} else if($maxX < $x1) {
@@ -70,7 +71,7 @@ final class BlockArraySizeData {
 				break;
 			}
 
-			$this->blockArray->readNext($x2, $y2, $z2, $id, $meta);
+			$this->blocks->readNext($x2, $y2, $z2, $id, $meta);
 			if($x1 > $x2) {
 				if($minX > $x2) {
 					$minX = $x2;
@@ -105,7 +106,7 @@ final class BlockArraySizeData {
 		$this->maxY = $maxY;
 		$this->maxZ = $maxZ;
 
-		$this->blockArray->offset = 0;
+		$this->blocks->resetOffset();
 	}
 
 	/**

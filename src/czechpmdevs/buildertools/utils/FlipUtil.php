@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\utils;
 
+use czechpmdevs\buildertools\blockstorage\BlockArraySizeData;
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use pocketmine\world\World;
 
@@ -30,31 +31,34 @@ class FlipUtil {
 		$modifiedSelection->setWorld($selection->getWorld());
 		$modifiedSelection->setPlayerPosition($selection->getPlayerPosition());
 
-		$sizeData = $selection->getSizeData();
+		$selectionBlocks = $selection->getBlocks();
+		$modifiedSelectionBlocks = $modifiedSelection->getBlocks();
+
+		$sizeData = new BlockArraySizeData($selection);
 		if($axis == Axis::X_AXIS) { // y & z const
-			while($selection->hasNext()) {
-				$selection->readNext($x, $y, $z, $id, $meta);
+			while($selectionBlocks->hasNext()) {
+				$selectionBlocks->readNext($x, $y, $z, $id, $meta);
 				FlipHelper::flip($axis, $id, $meta);
-				$modifiedSelection->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $id, $meta);
+				$modifiedSelectionBlocks->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $id, $meta);
 			}
 		} elseif($axis == Axis::Y_AXIS) { // x & z const
-			while($selection->hasNext()) {
-				$selection->readNext($x, $y, $z, $id, $meta);
+			while($selectionBlocks->hasNext()) {
+				$selectionBlocks->readNext($x, $y, $z, $id, $meta);
 				$y = (($sizeData->minY + $sizeData->maxY) - $y) + $motion;
 				if($y < World::Y_MIN || $y >= World::Y_MAX) {
 					continue;
 				}
 				FlipHelper::flip($axis, $id, $meta);
-				$modifiedSelection->addBlockAt($x, $y, $z, $id, $meta);
+				$modifiedSelectionBlocks->addBlockAt($x, $y, $z, $id, $meta);
 			}
 		} else {
-			while($selection->hasNext()) { // x & y const
-				$selection->readNext($x, $y, $z, $id, $meta);
+			while($selectionBlocks->hasNext()) { // x & y const
+				$selectionBlocks->readNext($x, $y, $z, $id, $meta);
 				FlipHelper::flip($axis, $id, $meta);
-				$modifiedSelection->addBlockAt($x, $y, (($sizeData->minZ + $sizeData->maxZ) - $z) + $motion, $id, $meta);
+				$modifiedSelectionBlocks->addBlockAt($x, $y, (($sizeData->minZ + $sizeData->maxZ) - $z) + $motion, $id, $meta);
 			}
 		}
-		$selection->offset = 0;
+		$selectionBlocks->resetOffset();
 
 		return $modifiedSelection;
 	}

@@ -54,14 +54,7 @@ final class OfflineSession {
 		if(ClipboardManager::hasClipboardCopied($player)) {
 			/** @phpstan-var SelectionData $clipboard */
 			$clipboard = ClipboardManager::getClipboard($player);
-
-			$clipboard->compress();
-
-			$nbt->setTag("Clipboard", (new CompoundTag())
-				->setByteArray("Coordinates", $clipboard->compressedCoords)
-				->setByteArray("Blocks", $clipboard->compressedBlocks)
-				->setByteArray("RelativePosition", $clipboard->compressedPlayerPosition)
-			);
+			$nbt->setTag("Clipboard", $clipboard->getSerializedNbt());
 
 			unset(ClipboardManager::$clipboards[$player->getName()]);
 		}
@@ -96,15 +89,7 @@ final class OfflineSession {
 		if($nbt->getTag("Clipboard") instanceof CompoundTag) {
 			/** @var CompoundTag $clipboardTag */
 			$clipboardTag = $nbt->getCompoundTag("Clipboard");
-
-			$clipboard = new SelectionData();
-			$clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
-			$clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
-			$clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
-
-			$clipboard->decompress();
-
-			ClipboardManager::saveClipboard($player, $clipboard);
+			ClipboardManager::saveClipboard($player, SelectionData::deserializeNbt($clipboardTag));
 		}
 	}
 }

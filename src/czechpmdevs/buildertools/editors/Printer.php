@@ -38,12 +38,12 @@ use function microtime;
 class Printer {
 	use SingletonTrait;
 
-	public const CUBE = 0x00;
-	public const SPHERE = 0x01;
-	public const CYLINDER = 0x02;
-	public const HOLLOW_CUBE = 0x03;
-	public const HOLLOW_SPHERE = 0x04;
-	public const HOLLOW_CYLINDER = 0x05;
+	public const CUBE = 1;
+	public const SPHERE = 2;
+	public const CYLINDER = 3;
+	public const H_CUBE = 4;
+	public const H_SPHERE = 5;
+	public const H_CYLINDER = 6;
 
 	public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false): void {
 		$undoList = new BlockArray();
@@ -61,7 +61,7 @@ class Printer {
 			}
 
 			$fullBlock = $level->getBlock($vector3);
-			$undoList->addBlock($vector3, $fullBlock->getId(), $fullBlock->getMeta());
+			$undoList->getBlocks()->addBlock($vector3, $fullBlock->getId(), $fullBlock->getMeta());
 
 			/** @phpstan-ignore-next-line */
 			$level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block); // We provide valid values
@@ -75,26 +75,26 @@ class Printer {
 			foreach(BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$undoList->removeDuplicates();
+			$undoList->getBlocks()->removeDuplicates();
 		} elseif($mode == Printer::CYLINDER) {
 			foreach(BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$undoList->removeDuplicates();
-		} elseif($mode == Printer::HOLLOW_CUBE) {
+			$undoList->getBlocks()->removeDuplicates();
+		} elseif($mode == Printer::H_CUBE) {
 			foreach(BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-		} elseif($mode == Printer::HOLLOW_SPHERE) {
+		} elseif($mode == Printer::H_SPHERE) {
 			foreach(BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$undoList->removeDuplicates();
-		} elseif($mode == Printer::HOLLOW_CYLINDER) {
+			$undoList->getBlocks()->removeDuplicates();
+		} elseif($mode == Printer::H_CYLINDER) {
 			foreach(BlockGenerator::generateCylinder($brush, $brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$undoList->removeDuplicates();
+			$undoList->getBlocks()->removeDuplicates();
 		}
 
 		$undoList->save();
@@ -198,7 +198,7 @@ class Printer {
 		$fillSession->close();
 
 		$undoList = $fillSession->getChanges();
-		$undoList->removeDuplicates();
+		$undoList->getBlocks()->removeDuplicates();
 		$undoList->save();
 
 		Canceller::getInstance()->addStep($player, $undoList);
@@ -286,7 +286,7 @@ class Printer {
 		$fillSession->close();
 
 		$undoList = $fillSession->getChanges();
-		$undoList->removeDuplicates();
+		$undoList->getBlocks()->removeDuplicates();
 		$undoList->save();
 
 		Canceller::getInstance()->addStep($player, $undoList);
@@ -348,7 +348,7 @@ class Printer {
 		$fillSession->close();
 
 		$undoList = $fillSession->getChanges();
-		$undoList->removeDuplicates();
+		$undoList->getBlocks()->removeDuplicates();
 		$undoList->save();
 
 		Canceller::getInstance()->addStep($player, $undoList);
@@ -456,7 +456,7 @@ class Printer {
 		$fillSession->close();
 
 		$undoList = $fillSession->getChanges();
-		$undoList->removeDuplicates();
+		$undoList->getBlocks()->removeDuplicates();
 		$undoList->save();
 		Canceller::getInstance()->addStep($player, $undoList);
 

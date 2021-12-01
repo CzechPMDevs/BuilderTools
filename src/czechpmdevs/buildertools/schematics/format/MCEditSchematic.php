@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\schematics\format;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockArraySizeData;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\nbt\BigEndianNbtSerializer;
@@ -57,26 +58,24 @@ class MCEditSchematic implements Schematic {
 		$this->readBlockData($nbt, $blocks, $data);
 		$this->readMaterials($nbt, $materials);
 
+		$convert = $materials == MCEditSchematic::MATERIALS_CLASSIC || $materials == MCEditSchematic::MATERIALS_ALPHA;
+		$fixer = Fixer::getInstance();
+
 		$blockArray = new BlockArray();
+		$blockArrayBlocks = $blockArray->getBlocks();
 
 		$i = 0;
 		for($y = 0; $y < $height; ++$y) {
 			for($z = 0; $z < $length; ++$z) {
 				for($x = 0; $x < $width; ++$x) {
-					$id = ord($blocks[$i]);
-					$meta = ord($data[$i]);
+					$fullBlockId = ord($blocks[$i]) << 4 | ord($data[$i]);
+					if($convert) {
+						$fixer->convertJavaToBedrockId($fullBlockId);
+					}
 
-					$blockArray->addBlockAt($x, $y, $z, $id, $meta);
+					$blockArrayBlocks->addBlockAt($x, $y, $z, $fullBlockId >> 4, $fullBlockId & 0xf);
 					++$i;
 				}
-			}
-		}
-
-		if($materials == MCEditSchematic::MATERIALS_CLASSIC || $materials == MCEditSchematic::MATERIALS_ALPHA) {
-			$fixer = Fixer::getInstance();
-
-			foreach($blockArray->blocks as &$fullBlock) {
-				$fixer->convertJavaToBedrockId($fullBlock);
 			}
 		}
 
@@ -130,7 +129,8 @@ class MCEditSchematic implements Schematic {
 	public function save(BlockArray $blockArray): string {
 		$nbt = new CompoundTag();
 
-		$sizeData = $blockArray->getSizeData();
+		$sizeData = new BlockArraySizeData($blockArray);
+		$blockArrayBlocks = $blockArray->getBlocks();
 
 		$width = (($sizeData->maxX - $sizeData->minX) + 1);
 		$height = (($sizeData->maxY - $sizeData->minY) + 1);
@@ -140,8 +140,8 @@ class MCEditSchematic implements Schematic {
 		$totalSize = $xz * $height;
 
 		$blocks = $data = str_repeat(chr(0), $totalSize);
-		while($blockArray->hasNext()) {
-			$blockArray->readNext($x, $y, $z, $id, $meta);
+		while($blockArrayBlocks->hasNext()) {
+			$blockArrayBlocks->readNext($x, $y, $z, $id, $meta);
 			$key = $x + ($width * $z) + ($xz * $y);
 
 			$blocks[$key] = chr($id);
@@ -209,7 +209,7 @@ class MCEditSchematic implements Schematic {
 			}
 
 			return false;
-		} catch(Throwable $ignore) {
+		} catch(Throwable) {
 			return false;
 		}
 	}

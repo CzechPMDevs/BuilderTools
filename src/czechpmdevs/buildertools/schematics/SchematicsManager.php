@@ -133,7 +133,8 @@ class SchematicsManager {
 		}
 
 		$fillSession = new FillSession($player->getWorld());
-		$blocks = new BlockArray();
+		$blockArray = new BlockArray();
+		$blockArrayBlocks = $blockArray->getBlocks();
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -141,13 +142,13 @@ class SchematicsManager {
 			for($x = $minX; $x <= $maxX; ++$x) {
 				for($z = $minZ; $z <= $maxZ; ++$z) {
 					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $id, $meta);
+					$blockArrayBlocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $id, $meta);
 				}
 			}
 		}
 
 		/** @phpstan-ignore-next-line */
-		AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function(SchematicCreateTask $task) use ($callback, $startTime): void {
+		AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blockArray), function(SchematicCreateTask $task) use ($callback, $startTime): void {
 			if($task->error !== null) {
 				$callback(SchematicActionResult::error($task->error));
 				return;
@@ -165,6 +166,7 @@ class SchematicsManager {
 		}
 
 		$schematic = clone SchematicsManager::$loadedSchematics[$schematicName];
+		$schematicBlocks = $schematic->getBlocks();
 
 		$fillSession = new FillSession($player->getWorld(), true, true);
 
@@ -172,8 +174,8 @@ class SchematicsManager {
 		$floorY = $player->getPosition()->getFloorY();
 		$floorZ = $player->getPosition()->getFloorZ();
 
-		while($schematic->hasNext()) {
-			$schematic->readNext($x, $y, $z, $id, $meta);
+		while($schematicBlocks->hasNext()) {
+			$schematicBlocks->readNext($x, $y, $z, $id, $meta);
 			if($id != 0)
 				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 		}

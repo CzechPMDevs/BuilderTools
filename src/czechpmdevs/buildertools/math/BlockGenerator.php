@@ -99,7 +99,7 @@ class BlockGenerator {
 				$incDivZ = ($z + 1) / $radius;
 
 				$lengthSquared = Math::lengthSquared2d($divX, $divZ);
-				if($lengthSquared > 1) { // checking if can skip blocks outside of circle
+				if($lengthSquared > 1) { // checking if it's possible to skip blocks outside of circle
 					if($z == 0) {
 						break 2;
 					}

@@ -18,24 +18,13 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\blockstorage;
+namespace czechpmdevs\buildertools\world;
 
-use pocketmine\world\ChunkManager;
+use pocketmine\world\format\SubChunk;
 
-interface UpdateLevelData {
+class SubChunkExplorer extends \pocketmine\world\utils\SubChunkExplorer {
 
-	/**
-	 * @return bool Returns if it is possible read next blocks
-	 */
-	public function hasNext(): bool;
-
-	/**
-	 * Reads next block from the array
-	 */
-	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
-
-	/**
-	 * Should not be null when used in filler
-	 */
-	public function getWorld(): ?ChunkManager;
+	public function moveToXZ(int $x, int $z): int {
+		return $this->moveTo($x, $this->currentY << SubChunk::COORD_BIT_SIZE, $z);
+	}
 }

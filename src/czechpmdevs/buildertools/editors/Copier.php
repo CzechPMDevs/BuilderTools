@@ -34,6 +34,7 @@ use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\World;
 use function max;
 use function microtime;
 use function min;
@@ -49,6 +50,8 @@ class Copier {
 		$startTime = microtime(true);
 
 		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
+		$clipboardBiomes = $clipboard->getBiomes();
+		$clipboardBlocks = $clipboard->getBlocks();
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -60,8 +63,11 @@ class Copier {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
 					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$clipboard->addBlockAt($x, $y, $z, $id, $meta);
+					$clipboardBlocks->addBlockAt($x, $y, $z, $id, $meta);
 				}
+
+				$fillSession->getBiomeAt($x, $z, $id);
+				$clipboardBiomes->addBiomeAt($x, $z, $id);
 			}
 		}
 
@@ -75,6 +81,8 @@ class Copier {
 		$startTime = microtime(true);
 
 		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
+		$clipboardBiomes = $clipboard->getBiomes();
+		$clipboardBlocks = $clipboard->getBlocks();
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -86,10 +94,12 @@ class Copier {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
 					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$clipboard->addBlockAt($x, $y, $z, $id, $meta);
+					$clipboardBlocks->addBlockAt($x, $y, $z, $id, $meta);
 
 					$fillSession->setBlockAt($x, $y, $z, 0, 0);
 				}
+				$fillSession->getBiomeAt($x, $z, $id);
+				$clipboardBiomes->addBiomeAt($x, $z, $id);
 			}
 		}
 
@@ -119,6 +129,8 @@ class Copier {
 		$clipboard->setWorld($player->getWorld());
 		$clipboard->load();
 
+		$clipboardBlocks = $clipboard->getBlocks();
+
 		/** @phpstan-var Vector3 $relativePosition */
 		$relativePosition = $clipboard->getPlayerPosition();
 
@@ -130,8 +142,8 @@ class Copier {
 		$floorY = $motion->getFloorY();
 		$floorZ = $motion->getFloorZ();
 
-		while($clipboard->hasNext()) {
-			$clipboard->readNext($x, $y, $z, $id, $meta);
+		while($clipboardBlocks->hasNext()) {
+			$clipboardBlocks->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 		}
 
@@ -157,6 +169,8 @@ class Copier {
 		$clipboard->setWorld($player->getWorld());
 		$clipboard->load();
 
+		$clipboardBlocks = $clipboard->getBlocks();
+
 		/** @phpstan-var Vector3 $relativePosition */
 		$relativePosition = $clipboard->getPlayerPosition();
 
@@ -168,8 +182,8 @@ class Copier {
 		$floorY = $motion->getFloorY();
 		$floorZ = $motion->getFloorZ();
 
-		while($clipboard->hasNext()) {
-			$clipboard->readNext($x, $y, $z, $id, $meta);
+		while($clipboardBlocks->hasNext()) {
+			$clipboardBlocks->readNext($x, $y, $z, $id, $meta);
 			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
 		}
 
@@ -223,20 +237,21 @@ class Copier {
 
 		// Copying on to block array
 		$temporaryBlockArray = new BlockArray();
+		$temporaryBlockArrayBlocks = $temporaryBlockArray->getBlocks();
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		for($x = $minX; $x <= $maxX; ++$x) {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
 					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$temporaryBlockArray->addBlockAt($x, $y, $z, $id, $meta);
+					$temporaryBlockArrayBlocks->addBlockAt($x, $y, $z, $id, $meta);
 				}
 			}
 		}
 
 		$direction = Math::getPlayerDirection($player);
 		if($mode == self::DIRECTION_PLAYER) {
-			if($direction == 0 || $direction == 2) { // Moving along x axis (z = const)
+			if($direction == 0 || $direction == 2) { // Moving along x-axis (z = const)
 				$xSize = ($maxX - $minX) + 1;
 
 				if($direction == 0) {
@@ -250,13 +265,13 @@ class Copier {
 
 				for($i = 1; $i < $pasteCount; ++$i) {
 					$j = $i * $xSize;
-					while($temporaryBlockArray->hasNext()) {
-						$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
+					while($temporaryBlockArrayBlocks->hasNext()) {
+						$temporaryBlockArrayBlocks->readNext($x, $y, $z, $id, $meta);
 						$fillSession->setBlockAt($x + $j, $y, $z, $id, $meta);
 					}
 
 					// Resets the array reader
-					$temporaryBlockArray->offset = 0;
+					$temporaryBlockArrayBlocks->resetOffset();
 				}
 			} else { // Moving along z axis (x = const)
 				$zSize = ($maxZ - $minZ) + 1;
@@ -272,13 +287,13 @@ class Copier {
 
 				for($i = 1; $i < $pasteCount; ++$i) {
 					$j = $i * $zSize;
-					while($temporaryBlockArray->hasNext()) {
-						$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
+					while($temporaryBlockArrayBlocks->hasNext()) {
+						$temporaryBlockArrayBlocks->readNext($x, $y, $z, $id, $meta);
 						$fillSession->setBlockAt($x, $y, $z + $j, $id, $meta);
 					}
 
 					// Resets array reader
-					$temporaryBlockArray->offset = 0;
+					$temporaryBlockArrayBlocks->resetOffset();
 				}
 			}
 		} else {
@@ -293,15 +308,15 @@ class Copier {
 
 			for($i = 1; $i < $pasteCount; ++$i) {
 				$j = $i * $ySize;
-				while($temporaryBlockArray->hasNext()) {
-					$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
-					if($y >= 0 && $y <= 255) {
+				while($temporaryBlockArrayBlocks->hasNext()) {
+					$temporaryBlockArrayBlocks->readNext($x, $y, $z, $id, $meta);
+					if($y >= World::Y_MIN && $y < World::Y_MAX) {
 						$fillSession->setBlockAt($x, $y + $j, $z, $id, $meta);
 					}
 				}
 
 				// Resets array header
-				$temporaryBlockArray->offset = 0;
+				$temporaryBlockArrayBlocks->resetOffset();
 			}
 		}
 
@@ -350,7 +365,7 @@ class Copier {
 
 					/** @phpstan-var int $finalY */
 					$finalY = $floorY + $y;
-					if($finalY >= 0 && $finalY <= 255) {
+					if($finalY >= World::Y_MIN && $finalY < World::Y_MAX) {
 						$fillSession->setBlockAt($floorX + $x, $finalY, $floorZ + $z, $id, $meta);
 					}
 				}

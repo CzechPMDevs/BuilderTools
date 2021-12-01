@@ -27,7 +27,6 @@ class SchematicActionResult {
 	protected bool $loaded = true;
 
 	protected string $errorMessage = "";
-
 	protected float $processTime = 0;
 
 	private function __construct() { }

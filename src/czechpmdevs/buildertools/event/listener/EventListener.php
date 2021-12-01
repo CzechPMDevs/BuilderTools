@@ -40,9 +40,9 @@ use function microtime;
 
 class EventListener implements Listener {
 
-	/** @var float[] */
+	/** @var array<string, float> */
 	private array $wandClicks = [];
-	/** @var float[] */
+	/** @var array<string, float> */
 	private array $blockInfoClicks = [];
 
 	/** @noinspection PhpUnused */

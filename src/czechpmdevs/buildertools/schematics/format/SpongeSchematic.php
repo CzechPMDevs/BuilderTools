@@ -61,7 +61,9 @@ class SpongeSchematic implements Schematic {
 		}
 
 		$blocks = $nbt->getByteArray("BlockData");
+
 		$blockArray = new BlockArray();
+		$blockArrayBlocks = $blockArray->getBlocks();
 
 		$i = 0;
 		for($y = 0; $y < $height; ++$y) {
@@ -69,7 +71,7 @@ class SpongeSchematic implements Schematic {
 				for($x = 0; $x < $width; ++$x) {
 					$blockHash = $palette[ord($blocks[$i++])];
 
-					$blockArray->addBlockAt($x, $y, $z, $blockHash >> 4, $blockHash & 0xf);
+					$blockArrayBlocks->addBlockAt($x, $y, $z, $blockHash >> 4, $blockHash & 0xf);
 				}
 			}
 		}
