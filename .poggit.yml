@@ -1,13 +1,10 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools
 branches:
-- default
-- 1.2.0
-- feature/pm-4.0.0
+- main
+- feature/tiles
+-
 projects:
   BuilderTools:
     path: ""
     icon: "icon.png"
-    lint:
-      phpstan: false
-      syntaxError: false
 ...
