@@ -108,7 +108,7 @@ class WorldFixTask extends AsyncTask {
 				try {
 					$chunk = $provider->loadChunk($chunkX, $chunkZ)?->getChunk();
 				} catch(CorruptedChunkException $e) {
-//                    MainLogger::getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
+					//                    MainLogger::getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
 					continue;
 				}
 
@@ -126,18 +126,18 @@ class WorldFixTask extends AsyncTask {
 			}
 
 			$percent = round(((++$regionsFixed) * 100) / $regionCount, 3);
-//            $timePerChunk = round((microtime(true) - $startTime) / $chunksFixed, 3);
-//            $timePerRegion = (microtime(true) - $startTime) / $regionsFixed;
-//            $expectedTime = gmdate("H:i:s", (int)ceil($timePerRegion * ($regionCount - $regionsFixed)));
+			//            $timePerChunk = round((microtime(true) - $startTime) / $chunksFixed, 3);
+			//            $timePerRegion = (microtime(true) - $startTime) / $regionsFixed;
+			//            $expectedTime = gmdate("H:i:s", (int)ceil($timePerRegion * ($regionCount - $regionsFixed)));
 
-//            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
+			//            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
 
 			$this->percent = (int)$percent;
 			$provider->doGarbageCollection();
 		}
 
 		$this->time = round(microtime(true) - $startTime);
-//        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
+		//        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
 
 		$this->done = true;
 		$this->chunkCount = $chunksFixed;
@@ -165,7 +165,7 @@ class WorldFixTask extends AsyncTask {
 			try {
 				$region = new McRegion($regionFilePath);
 			} catch(CorruptedRegionException $e) {
-//                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
+				//                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
 				continue;
 			}
 

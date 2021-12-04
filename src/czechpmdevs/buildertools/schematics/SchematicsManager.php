@@ -174,8 +174,7 @@ class SchematicsManager {
 
 		while($schematic->hasNext()) {
 			$schematic->readNext($x, $y, $z, $fullBlockId);
-			if($fullBlockId != 0)
-				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+			if($fullBlockId != 0) $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
 		if($fillSession->getBlocksChanged() == 0) {

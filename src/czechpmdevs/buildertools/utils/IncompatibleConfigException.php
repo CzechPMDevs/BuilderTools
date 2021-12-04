@@ -22,4 +22,5 @@ namespace czechpmdevs\buildertools\utils;
 
 use Exception;
 
-class IncompatibleConfigException extends Exception { }
+class IncompatibleConfigException extends Exception {
+}

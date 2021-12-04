@@ -78,7 +78,7 @@ class BuilderTools extends PluginBase {
 	public const CURRENT_CONFIG_VERSION = "1.3.0.0";
 
 	private static BuilderTools $instance;
-    private static Configuration $configuration;
+	private static Configuration $configuration;
 
 	/** @var Command[] */
 	private static array $commands = [];
@@ -119,11 +119,7 @@ class BuilderTools extends PluginBase {
 		}
 
 		$configuration = $this->getConfig()->getAll();
-		if(
-			!array_key_exists("config-version", $configuration) ||
-			!is_string($version = $configuration["config-version"]) ||
-			version_compare($version, BuilderTools::CURRENT_CONFIG_VERSION) < 0
-		) {
+		if(!array_key_exists("config-version", $configuration) || !is_string($version = $configuration["config-version"]) || version_compare($version, BuilderTools::CURRENT_CONFIG_VERSION) < 0) {
 			// Update is required
 			@unlink($this->getDataFolder() . "config.yml.old");
 			@rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
@@ -147,46 +143,7 @@ class BuilderTools extends PluginBase {
 
 	private function registerCommands(): void {
 		$map = $this->getServer()->getCommandMap();
-		BuilderTools::$commands = [
-			new BiomeCommand,
-			new BlockInfoCommand,
-			new CenterCommand,
-			new ClearInventoryCommand,
-			new CopyCommand,
-			new CubeCommand,
-			new CutCommand,
-			new CylinderCommand,
-			new DecorationCommand,
-			new DrawCommand,
-			new FillCommand,
-			new FirstPositionCommand,
-			new FixCommand,
-			new FlipCommand,
-			new HelpCommand,
-			new HollowCubeCommand,
-			new HollowCylinderCommand,
-			new HollowPyramidCommand,
-			new HollowSphereCommand,
-			new IdCommand,
-			new IslandCommand,
-			new MergeCommand,
-			new MoveCommand,
-			new NaturalizeCommand,
-			new OutlineCommand,
-			new PasteCommand,
-			new PyramidCommand,
-			new RedoCommand,
-			new ReplaceCommand,
-			new RotateCommand,
-			new SchematicCommand,
-			new SecondPositionCommand,
-			new SphereCommand,
-			new StackCommand,
-			new TreeCommand,
-			new UndoCommand,
-			new WallsCommand,
-			new WandCommand
-		];
+		BuilderTools::$commands = [new BiomeCommand, new BlockInfoCommand, new CenterCommand, new ClearInventoryCommand, new CopyCommand, new CubeCommand, new CutCommand, new CylinderCommand, new DecorationCommand, new DrawCommand, new FillCommand, new FirstPositionCommand, new FixCommand, new FlipCommand, new HelpCommand, new HollowCubeCommand, new HollowCylinderCommand, new HollowPyramidCommand, new HollowSphereCommand, new IdCommand, new IslandCommand, new MergeCommand, new MoveCommand, new NaturalizeCommand, new OutlineCommand, new PasteCommand, new PyramidCommand, new RedoCommand, new ReplaceCommand, new RotateCommand, new SchematicCommand, new SecondPositionCommand, new SphereCommand, new StackCommand, new TreeCommand, new UndoCommand, new WallsCommand, new WandCommand];
 
 		foreach(self::$commands as $command) {
 			$map->register("BuilderTools", $command);

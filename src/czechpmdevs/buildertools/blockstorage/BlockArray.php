@@ -117,7 +117,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 		$this->lastHash = $this->coords[$this->offset];
 
 		World::getBlockXYZ($this->lastHash, $x, $y, $z);
-        $fullBlockId = $this->blocks[$this->offset++];
+		$fullBlockId = $this->blocks[$this->offset++];
 	}
 
 	/**

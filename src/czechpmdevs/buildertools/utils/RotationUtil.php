@@ -112,12 +112,12 @@ class RotationUtil {
 	}
 
 	public static function getRotation(int $degrees): int {
-        return match ((int)fmod($degrees, 360)) {
-            0 => RotationUtil::ROTATE_0,
-            90 => RotationUtil::ROTATE_90,
-            180 => RotationUtil::ROTATE_180,
-            270 => RotationUtil::ROTATE_270,
-            default => RotationUtil::ROTATE_360,
-        };
-    }
+		return match ((int)fmod($degrees, 360)) {
+			0 => RotationUtil::ROTATE_0,
+			90 => RotationUtil::ROTATE_90,
+			180 => RotationUtil::ROTATE_180,
+			270 => RotationUtil::ROTATE_270,
+			default => RotationUtil::ROTATE_360,
+		};
+	}
 }

@@ -27,8 +27,8 @@ class FlipHelper {
 
 	// TODO: lily pads, doors, trapdoors, terracotta, signs, buttons, tripwire hooks, banners, pillars (quartz, purpur), torches, item frames
 	public static function flip(int $axis, int &$fullBlockId): void {
-        $id = $fullBlockId >> 4;
-        $meta = $fullBlockId & 0xf;
+		$id = $fullBlockId >> 4;
+		$meta = $fullBlockId & 0xf;
 		if($axis == Axis::Y_AXIS) {
 			if(FlipHelper::isSlab($id)) {
 				if($meta < 8) {
@@ -128,44 +128,18 @@ class FlipHelper {
 				}
 			}
 		}
-        $fullBlockId = $id << 4 | $meta;
+		$fullBlockId = $id << 4 | $meta;
 	}
 
 	private static function isSlab(int $id): bool {
-		return (
-			$id == BlockLegacyIds::STONE_SLAB ||
-			$id == BlockLegacyIds::WOODEN_SLAB ||
-			$id == BlockLegacyIds::STONE_SLAB2
-		);
+		return ($id == BlockLegacyIds::STONE_SLAB || $id == BlockLegacyIds::WOODEN_SLAB || $id == BlockLegacyIds::STONE_SLAB2);
 	}
 
 	private static function isStairs(int $id): bool {
-		return (
-			$id == BlockLegacyIds::WOODEN_STAIRS ||
-			$id == BlockLegacyIds::COBBLESTONE_STAIRS ||
-			$id == BlockLegacyIds::BRICK_STAIRS ||
-			$id == BlockLegacyIds::STONE_BRICK_STAIRS ||
-			$id == BlockLegacyIds::NETHER_BRICK_STAIRS ||
-			$id == BlockLegacyIds::SANDSTONE_STAIRS ||
-			$id == BlockLegacyIds::SPRUCE_STAIRS ||
-			$id == BlockLegacyIds::BIRCH_STAIRS ||
-			$id == BlockLegacyIds::JUNGLE_STAIRS ||
-			$id == BlockLegacyIds::QUARTZ_STAIRS ||
-			$id == BlockLegacyIds::ACACIA_STAIRS ||
-			$id == BlockLegacyIds::DARK_OAK_STAIRS ||
-			$id == BlockLegacyIds::RED_SANDSTONE_STAIRS ||
-			$id == BlockLegacyIds::PURPUR_STAIRS
-		);
+		return ($id == BlockLegacyIds::WOODEN_STAIRS || $id == BlockLegacyIds::COBBLESTONE_STAIRS || $id == BlockLegacyIds::BRICK_STAIRS || $id == BlockLegacyIds::STONE_BRICK_STAIRS || $id == BlockLegacyIds::NETHER_BRICK_STAIRS || $id == BlockLegacyIds::SANDSTONE_STAIRS || $id == BlockLegacyIds::SPRUCE_STAIRS || $id == BlockLegacyIds::BIRCH_STAIRS || $id == BlockLegacyIds::JUNGLE_STAIRS || $id == BlockLegacyIds::QUARTZ_STAIRS || $id == BlockLegacyIds::ACACIA_STAIRS || $id == BlockLegacyIds::DARK_OAK_STAIRS || $id == BlockLegacyIds::RED_SANDSTONE_STAIRS || $id == BlockLegacyIds::PURPUR_STAIRS);
 	}
 
 	private static function isGate(int $id): bool {
-		return (
-			$id == BlockLegacyIds::OAK_FENCE_GATE ||
-			$id == BlockLegacyIds::SPRUCE_FENCE_GATE ||
-			$id == BlockLegacyIds::BIRCH_FENCE_GATE ||
-			$id == BlockLegacyIds::JUNGLE_FENCE_GATE ||
-			$id == BlockLegacyIds::DARK_OAK_FENCE_GATE ||
-			$id == BlockLegacyIds::ACACIA_FENCE_GATE
-		);
+		return ($id == BlockLegacyIds::OAK_FENCE_GATE || $id == BlockLegacyIds::SPRUCE_FENCE_GATE || $id == BlockLegacyIds::BIRCH_FENCE_GATE || $id == BlockLegacyIds::JUNGLE_FENCE_GATE || $id == BlockLegacyIds::DARK_OAK_FENCE_GATE || $id == BlockLegacyIds::ACACIA_FENCE_GATE);
 	}
 }

@@ -39,9 +39,9 @@ class CopyCommand extends BuilderToolsCommand {
 			return;
 		}
 
-        if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-            return;
-        }
+		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+			return;
+		}
 
 		$result = Copier::getInstance()->copy($firstPos, $secondPos, $sender);
 		if(!$result->successful()) {

@@ -83,11 +83,7 @@ class SpongeSchematic implements Schematic {
 	 * @throws SchematicException
 	 */
 	private function readDimensions(CompoundTag $nbt, ?int &$xSize, ?int &$ySize, ?int &$zSize): void {
-		if(
-			!$nbt->getTag("Width") instanceof ShortTag ||
-			!$nbt->getTag("Height") instanceof ShortTag ||
-			!$nbt->getTag("Length") instanceof ShortTag
-		) {
+		if(!$nbt->getTag("Width") instanceof ShortTag || !$nbt->getTag("Height") instanceof ShortTag || !$nbt->getTag("Length") instanceof ShortTag) {
 			throw new SchematicException("NBT does not contain Dimension vector");
 		}
 
@@ -135,13 +131,7 @@ class SpongeSchematic implements Schematic {
 				return false;
 			}
 
-			if(
-				$nbt->getTag("Width") instanceof ShortTag &&
-				$nbt->getTag("Height") instanceof ShortTag &&
-				$nbt->getTag("Length") instanceof ShortTag &&
-				$nbt->getTag("Palette") instanceof CompoundTag &&
-				$nbt->getTag("BlockData") instanceof ByteArrayTag
-			) {
+			if($nbt->getTag("Width") instanceof ShortTag && $nbt->getTag("Height") instanceof ShortTag && $nbt->getTag("Length") instanceof ShortTag && $nbt->getTag("Palette") instanceof CompoundTag && $nbt->getTag("BlockData") instanceof ByteArrayTag) {
 				return true;
 			}
 			return false;

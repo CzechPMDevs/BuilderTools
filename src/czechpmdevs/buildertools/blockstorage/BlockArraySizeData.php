@@ -54,17 +54,17 @@ final class BlockArraySizeData {
 			if(!$this->blockArray->hasNext()) {
 				if($minX > $x1) {
 					$minX = $x1;
-				} else if($maxX < $x1) {
+				} elseif($maxX < $x1) {
 					$maxX = $x1;
 				}
 				if($minY > $y1) {
 					$minY = $y1;
-				} else if($maxY < $y1) {
+				} elseif($maxY < $y1) {
 					$maxY = $y1;
 				}
 				if($minZ > $z1) {
 					$minZ = $z1;
-				} else if($maxZ < $z1) {
+				} elseif($maxZ < $z1) {
 					$maxZ = $z1;
 				}
 				break;

@@ -64,9 +64,7 @@ class BuilderToolsSchematic implements Schematic {
 
 			$nbt = (new BigEndianNbtSerializer())->read($rawData)->mustGetCompoundTag();
 
-			return $nbt->getTag("Coords") instanceof ByteArrayTag &&
-				$nbt->getTag("Blocks") instanceof ByteArrayTag &&
-				$nbt->getTag("DuplicateDetection") instanceof ByteTag;
+			return $nbt->getTag("Coords") instanceof ByteArrayTag && $nbt->getTag("Blocks") instanceof ByteArrayTag && $nbt->getTag("DuplicateDetection") instanceof ByteTag;
 
 		} catch(Throwable) {
 			return false;

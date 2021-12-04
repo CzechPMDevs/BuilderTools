@@ -97,11 +97,7 @@ class EventListener implements Listener {
 
 			$world = $block->getPosition()->getWorld();
 
-			$player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" .
-				"§aName: §7" . $block->getName() . "\n" .
-				"§aPosition: §7" . $block->getPosition()->getFloorX() . ";" . $block->getPosition()->getFloorY() . ";" . $block->getPosition()->getFloorZ() . " (" . ($block->getPosition()->getFloorX() >> 4) . ";" . ($block->getPosition()->getFloorZ() >> 4) . ")\n" .
-				"§World: §7" . $world->getDisplayName() . "\n" .
-				"§aBiome: §7" . $block->getPosition()->getWorld()->getBiomeId($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ()) . " (" . $block->getPosition()->getWorld()->getBiome($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ())->getName() . ")");
+			$player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" . "§aName: §7" . $block->getName() . "\n" . "§aPosition: §7" . $block->getPosition()->getFloorX() . ";" . $block->getPosition()->getFloorY() . ";" . $block->getPosition()->getFloorZ() . " (" . ($block->getPosition()->getFloorX() >> 4) . ";" . ($block->getPosition()->getFloorZ() >> 4) . ")\n" . "§World: §7" . $world->getDisplayName() . "\n" . "§aBiome: §7" . $block->getPosition()->getWorld()->getBiomeId($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ()) . " (" . $block->getPosition()->getWorld()->getBiome($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ())->getName() . ")");
 		}
 	}
 

@@ -93,7 +93,7 @@ class WorldFixUtil {
 
 				finish:
 				$handler = $task->getHandler();
-                $handler?->cancel();
+				$handler?->cancel();
 				WorldFixUtil::finishWorldFixTask($asyncTask);
 			}
 		}), 60, 2);

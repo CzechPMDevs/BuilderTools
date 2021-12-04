@@ -53,8 +53,7 @@ class Math {
 	/**
 	 * Returns distance^2 between (0, 0) and (x, y)
 	 */
-	public static function lengthSquared2d(float|int $x, float|int $y): float|int
-    {
+	public static function lengthSquared2d(float|int $x, float|int $y): float|int {
 		return ($x ** 2) + ($y ** 2);
 	}
 

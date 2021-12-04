@@ -28,9 +28,9 @@ class RotationHelper {
 	private const STAIRS_IDS = [BlockLegacyIds::COBBLESTONE_STAIRS, BlockLegacyIds::WOODEN_STAIRS, BlockLegacyIds::SPRUCE_STAIRS, BlockLegacyIds::BIRCH_STAIRS, BlockLegacyIds::JUNGLE_STAIRS, BlockLegacyIds::ACACIA_STAIRS, BlockLegacyIds::STONE_BRICK_STAIRS, BlockLegacyIds::SANDSTONE_STAIRS, BlockLegacyIds::RED_SANDSTONE_STAIRS, BlockLegacyIds::BRICK_STAIRS, BlockLegacyIds::NETHER_BRICK_STAIRS, BlockLegacyIds::QUARTZ_STAIRS, BlockLegacyIds::PURPUR_STAIRS];
 	private const STAIRS_ROTATION_DATA = [0 => 2, 1 => 3, 2 => 1, 3 => 0, 4 => 6, 5 => 7, 6 => 5, 7 => 4];
 
-    public static function rotate(int $degrees, int &$fullBlockId): void {
-        $id = $fullBlockId >> 4;
-        $meta = $fullBlockId & 0xf;
+	public static function rotate(int $degrees, int &$fullBlockId): void {
+		$id = $fullBlockId >> 4;
+		$meta = $fullBlockId & 0xf;
 		if($degrees == 90) {
 			RotationHelper::rotate90($id, $meta);
 		} elseif($degrees == 180) {
@@ -38,7 +38,7 @@ class RotationHelper {
 		} elseif($degrees == 270) {
 			RotationHelper::rotate270($id, $meta);
 		}
-        $fullBlockId = $id << 4 | $meta;
+		$fullBlockId = $id << 4 | $meta;
 	}
 
 	private static function rotate90(int $id, int &$meta): void {

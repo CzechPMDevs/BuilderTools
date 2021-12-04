@@ -87,11 +87,7 @@ class MCEditSchematic implements Schematic {
 	 * @throws SchematicException
 	 */
 	private function readDimensions(CompoundTag $nbt, ?int &$xSize, ?int &$ySize, ?int &$zSize): void {
-		if(
-			!$nbt->getTag("Width") instanceof ShortTag ||
-			!$nbt->getTag("Height") instanceof ShortTag ||
-			!$nbt->getTag("Length") instanceof ShortTag
-		) {
+		if(!$nbt->getTag("Width") instanceof ShortTag || !$nbt->getTag("Height") instanceof ShortTag || !$nbt->getTag("Length") instanceof ShortTag) {
 			throw new SchematicException("NBT does not contain Dimension vector");
 		}
 
@@ -104,10 +100,7 @@ class MCEditSchematic implements Schematic {
 	 * @throws SchematicException
 	 */
 	private function readBlockData(CompoundTag $nbt, ?string &$blocks, ?string &$data): void {
-		if(
-			!$nbt->getTag("Blocks") instanceof ByteArrayTag ||
-			!$nbt->getTag("Data") instanceof ByteArrayTag
-		) {
+		if(!$nbt->getTag("Blocks") instanceof ByteArrayTag || !$nbt->getTag("Data") instanceof ByteArrayTag) {
 			throw new SchematicException("NBT does not contains Block information");
 		}
 
@@ -198,13 +191,7 @@ class MCEditSchematic implements Schematic {
 			}
 
 			// MCEdit
-			if(
-				$nbt->getTag("Width") instanceof ShortTag &&
-				$nbt->getTag("Height") instanceof ShortTag &&
-				$nbt->getTag("Length") instanceof ShortTag &&
-				$nbt->getTag("Blocks") instanceof ByteArrayTag &&
-				$nbt->getTag("Data") instanceof ByteArrayTag
-			) {
+			if($nbt->getTag("Width") instanceof ShortTag && $nbt->getTag("Height") instanceof ShortTag && $nbt->getTag("Length") instanceof ShortTag && $nbt->getTag("Blocks") instanceof ByteArrayTag && $nbt->getTag("Data") instanceof ByteArrayTag) {
 				return true;
 			}
 

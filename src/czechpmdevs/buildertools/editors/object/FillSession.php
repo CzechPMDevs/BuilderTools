@@ -189,12 +189,12 @@ class FillSession {
 			BuilderTools::getInstance()->getLogger()->notice("Some chunks were not found");
 		}
 
-        // If dimensions are not set, there should not be any blocks changed within fill session.
-        // Also, it is not needed to reload chunks in that case
-        if(!isset($this->minX) || !isset($this->maxX) || !isset($this->minZ) || !isset($this->maxZ)) {
-            BuilderTools::getInstance()->getLogger()->debug("Received empty undo action");
-            return;
-        }
+		// If dimensions are not set, there should not be any blocks changed within fill session.
+		// Also, it is not needed to reload chunks in that case
+		if(!isset($this->minX) || !isset($this->maxX) || !isset($this->minZ) || !isset($this->maxZ)) {
+			BuilderTools::getInstance()->getLogger()->debug("Received empty undo action");
+			return;
+		}
 
 		$minX = $this->minX >> 4;
 		$maxX = $this->maxX >> 4;
