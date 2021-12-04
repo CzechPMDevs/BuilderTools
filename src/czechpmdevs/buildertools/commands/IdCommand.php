@@ -38,6 +38,6 @@ class IdCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aID: §9{$sender->getInventory()->getItemInHand()->getId()}:{$sender->getInventory()->getItemInHand()->getMeta()}");
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aID: §9{$sender->getInventory()->getItemInHand()->getBlock()->getId()}:{$sender->getInventory()->getItemInHand()->getBlock()->getMeta()}");
 	}
 }
