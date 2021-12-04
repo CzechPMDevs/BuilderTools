@@ -69,7 +69,7 @@ class SpongeSchematic implements Schematic {
 				for($x = 0; $x < $width; ++$x) {
 					$blockHash = $palette[ord($blocks[$i++])];
 
-					$blockArray->addBlockAt($x, $y, $z, $blockHash >> 4, $blockHash & 0xf);
+					$blockArray->addBlockAt($x, $y, $z, $blockHash);
 				}
 			}
 		}

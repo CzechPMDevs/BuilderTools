@@ -36,7 +36,7 @@ class MaskedFillSession extends FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function setBlockAt(int $x, int $y, int $z, int $id, int $meta): void {
+	public function setBlockAt(int $x, int $y, int $z, int $fullBlockId): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
@@ -60,7 +60,7 @@ class MaskedFillSession extends FillSession {
 		$this->saveChanges($x, $y, $z);
 
 		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4 | $meta);
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId);
 		$this->blocksChanged++;
 	}
 

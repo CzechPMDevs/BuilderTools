@@ -52,26 +52,16 @@ class Math {
 
 	/**
 	 * Returns distance^2 between (0, 0) and (x, y)
-	 *
-	 * @param int|float $x
-	 * @param int|float $y
-	 *
-	 * @return int|float
 	 */
-	public static function lengthSquared2d($x, $y) {
+	public static function lengthSquared2d(float|int $x, float|int $y): float|int
+    {
 		return ($x ** 2) + ($y ** 2);
 	}
 
 	/**
 	 * Returns distance^2 between (0, 0, 0) and (x, y, z)
-	 *
-	 * @param int|float $x
-	 * @param int|float $y
-	 * @param int|float $z
-	 *
-	 * @return int|float
 	 */
-	public static function lengthSquared3d($x, $y, $z) {
+	public static function lengthSquared3d(float|int $x, float|int $y, float|int $z): float|int {
 		return ($x ** 2) + ($y ** 2) + ($z ** 2);
 	}
 

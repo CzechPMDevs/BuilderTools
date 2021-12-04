@@ -66,7 +66,7 @@ class MCEditSchematic implements Schematic {
 					$id = ord($blocks[$i]);
 					$meta = ord($data[$i]);
 
-					$blockArray->addBlockAt($x, $y, $z, $id, $meta);
+					$blockArray->addBlockAt($x, $y, $z, $id << 4 | $meta);
 					++$i;
 				}
 			}
@@ -141,11 +141,11 @@ class MCEditSchematic implements Schematic {
 
 		$blocks = $data = str_repeat(chr(0), $totalSize);
 		while($blockArray->hasNext()) {
-			$blockArray->readNext($x, $y, $z, $id, $meta);
+			$blockArray->readNext($x, $y, $z, $fullBlockId);
 			$key = $x + ($width * $z) + ($xz * $y);
 
-			$blocks[$key] = chr($id);
-			$data[$key] = chr($meta);
+			$blocks[$key] = chr($fullBlockId >> 4);
+			$data[$key] = chr($fullBlockId & 0xf);
 		}
 
 		$this->writeDimensions($nbt, $width, $height, $length);

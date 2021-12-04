@@ -75,7 +75,7 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function setBlockAt(int $x, int $y, int $z, int $id, int $meta): void {
+	public function setBlockAt(int $x, int $y, int $z, int $fullBlockId): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
@@ -83,7 +83,7 @@ class FillSession {
 		$this->saveChanges($x, $y, $z);
 
 		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4 | $meta);
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId);
 		$this->blocksChanged++;
 	}
 
@@ -105,16 +105,13 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function getBlockAt(int $x, int $y, int $z, ?int &$id, ?int &$meta): void {
+	public function getBlockAt(int $x, int $y, int $z, ?int &$fullBlockId): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
 
 		/** @phpstan-ignore-next-line */
-		$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-
-		$id = $this->lastHash >> 4;
-		$meta = $this->lastHash & 0xf;
+		$fullBlockId = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
 	}
 
 	/**
@@ -245,8 +242,7 @@ class FillSession {
 	protected function saveChanges(int $x, int $y, int $z): void {
 		if($this->saveChanges) {
 			/** @phpstan-ignore-next-line */
-			$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-			$this->changes->addBlockAt($x, $y, $z, $this->lastHash >> 4, $this->lastHash & 0xf);
+			$this->changes->addBlockAt($x, $y, $z, $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf));
 		}
 	}
 

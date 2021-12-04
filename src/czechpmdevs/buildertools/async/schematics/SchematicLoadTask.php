@@ -32,7 +32,6 @@ use function serialize;
 class SchematicLoadTask extends BuilderToolsAsyncTask {
 
 	public string $file;
-
 	public string $name;
 
 	public string $blockArray;

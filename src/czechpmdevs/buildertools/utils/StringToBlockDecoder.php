@@ -68,18 +68,15 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 	 * Reads next block from the string,
 	 * @throws OutOfBoundsException if string is not valid.
 	 */
-	public function nextBlock(?int &$id, ?int &$meta): void {
-		$hash = $this->blockMap[array_rand($this->blockMap)];
-
-		$id = $hash >> 4;
-		$meta = $hash & 0xf;
+	public function nextBlock(?int &$fullBlockId): void {
+		$fullBlockId = $this->blockMap[array_rand($this->blockMap)];
 	}
 
 	/**
 	 * @return bool Returns if the block is in the array
 	 */
-	public function containsBlock(int $blockHash): bool {
-		return in_array($blockHash, $this->blockMap, true);
+	public function containsBlock(int $fullBlockId): bool {
+		return in_array($fullBlockId, $this->blockMap, true);
 	}
 
 	/**

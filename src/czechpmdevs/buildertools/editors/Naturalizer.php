@@ -48,16 +48,16 @@ class Naturalizer {
 						$state = 0;
 					} elseif($state == 0) {
 						$state = 1;
-						$fillSession->setBlockAt($x, $y, $z, 2, 0); // Grass
+						$fillSession->setBlockAt($x, $y, $z, 2 << 4); // Grass
 					} elseif($state < 5) { // 1 - 3
 						if($state == 3) {
 							$state += 2;
 						} else {
 							$state++;
 						}
-						$fillSession->setBlockAt($x, $y, $z, 3, 0);
+						$fillSession->setBlockAt($x, $y, $z, 3 << 4);
 					} else {
-						$fillSession->setBlockAt($x, $y, $z, 1, 0);
+						$fillSession->setBlockAt($x, $y, $z, 1 << 4);
 					}
 				}
 			}

@@ -32,7 +32,7 @@ interface UpdateLevelData {
 	/**
 	 * Reads next block from the array
 	 */
-	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void;
+	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$fullBlockId): void;
 
 	/**
 	 * Should not be null when used in filler

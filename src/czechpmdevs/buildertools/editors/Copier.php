@@ -59,8 +59,8 @@ class Copier {
 		for($x = $minX; $x <= $maxX; ++$x) {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$clipboard->addBlockAt($x, $y, $z, $id, $meta);
+					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
+					$clipboard->addBlockAt($x, $y, $z, $fullBlockId);
 				}
 			}
 		}
@@ -85,10 +85,10 @@ class Copier {
 		for($x = $minX; $x <= $maxX; ++$x) {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$clipboard->addBlockAt($x, $y, $z, $id, $meta);
+					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
+					$clipboard->addBlockAt($x, $y, $z, $fullBlockId);
 
-					$fillSession->setBlockAt($x, $y, $z, 0, 0);
+					$fillSession->setBlockAt($x, $y, $z, 0);
 				}
 			}
 		}
@@ -131,8 +131,8 @@ class Copier {
 		$floorZ = $motion->getFloorZ();
 
 		while($clipboard->hasNext()) {
-			$clipboard->readNext($x, $y, $z, $id, $meta);
-			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+			$clipboard->readNext($x, $y, $z, $fullBlockId);
+			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
 		$fillSession->reloadChunks($player->getWorld());
@@ -169,8 +169,8 @@ class Copier {
 		$floorZ = $motion->getFloorZ();
 
 		while($clipboard->hasNext()) {
-			$clipboard->readNext($x, $y, $z, $id, $meta);
-			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+			$clipboard->readNext($x, $y, $z, $fullBlockId);
+			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
 		$fillSession->reloadChunks($player->getWorld());
@@ -228,8 +228,8 @@ class Copier {
 		for($x = $minX; $x <= $maxX; ++$x) {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$temporaryBlockArray->addBlockAt($x, $y, $z, $id, $meta);
+					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
+					$temporaryBlockArray->addBlockAt($x, $y, $z, $fullBlockId);
 				}
 			}
 		}
@@ -251,8 +251,8 @@ class Copier {
 				for($i = 1; $i < $pasteCount; ++$i) {
 					$j = $i * $xSize;
 					while($temporaryBlockArray->hasNext()) {
-						$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
-						$fillSession->setBlockAt($x + $j, $y, $z, $id, $meta);
+						$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
+						$fillSession->setBlockAt($x + $j, $y, $z, $fullBlockId);
 					}
 
 					// Resets the array reader
@@ -273,8 +273,8 @@ class Copier {
 				for($i = 1; $i < $pasteCount; ++$i) {
 					$j = $i * $zSize;
 					while($temporaryBlockArray->hasNext()) {
-						$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
-						$fillSession->setBlockAt($x, $y, $z + $j, $id, $meta);
+						$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
+						$fillSession->setBlockAt($x, $y, $z + $j, $fullBlockId);
 					}
 
 					// Resets array reader
@@ -294,9 +294,9 @@ class Copier {
 			for($i = 1; $i < $pasteCount; ++$i) {
 				$j = $i * $ySize;
 				while($temporaryBlockArray->hasNext()) {
-					$temporaryBlockArray->readNext($x, $y, $z, $id, $meta);
+					$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
 					if($y >= 0 && $y <= 255) {
-						$fillSession->setBlockAt($x, $y + $j, $z, $id, $meta);
+						$fillSession->setBlockAt($x, $y + $j, $z, $fullBlockId);
 					}
 				}
 
@@ -341,17 +341,17 @@ class Copier {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				$isZInside = $z >= $finalMinZ && $z <= $finalMaxZ;
 				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
+					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
 
 					// We remove the block if it is not inside the final area
 					if(!($isXInside && $isZInside && $y >= $finalMinY && $y <= $finalMaxY)) {
-						$fillSession->setBlockAt($x, $y, $z, 0, 0);
+						$fillSession->setBlockAt($x, $y, $z, 0);
 					}
 
 					/** @phpstan-var int $finalY */
 					$finalY = $floorY + $y;
 					if($finalY >= 0 && $finalY <= 255) {
-						$fillSession->setBlockAt($floorX + $x, $finalY, $floorZ + $z, $id, $meta);
+						$fillSession->setBlockAt($floorX + $x, $finalY, $floorZ + $z, $fullBlockId);
 					}
 				}
 			}

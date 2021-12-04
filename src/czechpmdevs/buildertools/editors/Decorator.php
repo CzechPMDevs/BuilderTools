@@ -57,8 +57,8 @@ class Decorator {
 					continue;
 				}
 
-				$stringToBlockDecoder->nextBlock($id, $meta);
-				$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+				$stringToBlockDecoder->nextBlock($fullBlockId);
+				$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 			}
 		}
 

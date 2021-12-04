@@ -70,7 +70,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 	 * when writing or reading block from the
 	 * array
 	 */
-	protected int $lastHash, $lastBlockHash;
+	protected int $lastHash;
 
 	public function __construct(bool $detectDuplicates = false) {
 		$this->detectDuplicates = $detectDuplicates;
@@ -81,8 +81,8 @@ class BlockArray implements UpdateLevelData, Serializable {
 	 *
 	 * @return $this
 	 */
-	public function addBlock(Vector3 $vector3, int $id, int $meta): BlockArray {
-		return $this->addBlockAt($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ(), $id, $meta);
+	public function addBlock(Vector3 $vector3, int $fullBlockId): BlockArray {
+		return $this->addBlockAt($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ(), $fullBlockId);
 	}
 
 	/**
@@ -90,7 +90,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 	 *
 	 * @return $this
 	 */
-	public function addBlockAt(int $x, int $y, int $z, int $id, int $meta): BlockArray {
+	public function addBlockAt(int $x, int $y, int $z, int $fullBlockId): BlockArray {
 		$this->lastHash = World::blockHash($x, $y, $z);
 
 		if($this->detectDuplicates && in_array($this->lastHash, $this->coords, true)) {
@@ -98,7 +98,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 		}
 
 		$this->coords[] = $this->lastHash;
-		$this->blocks[] = $id << 4 | $meta;
+		$this->blocks[] = $fullBlockId;
 
 		return $this;
 	}
@@ -113,13 +113,11 @@ class BlockArray implements UpdateLevelData, Serializable {
 	/**
 	 * Reads next block in the array
 	 */
-	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$id, ?int &$meta): void {
+	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$fullBlockId): void {
 		$this->lastHash = $this->coords[$this->offset];
-		$this->lastBlockHash = $this->blocks[$this->offset++];
 
 		World::getBlockXYZ($this->lastHash, $x, $y, $z);
-		$id = $this->lastBlockHash >> 4;
-		$meta = $this->lastBlockHash & 0xf;
+        $fullBlockId = $this->blocks[$this->offset++];
 	}
 
 	/**

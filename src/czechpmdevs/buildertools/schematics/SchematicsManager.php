@@ -140,8 +140,8 @@ class SchematicsManager {
 		for($y = $minY; $y <= $maxY; ++$y) {
 			for($x = $minX; $x <= $maxX; ++$x) {
 				for($z = $minZ; $z <= $maxZ; ++$z) {
-					$fillSession->getBlockAt($x, $y, $z, $id, $meta);
-					$blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $id, $meta);
+					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
+					$blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $fullBlockId);
 				}
 			}
 		}
@@ -173,9 +173,9 @@ class SchematicsManager {
 		$floorZ = $player->getPosition()->getFloorZ();
 
 		while($schematic->hasNext()) {
-			$schematic->readNext($x, $y, $z, $id, $meta);
-			if($id != 0)
-				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+			$schematic->readNext($x, $y, $z, $fullBlockId);
+			if($fullBlockId != 0)
+				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
 		if($fillSession->getBlocksChanged() == 0) {

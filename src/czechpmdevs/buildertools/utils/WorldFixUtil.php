@@ -93,9 +93,7 @@ class WorldFixUtil {
 
 				finish:
 				$handler = $task->getHandler();
-				if($handler !== null) {
-					$handler->cancel(); // TODO - Check if it's cancelled right
-				}
+                $handler?->cancel();
 				WorldFixUtil::finishWorldFixTask($asyncTask);
 			}
 		}), 60, 2);

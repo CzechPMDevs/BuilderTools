@@ -39,7 +39,7 @@ final class BlockArraySizeData {
 			return;
 		}
 
-		$this->blockArray->readNext($x, $y, $z, $id, $meta);
+		$this->blockArray->readNext($x, $y, $z, $fullBlockId);
 
 		$minX = $maxX = $x;
 		$minY = $maxY = $y;
@@ -50,7 +50,7 @@ final class BlockArraySizeData {
 		}
 
 		while($this->blockArray->hasNext()) {
-			$this->blockArray->readNext($x1, $y1, $z1, $id, $meta);
+			$this->blockArray->readNext($x1, $y1, $z1, $fullBlockId);
 			if(!$this->blockArray->hasNext()) {
 				if($minX > $x1) {
 					$minX = $x1;
@@ -70,7 +70,7 @@ final class BlockArraySizeData {
 				break;
 			}
 
-			$this->blockArray->readNext($x2, $y2, $z2, $id, $meta);
+			$this->blockArray->readNext($x2, $y2, $z2, $fullBlockId);
 			if($x1 > $x2) {
 				if($minX > $x2) {
 					$minX = $x2;

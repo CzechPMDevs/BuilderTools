@@ -58,8 +58,8 @@ class Canceller {
 
 		$undoAction->load();
 		while($undoAction->hasNext()) {
-			$undoAction->readNext($x, $y, $z, $id, $meta);
-			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+			$undoAction->readNext($x, $y, $z, $fullBlockId);
+			$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 		}
 
 		$fillSession->reloadChunks($player->getWorld());
@@ -100,8 +100,8 @@ class Canceller {
 
 		$redoAction->load();
 		while($redoAction->hasNext()) {
-			$redoAction->readNext($x, $y, $z, $id, $meta);
-			$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+			$redoAction->readNext($x, $y, $z, $fullBlockId);
+			$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 		}
 
 		$fillSession->reloadChunks($player->getWorld());

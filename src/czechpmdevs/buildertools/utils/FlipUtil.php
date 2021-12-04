@@ -33,25 +33,25 @@ class FlipUtil {
 		$sizeData = $selection->getSizeData();
 		if($axis == Axis::X_AXIS) { // y & z const
 			while($selection->hasNext()) {
-				$selection->readNext($x, $y, $z, $id, $meta);
-				FlipHelper::flip($axis, $id, $meta);
-				$modifiedSelection->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $id, $meta);
+				$selection->readNext($x, $y, $z, $fullBlockId);
+				FlipHelper::flip($axis, $fullBlockId);
+				$modifiedSelection->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $fullBlockId);
 			}
 		} elseif($axis == Axis::Y_AXIS) { // x & z const
 			while($selection->hasNext()) {
-				$selection->readNext($x, $y, $z, $id, $meta);
+				$selection->readNext($x, $y, $z, $fullBlockId);
 				$y = (($sizeData->minY + $sizeData->maxY) - $y) + $motion;
 				if($y < World::Y_MIN || $y >= World::Y_MAX) {
 					continue;
 				}
-				FlipHelper::flip($axis, $id, $meta);
-				$modifiedSelection->addBlockAt($x, $y, $z, $id, $meta);
+				FlipHelper::flip($axis, $fullBlockId);
+				$modifiedSelection->addBlockAt($x, $y, $z, $fullBlockId);
 			}
 		} else {
 			while($selection->hasNext()) { // x & y const
-				$selection->readNext($x, $y, $z, $id, $meta);
-				FlipHelper::flip($axis, $id, $meta);
-				$modifiedSelection->addBlockAt($x, $y, (($sizeData->minZ + $sizeData->maxZ) - $z) + $motion, $id, $meta);
+				$selection->readNext($x, $y, $z, $fullBlockId);
+				FlipHelper::flip($axis, $fullBlockId);
+				$modifiedSelection->addBlockAt($x, $y, (($sizeData->minZ + $sizeData->maxZ) - $z) + $motion, $fullBlockId);
 			}
 		}
 		$selection->offset = 0;

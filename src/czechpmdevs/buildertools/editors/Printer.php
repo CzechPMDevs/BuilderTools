@@ -60,8 +60,7 @@ class Printer {
 				return;
 			}
 
-			$fullBlock = $level->getBlock($vector3);
-			$undoList->addBlock($vector3, $fullBlock->getId(), $fullBlock->getMeta());
+			$undoList->addBlock($vector3, $level->getBlock($vector3, true, false)->getId());
 
 			/** @phpstan-ignore-next-line */
 			$level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block); // We provide valid values
@@ -165,30 +164,30 @@ class Printer {
 					}
 
 					if($floorY + $y >= 0 && $floorY + $y < 256) { // TODO - Try creating 4 chunk iterators
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $fullBlockId);
 
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $fullBlockId);
 					}
 					if($floorY - $y >= 0 && $floorY - $y < 256) {
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ + $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ + $z, $fullBlockId);
 
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ + $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ + $z, $fullBlockId);
 
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ - $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ - $z, $fullBlockId);
 
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ - $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ - $z, $fullBlockId);
 					}
 				}
 			}
@@ -264,20 +263,20 @@ class Printer {
 				}
 
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $fullBlockId);
 				}
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $fullBlockId);
 				}
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $fullBlockId);
 				}
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $fullBlockId);
 				}
 			}
 		}
@@ -328,17 +327,17 @@ class Printer {
 						continue;
 					}
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $fullBlockId);
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $fullBlockId);
 				}
 			}
 			$currentLevelHeight--;
@@ -431,17 +430,17 @@ class Printer {
 						break;
 					}
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $fullBlockId);
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $fullBlockId);
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $fullBlockId);
 
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $fullBlockId);
 				}
 			}
 

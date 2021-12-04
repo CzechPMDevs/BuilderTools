@@ -83,7 +83,7 @@ class MCStructureSchematic implements Schematic {
 						$id = 0;
 					}
 
-					$blockArray->addBlockAt($x, $y, $z, $id, $meta);
+					$blockArray->addBlockAt($x, $y, $z, $id << 4 | $meta);
 					++$i;
 				}
 			}

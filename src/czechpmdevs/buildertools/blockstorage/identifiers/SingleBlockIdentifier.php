@@ -32,13 +32,12 @@ class SingleBlockIdentifier implements BlockIdentifierList {
 		}
 	}
 
-	public function nextBlock(?int &$id, ?int &$meta): void {
-		$id = $this->id;
-		$meta = $this->meta;
+	public function nextBlock(?int &$fullBlockId): void {
+		$fullBlockId = $this->id << 4 | $this->meta;
 	}
 
-	public function containsBlock(int $blockHash): bool {
-		return isset($this->meta) ? $blockHash == ($this->id << 4 | $this->meta) : $blockHash >> 4 == $this->id;
+	public function containsBlock(int $fullBlockId): bool {
+		return isset($this->meta) ? $fullBlockId == ($this->id << 4 | $this->meta) : $fullBlockId >> 4 == $this->id;
 	}
 
 	public function containsBlockId(int $id): bool {

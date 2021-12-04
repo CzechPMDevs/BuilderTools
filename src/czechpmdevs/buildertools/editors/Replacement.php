@@ -61,8 +61,8 @@ class Replacement {
 		for($x = $minX; $x <= $maxX; ++$x) {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
-					$stringToBlockDecoder->nextBlock($id, $meta);
-					$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+					$stringToBlockDecoder->nextBlock($fullBlockId);
+					$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 				}
 			}
 		}

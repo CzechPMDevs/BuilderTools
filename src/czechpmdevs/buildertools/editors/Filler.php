@@ -57,8 +57,8 @@ class Filler {
 							continue;
 						}
 
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 					}
 				}
 			}
@@ -66,8 +66,8 @@ class Filler {
 			for($x = $minX; $x <= $maxX; ++$x) {
 				for($z = $minZ; $z <= $maxZ; ++$z) {
 					for($y = $minY; $y <= $maxY; ++$y) {
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 					}
 				}
 			}
@@ -99,8 +99,8 @@ class Filler {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
 					if($x == $minX || $x == $maxX || $z == $minZ || $z == $maxZ) {
-						$stringToBlockDecoder->nextBlock($id, $meta);
-						$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 					}
 				}
 			}
@@ -136,8 +136,8 @@ class Filler {
 
 		if($relativePosition === null) {
 			while($changes->hasNext()) {
-				$changes->readNext($x, $y, $z, $id, $meta);
-				$fillSession->setBlockAt($x, $y, $z, $id, $meta);
+				$changes->readNext($x, $y, $z, $fullBlockId);
+				$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 			}
 		} else {
 			$floorX = $relativePosition->getFloorX();
@@ -145,8 +145,8 @@ class Filler {
 			$floorZ = $relativePosition->getFloorZ();
 
 			while($changes->hasNext()) {
-				$changes->readNext($x, $y, $z, $id, $meta);
-				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $id, $meta);
+				$changes->readNext($x, $y, $z, $fullBlockId);
+				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 			}
 		}
 
