@@ -23,7 +23,6 @@ declare(strict_types=1);
  *
  * Requires
  * 	- composer installed with PocketMine package
- * 	- blocks.json from GeyserMC (https://github.com/GeyserMC/mappings/blob/master/blocks.json)
  */
 
 use pocketmine\nbt\tag\CompoundTag;
@@ -32,6 +31,7 @@ use pocketmine\network\mcpe\protocol\serializer\NetworkNbtSerializer;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializerContext;
 use pocketmine\utils\AssumptionFailedError;
+use pocketmine\utils\Internet;
 use Webmozart\PathUtil\Path;
 use const pocketmine\BEDROCK_DATA_PATH;
 
@@ -81,8 +81,8 @@ while(!$legacyStateMapReader->feof()) {
 	$bedrockStatesMap[serializeBlockNbt($state)] = $legacyId << 4 | $meta;
 }
 
-$java2BedrockStatesFile = file_get_contents("blocks.json");
-if(!$java2BedrockStatesFile) {
+$java2BedrockStatesFile = Internet::getURL("https://github.com/GeyserMC/mappings/raw/master/blocks.json")?->getBody();
+if($java2BedrockStatesFile === null) {
 	throw new AssumptionFailedError("Missing required resource file");
 }
 
@@ -106,10 +106,10 @@ foreach(json_decode($java2BedrockStatesFile, true) as $javaId => $bedrockData) {
 echo "Found $found of $checked block states.\n";
 
 asort($bedrockStatesMap);
-file_put_contents("bedrock_block_states_map.json", json_encode($bedrockStatesMap));
+file_put_contents("../resources/data/bedrock_block_states_map.json", json_encode($bedrockStatesMap));
 
 asort($javaStatesMap);
-file_put_contents("java_block_states_map.json", json_encode($javaStatesMap));
+file_put_contents("../resources/data/java_block_states_map.json", json_encode($javaStatesMap));
 
 
 /**

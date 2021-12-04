@@ -65,7 +65,6 @@ class Canceller {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-
 		$updates = $fillSession->getChanges();
 		$updates->save();
 

@@ -78,16 +78,13 @@ class BuilderTools extends PluginBase {
 	public const CURRENT_CONFIG_VERSION = "1.3.0.0";
 
 	private static BuilderTools $instance;
-
-	private static string $prefix = "§7[BuilderTools] §a";
-
-	private static Configuration $configuration;
+    private static Configuration $configuration;
 
 	/** @var Command[] */
 	private static array $commands = [];
 
 	/** @noinspection PhpUnused */
-	public function onEnable(): void {
+	protected function onEnable(): void {
 		BuilderTools::$instance = $this;
 
 		$this->initConfig();
@@ -100,7 +97,7 @@ class BuilderTools extends PluginBase {
 	}
 
 	/** @noinspection PhpUnused */
-	public function onDisable(): void {
+	protected function onDisable(): void {
 		$this->cleanCache();
 	}
 
@@ -232,7 +229,7 @@ class BuilderTools extends PluginBase {
 	}
 
 	public static function getPrefix(): string {
-		return self::$prefix;
+		return "§7[BuilderTools] §a";
 	}
 
 	public static function getConfiguration(): Configuration {

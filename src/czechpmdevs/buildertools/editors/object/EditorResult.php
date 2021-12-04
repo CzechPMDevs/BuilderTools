@@ -25,7 +25,6 @@ use function round;
 class EditorResult {
 
 	protected int $blocksChanged = 0;
-
 	protected float $processTime = 0.0;
 
 	protected ?string $errorMessage = null;

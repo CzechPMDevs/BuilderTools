@@ -217,14 +217,10 @@ class BlockArray implements UpdateLevelData, Serializable {
 	}
 
 	public function compress(bool $cleanDecompressed = true): void {
-		/** @phpstan-var string|false $coords */
+		/** @phpstan-var string $coords */
 		$coords = pack("q*", ...$this->coords);
-		/** @phpstan-var string|false $blocks */
+		/** @phpstan-var string $blocks */
 		$blocks = pack("N*", ...$this->blocks);
-
-		if($coords === false || $blocks === false) {
-			throw new RuntimeException("Error whilst compressing");
-		}
 
 		$this->compressedCoords = $coords;
 		$this->compressedBlocks = $blocks;

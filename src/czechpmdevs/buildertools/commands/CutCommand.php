@@ -39,9 +39,11 @@ class CutCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$this->readPositions($sender, $pos1, $pos2);
+        if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+            return;
+        }
 
-		$result = Copier::getInstance()->cut($pos1, $pos2, $sender);
+		$result = Copier::getInstance()->cut($firstPos, $secondPos, $sender);
 		if(!$result->successful()) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
 			return;
