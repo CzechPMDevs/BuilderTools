@@ -22,12 +22,12 @@ namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
-use Error;
 use pocketmine\block\BlockFactory;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\World;
+use Throwable;
 
 class FillSession {
 
@@ -223,7 +223,7 @@ class FillSession {
 			try {
 				/** @phpstan-ignore-next-line */
 				$this->explorer->currentSubChunk = $this->explorer->currentChunk->getSubChunk($y >> 4);
-			} catch(Error) { // For the case if chunk is null
+			} catch(Throwable) { // For the case if chunk is null or y coordinate is less than 0
 				$this->error = true;
 				return false;
 			}
