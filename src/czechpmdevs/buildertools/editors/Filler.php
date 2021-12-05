@@ -20,11 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
-use czechpmdevs\buildertools\blockstorage\UpdateLevelData;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
-use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\math\Vector3;
@@ -42,7 +39,7 @@ class Filler {
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks specified in string {$blockArgs}");
+			return EditorResult::error("No blocks specified in string $blockArgs");
 		}
 
 		$fillSession = new FillSession($player->getWorld(), false);
@@ -90,6 +87,9 @@ class Filler {
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
+		if(!$stringToBlockDecoder->isValid()) {
+			return EditorResult::error("No blocks found in string $blockArgs");
+		}
 
 		$fillSession = new FillSession($player->getWorld(), false);
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
@@ -113,54 +113,6 @@ class Filler {
 		$changes->save();
 
 		Canceller::getInstance()->addStep($player, $changes);
-
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-	}
-
-	/**
-	 * @deprecated FillSession makes fill direct & faster
-	 * @link FillSession
-	 */
-	public function fill(Player $player, UpdateLevelData $changes, ?Vector3 $relativePosition = null, bool $saveUndo = true, bool $saveRedo = false, bool $airMask = false): EditorResult {
-		if($changes->getWorld() === null) {
-			return EditorResult::error("Could not find world to process updates on.");
-		}
-
-		$startTime = microtime(true);
-
-		if($airMask) {
-			$fillSession = new MaskedFillSession($changes->getWorld(), true, true, SingleBlockIdentifier::airIdentifier());
-		} else {
-			$fillSession = new FillSession($changes->getWorld(), true, $saveUndo || $saveRedo);
-		}
-
-		if($relativePosition === null) {
-			while($changes->hasNext()) {
-				$changes->readNext($x, $y, $z, $fullBlockId);
-				$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
-			}
-		} else {
-			$floorX = $relativePosition->getFloorX();
-			$floorY = $relativePosition->getFloorY();
-			$floorZ = $relativePosition->getFloorZ();
-
-			while($changes->hasNext()) {
-				$changes->readNext($x, $y, $z, $fullBlockId);
-				$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
-			}
-		}
-
-		if($saveUndo || $saveRedo) {
-			$updates = $fillSession->getChanges();
-			$updates->save();
-
-			if($saveUndo) {
-				Canceller::getInstance()->addStep($player, $updates);
-			}
-			if($saveRedo) {
-				Canceller::getInstance()->addRedo($player, $updates);
-			}
-		}
 
 		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
