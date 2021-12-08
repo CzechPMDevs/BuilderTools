@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\async\convert;
 use czechpmdevs\buildertools\editors\Fixer;
 use Generator;
 use pocketmine\scheduler\AsyncTask;
+use pocketmine\Server;
 use pocketmine\world\format\io\exception\CorruptedChunkException;
 use pocketmine\world\format\io\leveldb\LevelDB;
 use pocketmine\world\format\io\region\Anvil;
@@ -40,7 +41,6 @@ use function microtime;
 use function round;
 use const DIRECTORY_SEPARATOR;
 
-// TODO
 class WorldFixTask extends AsyncTask {
 
 	public string $worldPath;
@@ -68,7 +68,7 @@ class WorldFixTask extends AsyncTask {
 			return;
 		}
 
-		$providerManager = new WorldProviderManager(); // TODO
+		$providerManager = new WorldProviderManager();
 		$worldProviderManagerEntry = null;
 		foreach($providerManager->getMatchingProviders($this->worldPath) as $worldProviderManagerEntry) {
 			break;
@@ -108,7 +108,7 @@ class WorldFixTask extends AsyncTask {
 				try {
 					$chunk = $provider->loadChunk($chunkX, $chunkZ)?->getChunk();
 				} catch(CorruptedChunkException $e) {
-					//                    MainLogger::getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
+					Server::getInstance()->getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
 					continue;
 				}
 
@@ -126,18 +126,13 @@ class WorldFixTask extends AsyncTask {
 			}
 
 			$percent = round(((++$regionsFixed) * 100) / $regionCount, 3);
-			//            $timePerChunk = round((microtime(true) - $startTime) / $chunksFixed, 3);
-			//            $timePerRegion = (microtime(true) - $startTime) / $regionsFixed;
-			//            $expectedTime = gmdate("H:i:s", (int)ceil($timePerRegion * ($regionCount - $regionsFixed)));
-
-			//            MainLogger::getLogger()->debug("[BuilderTools] World is fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed with speed of $timePerChunk seconds per chunk. Expected time: $expectedTime.");
+			Server::getInstance()->getLogger()->debug("[BuilderTools] The World is now fixed from $percent% ($regionsFixed/$regionCount regions), $chunksFixed chunks fixed.");
 
 			$this->percent = (int)$percent;
 			$provider->doGarbageCollection();
 		}
 
 		$this->time = round(microtime(true) - $startTime);
-		//        MainLogger::getLogger()->debug("[BuilderTools] World fixed in $this->time seconds, affected $chunksFixed chunks!");
 
 		$this->done = true;
 		$this->chunkCount = $chunksFixed;
@@ -147,9 +142,7 @@ class WorldFixTask extends AsyncTask {
 	 * @phpstan-return Generator<int[][]>
 	 */
 	private function getListOfChunksToFix(string $worldPath, ?int &$regionCount = null): Generator {
-		$regionPath = $worldPath . DIRECTORY_SEPARATOR . "region" . DIRECTORY_SEPARATOR;
-
-		$files = glob($regionPath . "*.mca*");
+		$files = glob($worldPath . DIRECTORY_SEPARATOR . "region/*.mca");
 		if($files === false) {
 			return [];
 		}
@@ -163,20 +156,19 @@ class WorldFixTask extends AsyncTask {
 			$regionZ = (int)$split[2];
 
 			try {
-				$region = new McRegion($regionFilePath);
+				$region = new McRegion($worldPath . DIRECTORY_SEPARATOR);
 			} catch(CorruptedRegionException $e) {
-				//                MainLogger::getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
+				Server::getInstance()->getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
 				continue;
 			}
 
 			for($x = 0; $x < 32; ++$x) {
 				for($z = 0; $z < 32; ++$z) {
-					if($region->loadChunk($x, $z) !== null) {
-						$chunks[] = [($regionX << 5) + $x, ($regionZ << 5) + $z];
-					}
+					$chunkLoad = $region->loadChunk($x, $z);
+					if($chunkLoad === null)return false;
+					$chunks[] = [($regionX << 5) + $x, ($regionZ << 5) + $z];
 				}
 			}
-
 			yield $chunks;
 			$chunks = [];
 		}
