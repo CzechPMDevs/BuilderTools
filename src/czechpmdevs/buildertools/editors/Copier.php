@@ -31,6 +31,7 @@ use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\utils\FlipUtil;
 use czechpmdevs\buildertools\utils\RotationUtil;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
@@ -236,7 +237,7 @@ class Copier {
 
 		$direction = Math::getPlayerDirection($player);
 		if($mode == self::DIRECTION_PLAYER) {
-			if($direction == 0 || $direction == 2) { // Moving along x axis (z = const)
+			if($direction == Facing::WEST || $direction == Facing::SOUTH) { // Moving along x axis (z = const)
 				$xSize = ($maxX - $minX) + 1;
 
 				if($direction == 0) {

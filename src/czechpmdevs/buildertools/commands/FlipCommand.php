@@ -22,8 +22,8 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\utils\Axis;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Axis;
 use pocketmine\player\Player;
 use function microtime;
 use function round;
@@ -49,11 +49,11 @@ class FlipCommand extends BuilderToolsCommand {
 		}
 
 		if(strtolower($args[0]) == "x") {
-			$axis = Axis::X_AXIS;
+			$axis = Axis::X;
 		} elseif(strtolower($args[0]) == "y") {
-			$axis = Axis::Y_AXIS;
+			$axis = Axis::Y;
 		} elseif(strtolower($args[0]) == "z") {
-			$axis = Axis::Z_AXIS;
+			$axis = Axis::Z;
 		} else {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cUnknown axis '$args[0]'. You can use only 'X', 'Y' and 'Z' axis.");
 			return;

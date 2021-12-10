@@ -21,23 +21,24 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\utils;
 
 use czechpmdevs\buildertools\blockstorage\SelectionData;
+use pocketmine\math\Axis;
 use pocketmine\world\World;
 
 class FlipUtil {
 
-	public static function flip(SelectionData $selection, int $axis = Axis::Y_AXIS, int $motion = 0): SelectionData {
+	public static function flip(SelectionData $selection, int $axis = Axis::Y, int $motion = 0): SelectionData {
 		$modifiedSelection = new SelectionData();
 		$modifiedSelection->setWorld($selection->getWorld());
 		$modifiedSelection->setPlayerPosition($selection->getPlayerPosition());
 
 		$sizeData = $selection->getSizeData();
-		if($axis == Axis::X_AXIS) { // y & z const
+		if($axis === Axis::X) { // y & z const
 			while($selection->hasNext()) {
 				$selection->readNext($x, $y, $z, $fullBlockId);
 				FlipHelper::flip($axis, $fullBlockId);
 				$modifiedSelection->addBlockAt((($sizeData->minX + $sizeData->maxX) - $x) + $motion, $y, $z, $fullBlockId);
 			}
-		} elseif($axis == Axis::Y_AXIS) { // x & z const
+		} elseif($axis === Axis::Y) { // x & z const
 			while($selection->hasNext()) {
 				$selection->readNext($x, $y, $z, $fullBlockId);
 				$y = (($sizeData->minY + $sizeData->maxY) - $y) + $motion;

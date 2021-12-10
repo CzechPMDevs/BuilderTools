@@ -22,9 +22,9 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\utils\Axis;
 use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Axis;
 use pocketmine\player\Player;
 use function is_numeric;
 use function microtime;
@@ -66,11 +66,11 @@ class RotateCommand extends BuilderToolsCommand {
 		$copier = Copier::getInstance();
 		foreach($args as $i => $arg) {
 			if($i === 0) {
-				$copier->rotate($sender, Axis::Y_AXIS, RotationUtil::getRotation((int)$arg));
+				$copier->rotate($sender, Axis::Y, RotationUtil::getRotation((int)$arg));
 			} elseif($i === 1) {
-				$copier->rotate($sender, Axis::X_AXIS, RotationUtil::getRotation((int)$arg));
+				$copier->rotate($sender, Axis::X, RotationUtil::getRotation((int)$arg));
 			} elseif($i === 2) {
-				$copier->rotate($sender, Axis::Z_AXIS, RotationUtil::getRotation((int)$arg));
+				$copier->rotate($sender, Axis::Z, RotationUtil::getRotation((int)$arg));
 			}
 		}
 

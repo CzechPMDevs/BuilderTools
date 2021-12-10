@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\utils;
 
 // TODO - Use pre-generated data in full block ids
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\math\Axis;
 
 class FlipHelper {
 
@@ -29,7 +30,7 @@ class FlipHelper {
 	public static function flip(int $axis, int &$fullBlockId): void {
 		$id = $fullBlockId >> 4;
 		$meta = $fullBlockId & 0xf;
-		if($axis == Axis::Y_AXIS) {
+		if($axis === Axis::Y) {
 			if(FlipHelper::isSlab($id)) {
 				if($meta < 8) {
 					$meta += 8;
@@ -44,86 +45,86 @@ class FlipHelper {
 					$meta -= 4;
 				}
 			}
-		} elseif($axis == Axis::X_AXIS) {
+		} elseif($axis === Axis::X) {
 			if(FlipHelper::isStairs($id)) {
-				if($meta == 0) {
+				if($meta === 0) {
 					$meta = 1;
-				} elseif($meta == 1) {
+				} elseif($meta === 1) {
 					$meta = 0;
-				} elseif($meta == 5) {
+				} elseif($meta === 5) {
 					$meta = 4;
-				} elseif($meta == 4) {
+				} elseif($meta === 4) {
 					$meta = 5;
 				}
 			}
 
-			if($id == BlockLegacyIds::LADDER || $id == BlockLegacyIds::FURNACE || $id == BlockLegacyIds::CHEST || $id == BlockLegacyIds::ENDER_CHEST || $id == BlockLegacyIds::TRAPPED_CHEST) {
-				if($meta == 4) {
+			if($id === BlockLegacyIds::LADDER || $id === BlockLegacyIds::FURNACE || $id === BlockLegacyIds::CHEST || $id === BlockLegacyIds::ENDER_CHEST || $id === BlockLegacyIds::TRAPPED_CHEST) {
+				if($meta === 4) {
 					$meta = 5;
-				} elseif($meta == 5) {
+				} elseif($meta === 5) {
 					$meta = 4;
 				}
 			}
 
 			if(FlipHelper::isGate($id)) {
-				if($meta == 1) {
+				if($meta === 1) {
 					$meta = 3;
-				} elseif($meta == 3) {
+				} elseif($meta === 3) {
 					$meta = 1;
-				} elseif($meta == 5) {
+				} elseif($meta === 5) {
 					$meta = 7;
-				} elseif($meta == 7) {
+				} elseif($meta === 7) {
 					$meta = 5;
 				}
 			}
 
-			if($id == BlockLegacyIds::TORCH || $id == BlockLegacyIds::REDSTONE_TORCH || $id == BlockLegacyIds::LEVER) {
-				if($meta == 1) {
+			if($id === BlockLegacyIds::TORCH || $id === BlockLegacyIds::REDSTONE_TORCH || $id === BlockLegacyIds::LEVER) {
+				if($meta === 1) {
 					$meta = 2;
-				} elseif($meta == 2) {
+				} elseif($meta === 2) {
 					$meta = 1;
 				}
 			}
 		} else { // Z axis
 			// Stairs
 			if(FlipHelper::isStairs($id)) {
-				if($meta == 2) {
+				if($meta === 2) {
 					$meta = 3;
-				} elseif($meta == 3) {
+				} elseif($meta === 3) {
 					$meta = 2;
-				} elseif($meta == 6) {
+				} elseif($meta === 6) {
 					$meta = 7;
-				} elseif($meta == 7) {
+				} elseif($meta === 7) {
 					$meta = 6;
 				}
 			}
 
-			if($id == BlockLegacyIds::LADDER || $id == BlockLegacyIds::FURNACE || $id == BlockLegacyIds::CHEST || $id == BlockLegacyIds::ENDER_CHEST || $id == BlockLegacyIds::TRAPPED_CHEST) {
-				if($meta == 2) {
+			if($id === BlockLegacyIds::LADDER || $id === BlockLegacyIds::FURNACE || $id === BlockLegacyIds::CHEST || $id === BlockLegacyIds::ENDER_CHEST || $id === BlockLegacyIds::TRAPPED_CHEST) {
+				if($meta === 2) {
 					$meta = 3;
-				} elseif($meta == 3) {
+				} elseif($meta === 3) {
 					$meta = 2;
 				}
 			}
 
 			// Gates
 			if(FlipHelper::isGate($id)) {
-				if($meta == 0) {
+				if($meta === 0) {
 					$meta = 2;
-				} elseif($meta == 2) {
+				} elseif($meta === 2) {
 					$meta = 0;
-				} elseif($meta == 4) {
+				} elseif($meta === 4) {
 					$meta = 6;
-				} elseif($meta == 6) {
+				} elseif($meta === 6) {
 					$meta = 4;
 				}
 			}
 
-			if($id == BlockLegacyIds::TORCH || $id == BlockLegacyIds::REDSTONE_TORCH || $id == BlockLegacyIds::LEVER) {
+			if($id === BlockLegacyIds::TORCH || $id === BlockLegacyIds::REDSTONE_TORCH || $id === BlockLegacyIds::LEVER) {
 				// 1 <-> 2
-				if($meta == 2) {
+				if($meta === 2) {
 					$meta = 1;
-				} elseif($meta == 1) {
+				} elseif($meta === 1) {
 					$meta = 2;
 				}
 			}
@@ -132,14 +133,14 @@ class FlipHelper {
 	}
 
 	private static function isSlab(int $id): bool {
-		return ($id == BlockLegacyIds::STONE_SLAB || $id == BlockLegacyIds::WOODEN_SLAB || $id == BlockLegacyIds::STONE_SLAB2);
+		return ($id === BlockLegacyIds::STONE_SLAB || $id === BlockLegacyIds::WOODEN_SLAB || $id === BlockLegacyIds::STONE_SLAB2);
 	}
 
 	private static function isStairs(int $id): bool {
-		return ($id == BlockLegacyIds::WOODEN_STAIRS || $id == BlockLegacyIds::COBBLESTONE_STAIRS || $id == BlockLegacyIds::BRICK_STAIRS || $id == BlockLegacyIds::STONE_BRICK_STAIRS || $id == BlockLegacyIds::NETHER_BRICK_STAIRS || $id == BlockLegacyIds::SANDSTONE_STAIRS || $id == BlockLegacyIds::SPRUCE_STAIRS || $id == BlockLegacyIds::BIRCH_STAIRS || $id == BlockLegacyIds::JUNGLE_STAIRS || $id == BlockLegacyIds::QUARTZ_STAIRS || $id == BlockLegacyIds::ACACIA_STAIRS || $id == BlockLegacyIds::DARK_OAK_STAIRS || $id == BlockLegacyIds::RED_SANDSTONE_STAIRS || $id == BlockLegacyIds::PURPUR_STAIRS);
+		return ($id === BlockLegacyIds::WOODEN_STAIRS || $id === BlockLegacyIds::COBBLESTONE_STAIRS || $id === BlockLegacyIds::BRICK_STAIRS || $id === BlockLegacyIds::STONE_BRICK_STAIRS || $id === BlockLegacyIds::NETHER_BRICK_STAIRS || $id === BlockLegacyIds::SANDSTONE_STAIRS || $id === BlockLegacyIds::SPRUCE_STAIRS || $id === BlockLegacyIds::BIRCH_STAIRS || $id === BlockLegacyIds::JUNGLE_STAIRS || $id === BlockLegacyIds::QUARTZ_STAIRS || $id === BlockLegacyIds::ACACIA_STAIRS || $id === BlockLegacyIds::DARK_OAK_STAIRS || $id === BlockLegacyIds::RED_SANDSTONE_STAIRS || $id === BlockLegacyIds::PURPUR_STAIRS);
 	}
 
 	private static function isGate(int $id): bool {
-		return ($id == BlockLegacyIds::OAK_FENCE_GATE || $id == BlockLegacyIds::SPRUCE_FENCE_GATE || $id == BlockLegacyIds::BIRCH_FENCE_GATE || $id == BlockLegacyIds::JUNGLE_FENCE_GATE || $id == BlockLegacyIds::DARK_OAK_FENCE_GATE || $id == BlockLegacyIds::ACACIA_FENCE_GATE);
+		return ($id === BlockLegacyIds::OAK_FENCE_GATE || $id === BlockLegacyIds::SPRUCE_FENCE_GATE || $id === BlockLegacyIds::BIRCH_FENCE_GATE || $id === BlockLegacyIds::JUNGLE_FENCE_GATE || $id === BlockLegacyIds::DARK_OAK_FENCE_GATE || $id === BlockLegacyIds::ACACIA_FENCE_GATE);
 	}
 }

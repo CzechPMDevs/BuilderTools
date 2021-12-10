@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\math;
 
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\World;
@@ -74,15 +75,13 @@ class Math {
 			$rotation += 360.0;
 		}
 		if((0 <= $rotation and $rotation < 45) or (315 <= $rotation and $rotation < 360)) {
-			return 2; //North
+			return Facing::NORTH;
 		} elseif(45 <= $rotation and $rotation < 135) {
-			return 3; //East
+			return Facing::EAST;
 		} elseif(135 <= $rotation and $rotation < 225) {
-			return 0; //South
-		} elseif(225 <= $rotation and $rotation < 315) {
-			return 1; //West
+			return Facing::SOUTH;
 		} else {
-			return -1;
+			return Facing::WEST;
 		}
 	}
 

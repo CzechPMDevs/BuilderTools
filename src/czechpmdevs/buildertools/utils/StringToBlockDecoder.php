@@ -23,8 +23,7 @@ namespace czechpmdevs\buildertools\utils;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use OutOfBoundsException;
 use pocketmine\item\Item;
-use pocketmine\item\LegacyStringToItemParser;
-use pocketmine\item\LegacyStringToItemParserException;
+use pocketmine\item\StringToItemParser;
 use function array_rand;
 use function count;
 use function explode;
@@ -99,8 +98,8 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 		foreach($split as $entry) {
 			$count = 1;
 			$block = $entry;
-			if(strpos($entry, "%") !== false) {
-				$p = substr($entry, 0, $pos = strpos($entry, "%"));
+			if(($pos = strpos($entry, "%")) !== false) {
+				$p = substr($entry, 0, $pos);
 				if(!is_numeric($p)) {
 					continue;
 				}
@@ -109,10 +108,9 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 				$block = substr($entry, $pos + 1);
 			}
 
-			try {
-				$item = LegacyStringToItemParser::getInstance()->parse($block);
-			} catch(LegacyStringToItemParserException $ignore) {
-				continue; // Item not found
+			$item = StringToItemParser::getInstance()->parse($block);
+			if($item === null) {
+				continue;
 			}
 
 			$class = $item->getBlock();
@@ -121,7 +119,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 			}
 
 			if(!$mixBlockIds) {
-				if(strpos($entry, ":") !== false) { // Meta is specified
+				if(str_contains($entry, ":")) { // Meta is specified
 					for($i = 0; $i < $count; ++$i) {
 						$this->blockMap[] = $class->getId() << 4 | $class->getMeta();
 					}

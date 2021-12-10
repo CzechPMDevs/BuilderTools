@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\utils;
 
 use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\math\Math;
+use pocketmine\math\Axis;
 use pocketmine\math\Vector3;
 use pocketmine\world\World;
 use function atan2;
@@ -53,7 +54,7 @@ class RotationUtil {
 
 		$modifiedBlockArray = new SelectionData();
 		switch($axis) {
-			case Axis::Y_AXIS:
+			case Axis::Y:
 				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $fullBlockId);
 					RotationHelper::rotate($deg, $fullBlockId);
@@ -67,7 +68,7 @@ class RotationUtil {
 				$blockArray->coords = $modifiedBlockArray->coords;
 				$blockArray->offset = 0;
 				return $blockArray;
-			case Axis::X_AXIS:
+			case Axis::X:
 				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $fullBlockId);
 
@@ -84,7 +85,7 @@ class RotationUtil {
 				$blockArray->coords = $modifiedBlockArray->coords;
 				$blockArray->offset = 0;
 				return $blockArray;
-			case Axis::Z_AXIS:
+			case Axis::Z:
 				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $fullBlockId);
 
