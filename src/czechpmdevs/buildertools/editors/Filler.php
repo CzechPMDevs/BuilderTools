@@ -73,10 +73,10 @@ class Filler {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$changes = $fillSession->getChanges();
-		$changes->save();
+		$updates = $fillSession->getChanges();
+		$updates->save();
 
-		Canceller::getInstance()->addStep($player, $changes);
+		Canceller::getInstance()->addStep($player, $updates);
 
 		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
@@ -109,10 +109,10 @@ class Filler {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$changes = $fillSession->getChanges();
-		$changes->save();
+		$updates = $fillSession->getChanges();
+		$updates->save();
 
-		Canceller::getInstance()->addStep($player, $changes);
+		Canceller::getInstance()->addStep($player, $updates);
 
 		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}

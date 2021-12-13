@@ -64,9 +64,10 @@ class Decorator {
 
 		$fillSession->reloadChunks($center->getWorld());
 
-		$changes = $fillSession->getChanges();
-		$changes->save();
-		Canceller::getInstance()->addStep($player, $changes);
+		$updates = $fillSession->getChanges();
+		$updates->save();
+
+		Canceller::getInstance()->addStep($player, $updates);
 
 		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}

@@ -184,8 +184,9 @@ class SchematicsManager {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$changes = $fillSession->getChanges();
-		Canceller::getInstance()->addStep($player, $changes);
+		$updates = $fillSession->getChanges();
+		$updates->save();
+		Canceller::getInstance()->addStep($player, $updates);
 
 		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
