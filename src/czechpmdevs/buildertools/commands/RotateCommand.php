@@ -75,7 +75,6 @@ class RotateCommand extends BuilderToolsCommand {
 		}
 
 		$time = round(microtime(true) - $startTime, 3);
-
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area rotated (Took $time seconds)!");
 	}
 }

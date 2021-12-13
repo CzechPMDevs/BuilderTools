@@ -61,7 +61,11 @@ class RotationUtil {
 
 					$dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $z - $diff->getZ()));
 					$alfa = atan2($z - $diff->getZ(), $x - $diff->getX()) + $rad;
-					$modifiedBlockArray->addBlock(new Vector3((int)round($dist * Math::cos($alfa)) + $diff->getX(), $y, (int)round($dist * Math::sin($alfa)) + $diff->getZ()), $fullBlockId);
+					$modifiedBlockArray->addBlock(new Vector3(
+						(int)round($dist * Math::cos($alfa)) + $diff->getX(),
+						$y,
+						(int)round($dist * Math::sin($alfa)) + $diff->getZ()
+					), $fullBlockId);
 				}
 
 				$blockArray->blocks = $modifiedBlockArray->blocks;
@@ -72,16 +76,17 @@ class RotationUtil {
 				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $fullBlockId);
 
-					$dist = sqrt(Math::lengthSquared2d($y - $diff->getY(), $z - $diff->getZ()));
+					$dist = sqrt(Math::lengthSquared2d($z - $diff->getZ(), $y - $diff->getY()));
 					$alfa = atan2($y - $diff->getY(), $z - $diff->getZ()) + $rad;
-					$y = (int)round($dist * Math::cos($alfa)) + $diff->getX();
+					$y = (int)round($dist * Math::sin($alfa)) + $diff->getY();
 					if($y < World::Y_MIN || $y >= World::Y_MAX) {
 						continue;
 					}
 
-					$modifiedBlockArray->addBlock(new Vector3($x, $y, (int)round($dist * Math::sin($alfa)) + $diff->getZ()), $fullBlockId);
+					$modifiedBlockArray->addBlock(new Vector3($x, $y, (int)round($dist * Math::cos($alfa)) + $diff->getZ()), $fullBlockId);
 				}
 
+				$blockArray->blocks = $modifiedBlockArray->blocks;
 				$blockArray->coords = $modifiedBlockArray->coords;
 				$blockArray->offset = 0;
 				return $blockArray;
@@ -89,15 +94,16 @@ class RotationUtil {
 				while($blockArray->hasNext()) {
 					$blockArray->readNext($x, $y, $z, $fullBlockId);
 
-					$dist = sqrt(Math::lengthSquared2d($x - $diff->getX(), $y - $diff->getY()));
+					$dist = sqrt(Math::lengthSquared2d($y - $diff->getY(), $x - $diff->getX()));
 					$alfa = atan2($x - $diff->getX(), $y - $diff->getY()) + $rad;
-					$y = (int)round($dist * Math::sin($alfa));
+					$y = (int)round($dist * Math::cos($alfa)) + $diff->getY();
 					if($y < World::Y_MIN || $y >= World::Y_MAX) {
 						continue;
 					}
-					$modifiedBlockArray->addBlock(new Vector3((int)round($dist * Math::cos($alfa)), $y, $z), $fullBlockId);
+					$modifiedBlockArray->addBlock(new Vector3((int)round($dist * Math::sin($alfa)) + $diff->getX(), $y, $z), $fullBlockId);
 				}
 
+				$blockArray->blocks = $modifiedBlockArray->blocks;
 				$blockArray->coords = $modifiedBlockArray->coords;
 				$blockArray->offset = 0;
 				return $blockArray;
