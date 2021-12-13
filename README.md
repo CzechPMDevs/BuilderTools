@@ -1,4 +1,4 @@
-<a align="center"><img src="https://i.ibb.co/ckmrTb0/bt.png"></a>  
+<p align="center"><img src="https://i.ibb.co/ckmrTb0/bt.png"></p>  
   
 <p align="center">  
    <a href="https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools">  
