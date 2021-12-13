@@ -105,7 +105,7 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function getBlockAt(int $x, int $y, int $z, int &$fullBlockId = 0): void {
+	public function getBlockAt(int $x, int $y, int $z, ?int &$fullBlockId = 0): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
