@@ -1,12 +1,12 @@
 ---
 # BuilderTools configuration file
-# Target BuilderTools version: 1.3.0-beta2
+# Target BuilderTools version: 1.3.0
 
 # Do not change this line.
 config-version: 1.3.0.0
 
 # This is format which will be used for creating schematics
-# Supported formats: 'mcedit', 'mcstructure', 'buildertools'
+# Supported formats: 'mcedit', 'buildertools'
 output-schematics-format: 'mcedit'
 
 # Option for compressing clipboards. This will make the actions
