@@ -7,7 +7,4 @@ projects:
   BuilderTools:
     path: ""
     icon: "icon.png"
-    lint:
-      phpstan: false
-      syntaxError: false
 ...
