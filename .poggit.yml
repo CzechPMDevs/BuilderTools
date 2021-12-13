@@ -5,6 +5,6 @@ branches:
 - feature/tiles
 projects:
   BuilderTools:
-    path: ""
-    icon: "icon.png"
+    path: ''
+    icon: 'icon.png'
 ...
