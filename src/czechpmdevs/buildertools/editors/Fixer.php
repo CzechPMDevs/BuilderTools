@@ -59,7 +59,7 @@ class Fixer {
 		$subChunk = null;
 
 		for($y = 0; $y < $maxY; ++$y) {
-			if($currentY === null || $y >> 4 != $currentY) {
+			if($currentY === null || $y >> 4 !== $currentY) {
 				$currentY = $y >> 4;
 				$subChunk = $chunk->getSubChunk($y >> 4);
 

@@ -33,7 +33,7 @@ class BlockGenerator {
 		for($x = -$radius; $x <= $radius; ++$x) {
 			for($z = -$radius; $z <= $radius; ++$z) {
 				for($y = -$radius; $y <= $radius; ++$y) {
-					if($hollow && ($x != $radius && $y != $radius && $z != $radius)) {
+					if($hollow && ($x !== $radius && $y !== $radius && $z !== $radius)) {
 						continue;
 					}
 
@@ -64,8 +64,8 @@ class BlockGenerator {
 
 					$lengthSquared = Math::lengthSquared3d($divX, $divY, $divZ);
 					if($lengthSquared > 1) { // x**2 + y**2 + z**2 < r**2
-						if($z == 0) {
-							if($y == 0) {
+						if($z === 0) {
+							if($y === 0) {
 								break 2;
 							}
 							break;
@@ -100,7 +100,7 @@ class BlockGenerator {
 
 				$lengthSquared = Math::lengthSquared2d($divX, $divZ);
 				if($lengthSquared > 1) { // checking if can skip blocks outside of circle
-					if($z == 0) {
+					if($z === 0) {
 						break 2;
 					}
 
@@ -128,7 +128,7 @@ class BlockGenerator {
 		for($y = 0; $y <= $size; ++$y) {
 			for($x = 0; $x <= $currentLevelHeight; ++$x) {
 				for($z = 0; $z <= $currentLevelHeight; ++$z) {
-					if($hollow && ($x != $currentLevelHeight && $z != $currentLevelHeight)) {
+					if($hollow && ($x !== $currentLevelHeight && $z !== $currentLevelHeight)) {
 						continue;
 					}
 

@@ -44,13 +44,13 @@ class Naturalizer {
 				$state = 0;
 				for($y = 255; $y >= 0; --$y) {
 					$fillSession->getBlockIdAt($x, $y, $z, $id);
-					if($id == 0) {
+					if($id === 0) {
 						$state = 0;
-					} elseif($state == 0) {
+					} elseif($state === 0) {
 						$state = 1;
 						$fillSession->setBlockAt($x, $y, $z, 2 << 4); // Grass
 					} elseif($state < 5) { // 1 - 3
-						if($state == 3) {
+						if($state === 3) {
 							$state += 2;
 						} else {
 							$state++;

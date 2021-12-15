@@ -64,7 +64,7 @@ class EventListener implements Listener {
 
 	/** @noinspection PhpUnused */
 	public function onBlockBreak(BlockBreakEvent $event): void {
-		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
+		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() === ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
 			$size = Selectors::addSelector($player, 1, $position = $event->getBlock()->getPosition());
 			$player->sendMessage(BuilderTools::getPrefix() . "§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
 			$event->cancel();
@@ -74,7 +74,7 @@ class EventListener implements Listener {
 	/** @noinspection PhpUnused */
 	public function onBlockTouch(PlayerInteractEvent $event): void {
 		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
-		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
+		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() === ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
 			// antispam ._.
 			if(isset($this->wandClicks[$player->getName()]) && microtime(true) - $this->wandClicks[$player->getName()] < 0.5) {
 				return;
@@ -86,7 +86,7 @@ class EventListener implements Listener {
 			$event->cancel();
 		}
 
-		if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() == ItemIds::STICK && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
+		if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() === ItemIds::STICK && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
 			// antispam ._.
 			if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true) - $this->blockInfoClicks[$player->getName()] < 0.5) {
 				return;

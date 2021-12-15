@@ -59,7 +59,7 @@ class BiomeCommand extends BuilderToolsCommand {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cUsage: §7//biome <biome OR list>");
 			return;
 		}
-		if($args[0] == "list") {
+		if($args[0] === "list") {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§aAvailable biomes: " . implode(", ", array_keys($this->biomeData)));
 			return;
 		}

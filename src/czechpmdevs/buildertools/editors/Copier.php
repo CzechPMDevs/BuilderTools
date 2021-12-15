@@ -251,11 +251,11 @@ class Copier {
 		}
 
 		$direction = Math::getPlayerDirection($player);
-		if($mode == self::DIRECTION_PLAYER) {
-			if($direction == Facing::WEST || $direction == Facing::SOUTH) { // Moving along x axis (z = const)
+		if($mode === self::DIRECTION_PLAYER) {
+			if($direction === Facing::WEST || $direction === Facing::SOUTH) { // Moving along x axis (z = const)
 				$xSize = ($maxX - $minX) + 1;
 
-				if($direction == 0) {
+				if($direction === 0) {
 					$fillSession->setDimensions($minX, $minX + ($xSize * $pasteCount), $minZ, $maxZ);
 				} else {
 					$fillSession->setDimensions($minX - ($xSize * $pasteCount), $minX, $minZ, $maxZ);
@@ -277,7 +277,7 @@ class Copier {
 			} else { // Moving along z axis (x = const)
 				$zSize = ($maxZ - $minZ) + 1;
 
-				if($direction == 1) {
+				if($direction === 1) {
 					$fillSession->setDimensions($minX, $maxX, $minZ, $minZ + ($zSize * $pasteCount));
 				} else {
 					$fillSession->setDimensions($minX, $maxX, $minZ - ($zSize * $pasteCount), $maxZ);
@@ -301,7 +301,7 @@ class Copier {
 			$ySize = ($maxY - $minY) + 1;
 
 			$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-			if($mode == Copier::DIRECTION_DOWN) {
+			if($mode === Copier::DIRECTION_DOWN) {
 				$ySize = -$ySize;
 			}
 

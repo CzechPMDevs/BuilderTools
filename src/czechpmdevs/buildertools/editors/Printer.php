@@ -66,30 +66,30 @@ class Printer {
 			$level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block); // We provide valid values
 		};
 
-		if($mode == Printer::CUBE) {
+		if($mode === Printer::CUBE) {
 			foreach(BlockGenerator::generateCube($brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-		} elseif($mode == Printer::SPHERE) {
+		} elseif($mode === Printer::SPHERE) {
 			foreach(BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 			$updates->removeDuplicates();
-		} elseif($mode == Printer::CYLINDER) {
+		} elseif($mode === Printer::CYLINDER) {
 			foreach(BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 			$updates->removeDuplicates();
-		} elseif($mode == Printer::HOLLOW_CUBE) {
+		} elseif($mode === Printer::HOLLOW_CUBE) {
 			foreach(BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-		} elseif($mode == Printer::HOLLOW_SPHERE) {
+		} elseif($mode === Printer::HOLLOW_SPHERE) {
 			foreach(BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
 			$updates->removeDuplicates();
-		} elseif($mode == Printer::HOLLOW_CYLINDER) {
+		} elseif($mode === Printer::HOLLOW_CYLINDER) {
 			foreach(BlockGenerator::generateCylinder($brush, $brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
@@ -108,7 +108,7 @@ class Printer {
 		$z = $position->getFloorZ();
 
 		/** @noinspection PhpStatementHasEmptyBodyInspection */
-		for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() == 0; $y--) ;
+		for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() === 0; $y--) ;
 
 		return new Vector3($x, ++$y, $z);
 	}
@@ -117,7 +117,7 @@ class Printer {
 		$startTime = microtime(true);
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 		$radius = abs($radius);
-		if($radius == 0) {
+		if($radius === 0) {
 			return EditorResult::error("Radius could not be 0");
 		}
 
@@ -150,8 +150,8 @@ class Printer {
 
 					$lengthSquared = Math::lengthSquared3d($divX, $divY, $divZ);
 					if($lengthSquared > 1) { // x**2 + y**2 + z**2 < r**2
-						if($z == 0) {
-							if($y == 0) {
+						if($z === 0) {
+							if($y === 0) {
 								break 2;
 							}
 							break;
@@ -214,7 +214,7 @@ class Printer {
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$radius = abs($radius);
-		if($radius == 0) {
+		if($radius === 0) {
 			return EditorResult::error("Radius could not be 0");
 		}
 
@@ -252,7 +252,7 @@ class Printer {
 
 				$lengthSquared = Math::lengthSquared2d($divX, $divZ);
 				if($lengthSquared > 1) { // checking if can skip blocks outside of circle
-					if($z == 0) {
+					if($z === 0) {
 						break 2;
 					}
 					break;
@@ -319,7 +319,7 @@ class Printer {
 		for($y = 0; $y <= $size; ++$y) {
 			for($x = 0; $x <= $currentLevelHeight; ++$x) {
 				for($z = 0; $z <= $currentLevelHeight; ++$z) {
-					if($hollow && ($x != $currentLevelHeight && $z != $currentLevelHeight)) {
+					if($hollow && ($x !== $currentLevelHeight && $z !== $currentLevelHeight)) {
 						continue;
 					}
 
@@ -424,7 +424,7 @@ class Printer {
 
 					$lengthSquared = Math::lengthSquared2d($divX, $divZ);
 					if($lengthSquared > 1) {
-						if($z == 0) {
+						if($z === 0) {
 							break 2;
 						}
 						break;

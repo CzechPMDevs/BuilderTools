@@ -53,13 +53,13 @@ class CenterCommand extends BuilderToolsCommand {
 		$min = $center->floor();
 		$max = $center->floor();
 
-		if($center->getX() != $center->getFloorX()) {
+		if($center->getX() !== $center->getFloorX()) {
 			$max->x = $center->getFloorX() + 1;
 		}
-		if($center->getY() != $center->getFloorY()) {
+		if($center->getY() !== $center->getFloorY()) {
 			$max->y = $center->getFloorY() + 1;
 		}
-		if($center->getZ() != $center->getFloorZ()) {
+		if($center->getZ() !== $center->getFloorZ()) {
 			$max->z = $center->getFloorZ() + 1;
 		}
 

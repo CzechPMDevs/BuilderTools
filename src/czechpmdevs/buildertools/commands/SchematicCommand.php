@@ -117,7 +117,7 @@ class SchematicCommand extends BuilderToolsCommand {
 
 			case "list":
 				$loaded = SchematicsManager::getLoadedSchematics();
-				if(count($loaded) == 0) {
+				if(count($loaded) === 0) {
 					$sender->sendMessage(BuilderTools::getPrefix() . "§cThere aren't any loaded schematics on the server");
 					break;
 				}

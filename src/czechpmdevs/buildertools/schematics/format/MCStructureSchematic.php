@@ -134,7 +134,7 @@ class MCStructureSchematic implements Schematic {
 
 	private function getFullBlockIdByState(CompoundTag $blockState): int {
 		$index = $blockState->getString("name");
-		if(($states = $blockState->getCompoundTag("states")) !== null && $states->count() != 0) {
+		if(($states = $blockState->getCompoundTag("states")) !== null && $states->count() !== 0) {
 			$data = [];
 			/** @var StringTag $state */
 			foreach($states as $k => $state) {
@@ -186,7 +186,7 @@ class MCStructureSchematic implements Schematic {
 			// Test if block indexes exists
 			$nbt->getCompoundTag("structure")->getListTag("block_indices")->get(0)->getValue(); // @phpstan-ignore-line (Errors are caught)
 
-			return $nbt->getTag("size") instanceof ListTag && $nbt->getListTag("size")->count() == 3; // @phpstan-ignore-line (Errors are caught)
+			return $nbt->getTag("size") instanceof ListTag && $nbt->getListTag("size")->count() === 3; // @phpstan-ignore-line (Errors are caught)
 		} catch(Throwable) {
 			return false;
 		}

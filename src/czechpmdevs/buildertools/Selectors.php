@@ -70,14 +70,14 @@ class Selectors {
 	 * @return int|null If not null, returns count of blocks in selection
 	 */
 	public static function addSelector(Player $player, int $pos, Position $position): ?int {
-		if($pos != 1 && $pos != 2) {
+		if($pos !== 1 && $pos !== 2) {
 			throw new InvalidArgumentException("Player can select only two positions");
 		}
 		if(!$position->equals($position->ceil())) {
 			throw new InvalidArgumentException("Position coordinates must be integer type.");
 		}
 
-		if($pos == 1) {
+		if($pos === 1) {
 			Selectors::$pos1[$player->getName()] = $position;
 		} else {
 			Selectors::$pos2[$player->getName()] = $position;
@@ -94,7 +94,7 @@ class Selectors {
 			return null;
 		}
 
-		if($pos1->getWorld()->getId() != $pos2->getWorld()->getId()) {
+		if($pos1->getWorld()->getId() !== $pos2->getWorld()->getId()) {
 			return null;
 		}
 
@@ -102,10 +102,10 @@ class Selectors {
 	}
 
 	public static function getPosition(Player $player, int $pos): Position {
-		if($pos == 1) {
+		if($pos === 1) {
 			return Selectors::$pos1[$player->getName()];
 		}
-		if($pos == 2) {
+		if($pos === 2) {
 			return Selectors::$pos2[$player->getName()];
 		}
 
@@ -113,10 +113,10 @@ class Selectors {
 	}
 
 	public static function isSelected(int $pos, Player $player): bool {
-		if($pos == 1) {
+		if($pos === 1) {
 			return array_key_exists($player->getName(), Selectors::$pos1);
 		}
-		if($pos == 2) {
+		if($pos === 2) {
 			return array_key_exists($player->getName(), Selectors::$pos2);
 		}
 

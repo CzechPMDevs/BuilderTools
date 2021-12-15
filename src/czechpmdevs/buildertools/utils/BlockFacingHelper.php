@@ -159,21 +159,24 @@ class BlockFacingHelper {
 				if(Facing::axis($sourceFacing) === Axis::X) {
 					try {
 						$block->setFacing(Facing::opposite($sourceFacing)); // @phpstan-ignore-line
-					} catch(InvalidArgumentException) {}
+					} catch(InvalidArgumentException) {
+					}
 
 					$this->flipXMap[$sourceId] = $block->getFullId();
 				}
 				if(Facing::axis($sourceFacing) === Axis::Z) {
 					try {
 						$block->setFacing(Facing::opposite($sourceFacing)); // @phpstan-ignore-line
-					} catch(InvalidArgumentException) {}
+					} catch(InvalidArgumentException) {
+					}
 
 					$this->flipZMap[$sourceId] = $block->getFullId();
 				}
 				if(Facing::axis($sourceFacing) === Axis::Y) {
 					try {
 						$block->setFacing(Facing::opposite($sourceFacing)); // @phpstan-ignore-line
-					} catch(InvalidArgumentException) {}
+					} catch(InvalidArgumentException) {
+					}
 
 					$this->flipYMap[$sourceId] = $block->getFullId();
 				}

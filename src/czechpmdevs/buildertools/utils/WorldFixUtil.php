@@ -46,7 +46,7 @@ class WorldFixUtil {
 			return;
 		}
 
-		if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld() == $worldName) {
+		if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld() === $worldName) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
 			return;
 		}
@@ -83,7 +83,7 @@ class WorldFixUtil {
 				}
 			}
 
-			if($asyncTask->error != "") {
+			if($asyncTask->error !== "") {
 				$sender->sendMessage(BuilderTools::getPrefix() . "§c" . $asyncTask->error);
 				goto finish;
 			}

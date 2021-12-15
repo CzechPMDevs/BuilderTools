@@ -174,10 +174,10 @@ class SchematicsManager {
 
 		while($schematic->hasNext()) {
 			$schematic->readNext($x, $y, $z, $fullBlockId);
-			if($fullBlockId != 0) $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+			if($fullBlockId !== 0) $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
-		if($fillSession->getBlocksChanged() == 0) {
+		if($fillSession->getBlocksChanged() === 0) {
 			return EditorResult::error("0 blocks changed");
 		}
 
@@ -232,7 +232,7 @@ class SchematicsManager {
 		$extension = trim(strtolower($extension));
 
 		foreach(SchematicsManager::$registeredTypes as $class) {
-			if(strtolower($class::getFileExtension()) == $extension) {
+			if(strtolower($class::getFileExtension()) === $extension) {
 				return $class;
 			}
 		}
