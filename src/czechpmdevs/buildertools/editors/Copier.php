@@ -29,8 +29,9 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\math\Transform;
 use czechpmdevs\buildertools\utils\FlipUtil;
-use czechpmdevs\buildertools\utils\RotationUtil;
+use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -193,10 +194,17 @@ class Copier {
 
 		/** @phpstan-var SelectionData $clipboard */
 		$clipboard = ClipboardManager::getClipboard($player);
-		$clipboard->load();
 
-		$clipboard = RotationUtil::rotate($clipboard, $axis, $rotation);
-		$clipboard->save();
+		$transform = new Transform($clipboard);
+		if($axis === Axis::Y) {
+			$transform->rotateY($rotation);
+		} elseif($axis === Axis::X) {
+			$transform->rotateX($rotation);
+		} else {
+			$transform->rotateZ($rotation);
+		}
+
+		$transform->close();
 
 		ClipboardManager::saveClipboard($player, $clipboard);
 	}
@@ -209,10 +217,17 @@ class Copier {
 
 		/** @phpstan-var SelectionData $clipboard */
 		$clipboard = ClipboardManager::getClipboard($player);
-		$clipboard->load();
 
-		$clipboard = FlipUtil::flip($clipboard, $axis);
-		$clipboard->save();
+		$transform = new Transform($clipboard);
+		if($axis === Axis::X) {
+			$transform->flipX();
+		} elseif($axis === Axis::Y) {
+			$transform->flipY();
+		} else {
+			$transform->flipZ();
+		}
+
+		$transform->close();
 
 		ClipboardManager::saveClipboard($player, $clipboard);
 	}
