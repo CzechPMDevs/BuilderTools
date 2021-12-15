@@ -30,7 +30,6 @@ use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\math\Transform;
-use czechpmdevs\buildertools\utils\FlipUtil;
 use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
@@ -252,10 +251,10 @@ class Copier {
 
 		$direction = Math::getPlayerDirection($player);
 		if($mode === self::DIRECTION_PLAYER) {
-			if($direction === Facing::WEST || $direction === Facing::SOUTH) { // Moving along x axis (z = const)
+			if($direction === Facing::WEST || $direction === Facing::SOUTH) { // Moving along x-axis (z = const)
 				$xSize = ($maxX - $minX) + 1;
 
-				if($direction === 0) {
+				if($direction === Facing::WEST) {
 					$fillSession->setDimensions($minX, $minX + ($xSize * $pasteCount), $minZ, $maxZ);
 				} else {
 					$fillSession->setDimensions($minX - ($xSize * $pasteCount), $minX, $minZ, $maxZ);

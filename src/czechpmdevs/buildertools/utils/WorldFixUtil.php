@@ -46,7 +46,7 @@ class WorldFixUtil {
 			return;
 		}
 
-		if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld() === $worldName) {
+		if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld()->getFolderName() === $worldName) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
 			return;
 		}
