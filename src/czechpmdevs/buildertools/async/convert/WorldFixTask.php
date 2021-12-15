@@ -108,7 +108,7 @@ class WorldFixTask extends AsyncTask {
 				try {
 					$chunk = $provider->loadChunk($chunkX, $chunkZ)?->getChunk();
 				} catch(CorruptedChunkException $e) {
-					Server::getInstance()->getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) .",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
+					Server::getInstance()->getLogger()->warning("[BuilderTools] Chunk $chunkX:$chunkZ is corrupted. Area from X=" . ($chunkX << 4) . ",Z=" . ($chunkZ << 4) . " to X=" . (($chunkX << 4) + 15) . ",Z=" . (($chunkZ << 4) + 15) . " might not have been fixed.");
 					continue;
 				}
 
@@ -158,14 +158,14 @@ class WorldFixTask extends AsyncTask {
 			try {
 				$region = new McRegion($worldPath . DIRECTORY_SEPARATOR);
 			} catch(CorruptedRegionException $e) {
-				Server::getInstance()->getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) .",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
+				Server::getInstance()->getLogger()->warning("[BuilderTools] Region $regionX:$regionZ (File $regionFilePath) is corrupted. Area from X=" . ($regionX << 9) . ",Z=" . ($regionZ << 9) . " to X=" . ((($regionX + 1) << 9) - 1) . ",Z=" . ((($regionZ + 1) << 9) - 1) . " might not have been fixed.");
 				continue;
 			}
 
 			for($x = 0; $x < 32; ++$x) {
 				for($z = 0; $z < 32; ++$z) {
 					$chunkLoad = $region->loadChunk($x, $z);
-					if($chunkLoad === null)return false;
+					if($chunkLoad === null) return false;
 					$chunks[] = [($regionX << 5) + $x, ($regionZ << 5) + $z];
 				}
 			}
