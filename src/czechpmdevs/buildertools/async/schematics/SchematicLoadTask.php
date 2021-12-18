@@ -22,8 +22,8 @@ namespace czechpmdevs\buildertools\async\schematics;
 
 use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
 use czechpmdevs\buildertools\schematics\format\Schematic;
-use czechpmdevs\buildertools\schematics\SchematicException;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use RuntimeException;
 use function basename;
 use function file_exists;
 use function file_get_contents;
@@ -36,42 +36,32 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 
 	public string $blockArray;
 
-	public ?string $error = null;
-
 	public function __construct(string $file) {
+		parent::__construct();
+
 		$this->file = $file;
 	}
 
-	/** @noinspection PhpUnused */
-	public function onRun(): void {
+	public function execute(): void {
 		if(!file_exists($this->file)) {
-			$this->error = "File not found.";
-			return;
+			throw new RuntimeException("File not found");
 		}
 
 		$rawData = file_get_contents($this->file);
 		if($rawData === false) {
-			$this->error = "Could not read file $this->file";
-			return;
+			throw new RuntimeException("Could not read file $this->file");
 		}
 
 		SchematicsManager::lazyInit();
 
 		$format = SchematicsManager::getSchematicFormat($rawData);
 		if($format === null) {
-			$this->error = "Unrecognised format";
-			return;
+			throw new RuntimeException("Unrecognised schematics format");
 		}
 
 		/** @var Schematic $schematic */
 		$schematic = new $format;
-
-		try {
-			$blockArray = $schematic->load($rawData);
-		} catch(SchematicException $exception) {
-			$this->error = $exception->getMessage();
-			return;
-		}
+		$blockArray = $schematic->load($rawData);
 
 		$this->name = basename($this->file, "." . $schematic::getFileExtension());
 		$this->blockArray = serialize($blockArray);

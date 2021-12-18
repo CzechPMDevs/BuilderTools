@@ -84,8 +84,8 @@ class SchematicsManager {
 
 		/** @phpstan-ignore-next-line */
 		AsyncQueue::submitTask(new SchematicLoadTask($file), function(SchematicLoadTask $task) use ($startTime, $schematic, $callback): void {
-			if($task->error !== null) {
-				$callback(SchematicActionResult::error($task->error));
+			if($task->getErrorMessage() !== null) {
+				$callback(SchematicActionResult::error($task->getErrorMessage()));
 				return;
 			}
 

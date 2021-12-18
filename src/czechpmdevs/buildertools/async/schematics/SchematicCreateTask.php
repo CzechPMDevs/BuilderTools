@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicException;
+use pocketmine\utils\AssumptionFailedError;
 use function file_put_contents;
 use function serialize;
 use function unserialize;
@@ -42,17 +43,17 @@ class SchematicCreateTask extends BuilderToolsAsyncTask {
 	 * @param class-string<Schematic> $format
 	 */
 	public function __construct(string $targetFilePath, string $format, BlockArray $blockArray) {
+		parent::__construct();
+
 		$this->targetFilePath = $targetFilePath;
 		$this->format = $format;
 		$this->blockArray = serialize($blockArray);
 	}
 
-	/** @noinspection PhpUnused */
-	public function onRun(): void {
+	public function execute(): void {
 		$blockArray = unserialize($this->blockArray);
 		if(!$blockArray instanceof BlockArray) {
-			$this->error = "Error whilst moving block array on to another thread";
-			return;
+			throw new AssumptionFailedError("Error whilst creating schematics: Could not deserialize block array properly.");
 		}
 
 		try {
