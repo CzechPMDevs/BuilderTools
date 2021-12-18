@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
  *
@@ -18,8 +16,11 @@ declare(strict_types=1);
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace czechpmdevs\buildertools\commands;
 
+use czechpmdevs\buildertools\blockstorage\identifiers\OppositeBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
@@ -53,7 +54,7 @@ class ReplaceCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill($fromBlockIds, $toBlockIds);
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill(new OppositeBlockIdentifier($fromBlockIds), $toBlockIds);
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
