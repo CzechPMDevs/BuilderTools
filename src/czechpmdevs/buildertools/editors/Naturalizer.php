@@ -28,6 +28,7 @@ use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
+/** @deprecated */
 class Naturalizer {
 	use SingletonTrait;
 

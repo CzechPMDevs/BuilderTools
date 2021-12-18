@@ -20,27 +20,23 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
-use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
+/** @deprecated */
 class Filler {
 	use SingletonTrait;
 
-	public function directFill(Player $player, Vector3 $pos1, Vector3 $pos2, string $blockArgs, bool $hollow = false): EditorResult {
+	public function directFill(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blockGenerator, bool $hollow = false): EditorResult {
 		$startTime = microtime(true);
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
-
-		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
-		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks specified in string $blockArgs");
-		}
 
 		$fillSession = new FillSession($player->getWorld(), false);
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
@@ -54,7 +50,7 @@ class Filler {
 							continue;
 						}
 
-						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$blockGenerator->nextBlock($fullBlockId);
 						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 					}
 				}
@@ -63,7 +59,7 @@ class Filler {
 			for($x = $minX; $x <= $maxX; ++$x) {
 				for($z = $minZ; $z <= $maxZ; ++$z) {
 					for($y = $minY; $y <= $maxY; ++$y) {
-						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$blockGenerator->nextBlock($fullBlockId);
 						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 					}
 				}
@@ -81,15 +77,10 @@ class Filler {
 		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function directWalls(Player $player, Vector3 $pos1, Vector3 $pos2, string $blockArgs): EditorResult {
+	public function directWalls(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blocks): EditorResult {
 		$startTime = microtime(true);
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
-
-		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
-		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks found in string $blockArgs");
-		}
 
 		$fillSession = new FillSession($player->getWorld(), false);
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
@@ -99,7 +90,7 @@ class Filler {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
 					if($x === $minX || $x === $maxX || $z === $minZ || $z === $maxZ) {
-						$stringToBlockDecoder->nextBlock($fullBlockId);
+						$blocks->nextBlock($fullBlockId);
 						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 					}
 				}

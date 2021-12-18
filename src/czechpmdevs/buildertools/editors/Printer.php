@@ -35,6 +35,7 @@ use pocketmine\world\World;
 use function abs;
 use function microtime;
 
+/** @deprecated */
 class Printer {
 	use SingletonTrait;
 
@@ -372,7 +373,7 @@ class Printer {
 			return EditorResult::error("No blocks found in string $blockArgs");
 		}
 
-		return Filler::getInstance()->directFill($player, $center->subtract($radius, $radius, $radius), $center->add($radius, $radius, $radius), $blockArgs, $hollow);
+		return Filler::getInstance()->directFill($player, $center->subtract($radius, $radius, $radius), $center->add($radius, $radius, $radius), $stringToBlockDecoder, $hollow);
 	}
 
 	public function makeHollowCube(Player $player, Position $center, int $radius, string $blockArgs): EditorResult {

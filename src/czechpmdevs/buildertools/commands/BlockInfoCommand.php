@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
@@ -42,17 +41,13 @@ class BlockInfoCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cThis command can be used only in game!");
 			return;
 		}
-		if(BuilderTools::getConfiguration()->getBoolProperty("blockinfo-stick.enabled")) {
-			$item = VanillaItems::STICK();
-			$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("blockinfo-stick.name"));
-			$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
-			$item->getNamedTag()->setByte("buildertools", 1);
 
-			$sender->getInventory()->addItem($item);
-			$sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
-			return;
-		}
-		Selectors::switchBlockInfoSelector($sender);
-		$sender->sendMessage(BuilderTools::getPrefix() . "Block info mode turned " . (Selectors::isBlockInfoPlayer($sender) ? "on" : "off") . "!");
+		$item = VanillaItems::STICK();
+		$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("blockinfo-stick-name"));
+		$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
+		$item->getNamedTag()->setByte("buildertools", 1);
+
+		$sender->getInventory()->addItem($item);
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aBlock info stick added to your inventory!");
 	}
 }

@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\event\listener;
 use czechpmdevs\buildertools\blockstorage\OfflineSession;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\session\SessionHolder;
 use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
@@ -32,22 +32,20 @@ use pocketmine\event\player\PlayerItemUseEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\world\WorldLoadEvent;
-use pocketmine\item\ItemIds;
-use pocketmine\nbt\tag\ByteTag;
+use pocketmine\item\VanillaItems;
 use pocketmine\Server;
-use function is_int;
+use function array_key_exists;
 use function microtime;
 
 class EventListener implements Listener {
 
 	/** @var float[] */
-	private array $wandClicks = [];
-	/** @var float[] */
-	private array $blockInfoClicks = [];
+	private array $clickTime = [];
 
 	/** @noinspection PhpUnused */
 	public function onAirClick(PlayerItemUseEvent $event): void {
-		if(!Selectors::isDrawingPlayer($player = $event->getPlayer())) {
+		$session = SessionHolder::getInstance()->getSession($player = $event->getPlayer());
+		if(!$session->isDrawing()) {
 			return;
 		}
 
@@ -58,46 +56,52 @@ class EventListener implements Listener {
 
 		$position = $targetBlock->getPosition();
 
-		Printer::getInstance()->draw($player, $position, $player->getInventory()->getItemInHand()->getBlock(), Selectors::getDrawingPlayerBrush($player), Selectors::getDrawingPlayerMode($player), Selectors::getDrawingPlayerFall($player));
+		Printer::getInstance()->draw($player, $position, $player->getInventory()->getItemInHand()->getBlock(), $session->getDrawBrush(), $session->getDrawMode(), $session->getDrawFall());
 		$event->cancel();
 	}
 
 	/** @noinspection PhpUnused */
 	public function onBlockBreak(BlockBreakEvent $event): void {
-		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() === ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
-			$size = Selectors::addSelector($player, 1, $position = $event->getBlock()->getPosition());
-			$player->sendMessage(BuilderTools::getPrefix() . "§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
+		if(
+			$event->getItem()->equals(VanillaItems::WOODEN_AXE(), false, false) &&
+			$event->getItem()->getNamedTag()->getTag("buildertools") !== null
+		) {
+			SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder()->handleWandAxeBlockBreak($event->getBlock()->getPosition());
 			$event->cancel();
 		}
 	}
 
 	/** @noinspection PhpUnused */
 	public function onBlockTouch(PlayerInteractEvent $event): void {
-		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) return;
-		if(Selectors::isWandSelector($player = $event->getPlayer()) || ($event->getItem()->getId() === ItemIds::WOODEN_AXE && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
-			// antispam ._.
-			if(isset($this->wandClicks[$player->getName()]) && microtime(true) - $this->wandClicks[$player->getName()] < 0.5) {
+		if($event->getItem()->getNamedTag()->getTag("buildertools") !== null) {
+			$player = $event->getPlayer();
+			if(array_key_exists($player->getName(), $this->clickTime) && microtime(true) - $this->clickTime[$player->getName()] < 0.5) {
+				$event->cancel();
+				return;
+			}
+			$this->clickTime[$player->getName()] = microtime(true);
+
+			if($event->getItem()->equals(VanillaItems::WOODEN_AXE(), false, false)) {
+				$event->cancel();
+
+				SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder()->handleWandAxeBlockClick($event->getBlock()->getPosition());
 				return;
 			}
 
-			$this->wandClicks[$player->getName()] = microtime(true);
-			$size = Selectors::addSelector($player, 2, $position = $event->getBlock()->getPosition());
-			$player->sendMessage(BuilderTools::getPrefix() . "§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
-			$event->cancel();
-		}
+			if($event->getItem()->equals(VanillaItems::STICK(), false, false)) {
+				$event->cancel();
 
-		if(Selectors::isBlockInfoPlayer($player = $event->getPlayer()) || ($event->getItem()->getId() === ItemIds::STICK && $event->getItem()->getNamedTag()->getTag("buildertools") instanceof ByteTag)) {
-			// antispam ._.
-			if(isset($this->blockInfoClicks[$player->getName()]) && microtime(true) - $this->blockInfoClicks[$player->getName()] < 0.5) {
-				return;
+				$block = $event->getBlock();
+				$world = $event->getBlock()->getPosition()->getWorld();
+
+				$player->sendTip(
+					"§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" .
+					"§aName: §7" . $block->getName() . "\n" .
+					"§aPosition: §7" . $block->getPosition()->getFloorX() . ";" . $block->getPosition()->getFloorY() . ";" . $block->getPosition()->getFloorZ() . " (" . ($block->getPosition()->getFloorX() >> 4) . ";" . ($block->getPosition()->getFloorZ() >> 4) . ")\n" .
+					"§World: §7" . $world->getDisplayName() . "\n" .
+					"§aBiome: §7" . $world->getBiomeId($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ()) . " (" . $world->getBiome($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ())->getName() . ")"
+				);
 			}
-
-			$block = $event->getBlock();
-			$this->blockInfoClicks[$player->getName()] = microtime(true);
-
-			$world = $block->getPosition()->getWorld();
-
-			$player->sendTip("§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" . "§aName: §7" . $block->getName() . "\n" . "§aPosition: §7" . $block->getPosition()->getFloorX() . ";" . $block->getPosition()->getFloorY() . ";" . $block->getPosition()->getFloorZ() . " (" . ($block->getPosition()->getFloorX() >> 4) . ";" . ($block->getPosition()->getFloorZ() >> 4) . ")\n" . "§World: §7" . $world->getDisplayName() . "\n" . "§aBiome: §7" . $block->getPosition()->getWorld()->getBiomeId($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ()) . " (" . $block->getPosition()->getWorld()->getBiome($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ())->getName() . ")");
 		}
 	}
 
@@ -116,7 +120,7 @@ class EventListener implements Listener {
 	/** @noinspection PhpUnused */
 	public function onQuit(PlayerQuitEvent $event): void {
 		OfflineSession::savePlayerSession($event->getPlayer());
-		Selectors::unloadPlayer($event->getPlayer());
+		SessionHolder::getInstance()->closeSession($event->getPlayer());
 	}
 
 	public function getPlugin(): BuilderTools {

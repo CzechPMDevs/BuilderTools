@@ -21,36 +21,29 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
 
+/** @deprecated */
 class Canceller {
 	use SingletonTrait;
 
 	public function addStep(Player $player, BlockArray $blocks): void {
-		ClipboardManager::saveUndo($player, $blocks);
+		SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo($blocks);
 	}
 
 	public function undo(Player $player): EditorResult {
-		$error = function(): EditorResult {
-			return EditorResult::error("There are not any actions to undo");
-		};
-
-		if(!ClipboardManager::hasActionToUndo($player)) {
-			return $error();
-		}
-
-		$undoAction = ClipboardManager::getNextUndoAction($player);
+		$undoAction = SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->nextUndoAction();
 		if($undoAction === null) {
-			return $error();
+			return EditorResult::error("There are not any actions to undo");
 		}
 
 		if($undoAction->getWorld() === null) {
-			return EditorResult::error("Could not find world to process updates on.");
+			return EditorResult::error("Could not find world to process changes on");
 		}
 
 		$startTime = microtime(true);
@@ -74,25 +67,17 @@ class Canceller {
 	}
 
 	public function addRedo(Player $player, BlockArray $blocks): void {
-		ClipboardManager::saveRedo($player, $blocks);
+		SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->saveRedo($blocks);
 	}
 
 	public function redo(Player $player): EditorResult {
-		$error = function(): EditorResult {
-			return EditorResult::error("There are not any actions to undo");
-		};
-
-		if(!ClipboardManager::hasActionToRedo($player)) {
-			return $error();
-		}
-
-		$redoAction = ClipboardManager::getNextRedoAction($player);
+		$redoAction = SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->nextRedoAction();
 		if($redoAction === null) {
-			return $error();
+			return EditorResult::error("There are not any actions to undo");
 		}
 
 		if($redoAction->getWorld() === null) {
-			return EditorResult::error("Could not find world to process updates on.");
+			return EditorResult::error("Could not find world to process changes on");
 		}
 
 		$startTime = microtime(true);

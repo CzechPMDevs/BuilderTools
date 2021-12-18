@@ -1,9 +1,9 @@
 ---
 # BuilderTools configuration file
-# Target BuilderTools version: 1.3.0
+# Target BuilderTools version: 1.3.1
 
 # Do not change this line.
-config-version: 1.3.0.0
+config-version: 1.3.1.0
 
 # This is format which will be used for creating schematics
 # Supported formats: 'mcedit', 'buildertools'
@@ -31,15 +31,7 @@ clean-cache: true
 # high amount of players.
 discard-sessions: false
 
-# PowerItems settings:
-
-# When disabled, //wand command still works, but instead of wand axe is hand
-# going to be the 'wand tool'
-wand-axe:
-  enabled: true
-  name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"
-
-blockinfo-stick:
-  enabled: false
-  name: "§r§fDebug Stick\n§7§oTouch block for info"
+# There is possible to change wand items names:
+wand-axe-name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"
+blockinfo-stick-name: "§r§fDebug Stick\n§7§oTouch block for info"
 ...

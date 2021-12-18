@@ -21,17 +21,15 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\EditorResult;
-use czechpmdevs\buildertools\editors\object\FillSession;
-use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 use function array_key_exists;
 use function array_keys;
 use function implode;
 use function is_numeric;
 use function json_decode;
-use function microtime;
 
 class BiomeCommand extends BuilderToolsCommand {
 
@@ -63,9 +61,6 @@ class BiomeCommand extends BuilderToolsCommand {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§aAvailable biomes: " . implode(", ", array_keys($this->biomeData)));
 			return;
 		}
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-			return;
-		}
 
 		/** @var int|null $id */
 		$id = null;
@@ -81,21 +76,13 @@ class BiomeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$startTime = microtime(true);
-
-		Math::calculateMinAndMaxValues($firstPos, $secondPos, false, $minX, $maxX, $_, $_, $minZ, $maxZ);
-
-		$fillSession = new FillSession($sender->getWorld(), false, false);
-		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-		for($x = $minX; $x <= $maxX; ++$x) {
-			for($z = $minZ; $z <= $maxZ; ++$z) {
-				$fillSession->setBiomeAt($x, $z, $id);
-			}
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->changeBiome($id);
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
+			return;
 		}
 
-		$result = EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-
-		$fillSession->reloadChunks($sender->getWorld());
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aBiomes updated, {$result->getBlocksChanged()} blocks affected in {$result->getProcessTime()}");
 	}
 }

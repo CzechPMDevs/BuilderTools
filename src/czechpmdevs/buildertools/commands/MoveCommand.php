@@ -21,10 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
-use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use RuntimeException;
 use function count;
 use function is_numeric;
 
@@ -47,11 +47,12 @@ class MoveCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->move((int)$args[0], (int)$args[1], (int)$args[2]);
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
-
-		$result = Copier::getInstance()->move($firstPos, $secondPos, new Vector3((int)$args[0], (int)$args[1], (int)$args[2]), $sender);
 
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area has been successfully moved, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
 	}

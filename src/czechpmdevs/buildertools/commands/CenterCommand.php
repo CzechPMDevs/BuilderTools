@@ -21,10 +21,11 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
-use pocketmine\world\Position;
+use RuntimeException;
 
 class CenterCommand extends BuilderToolsCommand {
 
@@ -40,15 +41,13 @@ class CenterCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+		try {
+			$center = ($selection = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder())->center();
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 
-		/**
-		 * @var Position $firstPos
-		 * @var Position $secondPos
-		 */
-		$center = $firstPos->addVector($secondPos)->divide(2);
 
 		$min = $center->floor();
 		$max = $center->floor();
@@ -66,7 +65,7 @@ class CenterCommand extends BuilderToolsCommand {
 		for($x = $min->getFloorX(); $x <= $max->getFloorX(); ++$x) {
 			for($y = $min->getFloorY(); $y <= $max->getFloorY(); ++$y) {
 				for($z = $min->getFloorZ(); $z <= $max->getFloorZ(); ++$z) {
-					$firstPos->getWorld()->setBlockAt($x, $y, $z, VanillaBlocks::BEDROCK());
+					$selection->getWorld()->setBlockAt($x, $y, $z, VanillaBlocks::BEDROCK());
 				}
 			}
 		}

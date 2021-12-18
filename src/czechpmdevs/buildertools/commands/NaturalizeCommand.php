@@ -21,9 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Naturalizer;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 
 class NaturalizeCommand extends BuilderToolsCommand {
 
@@ -39,11 +40,13 @@ class NaturalizeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->naturalize();
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 
-		$result = Naturalizer::getInstance()->naturalize($firstPos, $secondPos, $sender);
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
 	}
 }

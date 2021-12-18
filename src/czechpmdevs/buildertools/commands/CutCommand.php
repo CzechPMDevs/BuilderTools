@@ -21,9 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 
 class CutCommand extends BuilderToolsCommand {
 
@@ -39,11 +40,13 @@ class CutCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->cutToClipboard();
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage("§c{$exception->getMessage()}");
 			return;
 		}
 
-		$result = Copier::getInstance()->cut($firstPos, $secondPos, $sender);
 		if(!$result->successful()) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
 			return;

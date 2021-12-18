@@ -21,9 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Filler;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 
 class FillCommand extends BuilderToolsCommand {
 
@@ -43,13 +44,14 @@ class FillCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+		if(($blockIds = $this->createBlockDecoder($sender, $args[0])) === null) {
 			return;
 		}
 
-		$result = Filler::getInstance()->directFill($sender, $firstPos, $secondPos, $args[0], false);
-		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill($blockIds);
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 

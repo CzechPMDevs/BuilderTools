@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\ClipboardManager;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
@@ -37,11 +37,11 @@ use function zlib_decode;
 use function zlib_encode;
 use const ZLIB_ENCODING_GZIP;
 
+/** @deprecated */
 final class OfflineSession {
 
 	public static function savePlayerSession(Player $player): void {
 		if(BuilderTools::getConfiguration()->getBoolProperty("discard-sessions")) {
-			unset(ClipboardManager::$clipboards[$player->getName()]);
 			return;
 		}
 
@@ -50,16 +50,13 @@ final class OfflineSession {
 
 		$nbt = new CompoundTag();
 
+		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		// Clipboard
-		if(ClipboardManager::hasClipboardCopied($player)) {
-			/** @phpstan-var SelectionData $clipboard */
-			$clipboard = ClipboardManager::getClipboard($player);
-
+		if($clipboard !== null) {
 			$clipboard->compress();
 
 			$nbt->setTag("Clipboard", (new CompoundTag())->setByteArray("Coordinates", $clipboard->compressedCoords)->setByteArray("Blocks", $clipboard->compressedBlocks)->setByteArray("RelativePosition", $clipboard->compressedPlayerPosition));
-
-			unset(ClipboardManager::$clipboards[$player->getName()]);
+			unset($clipboard);
 		}
 
 		// TODO - Undo / Redo data
@@ -93,14 +90,14 @@ final class OfflineSession {
 			/** @var CompoundTag $clipboardTag */
 			$clipboardTag = $nbt->getCompoundTag("Clipboard");
 
-			$clipboard = new SelectionData();
+			$clipboard = new Clipboard();
 			$clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
 			$clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
 			$clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
 
 			$clipboard->decompress();
 
-			ClipboardManager::saveClipboard($player, $clipboard);
+			SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 		}
 	}
 }

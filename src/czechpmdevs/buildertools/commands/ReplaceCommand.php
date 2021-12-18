@@ -21,9 +21,10 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Replacement;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 
 class ReplaceCommand extends BuilderToolsCommand {
 
@@ -43,13 +44,18 @@ class ReplaceCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
+		if(($fromBlockIds = $this->createBlockDecoder($sender, $args[0])) === null) {
 			return;
 		}
 
-		$result = Replacement::getInstance()->directReplace($sender, $firstPos, $secondPos, $args[0], $args[1]);
-		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst processing the command: {$result->getErrorMessage()}");
+		if(($toBlockIds = $this->createBlockDecoder($sender, $args[1])) === null) {
+			return;
+		}
+
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill($fromBlockIds, $toBlockIds);
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 

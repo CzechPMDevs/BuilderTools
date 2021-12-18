@@ -21,13 +21,12 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginOwned;
-use pocketmine\world\Position;
 use RuntimeException;
 use function str_replace;
 use function strtolower;
@@ -51,25 +50,14 @@ abstract class BuilderToolsCommand extends Command implements PluginOwned {
 		}
 	}
 
-	protected function readPositions(Player $sender, ?Position &$firstPos = null, ?Position &$secondPos = null): bool {
-		if(!Selectors::isSelected(1, $sender)) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the first position.");
-			return false;
-		}
-		if(!Selectors::isSelected(2, $sender)) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the second position.");
-			return false;
+	protected function createBlockDecoder(Player $player, string $args): ?StringToBlockDecoder {
+		$decoder = new StringToBlockDecoder($args, $player->getInventory()->getItemInHand());
+		if(!$decoder->isValid()) {
+			$player->sendMessage(BuilderTools::getPrefix() . "§cNo blocks found in string '$args'");
+			return null;
 		}
 
-		$firstPos = Selectors::getPosition($sender, 1);
-		$secondPos = Selectors::getPosition($sender, 2);
-
-		if($firstPos->getWorld()->getId() !== $secondPos->getWorld()->getId()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cPositions must be in same level");
-			return false;
-		}
-
-		return true;
+		return $decoder;
 	}
 
 	private function getPerms(string $name): string {

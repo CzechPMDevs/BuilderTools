@@ -21,9 +21,12 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Facing;
 use pocketmine\player\Player;
+use RuntimeException;
 use function is_numeric;
 use function strtolower;
 
@@ -52,28 +55,30 @@ class StackCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-			return;
-		}
-
 		$count = (int)$args[0];
-		$mode = Copier::DIRECTION_PLAYER;
+
+		$direction = null;
 		if(isset($args[1])) {
 			switch(strtolower($args[1])):
 				case "up":
-					$mode = Copier::DIRECTION_UP;
+					$direction = Facing::UP;
 					break;
 				case "down":
-					$mode = Copier::DIRECTION_DOWN;
+					$direction = Facing::DOWN;
 			endswitch;
 		}
 
-		$result = Copier::getInstance()->stack($sender, $firstPos, $secondPos, $count, $mode);
-		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cProblem whilst stacking selection: {$result->getErrorMessage()}");
+		if($direction === null) {
+			$direction = Math::getPlayerDirection($sender);
+		}
+
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->stack($count, $direction);
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 
-		$sender->sendMessage(BuilderTools::getPrefix() . "Section stacked $count times (m=$mode), {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()})");
+		$sender->sendMessage(BuilderTools::getPrefix() . "Section stacked $count times, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()})");
 	}
 }

@@ -52,6 +52,7 @@ use czechpmdevs\buildertools\commands\ReplaceCommand;
 use czechpmdevs\buildertools\commands\RotateCommand;
 use czechpmdevs\buildertools\commands\SchematicCommand;
 use czechpmdevs\buildertools\commands\SecondPositionCommand;
+use czechpmdevs\buildertools\commands\SelectionCommand;
 use czechpmdevs\buildertools\commands\SphereCommand;
 use czechpmdevs\buildertools\commands\StackCommand;
 use czechpmdevs\buildertools\commands\TreeCommand;
@@ -75,7 +76,7 @@ use function version_compare;
 
 class BuilderTools extends PluginBase {
 
-	public const CURRENT_CONFIG_VERSION = "1.3.0.0";
+	public const CURRENT_CONFIG_VERSION = "1.3.1.0";
 
 	private static BuilderTools $instance;
 	private static Configuration $configuration;
@@ -143,7 +144,47 @@ class BuilderTools extends PluginBase {
 
 	private function registerCommands(): void {
 		$map = $this->getServer()->getCommandMap();
-		BuilderTools::$commands = [new BiomeCommand, new BlockInfoCommand, new CenterCommand, new ClearInventoryCommand, new CopyCommand, new CubeCommand, new CutCommand, new CylinderCommand, new DecorationCommand, new DrawCommand, new FillCommand, new FirstPositionCommand, new FixCommand, new FlipCommand, new HelpCommand, new HollowCubeCommand, new HollowCylinderCommand, new HollowPyramidCommand, new HollowSphereCommand, new IdCommand, new IslandCommand, new MergeCommand, new MoveCommand, new NaturalizeCommand, new OutlineCommand, new PasteCommand, new PyramidCommand, new RedoCommand, new ReplaceCommand, new RotateCommand, new SchematicCommand, new SecondPositionCommand, new SphereCommand, new StackCommand, new TreeCommand, new UndoCommand, new WallsCommand, new WandCommand];
+		BuilderTools::$commands = [
+			new BiomeCommand,
+			new BlockInfoCommand,
+			new CenterCommand,
+			new ClearInventoryCommand,
+			new CopyCommand,
+			new CubeCommand,
+			new CutCommand,
+			new CylinderCommand,
+			new DecorationCommand,
+			new DrawCommand,
+			new FillCommand,
+			new FirstPositionCommand,
+			new FixCommand,
+			new FlipCommand,
+			new HelpCommand,
+			new HollowCubeCommand,
+			new HollowCylinderCommand,
+			new HollowPyramidCommand,
+			new HollowSphereCommand,
+			new IdCommand,
+			new IslandCommand,
+			new MergeCommand,
+			new MoveCommand,
+			new NaturalizeCommand,
+			new OutlineCommand,
+			new PasteCommand,
+			new PyramidCommand,
+			new RedoCommand,
+			new ReplaceCommand,
+			new RotateCommand,
+			new SchematicCommand,
+			new SecondPositionCommand,
+			new SelectionCommand,
+			new SphereCommand,
+			new StackCommand,
+			new TreeCommand,
+			new UndoCommand,
+			new WallsCommand,
+			new WandCommand
+		];
 
 		foreach(self::$commands as $command) {
 			$map->register("BuilderTools", $command);

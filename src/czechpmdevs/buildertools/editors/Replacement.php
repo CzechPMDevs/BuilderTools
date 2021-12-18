@@ -31,6 +31,7 @@ use function max;
 use function microtime;
 use function min;
 
+/** @deprecated */
 class Replacement {
 	use SingletonTrait;
 

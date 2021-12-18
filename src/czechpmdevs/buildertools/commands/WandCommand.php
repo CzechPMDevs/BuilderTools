@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Copyright (C) 2018-2021  CzechPMDevs
  *
@@ -18,10 +16,11 @@ declare(strict_types=1);
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\Selectors;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
@@ -43,19 +42,12 @@ class WandCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(BuilderTools::getConfiguration()->getBoolProperty("wand-axe.enabled")) {
-			$item = VanillaItems::WOODEN_AXE();
-			$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("wand-axe.name"));
-			$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
-			$item->getNamedTag()->setByte("buildertools", 1);
+		$item = VanillaItems::WOODEN_AXE();
+		$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("wand-axe-name"));
+		$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
+		$item->getNamedTag()->setByte("buildertools", 1);
 
-			$sender->getInventory()->addItem($item);
-			$sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
-			return;
-		}
-
-		Selectors::switchWandSelector($sender);
-		$switch = Selectors::isWandSelector($sender) ? "ON" : "OFF";
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aWand tool turned $switch!");
+		$sender->getInventory()->addItem($item);
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aWand axe added to your inventory!");
 	}
 }

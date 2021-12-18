@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
+use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
@@ -39,18 +39,14 @@ class MergeCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cThis command can be used only in game!");
 			return;
 		}
-		if(!Selectors::isSelected(1, $sender)) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the first position.");
-			return;
-		}
-		if(!Selectors::isSelected(2, $sender)) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cFirst you need to select the second position.");
+
+		if(($blockIds = $this->createBlockDecoder($sender, $args[0])) === null) {
 			return;
 		}
 
-		$result = Copier::getInstance()->merge($sender);
+		$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill($blockIds, SingleBlockIdentifier::airIdentifier());
 		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cProblem while processing: {$result->getErrorMessage()}");
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
 			return;
 		}
 

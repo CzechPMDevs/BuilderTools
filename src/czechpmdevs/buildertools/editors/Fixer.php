@@ -27,6 +27,7 @@ use pocketmine\world\World;
 use function array_key_exists;
 use function json_decode;
 
+/** @deprecated */
 class Fixer {
 	use SingletonTrait;
 

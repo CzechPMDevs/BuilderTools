@@ -29,6 +29,7 @@ use pocketmine\world\Position;
 use function microtime;
 use function mt_rand;
 
+/** @deprecated */
 class Decorator {
 	use SingletonTrait;
 

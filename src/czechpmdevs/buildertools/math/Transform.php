@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\math;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\blockstorage\SelectionData;
+use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\utils\BlockFacingHelper;
 use pocketmine\math\Axis;
 use pocketmine\world\World;
@@ -33,7 +33,7 @@ use function sqrt;
 class Transform {
 
 	public function __construct(
-		private SelectionData $clipboard
+		private Clipboard $clipboard
 	) {
 		$this->clipboard->load();
 	}
@@ -41,7 +41,7 @@ class Transform {
 	public function rotateY(int $degrees): void {
 		$rad = deg2rad($degrees);
 
-		$diff = $this->clipboard->getPlayerPosition();
+		$diff = $this->clipboard->getRelativePosition();
 		[$diffX, $diffZ] = [$diff->getFloorX(), $diff->getFloorZ()];
 
 		$rotationMapping = BlockFacingHelper::getInstance()->getRotationMapping(Axis::Y, $degrees);
@@ -68,7 +68,7 @@ class Transform {
 	public function rotateX(int $degrees): void {
 		$rad = deg2rad($degrees);
 
-		$diff = $this->clipboard->getPlayerPosition();
+		$diff = $this->clipboard->getRelativePosition();
 		[$diffY, $diffZ] = [$diff->getFloorY(), $diff->getFloorZ()];
 
 		$rotationMapping = BlockFacingHelper::getInstance()->getRotationMapping(Axis::Y, $degrees);
@@ -99,7 +99,7 @@ class Transform {
 	public function rotateZ(int $degrees): void {
 		$rad = deg2rad($degrees);
 
-		$diff = $this->clipboard->getPlayerPosition();
+		$diff = $this->clipboard->getRelativePosition();
 		[$diffX, $diffY] = [$diff->getFloorX(), $diff->getFloorY()];
 
 		$rotationMapping = BlockFacingHelper::getInstance()->getRotationMapping(Axis::Z, $degrees);

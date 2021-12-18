@@ -21,15 +21,15 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
-use czechpmdevs\buildertools\blockstorage\SelectionData;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\ClipboardManager;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\math\Transform;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
@@ -39,6 +39,7 @@ use function max;
 use function microtime;
 use function min;
 
+/** @deprecated */
 class Copier {
 	use SingletonTrait;
 
@@ -49,7 +50,7 @@ class Copier {
 	public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
 		$startTime = microtime(true);
 
-		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
+		$clipboard = (new Clipboard())->setRelativePosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -67,7 +68,7 @@ class Copier {
 		}
 
 		$clipboard->save();
-		ClipboardManager::saveClipboard($player, $clipboard);
+		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 
 		return EditorResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
 	}
@@ -75,7 +76,7 @@ class Copier {
 	public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
 		$startTime = microtime(true);
 
-		$clipboard = (new SelectionData())->setPlayerPosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
+		$clipboard = (new Clipboard())->setRelativePosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -98,7 +99,7 @@ class Copier {
 		$fillSession->close();
 
 		$clipboard->save();
-		ClipboardManager::saveClipboard($player, $clipboard);
+		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 
 		$changes = $fillSession->getChanges();
 		$changes->save();
@@ -109,19 +110,18 @@ class Copier {
 	}
 
 	public function merge(Player $player): EditorResult {
-		if(!ClipboardManager::hasClipboardCopied($player)) {
+		$startTime = microtime(true);
+
+		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		if($clipboard === null) {
 			return EditorResult::error("Clipboard is empty");
 		}
 
-		$startTime = microtime(true);
-
-		/** @phpstan-var SelectionData $clipboard */
-		$clipboard = ClipboardManager::getClipboard($player);
 		$clipboard->setWorld($player->getWorld());
 		$clipboard->load();
 
 		/** @phpstan-var Vector3 $relativePosition */
-		$relativePosition = $clipboard->getPlayerPosition();
+		$relativePosition = $clipboard->getRelativePosition();
 
 		$fillSession = new MaskedFillSession($player->getWorld(), true, true, SingleBlockIdentifier::airIdentifier());
 
@@ -147,19 +147,18 @@ class Copier {
 	}
 
 	public function paste(Player $player): EditorResult {
-		if(!ClipboardManager::hasClipboardCopied($player)) {
+		$startTime = microtime(true);
+
+		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		if($clipboard === null) {
 			return EditorResult::error("Clipboard is empty");
 		}
 
-		$startTime = microtime(true);
-
-		/** @phpstan-var SelectionData $clipboard */
-		$clipboard = ClipboardManager::getClipboard($player);
 		$clipboard->setWorld($player->getWorld());
 		$clipboard->load();
 
 		/** @phpstan-var Vector3 $relativePosition */
-		$relativePosition = $clipboard->getPlayerPosition();
+		$relativePosition = $clipboard->getRelativePosition();
 
 		$fillSession = new FillSession($player->getWorld(), true, true);
 
@@ -186,13 +185,11 @@ class Copier {
 	}
 
 	public function rotate(Player $player, int $axis, int $rotation): void {
-		if(!ClipboardManager::hasClipboardCopied($player)) {
-			$player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		if($clipboard === null) {
+			$player->sendMessage(BuilderTools::getPrefix() . "§cYour clipboard is empty");
 			return;
 		}
-
-		/** @phpstan-var SelectionData $clipboard */
-		$clipboard = ClipboardManager::getClipboard($player);
 
 		$transform = new Transform($clipboard);
 		if($axis === Axis::Y) {
@@ -205,17 +202,15 @@ class Copier {
 
 		$transform->close();
 
-		ClipboardManager::saveClipboard($player, $clipboard);
+		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 	}
 
 	public function flip(Player $player, int $axis): void {
-		if(!ClipboardManager::hasClipboardCopied($player)) {
-			$player->sendMessage(BuilderTools::getPrefix() . "§cUse //copy first!");
+		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		if($clipboard === null) {
+			$player->sendMessage(BuilderTools::getPrefix() . "§cYour clipboard is empty");
 			return;
 		}
-
-		/** @phpstan-var SelectionData $clipboard */
-		$clipboard = ClipboardManager::getClipboard($player);
 
 		$transform = new Transform($clipboard);
 		if($axis === Axis::X) {
@@ -228,10 +223,10 @@ class Copier {
 
 		$transform->close();
 
-		ClipboardManager::saveClipboard($player, $clipboard);
+		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 	}
 
-	public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $mode = Copier::DIRECTION_PLAYER): EditorResult {
+	public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $direction): EditorResult {
 		$startTime = microtime(true);
 
 		$fillSession = new FillSession($player->getWorld(), false, true);
@@ -249,8 +244,7 @@ class Copier {
 			}
 		}
 
-		$direction = Math::getPlayerDirection($player);
-		if($mode === self::DIRECTION_PLAYER) {
+		if($direction !== Facing::DOWN && $direction !== Facing::UP) {
 			if($direction === Facing::WEST || $direction === Facing::SOUTH) { // Moving along x-axis (z = const)
 				$xSize = ($maxX - $minX) + 1;
 
@@ -276,7 +270,7 @@ class Copier {
 			} else { // Moving along z axis (x = const)
 				$zSize = ($maxZ - $minZ) + 1;
 
-				if($direction === 1) {
+				if($direction === Facing::EAST) {
 					$fillSession->setDimensions($minX, $maxX, $minZ, $minZ + ($zSize * $pasteCount));
 				} else {
 					$fillSession->setDimensions($minX, $maxX, $minZ - ($zSize * $pasteCount), $maxZ);
@@ -300,7 +294,7 @@ class Copier {
 			$ySize = ($maxY - $minY) + 1;
 
 			$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-			if($mode === Copier::DIRECTION_DOWN) {
+			if($direction === Facing::DOWN) {
 				$ySize = -$ySize;
 			}
 

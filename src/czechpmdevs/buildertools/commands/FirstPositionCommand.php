@@ -21,11 +21,11 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\Selectors;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
-use function is_int;
+use RuntimeException;
 
 class FirstPositionCommand extends BuilderToolsCommand {
 
@@ -41,7 +41,14 @@ class FirstPositionCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$size = Selectors::addSelector($sender, 1, $position = Position::fromObject($sender->getPosition()->floor(), $sender->getWorld()));
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}" . (is_int($size) ? " ($size)" : ""));
+		$selection = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder();
+		$selection->handleWandAxeBlockBreak($position = Position::fromObject($sender->getPosition()->floor(), $sender->getWorld()));
+		try {
+			$size = " ({$selection->size()})";
+		} catch(RuntimeException) {
+			$size = "";
+		}
+
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}$size");
 	}
 }

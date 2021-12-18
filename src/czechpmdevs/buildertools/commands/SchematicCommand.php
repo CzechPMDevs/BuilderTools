@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\schematics\SchematicActionResult;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use function count;
@@ -54,19 +55,17 @@ class SchematicCommand extends BuilderToolsCommand {
 					break;
 				}
 
-				if(!$this->readPositions($sender, $firstPos, $secondPos)) {
-					break;
-				}
-
-				$sender->sendMessage(BuilderTools::getPrefix() . "§6Saving schematic in background...");
-				SchematicsManager::createSchematic($sender, $firstPos, $secondPos, $args[1], function(SchematicActionResult $result) use ($sender): void {
+				$callback = function(SchematicActionResult $result) use ($sender): void {
 					if($result->successful()) {
 						$sender->sendMessage(BuilderTools::getPrefix() . "§aSchematic saved! (Took {$result->getProcessTime()} seconds)");
 						return;
 					}
 
 					$sender->sendMessage(BuilderTools::getPrefix() . "§cUnable to create schematic: {$result->getErrorMessage()}");
-				});
+				};
+
+				$sender->sendMessage(BuilderTools::getPrefix() . "§6Saving schematic in background...");
+				SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->saveToSchematic($args[1], $callback);
 				break;
 
 			case "load":
