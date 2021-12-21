@@ -20,11 +20,11 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
-use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\SessionHolder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 
 class MergeCommand extends BuilderToolsCommand {
 
@@ -40,13 +40,10 @@ class MergeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(($blockIds = $this->createBlockDecoder($sender, $args[0])) === null) {
-			return;
-		}
-
-		$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill($blockIds, SingleBlockIdentifier::airIdentifier());
-		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$result->getErrorMessage()}");
+		try {
+			$result = SessionHolder::getInstance()->getSession($sender)->getClipboardHolder()->paste($sender->getPosition());
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 

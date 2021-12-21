@@ -34,6 +34,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\item\VanillaItems;
 use pocketmine\Server;
+use RuntimeException;
 use function array_key_exists;
 use function microtime;
 
@@ -66,8 +67,18 @@ class EventListener implements Listener {
 			$event->getItem()->equals(VanillaItems::WOODEN_AXE(), false, false) &&
 			$event->getItem()->getNamedTag()->getTag("buildertools") !== null
 		) {
-			SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder()->handleWandAxeBlockBreak($event->getBlock()->getPosition());
+			$selection = SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
+			$selection->handleWandAxeBlockBreak($event->getBlock()->getPosition());
 			$event->cancel();
+
+			try {
+				$size = " ({$selection->size()})";
+			} catch(RuntimeException) {
+				$size = "";
+			}
+
+			$position = $event->getBlock()->getPosition()->floor();
+			$event->getPlayer()->sendMessage(BuilderTools::getPrefix() . "§aSelected first position at {$position->getX()}, {$position->getY()}, {$position->getZ()}$size");
 		}
 	}
 
@@ -82,9 +93,18 @@ class EventListener implements Listener {
 			$this->clickTime[$player->getName()] = microtime(true);
 
 			if($event->getItem()->equals(VanillaItems::WOODEN_AXE(), false, false)) {
+				$selection = SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
+				$selection->handleWandAxeBlockClick($event->getBlock()->getPosition());
 				$event->cancel();
 
-				SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder()->handleWandAxeBlockClick($event->getBlock()->getPosition());
+				try {
+					$size = " ({$selection->size()})";
+				} catch(RuntimeException) {
+					$size = "";
+				}
+
+				$position = $event->getBlock()->getPosition()->floor();
+				$event->getPlayer()->sendMessage(BuilderTools::getPrefix() . "§aSelected second position at {$position->getX()}, {$position->getY()}, {$position->getZ()}$size");
 				return;
 			}
 

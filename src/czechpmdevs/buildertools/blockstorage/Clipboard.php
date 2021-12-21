@@ -27,10 +27,8 @@ use function pack;
 use function unpack;
 
 class Clipboard extends BlockArray {
-
 	protected Vector3 $relativePosition;
-
-	public string $compressedPlayerPosition;
+	public string $compressedRelativePosition;
 
 	/**
 	 * @param bool $modifyBuffer If it's false, only relative position will be changed.
@@ -71,7 +69,7 @@ class Clipboard extends BlockArray {
 		}
 
 		$vector3 = $this->getRelativePosition();
-		$this->compressedPlayerPosition = pack("q", World::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
+		$this->compressedRelativePosition = pack("q", World::blockHash($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ()));
 
 		unset($this->relativePosition);
 	}
@@ -79,12 +77,12 @@ class Clipboard extends BlockArray {
 	public function decompress(bool $cleanCompressed = true): void {
 		parent::decompress($cleanCompressed);
 
-		if(!isset($this->compressedPlayerPosition)) {
+		if(!isset($this->compressedRelativePosition)) {
 			return;
 		}
 
 		/** @phpstan-ignore-next-line */
-		World::getBlockXYZ((int)(unpack("q", $this->compressedPlayerPosition)[1]), $x, $y, $z);
+		World::getBlockXYZ((int)(unpack("q", $this->compressedRelativePosition)[1]), $x, $y, $z);
 		$this->relativePosition = new Vector3($x, $y, $z);
 	}
 

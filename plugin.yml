@@ -109,6 +109,9 @@ permissions:
   buildertools.command.pos2:
     description: Permissions for //pos2
     default: op
+  buildertools.command.selection:
+    description: Permissions for //sel
+    default: op
   buildertools.command.sphere:
     description: Permissions for //sphere
     default: op

@@ -55,7 +55,7 @@ final class OfflineSession {
 		if($clipboard !== null) {
 			$clipboard->compress();
 
-			$nbt->setTag("Clipboard", (new CompoundTag())->setByteArray("Coordinates", $clipboard->compressedCoords)->setByteArray("Blocks", $clipboard->compressedBlocks)->setByteArray("RelativePosition", $clipboard->compressedPlayerPosition));
+			$nbt->setTag("Clipboard", (new CompoundTag())->setByteArray("Coordinates", $clipboard->compressedCoords)->setByteArray("Blocks", $clipboard->compressedBlocks)->setByteArray("RelativePosition", $clipboard->compressedRelativePosition));
 			unset($clipboard);
 		}
 
@@ -93,7 +93,7 @@ final class OfflineSession {
 			$clipboard = new Clipboard();
 			$clipboard->compressedCoords = $clipboardTag->getByteArray("Coordinates");
 			$clipboard->compressedBlocks = $clipboardTag->getByteArray("Blocks");
-			$clipboard->compressedPlayerPosition = $clipboardTag->getByteArray("RelativePosition");
+			$clipboard->compressedRelativePosition = $clipboardTag->getByteArray("RelativePosition");
 
 			$clipboard->decompress();
 
