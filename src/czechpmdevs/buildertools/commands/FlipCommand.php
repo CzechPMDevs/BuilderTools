@@ -48,11 +48,11 @@ class FlipCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(strtolower($args[0]) == "x") {
+		if(strtolower($args[0]) === "x") {
 			$axis = Axis::X;
-		} elseif(strtolower($args[0]) == "y") {
+		} elseif(strtolower($args[0]) === "y") {
 			$axis = Axis::Y;
-		} elseif(strtolower($args[0]) == "z") {
+		} elseif(strtolower($args[0]) === "z") {
 			$axis = Axis::Z;
 		} else {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cUnknown axis '$args[0]'. You can use only 'X', 'Y' and 'Z' axis.");

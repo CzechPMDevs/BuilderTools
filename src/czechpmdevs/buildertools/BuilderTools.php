@@ -153,7 +153,7 @@ class BuilderTools extends PluginBase {
 	}
 
 	public function sendWarnings(): void {
-		if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") != 0) {
+		if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") !== 0) {
 			$this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
 		}
 	}

@@ -46,14 +46,14 @@ class WorldFixUtil {
 			return;
 		}
 
-		if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld() == $worldName) {
+		if(Server::getInstance()->getWorldManager()->getDefaultWorld() !== null && Server::getInstance()->getWorldManager()->getDefaultWorld()->getFolderName() === $worldName) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cYou cannot fix default world!");
 			return;
 		}
 
 		$path = Server::getInstance()->getDataPath() . "worlds" . DIRECTORY_SEPARATOR . $worldName;
 		if(!is_dir($path)) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cLevel not found.");
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cWorld not found.");
 			return;
 		}
 
@@ -76,27 +76,22 @@ class WorldFixUtil {
 		BuilderTools::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task = new ClosureTask(function() use ($worldName, $asyncTask, $sender, &$task): void {
 			if($sender instanceof Player) {
 				if($sender->isOnline()) {
-					$sender->sendTip("§aWorld $worldName is fixed from $asyncTask->percent%.");
+					$sender->sendTip("§aWorld $worldName is fixed from $asyncTask->progressPercentage%%%.");
 				} else {
 					$asyncTask->forceStop = true;
 					goto finish;
 				}
 			}
 
-			if($asyncTask->error != "") {
-				$sender->sendMessage(BuilderTools::getPrefix() . "§c" . $asyncTask->error);
-				goto finish;
-			}
-
-			if($asyncTask->done) {
-				$sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->time seconds, ($asyncTask->chunkCount chunks updated)!");
+			if($asyncTask->isTaskDone) {
+				$sender->sendMessage(BuilderTools::getPrefix() . "§aWorld fix task completed in $asyncTask->totalTime seconds, ($asyncTask->totalChunkCount chunks updated)!");
 
 				finish:
 				$handler = $task->getHandler();
 				$handler?->cancel();
 				WorldFixUtil::finishWorldFixTask($asyncTask);
 			}
-		}), 60, 2);
+		}), 60, 5);
 
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aFixing the world...");
 	}

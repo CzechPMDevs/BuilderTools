@@ -144,7 +144,7 @@ class FillSession {
 
 			/** @phpstan-ignore-next-line */
 			$id = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-			if($id >> 4 != 0) {
+			if($id >> 4 !== 0) {
 				if(BlockFactory::getInstance()->get($id >> 4, $id & 0xf)->isSolid()) {
 					$y++;
 					return true;

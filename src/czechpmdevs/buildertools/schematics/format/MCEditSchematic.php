@@ -72,7 +72,7 @@ class MCEditSchematic implements Schematic {
 			}
 		}
 
-		if($materials == MCEditSchematic::MATERIALS_CLASSIC || $materials == MCEditSchematic::MATERIALS_ALPHA) {
+		if($materials === MCEditSchematic::MATERIALS_CLASSIC || $materials === MCEditSchematic::MATERIALS_ALPHA) {
 			$fixer = Fixer::getInstance();
 
 			foreach($blockArray->blocks as &$fullBlock) {
@@ -109,7 +109,7 @@ class MCEditSchematic implements Schematic {
 	}
 
 	private function readMaterials(CompoundTag $nbt, ?string &$materials): void {
-		if(strtolower($nbt->getString("Materials", MCEditSchematic::MATERIALS_CLASSIC)) == strtolower(MCEditSchematic::MATERIALS_BEDROCK)) {
+		if(strtolower($nbt->getString("Materials", MCEditSchematic::MATERIALS_CLASSIC)) === strtolower(MCEditSchematic::MATERIALS_BEDROCK)) {
 			$materials = MCEditSchematic::MATERIALS_BEDROCK;
 			return;
 		}

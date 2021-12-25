@@ -50,7 +50,7 @@ class Filler {
 			for($x = $minX; $x <= $maxX; ++$x) {
 				for($z = $minZ; $z <= $maxZ; ++$z) {
 					for($y = $minY; $y <= $maxY; ++$y) {
-						if(($x != $minX && $x != $maxX) && ($y != $minY && $y != $maxY) && ($z != $minZ && $z != $maxZ)) {
+						if(($x !== $minX && $x !== $maxX) && ($y !== $minY && $y !== $maxY) && ($z !== $minZ && $z !== $maxZ)) {
 							continue;
 						}
 
@@ -98,7 +98,7 @@ class Filler {
 		for($x = $minX; $x <= $maxX; ++$x) {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
-					if($x == $minX || $x == $maxX || $z == $minZ || $z == $maxZ) {
+					if($x === $minX || $x === $maxX || $z === $minZ || $z === $maxZ) {
 						$stringToBlockDecoder->nextBlock($fullBlockId);
 						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 					}

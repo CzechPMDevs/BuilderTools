@@ -37,11 +37,11 @@ class SingleBlockIdentifier implements BlockIdentifierList {
 	}
 
 	public function containsBlock(int $fullBlockId): bool {
-		return isset($this->meta) ? $fullBlockId == ($this->id << 4 | $this->meta) : $fullBlockId >> 4 == $this->id;
+		return isset($this->meta) ? $fullBlockId === ($this->id << 4 | $this->meta) : $fullBlockId >> 4 === $this->id;
 	}
 
 	public function containsBlockId(int $id): bool {
-		return $this->id == $id;
+		return $this->id === $id;
 	}
 
 	public static function airIdentifier(): SingleBlockIdentifier {
