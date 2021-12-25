@@ -60,7 +60,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 	 * any valid blocks
 	 */
 	public function isValid(bool $requireBlockMap = true): bool {
-		return count($this->blockMap) != 0 || (!$requireBlockMap && count($this->blockIdMap) != 0);
+		return count($this->blockMap) !== 0 || (!$requireBlockMap && count($this->blockIdMap) !== 0);
 	}
 
 	/**
@@ -114,7 +114,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 			}
 
 			$class = $item->getBlock();
-			if($class->getId() == 0 && $item->getId() != 0) {
+			if($class->getId() === 0 && $item->getId() !== 0) {
 				continue;
 			}
 

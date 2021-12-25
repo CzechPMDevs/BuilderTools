@@ -49,7 +49,7 @@ class TreeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(strtolower($args[0]) == "list") {
+		if(strtolower($args[0]) === "list") {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§aTree list: Birch, Oak, Jungle, Spruce");
 			return;
 		}

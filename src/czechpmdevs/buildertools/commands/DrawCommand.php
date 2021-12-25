@@ -58,7 +58,7 @@ class DrawCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cBrush #$args[1] wasn't found!");
 			return;
 		}
-		if($args[0] == "off") {
+		if($args[0] === "off") {
 			Selectors::removeDrawingPlayer($sender);
 			$sender->sendMessage(BuilderTools::getPrefix() . "§aBrush removed!");
 			return;
@@ -93,7 +93,7 @@ class DrawCommand extends BuilderToolsCommand {
 		}
 
 		$fall = false;
-		if(isset($args[2]) && $args[2] == "true") {
+		if(isset($args[2]) && $args[2] === "true") {
 			$fall = true;
 		}
 

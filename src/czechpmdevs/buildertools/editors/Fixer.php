@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\editors;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\format\SubChunk;
+use pocketmine\world\World;
 use function array_key_exists;
 use function json_decode;
 
@@ -50,7 +51,7 @@ class Fixer {
 		return true;
 	}
 
-	public function convertJavaToBedrockChunk(Chunk $chunk, int $maxY = 256): bool {
+	public function convertJavaToBedrockChunk(Chunk $chunk, int $maxY = World::Y_MAX): bool {
 		$hasChanged = false;
 
 		/** @var int|null $currentY */
@@ -59,11 +60,12 @@ class Fixer {
 		$subChunk = null;
 
 		for($y = 0; $y < $maxY; ++$y) {
-			if($currentY === null || $y >> 4 != $currentY) {
-				$currentY = $y >> 4;
-				$subChunk = $chunk->getSubChunk($y >> 4);
+			if($currentY === null || $y >> SubChunk::COORD_BIT_SIZE !== $currentY) {
+				$currentY = $y >> SubChunk::COORD_BIT_SIZE;
+				$subChunk = $chunk->getSubChunk($y >> SubChunk::COORD_BIT_SIZE);
 
 				if($subChunk->isEmptyFast()) {
+					$y += SubChunk::EDGE_LENGTH;
 					continue;
 				}
 			}

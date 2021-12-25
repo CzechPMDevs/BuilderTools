@@ -35,7 +35,7 @@ final class BlockArraySizeData {
 	}
 
 	private function calculateSizeData(): void {
-		if($this->blockArray->size() == 0) {
+		if($this->blockArray->size() === 0) {
 			return;
 		}
 
@@ -45,7 +45,7 @@ final class BlockArraySizeData {
 		$minY = $maxY = $y;
 		$minZ = $maxZ = $z;
 
-		if($this->blockArray->size() % 2 == 0) {
+		if($this->blockArray->size() % 2 === 0) {
 			$this->blockArray->offset = 0;
 		}
 

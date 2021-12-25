@@ -298,7 +298,7 @@ class BlockArray implements UpdateLevelData, Serializable {
 
 		$this->compressedCoords = $nbt->getByteArray("Coords");
 		$this->compressedBlocks = $nbt->getByteArray("Blocks");
-		$this->detectDuplicates = $nbt->getByte("DuplicateDetection") == 1;
+		$this->detectDuplicates = $nbt->getByte("DuplicateDetection") === 1;
 
 		$this->decompress();
 	}

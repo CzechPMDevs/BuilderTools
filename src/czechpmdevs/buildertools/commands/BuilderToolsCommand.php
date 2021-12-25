@@ -64,7 +64,7 @@ abstract class BuilderToolsCommand extends Command implements PluginOwned {
 		$firstPos = Selectors::getPosition($sender, 1);
 		$secondPos = Selectors::getPosition($sender, 2);
 
-		if($firstPos->getWorld()->getId() != $secondPos->getWorld()->getId()) {
+		if($firstPos->getWorld()->getId() !== $secondPos->getWorld()->getId()) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cPositions must be in same level");
 			return false;
 		}

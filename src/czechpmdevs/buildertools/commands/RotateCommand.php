@@ -22,7 +22,6 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\utils\RotationUtil;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Axis;
 use pocketmine\player\Player;
@@ -55,8 +54,9 @@ class RotateCommand extends BuilderToolsCommand {
 				return;
 			}
 
-			if(!RotationUtil::isDegreeValueValid((int)$argument)) {
-				$sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid degrees. You can rotate just about 90, 180 and 270 (-90) degrees!");
+			$deg = (int)$argument;
+			if($deg > 360 || $deg < 0) {
+				$sender->sendMessage(BuilderTools::getPrefix() . "§cPlease, type valid value (0-360 degrees)");
 				return;
 			}
 		}
@@ -66,11 +66,11 @@ class RotateCommand extends BuilderToolsCommand {
 		$copier = Copier::getInstance();
 		foreach($args as $i => $arg) {
 			if($i === 0) {
-				$copier->rotate($sender, Axis::Y, RotationUtil::getRotation((int)$arg));
+				$copier->rotate($sender, Axis::Y, (int)$arg);
 			} elseif($i === 1) {
-				$copier->rotate($sender, Axis::X, RotationUtil::getRotation((int)$arg));
+				$copier->rotate($sender, Axis::X, (int)$arg);
 			} elseif($i === 2) {
-				$copier->rotate($sender, Axis::Z, RotationUtil::getRotation((int)$arg));
+				$copier->rotate($sender, Axis::Z, (int)$arg);
 			}
 		}
 

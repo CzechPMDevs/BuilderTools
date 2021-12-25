@@ -29,8 +29,8 @@ use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
-use czechpmdevs\buildertools\utils\FlipUtil;
-use czechpmdevs\buildertools\utils\RotationUtil;
+use czechpmdevs\buildertools\math\Transform;
+use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -193,10 +193,17 @@ class Copier {
 
 		/** @phpstan-var SelectionData $clipboard */
 		$clipboard = ClipboardManager::getClipboard($player);
-		$clipboard->load();
 
-		$clipboard = RotationUtil::rotate($clipboard, $axis, $rotation);
-		$clipboard->save();
+		$transform = new Transform($clipboard);
+		if($axis === Axis::Y) {
+			$transform->rotateY($rotation);
+		} elseif($axis === Axis::X) {
+			$transform->rotateX($rotation);
+		} else {
+			$transform->rotateZ($rotation);
+		}
+
+		$transform->close();
 
 		ClipboardManager::saveClipboard($player, $clipboard);
 	}
@@ -209,10 +216,17 @@ class Copier {
 
 		/** @phpstan-var SelectionData $clipboard */
 		$clipboard = ClipboardManager::getClipboard($player);
-		$clipboard->load();
 
-		$clipboard = FlipUtil::flip($clipboard, $axis);
-		$clipboard->save();
+		$transform = new Transform($clipboard);
+		if($axis === Axis::X) {
+			$transform->flipX();
+		} elseif($axis === Axis::Y) {
+			$transform->flipY();
+		} else {
+			$transform->flipZ();
+		}
+
+		$transform->close();
 
 		ClipboardManager::saveClipboard($player, $clipboard);
 	}
@@ -236,11 +250,11 @@ class Copier {
 		}
 
 		$direction = Math::getPlayerDirection($player);
-		if($mode == self::DIRECTION_PLAYER) {
-			if($direction == Facing::WEST || $direction == Facing::SOUTH) { // Moving along x axis (z = const)
+		if($mode === self::DIRECTION_PLAYER) {
+			if($direction === Facing::WEST || $direction === Facing::SOUTH) { // Moving along x-axis (z = const)
 				$xSize = ($maxX - $minX) + 1;
 
-				if($direction == 0) {
+				if($direction === Facing::WEST) {
 					$fillSession->setDimensions($minX, $minX + ($xSize * $pasteCount), $minZ, $maxZ);
 				} else {
 					$fillSession->setDimensions($minX - ($xSize * $pasteCount), $minX, $minZ, $maxZ);
@@ -262,7 +276,7 @@ class Copier {
 			} else { // Moving along z axis (x = const)
 				$zSize = ($maxZ - $minZ) + 1;
 
-				if($direction == 1) {
+				if($direction === 1) {
 					$fillSession->setDimensions($minX, $maxX, $minZ, $minZ + ($zSize * $pasteCount));
 				} else {
 					$fillSession->setDimensions($minX, $maxX, $minZ - ($zSize * $pasteCount), $maxZ);
@@ -286,7 +300,7 @@ class Copier {
 			$ySize = ($maxY - $minY) + 1;
 
 			$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-			if($mode == Copier::DIRECTION_DOWN) {
+			if($mode === Copier::DIRECTION_DOWN) {
 				$ySize = -$ySize;
 			}
 
