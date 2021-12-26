@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
@@ -41,7 +41,7 @@ class FirstPositionCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$selection = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder();
+		$selection = SessionManager::getInstance()->getSession($sender)->getSelectionHolder();
 		$selection->handleWandAxeBlockBreak($position = Position::fromObject($sender->getPosition()->floor(), $sender->getWorld()));
 		try {
 			$size = " ({$selection->size()})";

@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\blockstorage\identifiers\OppositeBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use RuntimeException;
@@ -54,7 +54,7 @@ class ReplaceCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill(new OppositeBlockIdentifier($fromBlockIds), $toBlockIds);
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->fill(new OppositeBlockIdentifier($fromBlockIds), $toBlockIds);
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;

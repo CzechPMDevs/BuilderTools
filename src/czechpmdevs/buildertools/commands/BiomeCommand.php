@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use RuntimeException;
@@ -77,7 +77,7 @@ class BiomeCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->changeBiome($id);
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->changeBiome($id);
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;

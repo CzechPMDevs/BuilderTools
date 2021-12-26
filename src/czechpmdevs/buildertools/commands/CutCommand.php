@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use RuntimeException;
@@ -41,7 +41,7 @@ class CutCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->cutToClipboard();
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->cutToClipboard();
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage("§c{$exception->getMessage()}");
 			return;

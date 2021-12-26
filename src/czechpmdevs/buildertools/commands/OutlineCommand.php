@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use RuntimeException;
@@ -49,7 +49,7 @@ class OutlineCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->outline($blockIds);
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->outline($blockIds);
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$exception->getMessage()}");
 			return;

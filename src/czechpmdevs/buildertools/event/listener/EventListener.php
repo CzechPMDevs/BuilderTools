@@ -24,7 +24,7 @@ use czechpmdevs\buildertools\blockstorage\OfflineSession;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\item\WoodenAxe;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
@@ -46,7 +46,7 @@ class EventListener implements Listener {
 
 	/** @noinspection PhpUnused */
 	public function onAirClick(PlayerItemUseEvent $event): void {
-		$session = SessionHolder::getInstance()->getSession($player = $event->getPlayer());
+		$session = SessionManager::getInstance()->getSession($player = $event->getPlayer());
 		if(!$session->isDrawing()) {
 			return;
 		}
@@ -69,7 +69,7 @@ class EventListener implements Listener {
 			($item = $event->getItem()) instanceof WoodenAxe &&
 			$item->isWandAxe()
 		) {
-			$selection = SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
+			$selection = SessionManager::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
 			$selection->handleWandAxeBlockBreak($event->getBlock()->getPosition());
 			$event->cancel();
 
@@ -96,7 +96,7 @@ class EventListener implements Listener {
 			$this->clickTime[$player->getName()] = microtime(true);
 
 			if($item instanceof WoodenAxe && $item->isWandAxe()) {
-				$selection = SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
+				$selection = SessionManager::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
 				$selection->handleWandAxeBlockClick($event->getBlock()->getPosition());
 				$event->cancel();
 
@@ -143,7 +143,7 @@ class EventListener implements Listener {
 	/** @noinspection PhpUnused */
 	public function onQuit(PlayerQuitEvent $event): void {
 		OfflineSession::savePlayerSession($event->getPlayer());
-		SessionHolder::getInstance()->closeSession($event->getPlayer());
+		SessionManager::getInstance()->closeSession($event->getPlayer());
 	}
 
 	public function getPlugin(): BuilderTools {

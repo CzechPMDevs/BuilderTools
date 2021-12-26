@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -42,7 +42,7 @@ class CenterCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$center = ($selection = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder())->center();
+			$center = ($selection = SessionManager::getInstance()->getSession($sender)->getSelectionHolder())->center();
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;

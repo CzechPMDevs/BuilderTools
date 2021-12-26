@@ -24,7 +24,7 @@ use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function array_key_exists;
 
-class SessionHolder {
+class SessionManager {
 	use SingletonTrait;
 
 	/** @var array<string, Session> */

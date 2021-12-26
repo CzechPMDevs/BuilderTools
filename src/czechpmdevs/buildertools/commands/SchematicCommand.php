@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\schematics\SchematicActionResult;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use function count;
@@ -65,7 +65,7 @@ class SchematicCommand extends BuilderToolsCommand {
 				};
 
 				$sender->sendMessage(BuilderTools::getPrefix() . "§6Saving schematic in background...");
-				SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->saveToSchematic($args[1], $callback);
+				SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->saveToSchematic($args[1], $callback);
 				break;
 
 			case "load":

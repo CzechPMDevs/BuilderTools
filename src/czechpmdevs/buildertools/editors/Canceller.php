@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use function microtime;
@@ -33,11 +33,11 @@ class Canceller {
 	use SingletonTrait;
 
 	public function addStep(Player $player, BlockArray $blocks): void {
-		SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo($blocks);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo($blocks);
 	}
 
 	public function undo(Player $player): EditorResult {
-		$undoAction = SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->nextUndoAction();
+		$undoAction = SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->nextUndoAction();
 		if($undoAction === null) {
 			return EditorResult::error("There are not any actions to undo");
 		}
@@ -67,11 +67,11 @@ class Canceller {
 	}
 
 	public function addRedo(Player $player, BlockArray $blocks): void {
-		SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->saveRedo($blocks);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveRedo($blocks);
 	}
 
 	public function redo(Player $player): EditorResult {
-		$redoAction = SessionHolder::getInstance()->getSession($player)->getReverseDataHolder()->nextRedoAction();
+		$redoAction = SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->nextRedoAction();
 		if($redoAction === null) {
 			return EditorResult::error("There are not any actions to undo");
 		}

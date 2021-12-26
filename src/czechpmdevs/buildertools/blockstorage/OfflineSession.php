@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
@@ -50,7 +50,7 @@ final class OfflineSession {
 
 		$nbt = new CompoundTag();
 
-		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		// Clipboard
 		if($clipboard !== null) {
 			$clipboard->compress();
@@ -97,7 +97,7 @@ final class OfflineSession {
 
 			$clipboard->decompress();
 
-			SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
+			SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 		}
 	}
 }

@@ -29,7 +29,7 @@ use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\math\Transform;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
@@ -68,7 +68,7 @@ class Copier {
 		}
 
 		$clipboard->save();
-		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
+		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 
 		return EditorResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
 	}
@@ -99,7 +99,7 @@ class Copier {
 		$fillSession->close();
 
 		$clipboard->save();
-		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
+		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 
 		$changes = $fillSession->getChanges();
 		$changes->save();
@@ -112,7 +112,7 @@ class Copier {
 	public function merge(Player $player): EditorResult {
 		$startTime = microtime(true);
 
-		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		if($clipboard === null) {
 			return EditorResult::error("Clipboard is empty");
 		}
@@ -149,7 +149,7 @@ class Copier {
 	public function paste(Player $player): EditorResult {
 		$startTime = microtime(true);
 
-		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		if($clipboard === null) {
 			return EditorResult::error("Clipboard is empty");
 		}
@@ -185,7 +185,7 @@ class Copier {
 	}
 
 	public function rotate(Player $player, int $axis, int $rotation): void {
-		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		if($clipboard === null) {
 			$player->sendMessage(BuilderTools::getPrefix() . "§cYour clipboard is empty");
 			return;
@@ -202,11 +202,11 @@ class Copier {
 
 		$transform->close();
 
-		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
+		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 	}
 
 	public function flip(Player $player, int $axis): void {
-		$clipboard = SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
+		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		if($clipboard === null) {
 			$player->sendMessage(BuilderTools::getPrefix() . "§cYour clipboard is empty");
 			return;
@@ -223,7 +223,7 @@ class Copier {
 
 		$transform->close();
 
-		SessionHolder::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
+		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 	}
 
 	public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $direction): EditorResult {

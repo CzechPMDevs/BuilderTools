@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
-use czechpmdevs\buildertools\session\SessionHolder;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use function in_array;
@@ -59,7 +59,7 @@ class DrawCommand extends BuilderToolsCommand {
 			return;
 		}
 		if($args[0] === "off") {
-			SessionHolder::getInstance()->getSession($sender)->stopDrawing();
+			SessionManager::getInstance()->getSession($sender)->stopDrawing();
 			$sender->sendMessage(BuilderTools::getPrefix() . "§aBrush removed!");
 			return;
 		}
@@ -97,7 +97,7 @@ class DrawCommand extends BuilderToolsCommand {
 			$fall = true;
 		}
 
-		SessionHolder::getInstance()->getSession($sender)->startDrawing($brush, $mode, $fall);
+		SessionManager::getInstance()->getSession($sender)->startDrawing($brush, $mode, $fall);
 
 		$fall = $fall ? "§2true§a" : "§cfalse§a";
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected brush §7#$brush §a(§7shape: §a$args[0] §7Fall:$fall)!");
