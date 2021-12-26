@@ -49,7 +49,7 @@ class OutlineCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->fill($blockIds);
+			$result = SessionHolder::getInstance()->getSession($sender)->getSelectionHolder()->outline($blockIds);
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$exception->getMessage()}");
 			return;
