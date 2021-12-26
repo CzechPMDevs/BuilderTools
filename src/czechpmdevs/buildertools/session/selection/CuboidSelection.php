@@ -23,13 +23,13 @@ namespace czechpmdevs\buildertools\session\selection;
 use Closure;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\Copier;
-use czechpmdevs\buildertools\editors\Filler;
 use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\editors\object\EditorResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use czechpmdevs\buildertools\session\SelectionHolder;
+use czechpmdevs\buildertools\shape\Cuboid;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\math\Vector3;
 use pocketmine\world\Position;
@@ -54,22 +54,42 @@ class CuboidSelection extends SelectionHolder {
 		return $this->firstPosition->addVector($this->secondPosition)->divide(2);
 	}
 
-	// TODO - Mask
 	public function fill(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult {
 		$this->checkHasPositionsSelected();
 
-		return Filler::getInstance()->directFill($this->session->getPlayer(), $this->firstPosition, $this->secondPosition, $blockGenerator);
+		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
+			return throw new RuntimeException("No blocks found in string.");
+		}
+
+		$startTime = microtime(true);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
+			->fill($blockGenerator, true)
+			->getReverseData();
+
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+
+		return EditorResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
-	// TODO - Mask
 	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult {
 		$this->checkHasPositionsSelected();
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
-			return EditorResult::error("No blocks found in string.");
+			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		return Filler::getInstance()->directFill($this->session->getPlayer(), $this->firstPosition, $this->secondPosition, $blockGenerator, true);
+		$startTime = microtime(true);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
+			->outline($blockGenerator, true)
+			->getReverseData();
+
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+
+		return EditorResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
 	// TODO - Mask
@@ -77,10 +97,19 @@ class CuboidSelection extends SelectionHolder {
 		$this->checkHasPositionsSelected();
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
-			return EditorResult::error("No blocks found in string.");
+			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		return Filler::getInstance()->directWalls($this->session->getPlayer(), $this->firstPosition, $this->secondPosition, $blockGenerator);
+		$startTime = microtime(true);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
+			->walls($blockGenerator, true)
+			->getReverseData();
+
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+
+		return EditorResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
 

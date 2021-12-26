@@ -38,8 +38,10 @@ use function array_slice;
 use function array_values;
 use function count;
 use function in_array;
+use function intdiv;
 use function is_string;
 use function pack;
+use function strlen;
 use function unpack;
 use function zlib_decode;
 use function zlib_encode;
@@ -124,6 +126,10 @@ class BlockArray implements UpdateLevelData, Serializable {
 	 * @return int $size
 	 */
 	public function size(): int {
+		if($this->isCompressed) {
+			return intdiv(strlen($this->compressedCoords), 8);
+		}
+
 		return count($this->coords);
 	}
 

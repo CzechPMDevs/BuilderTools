@@ -174,8 +174,8 @@ class FillSession {
 		$minZ = $this->minZ >> 4;
 		$maxZ = $this->maxZ >> 4;
 
-		for($x = $minX; $x <= $maxX; $x++) {
-			for($z = $minZ; $z <= $maxZ; $z++) {
+		for($x = $minX; $x <= $maxX; ++$x) {
+			for($z = $minZ; $z <= $maxZ; ++$z) {
 				$chunk = $world->getChunk($x, $z);
 				if($chunk === null) {
 					$world->loadChunk($x, $z);
