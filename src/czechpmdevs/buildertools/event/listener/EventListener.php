@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\event\listener;
 use czechpmdevs\buildertools\blockstorage\OfflineSession;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
+use czechpmdevs\buildertools\item\WoodenAxe;
 use czechpmdevs\buildertools\session\SessionHolder;
 use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\event\block\BlockBreakEvent;
@@ -64,8 +65,9 @@ class EventListener implements Listener {
 	/** @noinspection PhpUnused */
 	public function onBlockBreak(BlockBreakEvent $event): void {
 		if(
-			$event->getItem()->equals(VanillaItems::WOODEN_AXE(), false, false) &&
-			$event->getItem()->getNamedTag()->getTag("buildertools") !== null
+			$event->getItem()->getNamedTag()->getTag("buildertools") !== null &&
+			($item = $event->getItem()) instanceof WoodenAxe &&
+			$item->isWandAxe()
 		) {
 			$selection = SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
 			$selection->handleWandAxeBlockBreak($event->getBlock()->getPosition());
@@ -84,15 +86,16 @@ class EventListener implements Listener {
 
 	/** @noinspection PhpUnused */
 	public function onBlockTouch(PlayerInteractEvent $event): void {
-		if($event->getItem()->getNamedTag()->getTag("buildertools") !== null) {
+		if($event->getItem()->getNamedTag()->getTag("buildertools") !== null && $event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
 			$player = $event->getPlayer();
+			$item = $event->getItem();
 			if(array_key_exists($player->getName(), $this->clickTime) && microtime(true) - $this->clickTime[$player->getName()] < 0.5) {
 				$event->cancel();
 				return;
 			}
 			$this->clickTime[$player->getName()] = microtime(true);
 
-			if($event->getItem()->equals(VanillaItems::WOODEN_AXE(), false, false)) {
+			if($item instanceof WoodenAxe && $item->isWandAxe()) {
 				$selection = SessionHolder::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
 				$selection->handleWandAxeBlockClick($event->getBlock()->getPosition());
 				$event->cancel();

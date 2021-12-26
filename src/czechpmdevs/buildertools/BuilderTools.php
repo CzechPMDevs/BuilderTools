@@ -60,9 +60,14 @@ use czechpmdevs\buildertools\commands\UndoCommand;
 use czechpmdevs\buildertools\commands\WallsCommand;
 use czechpmdevs\buildertools\commands\WandCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
+use czechpmdevs\buildertools\item\WoodenAxe;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use pocketmine\command\Command;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIdentifier;
+use pocketmine\item\ItemIds;
+use pocketmine\item\ToolTier;
 use pocketmine\plugin\PluginBase;
 use function array_key_exists;
 use function glob;
@@ -91,6 +96,7 @@ class BuilderTools extends PluginBase {
 		$this->initConfig();
 		$this->cleanCache();
 		$this->registerCommands();
+		$this->registerItems();
 		$this->initMath();
 		$this->initListener();
 		$this->sendWarnings();
@@ -193,17 +199,21 @@ class BuilderTools extends PluginBase {
 		HelpCommand::buildPages();
 	}
 
-	public function sendWarnings(): void {
+	private function registerItems(): void {
+		ItemFactory::getInstance()->register(new WoodenAxe(new ItemIdentifier(ItemIds::WOODEN_AXE, 0), "Wooden Axe", ToolTier::WOOD()), true);
+	}
+
+	private function sendWarnings(): void {
 		if($this->getServer()->getConfigGroup()->getProperty("memory.async-worker-hard-limit") !== 0) {
 			$this->getServer()->getLogger()->warning("We recommend to disable 'memory.async-worker-hard-limit' in pocketmine.yml. By disabling this option will be BuilderTools able to load bigger schematic files.");
 		}
 	}
 
-	public function loadSchematicsManager(): void {
+	private function loadSchematicsManager(): void {
 		SchematicsManager::lazyInit();
 	}
 
-	public function cleanCache(): void {
+	private function cleanCache(): void {
 		if(!self::getConfiguration()->getBoolProperty("clean-cache")) {
 			return;
 		}

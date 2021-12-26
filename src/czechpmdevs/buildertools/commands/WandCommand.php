@@ -21,11 +21,9 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\item\WoodenAxe;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\player\Player;
 
 class WandCommand extends BuilderToolsCommand {
@@ -43,8 +41,11 @@ class WandCommand extends BuilderToolsCommand {
 		}
 
 		$item = VanillaItems::WOODEN_AXE();
+		if($item instanceof WoodenAxe) {
+			$item->setIsWandAxe(true);
+		}
+
 		$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("wand-axe-name"));
-		$item->getNamedTag()->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
 		$item->getNamedTag()->setByte("buildertools", 1);
 
 		$sender->getInventory()->addItem($item);
