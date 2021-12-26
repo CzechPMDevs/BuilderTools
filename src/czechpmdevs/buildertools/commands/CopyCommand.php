@@ -41,7 +41,7 @@ class CopyCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->saveToClipboard();
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->saveToClipboard($sender->getPosition()->floor());
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage("§c{$exception->getMessage()}");
 			return;

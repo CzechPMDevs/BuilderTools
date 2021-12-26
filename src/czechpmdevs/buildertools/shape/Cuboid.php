@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
+use pocketmine\math\Vector3;
 use pocketmine\world\World;
 
 class Cuboid {
@@ -131,6 +132,28 @@ class Cuboid {
 			$fillSession->getChanges()->save();
 			$this->reverseData = $fillSession->getChanges();
 		}
+
+		return $this;
+	}
+
+	public function read(BlockArray $blockArray): self {
+		$fillSession = $this->mask === null ?
+			new FillSession($this->world, false, false) :
+			new MaskedFillSession($this->world, false, false, $this->mask);
+
+		$fillSession->setDimensions($this->minX, $this->maxX, $this->minZ, $this->maxZ);
+		$fillSession->loadChunks($this->world);
+
+		for($x = $this->minX; $x <= $this->maxX; ++$x) {
+			for($z = $this->minZ; $z <= $this->maxZ; ++$z) {
+				for($y = $this->minY; $y <= $this->maxY; ++$y) {
+					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
+					$blockArray->addBlockAt($x, $y, $z, $fullBlockId);
+				}
+			}
+		}
+
+		$blockArray->save();
 
 		return $this;
 	}

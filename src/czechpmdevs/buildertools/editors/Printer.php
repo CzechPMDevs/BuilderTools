@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
@@ -114,17 +114,17 @@ class Printer {
 		return new Vector3($x, ++$y, $z);
 	}
 
-	public function makeSphere(Player $player, Position $center, int $radius, string $blockArgs, bool $hollow = false): EditorResult {
+	public function makeSphere(Player $player, Position $center, int $radius, string $blockArgs, bool $hollow = false): UpdateResult {
 		$startTime = microtime(true);
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 		$radius = abs($radius);
 		if($radius === 0) {
-			return EditorResult::error("Radius could not be 0");
+			return UpdateResult::error("Radius could not be 0");
 		}
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks found in string $blockArgs");
+			return UpdateResult::error("No blocks found in string $blockArgs");
 		}
 
 		$floorX = $center->getFloorX();
@@ -203,25 +203,25 @@ class Printer {
 
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function makeHollowSphere(Player $player, Position $center, int $radius, string $blocks): EditorResult {
+	public function makeHollowSphere(Player $player, Position $center, int $radius, string $blocks): UpdateResult {
 		return $this->makeSphere($player, $center, $radius, $blocks, true);
 	}
 
-	public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blockArgs, bool $hollow = false): EditorResult {
+	public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blockArgs, bool $hollow = false): UpdateResult {
 		$startTime = microtime(true);
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$radius = abs($radius);
 		if($radius === 0) {
-			return EditorResult::error("Radius could not be 0");
+			return UpdateResult::error("Radius could not be 0");
 		}
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks found in string $blockArgs");
+			return UpdateResult::error("No blocks found in string $blockArgs");
 		}
 
 		$floorX = $center->getFloorX();
@@ -291,14 +291,14 @@ class Printer {
 
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, string $blockArgs): EditorResult {
+	public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, string $blockArgs): UpdateResult {
 		return $this->makeCylinder($player, $center, $radius, $height, $blockArgs, true);
 	}
 
-	public function makePyramid(Player $player, Position $center, int $size, string $blockArgs, bool $hollow = false): EditorResult {
+	public function makePyramid(Player $player, Position $center, int $size, string $blockArgs, bool $hollow = false): UpdateResult {
 		$startTime = microtime(true);
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
@@ -306,7 +306,7 @@ class Printer {
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks found in string $blockArgs");
+			return UpdateResult::error("No blocks found in string $blockArgs");
 		}
 
 		$floorX = $center->getFloorX();
@@ -353,54 +353,54 @@ class Printer {
 
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function makeHollowPyramid(Player $player, Position $center, int $size, string $blockArgs): EditorResult {
+	public function makeHollowPyramid(Player $player, Position $center, int $size, string $blockArgs): UpdateResult {
 		return $this->makePyramid($player, $center, $size, $blockArgs, true);
 	}
 
-	public function makeCube(Player $player, Position $center, int $radius, string $blockArgs, bool $hollow = false): EditorResult {
+	public function makeCube(Player $player, Position $center, int $radius, string $blockArgs, bool $hollow = false): UpdateResult {
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 		$radius = abs($radius);
 
 		if($player->getPosition()->getY() - $radius < 0 || $player->getPosition()->getY() + $radius >= World::Y_MAX) {
-			return EditorResult::error("Shape is outside of the map!");
+			return UpdateResult::error("Shape is outside of the map!");
 		}
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks found in string $blockArgs");
+			return UpdateResult::error("No blocks found in string $blockArgs");
 		}
 
 		return Filler::getInstance()->directFill($player, $center->subtract($radius, $radius, $radius), $center->add($radius, $radius, $radius), $stringToBlockDecoder, $hollow);
 	}
 
-	public function makeHollowCube(Player $player, Position $center, int $radius, string $blockArgs): EditorResult {
+	public function makeHollowCube(Player $player, Position $center, int $radius, string $blockArgs): UpdateResult {
 		return $this->makeCube($player, $center, $radius, $blockArgs, true);
 	}
 
-	public function makeIsland(Player $player, Position $center, int $radius, int $step, string $blockArgs): EditorResult {
+	public function makeIsland(Player $player, Position $center, int $radius, int $step, string $blockArgs): UpdateResult {
 		$startTime = microtime(true);
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$radius = abs($radius);
 		if($radius < 1) {
-			return EditorResult::error("Radius must be at least 1");
+			return UpdateResult::error("Radius must be at least 1");
 		}
 
 		if($step < 1) {
-			return EditorResult::error("Step must be at least 1");
+			return UpdateResult::error("Step must be at least 1");
 		}
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blockArgs, $player->getInventory()->getItemInHand());
 		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("No blocks found in string $blockArgs");
+			return UpdateResult::error("No blocks found in string $blockArgs");
 		}
 
 		$floorY = $center->getFloorY();
 		if($floorY < 0) {
-			return EditorResult::error("It is not possible to create island here");
+			return UpdateResult::error("It is not possible to create island here");
 		}
 
 		$floorX = $center->getFloorX();
@@ -460,6 +460,6 @@ class Printer {
 		$updates->save();
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }

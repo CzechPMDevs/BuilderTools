@@ -21,10 +21,13 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\session\selection;
 
 use Closure;
+use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
+use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\editors\Naturalizer;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\MaskedFillSession;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
@@ -42,20 +45,20 @@ class CuboidSelection extends SelectionHolder {
 	private Vector3 $firstPosition, $secondPosition;
 
 	public function size(): int {
-		$this->checkHasPositionsSelected();
+		$this->assureHasPositionsSelected();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		return (($maxX - $minX) + 1) * (($maxY - $minY) + 1) * (($maxZ - $minZ) + 1);
 	}
 
 	public function center(): Vector3 {
-		$this->checkHasPositionsSelected();
+		$this->assureHasPositionsSelected();
 
 		return $this->firstPosition->addVector($this->secondPosition)->divide(2);
 	}
 
-	public function fill(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function fill(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
+		$this->assureHasPositionsSelected();
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
 			return throw new RuntimeException("No blocks found in string.");
@@ -70,11 +73,11 @@ class CuboidSelection extends SelectionHolder {
 
 		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return EditorResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
-	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
+		$this->assureHasPositionsSelected();
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
 			return throw new RuntimeException("No blocks found in string.");
@@ -89,12 +92,11 @@ class CuboidSelection extends SelectionHolder {
 
 		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return EditorResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
-	// TODO - Mask
-	public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
+		$this->assureHasPositionsSelected();
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
 			return throw new RuntimeException("No blocks found in string.");
@@ -109,45 +111,84 @@ class CuboidSelection extends SelectionHolder {
 
 		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return EditorResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
 
-	public function stack(int $count, int $direction): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function stack(int $count, int $direction): UpdateResult {
+		$this->assureHasPositionsSelected();
 
 		return Copier::getInstance()->stack($this->session->getPlayer(), $this->firstPosition, $this->secondPosition, $count, $direction);
 	}
 
 	// TODO - Mask
-	public function naturalize(?BlockIdentifierList $mask = null): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function naturalize(?BlockIdentifierList $mask = null): UpdateResult {
+		$this->assureHasPositionsSelected();
 
-		return Naturalizer::getInstance()->naturalize($this->firstPosition, $this->secondPosition, $this->session->getPlayer());
+		$startTime = microtime(true);
+
+		$naturalizer = new Naturalizer();
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		$fillSession = ($mask === null ? new FillSession($this->world, false, true) : new MaskedFillSession($this->world, false, true, $mask))
+			->setDimensions($minX, $maxX, $minZ, $maxZ)
+			->loadChunks($this->world);
+
+		$naturalizer->naturalize($fillSession, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+		$reverseData = $fillSession->reloadChunks($this->world)->getChanges();
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+
+		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
 	// TODO - Mask
-	public function saveToClipboard(?BlockIdentifierList $mask = null): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
+		$this->assureHasPositionsSelected();
 
-		return Copier::getInstance()->copy($this->firstPosition, $this->secondPosition, $this->session->getPlayer());
+		$startTime = microtime(true);
+
+		$clipboard = new Clipboard();
+		$clipboard->setRelativePosition($relativePosition);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		(new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
+			->read($clipboard);
+
+		$this->session->getClipboardHolder()->setClipboard($clipboard);
+
+		return UpdateResult::success($clipboard->size(), microtime(true) - $startTime);
 	}
 
 	// TODO - Mask
-	public function cutToClipboard(?BlockIdentifierList $mask = null): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function cutToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
+		$this->assureHasPositionsSelected();
 
-		return Copier::getInstance()->cut($this->firstPosition, $this->secondPosition, $this->session->getPlayer());
+		$startTime = microtime(true);
+
+		$clipboard = new Clipboard();
+		$clipboard->setRelativePosition($relativePosition);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
+			->read($clipboard)
+			->fill(SingleBlockIdentifier::airIdentifier(), true)
+			->getReverseData();
+
+		$this->session->getClipboardHolder()->setClipboard($clipboard);
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+
+		return UpdateResult::success($clipboard->size(), microtime(true) - $startTime);
 	}
 
 	// TODO - Mask
 	public function saveToSchematic(string $name, Closure $callback, ?BlockIdentifierList $mask = null): void {
-		$this->checkHasPositionsSelected();
+		$this->assureHasPositionsSelected();
 
 		SchematicsManager::createSchematic($this->session->getPlayer(), $this->firstPosition, $this->secondPosition, $name, $callback);
 	}
 
-	private function checkHasPositionsSelected(): void {
+	private function assureHasPositionsSelected(): void {
 		if(!isset($this->firstPosition)) {
 			throw new RuntimeException("First position is not selected");
 		}
@@ -157,8 +198,8 @@ class CuboidSelection extends SelectionHolder {
 		}
 	}
 
-	public function changeBiome(int $biomeId): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function changeBiome(int $biomeId): UpdateResult {
+		$this->assureHasPositionsSelected();
 
 		$startTime = microtime(true);
 
@@ -174,11 +215,11 @@ class CuboidSelection extends SelectionHolder {
 
 		$fillSession->reloadChunks($this->getWorld());
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function move(int $x, int $y, int $z): EditorResult {
-		$this->checkHasPositionsSelected();
+	public function move(int $x, int $y, int $z): UpdateResult {
+		$this->assureHasPositionsSelected();
 
 		return Copier::getInstance()->move($this->firstPosition, $this->secondPosition, new Vector3($x, $y, $z), $this->session->getPlayer());
 	}

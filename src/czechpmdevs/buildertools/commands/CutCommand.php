@@ -41,7 +41,7 @@ class CutCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->cutToClipboard();
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->cutToClipboard($sender->getPosition()->floor());
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage("§c{$exception->getMessage()}");
 			return;

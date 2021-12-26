@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\session;
 
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use pocketmine\world\Position;
@@ -44,7 +44,7 @@ class ClipboardHolder {
 		return $this->clipboard;
 	}
 
-	public function paste(Position $position, ?BlockIdentifierList $mask = null): EditorResult {
+	public function paste(Position $position, ?BlockIdentifierList $mask = null): UpdateResult {
 		if($this->clipboard === null) {
 			throw new RuntimeException("There is not clipboard copied");
 		}
@@ -79,7 +79,7 @@ class ClipboardHolder {
 
 		$this->session->getReverseDataHolder()->saveUndo($changes);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
 	protected function getSession(): Session {

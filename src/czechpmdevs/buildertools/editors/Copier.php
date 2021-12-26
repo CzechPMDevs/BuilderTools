@@ -24,7 +24,7 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\Math;
@@ -47,7 +47,7 @@ class Copier {
 	public const DIRECTION_UP = 1;
 	public const DIRECTION_DOWN = 2;
 
-	public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
+	public function copy(Vector3 $pos1, Vector3 $pos2, Player $player): UpdateResult {
 		$startTime = microtime(true);
 
 		$clipboard = (new Clipboard())->setRelativePosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
@@ -70,10 +70,10 @@ class Copier {
 		$clipboard->save();
 		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 
-		return EditorResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
+		return UpdateResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
 	}
 
-	public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): EditorResult {
+	public function cut(Vector3 $pos1, Vector3 $pos2, Player $player): UpdateResult {
 		$startTime = microtime(true);
 
 		$clipboard = (new Clipboard())->setRelativePosition($player->getPosition()->subtract(0.5, 0, 0.5)->floor());
@@ -106,15 +106,15 @@ class Copier {
 
 		Canceller::getInstance()->addStep($player, $changes);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function merge(Player $player): EditorResult {
+	public function merge(Player $player): UpdateResult {
 		$startTime = microtime(true);
 
 		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		if($clipboard === null) {
-			return EditorResult::error("Clipboard is empty");
+			return UpdateResult::error("Clipboard is empty");
 		}
 
 		$clipboard->setWorld($player->getWorld());
@@ -143,15 +143,15 @@ class Copier {
 		$changes->save();
 		Canceller::getInstance()->addStep($player, $changes);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function paste(Player $player): EditorResult {
+	public function paste(Player $player): UpdateResult {
 		$startTime = microtime(true);
 
 		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
 		if($clipboard === null) {
-			return EditorResult::error("Clipboard is empty");
+			return UpdateResult::error("Clipboard is empty");
 		}
 
 		$clipboard->setWorld($player->getWorld());
@@ -181,7 +181,7 @@ class Copier {
 
 		Canceller::getInstance()->addStep($player, $changes);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
 	public function rotate(Player $player, int $axis, int $rotation): void {
@@ -226,7 +226,7 @@ class Copier {
 		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 	}
 
-	public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $direction): EditorResult {
+	public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $direction): UpdateResult {
 		$startTime = microtime(true);
 
 		$fillSession = new FillSession($player->getWorld(), false, true);
@@ -321,10 +321,10 @@ class Copier {
 		$changes->save();
 		Canceller::getInstance()->addStep($player, $changes);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $motion, Player $player): EditorResult {
+	public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $motion, Player $player): UpdateResult {
 		$startTime = microtime(true);
 
 		$fillSession = new FillSession($player->getWorld(), false, true);
@@ -371,6 +371,6 @@ class Copier {
 		$changes = $fillSession->getChanges();
 		Canceller::getInstance()->addStep($player, $changes);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }

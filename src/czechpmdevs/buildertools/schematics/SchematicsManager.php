@@ -27,7 +27,7 @@ use czechpmdevs\buildertools\async\schematics\SchematicLoadTask;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Canceller;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\format\BuilderToolsSchematic;
@@ -157,11 +157,11 @@ class SchematicsManager {
 		});
 	}
 
-	public static function pasteSchematic(Player $player, string $schematicName): EditorResult {
+	public static function pasteSchematic(Player $player, string $schematicName): UpdateResult {
 		$startTime = microtime(true);
 
 		if(!isset(SchematicsManager::$loadedSchematics[$schematicName])) {
-			return EditorResult::error("Schematic $schematicName is not loaded.");
+			return UpdateResult::error("Schematic $schematicName is not loaded.");
 		}
 
 		$schematic = clone SchematicsManager::$loadedSchematics[$schematicName];
@@ -178,7 +178,7 @@ class SchematicsManager {
 		}
 
 		if($fillSession->getBlocksChanged() === 0) {
-			return EditorResult::error("0 blocks changed");
+			return UpdateResult::error("0 blocks changed");
 		}
 
 		$fillSession->reloadChunks($player->getWorld());
@@ -188,7 +188,7 @@ class SchematicsManager {
 		$updates->save();
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
 	private static function findSchematicFile(string &$file): bool {

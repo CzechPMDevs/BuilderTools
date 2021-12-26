@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
 use pocketmine\math\Vector3;
@@ -33,7 +33,7 @@ use function microtime;
 class Filler {
 	use SingletonTrait;
 
-	public function directFill(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blockGenerator, bool $hollow = false): EditorResult {
+	public function directFill(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blockGenerator, bool $hollow = false): UpdateResult {
 		$startTime = microtime(true);
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
@@ -74,10 +74,10 @@ class Filler {
 
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function directWalls(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blocks): EditorResult {
+	public function directWalls(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blocks): UpdateResult {
 		$startTime = microtime(true);
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
@@ -105,6 +105,6 @@ class Filler {
 
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }

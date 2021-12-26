@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\player\Player;
@@ -36,14 +36,14 @@ class Canceller {
 		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo($blocks);
 	}
 
-	public function undo(Player $player): EditorResult {
+	public function undo(Player $player): UpdateResult {
 		$undoAction = SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->nextUndoAction();
 		if($undoAction === null) {
-			return EditorResult::error("There are not any actions to undo");
+			return UpdateResult::error("There are not any actions to undo");
 		}
 
 		if($undoAction->getWorld() === null) {
-			return EditorResult::error("Could not find world to process changes on");
+			return UpdateResult::error("Could not find world to process changes on");
 		}
 
 		$startTime = microtime(true);
@@ -63,21 +63,21 @@ class Canceller {
 
 		Canceller::getInstance()->addRedo($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
 	public function addRedo(Player $player, BlockArray $blocks): void {
 		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveRedo($blocks);
 	}
 
-	public function redo(Player $player): EditorResult {
+	public function redo(Player $player): UpdateResult {
 		$redoAction = SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->nextRedoAction();
 		if($redoAction === null) {
-			return EditorResult::error("There are not any actions to undo");
+			return UpdateResult::error("There are not any actions to undo");
 		}
 
 		if($redoAction->getWorld() === null) {
-			return EditorResult::error("Could not find world to process changes on");
+			return UpdateResult::error("Could not find world to process changes on");
 		}
 
 		$startTime = microtime(true);
@@ -97,6 +97,6 @@ class Canceller {
 
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }

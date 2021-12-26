@@ -30,7 +30,6 @@ use pocketmine\world\World;
 use Throwable;
 
 class FillSession {
-
 	protected SubChunkExplorer $explorer;
 
 	protected bool $calculateDimensions;
@@ -65,11 +64,13 @@ class FillSession {
 	/**
 	 * Requests block coordinates (not chunk ones)
 	 */
-	public function setDimensions(int $minX, int $maxX, int $minZ, int $maxZ): void {
+	public function setDimensions(int $minX, int $maxX, int $minZ, int $maxZ): self {
 		$this->minX = $minX;
 		$this->maxX = $maxX;
 		$this->minZ = $minZ;
 		$this->maxZ = $maxZ;
+
+		return $this;
 	}
 
 	/**
@@ -84,7 +85,7 @@ class FillSession {
 
 		/** @phpstan-ignore-next-line */
 		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId);
-		$this->blocksChanged++;
+		++$this->blocksChanged;
 	}
 
 	/**
@@ -99,7 +100,7 @@ class FillSession {
 
 		/** @phpstan-ignore-next-line */
 		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
-		$this->blocksChanged++;
+		++$this->blocksChanged;
 	}
 
 	/**
@@ -135,7 +136,7 @@ class FillSession {
 
 		/** @phpstan-ignore-next-line */
 		$this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
-		$this->blocksChanged++;
+		++$this->blocksChanged;
 	}
 
 	public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
@@ -168,7 +169,7 @@ class FillSession {
 		return $this->blocksChanged;
 	}
 
-	public function loadChunks(World $world): void {
+	public function loadChunks(World $world): self {
 		$minX = $this->minX >> 4;
 		$maxX = $this->maxX >> 4;
 		$minZ = $this->minZ >> 4;
@@ -182,9 +183,11 @@ class FillSession {
 				}
 			}
 		}
+
+		return $this;
 	}
 
-	public function reloadChunks(World $world): void {
+	public function reloadChunks(World $world): self {
 		if($this->error) {
 			BuilderTools::getInstance()->getLogger()->notice("Some chunks were not found");
 		}
@@ -193,7 +196,7 @@ class FillSession {
 		// Also, it is not needed to reload chunks in that case
 		if(!isset($this->minX) || !isset($this->maxX) || !isset($this->minZ) || !isset($this->maxZ)) {
 			BuilderTools::getInstance()->getLogger()->debug("Received empty undo action");
-			return;
+			return $this;
 		}
 
 		$minX = $this->minX >> 4;
@@ -214,6 +217,8 @@ class FillSession {
 				}
 			}
 		}
+
+		return $this;
 	}
 
 	protected function moveTo(int $x, int $y, int $z): bool {

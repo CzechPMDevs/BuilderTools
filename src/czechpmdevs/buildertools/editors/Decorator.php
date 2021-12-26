@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\player\Player;
@@ -33,7 +33,7 @@ use function mt_rand;
 class Decorator {
 	use SingletonTrait;
 
-	public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): EditorResult {
+	public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): UpdateResult {
 		$startTime = microtime(true);
 
 		$fillSession = new FillSession($center->getWorld(), false, true);
@@ -70,6 +70,6 @@ class Decorator {
 
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }

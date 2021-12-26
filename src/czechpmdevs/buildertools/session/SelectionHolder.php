@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\session;
 
 use Closure;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use pocketmine\math\Vector3;
 use pocketmine\world\Position;
 use pocketmine\world\World;
@@ -52,49 +52,49 @@ abstract class SelectionHolder {
 	 *
 	 * @throws RuntimeException If there is not enough positions set to fill selection.
 	 */
-	abstract public function fill(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult;
+	abstract public function fill(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult;
 
 	/**
 	 * Fills selection sides
 	 *
 	 * @throws RuntimeException If there is not enough positions set to fill selection.
 	 */
-	abstract public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult;
+	abstract public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult;
 
 	/**
 	 * Creates walls around the selection
 	 *
 	 * @throws RuntimeException If there is not enough positions set to make walls
 	 */
-	abstract public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): EditorResult;
+	abstract public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult;
 
 	/**
 	 * Duplicates selection $count times in specified $direction
 	 *
 	 * @throws RuntimeException If there is not enough positions set to make walls
 	 */
-	abstract public function stack(int $count, int $direction): EditorResult;
+	abstract public function stack(int $count, int $direction): UpdateResult;
 
 	/**
 	 * Naturalizes the selection
 	 *
 	 * @throws RuntimeException If there is not enough positions set to naturalize selection.
 	 */
-	abstract public function naturalize(?BlockIdentifierList $mask = null): EditorResult;
+	abstract public function naturalize(?BlockIdentifierList $mask = null): UpdateResult;
 
 	/**
 	 * Saves selection to the clipboard
 	 *
 	 * @throws RuntimeException If there is not enough positions set to fill selection.
 	 */
-	abstract public function saveToClipboard(?BlockIdentifierList $mask = null): EditorResult;
+	abstract public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult;
 
 	/**
 	 * Saves selection to the clipboard and fills it with air
 	 *
 	 * @throws RuntimeException If there is not enough positions set to cut selection
 	 */
-	abstract public function cutToClipboard(?BlockIdentifierList $mask = null): EditorResult;
+	abstract public function cutToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult;
 
 	/**
 	 * Saves selection as schematics
@@ -110,14 +110,14 @@ abstract class SelectionHolder {
 	 *
 	 * @throws RuntimeException If there is not enough positions set to change biome
 	 */
-	abstract public function changeBiome(int $biomeId): EditorResult;
+	abstract public function changeBiome(int $biomeId): UpdateResult;
 
 	/**
 	 * Moves the selection in both memory and world
 	 *
 	 * @throws RuntimeException If there is not enough positions set to move area
 	 */
-	abstract public function move(int $x, int $y, int $z): EditorResult;
+	abstract public function move(int $x, int $y, int $z): UpdateResult;
 
 	/**
 	 * @return World Returns world the selection is located in

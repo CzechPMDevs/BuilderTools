@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\editors\object\EditorResult;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\math\Vector3;
@@ -35,17 +35,17 @@ use function min;
 class Replacement {
 	use SingletonTrait;
 
-	public function directReplace(Player $player, Vector3 $pos1, Vector3 $pos2, string $blocks, string $replace): EditorResult {
+	public function directReplace(Player $player, Vector3 $pos1, Vector3 $pos2, string $blocks, string $replace): UpdateResult {
 		$startTime = microtime(true);
 
 		$mask = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand(), false);
 		$stringToBlockDecoder = new StringToBlockDecoder($replace, $player->getInventory()->getItemInHand());
 
 		if(!$mask->isValid(false)) { // Nothing to replace
-			return EditorResult::success(0, microtime(true) - $startTime);
+			return UpdateResult::success(0, microtime(true) - $startTime);
 		}
 		if(!$stringToBlockDecoder->isValid()) {
-			return EditorResult::error("Could not read blocks from $blocks");
+			return UpdateResult::error("Could not read blocks from $blocks");
 		}
 
 		$minX = (int)min($pos1->getX(), $pos2->getX());
@@ -75,6 +75,6 @@ class Replacement {
 		$updates->save();
 		Canceller::getInstance()->addStep($player, $updates);
 
-		return EditorResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }
