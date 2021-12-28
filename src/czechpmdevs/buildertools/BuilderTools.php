@@ -35,6 +35,7 @@ use czechpmdevs\buildertools\commands\DrainCommand;
 use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
+use czechpmdevs\buildertools\commands\FirstTargetingPositionCommand;
 use czechpmdevs\buildertools\commands\FixCommand;
 use czechpmdevs\buildertools\commands\FlipCommand;
 use czechpmdevs\buildertools\commands\HelpCommand;
@@ -57,6 +58,7 @@ use czechpmdevs\buildertools\commands\ReplaceCommand;
 use czechpmdevs\buildertools\commands\RotateCommand;
 use czechpmdevs\buildertools\commands\SchematicCommand;
 use czechpmdevs\buildertools\commands\SecondPositionCommand;
+use czechpmdevs\buildertools\commands\SecondTargetingPositionCommand;
 use czechpmdevs\buildertools\commands\SelectionCommand;
 use czechpmdevs\buildertools\commands\SphereCommand;
 use czechpmdevs\buildertools\commands\StackCommand;
@@ -86,7 +88,7 @@ use function version_compare;
 
 class BuilderTools extends PluginBase {
 
-	public const CURRENT_CONFIG_VERSION = "1.3.1.0";
+	public const CURRENT_CONFIG_VERSION = "1.4.0.0";
 
 	private static BuilderTools $instance;
 	private static Configuration $configuration;
@@ -171,6 +173,7 @@ class BuilderTools extends PluginBase {
 			new DrawCommand,
 			new FillCommand,
 			new FirstPositionCommand,
+			new FirstTargetingPositionCommand,
 			new FixCommand,
 			new FlipCommand,
 			new HelpCommand,
@@ -193,6 +196,7 @@ class BuilderTools extends PluginBase {
 			new RotateCommand,
 			new SchematicCommand,
 			new SecondPositionCommand,
+			new SecondTargetingPositionCommand,
 			new SelectionCommand,
 			new SphereCommand,
 			new StackCommand,

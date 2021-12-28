@@ -58,6 +58,9 @@ permissions:
   buildertools.command.pos1:
     description: Permissions for //pos1
     default: op
+  buildertools.command.hpos1:
+    description: Permissions for //hpos1
+    default: op
   buildertools.command.fix:
     descripion: Permissions for //fix
     default: op
@@ -123,6 +126,9 @@ permissions:
     default: op
   buildertools.command.pos2:
     description: Permissions for //pos2
+    default: op
+  buildertools.command.hpos2:
+    description: Permissions for //hpos2
     default: op
   buildertools.command.selection:
     description: Permissions for //sel

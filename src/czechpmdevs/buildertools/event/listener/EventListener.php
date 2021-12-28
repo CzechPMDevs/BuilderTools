@@ -51,7 +51,7 @@ class EventListener implements Listener {
 			return;
 		}
 
-		$targetBlock = $player->getTargetBlock(64);
+		$targetBlock = $player->getTargetBlock(BuilderTools::getConfiguration()->getIntProperty("max-ray-trace-distance"));
 		if($targetBlock === null) {
 			return;
 		}
