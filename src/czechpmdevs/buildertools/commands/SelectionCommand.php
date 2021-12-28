@@ -20,16 +20,51 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
+use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\session\selection\CuboidSelection;
+use czechpmdevs\buildertools\session\selection\ExtendSelection;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
+use pocketmine\player\Player;
+use function get_class;
+use function is_a;
+use function strtolower;
 
 class SelectionCommand extends BuilderToolsCommand {
-
 	public function __construct() {
 		parent::__construct("/selection", "Change the current selection style to a specific one.", null, ["/sel"]);
 	}
 
-	// TODO
 	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) return;
+		if(!$sender instanceof Player) {
+			$sender->sendMessage("§cThis command can be used only in game!");
+			return;
+		}
 
+		if(!isset($args[0])) {
+			$sender->sendMessage("§cUsage: §7//sel <cuboid|extend>");
+			return;
+		}
+
+		$class = match(strtolower($args[0])) {
+			"cuboid" => CuboidSelection::class,
+			"extend" => ExtendSelection::class,
+			default => null
+		};
+
+		if($class === null) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cUnknown selection type '$args[0]'.");
+			return;
+		}
+
+		$session = SessionManager::getInstance()->getSession($sender);
+		if(get_class($session->getSelectionHolder()) === $class) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cYou are already using '$args[0]' selection type.");
+			return;
+		}
+
+		$session->setSelectionHolder(new $class($session));
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelection type updated to '$args[0]'!");
 	}
 }

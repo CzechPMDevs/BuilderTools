@@ -70,7 +70,12 @@ class EventListener implements Listener {
 			$item->isWandAxe()
 		) {
 			$selection = SessionManager::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
-			$selection->handleWandAxeBlockBreak($event->getBlock()->getPosition());
+			try {
+				$selection->handleWandAxeBlockBreak($event->getBlock()->getPosition());
+			} catch(RuntimeException $exception) {
+				$event->getPlayer()->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
+				return;
+			}
 			$event->cancel();
 
 			try {
@@ -97,7 +102,12 @@ class EventListener implements Listener {
 
 			if($item instanceof WoodenAxe && $item->isWandAxe()) {
 				$selection = SessionManager::getInstance()->getSession($event->getPlayer())->getSelectionHolder();
-				$selection->handleWandAxeBlockClick($event->getBlock()->getPosition());
+				try {
+					$selection->handleWandAxeBlockClick($event->getBlock()->getPosition());
+				} catch(RuntimeException $exception) {
+					$event->getPlayer()->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
+					return;
+				}
 				$event->cancel();
 
 				try {

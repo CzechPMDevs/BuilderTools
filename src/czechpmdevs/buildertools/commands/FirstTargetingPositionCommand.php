@@ -48,7 +48,13 @@ class FirstTargetingPositionCommand extends BuilderToolsCommand {
 		}
 
 		$selection = SessionManager::getInstance()->getSession($sender)->getSelectionHolder();
-		$selection->handleWandAxeBlockBreak($position = Position::fromObject($targetBlock->getPosition()->floor(), $sender->getWorld()));
+		try {
+			$selection->handleWandAxeBlockBreak($position = Position::fromObject($targetBlock->getPosition()->floor(), $sender->getWorld()));
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
+			return;
+		}
+
 		try {
 			$size = " ({$selection->size()})";
 		} catch(RuntimeException) {

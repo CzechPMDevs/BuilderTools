@@ -44,8 +44,8 @@ use function microtime;
 use function min;
 
 class CuboidSelection extends SelectionHolder {
-	private World $world;
-	private Vector3 $firstPosition, $secondPosition;
+	protected World $world;
+	protected Vector3 $firstPosition, $secondPosition;
 
 	public function size(): int {
 		$this->assureHasPositionsSelected();

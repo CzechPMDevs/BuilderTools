@@ -43,7 +43,12 @@ class SecondPositionCommand extends BuilderToolsCommand {
 		}
 
 		$selection = SessionManager::getInstance()->getSession($sender)->getSelectionHolder();
-		$selection->handleWandAxeBlockClick($position = Position::fromObject($sender->getPosition()->floor(), $sender->getWorld()));
+		try {
+			$selection->handleWandAxeBlockClick($position = Position::fromObject($sender->getPosition()->floor(), $sender->getWorld()));
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
+			return;
+		}
 
 		try {
 			$size = " ({$selection->size()})";
