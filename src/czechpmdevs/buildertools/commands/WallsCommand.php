@@ -29,7 +29,7 @@ use RuntimeException;
 class WallsCommand extends BuilderToolsCommand {
 
 	public function __construct() {
-		parent::__construct("/walls", "Makes walls around selection", null, ["/wall"]);
+		parent::__construct("/walls", "Create walls around selection", null, ["/wall"]);
 	}
 
 	/** @noinspection PhpUnused */
@@ -49,7 +49,8 @@ class WallsCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->walls($blockIds);
+			$session = SessionManager::getInstance()->getSession($sender);
+			$result = $session->getSelectionHolder()->walls($blockIds, $session->getMask());
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;

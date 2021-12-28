@@ -62,7 +62,7 @@ class Cuboid {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$fillSession->getChanges()->save();
+			$fillSession->getChanges()->unload();
 			$this->reverseData = $fillSession->getChanges();
 		}
 
@@ -96,7 +96,7 @@ class Cuboid {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$fillSession->getChanges()->save();
+			$fillSession->getChanges()->unload();
 			$this->reverseData = $fillSession->getChanges();
 		}
 
@@ -129,7 +129,7 @@ class Cuboid {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$fillSession->getChanges()->save();
+			$fillSession->getChanges()->unload();
 			$this->reverseData = $fillSession->getChanges();
 		}
 
@@ -153,7 +153,7 @@ class Cuboid {
 			}
 		}
 
-		$blockArray->save();
+		$blockArray->unload();
 
 		return $this;
 	}

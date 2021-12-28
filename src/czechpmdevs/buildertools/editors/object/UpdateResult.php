@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\editors\object;
 
 use function round;
 
-class UpdateResult {
+final class UpdateResult {
 
 	protected int $blocksChanged = 0;
 	protected float $processTime = 0.0;
@@ -40,10 +40,12 @@ class UpdateResult {
 		return $this->processTime;
 	}
 
+	/** @deprecated */
 	public function successful(): bool {
 		return $this->errorMessage === null;
 	}
 
+	/** @deprecated */
 	public function getErrorMessage(): ?string {
 		return $this->errorMessage;
 	}
@@ -56,6 +58,7 @@ class UpdateResult {
 		return $result;
 	}
 
+	/** @deprecated */
 	public static function error(string $message): UpdateResult {
 		$result = new UpdateResult();
 		$result->errorMessage = $message;

@@ -97,7 +97,7 @@ class Printer {
 			$updates->removeDuplicates();
 		}
 
-		$updates->save();
+		$updates->unload();
 		Canceller::getInstance()->addStep($player, $updates);
 	}
 
@@ -199,7 +199,7 @@ class Printer {
 
 		$updates = $fillSession->getChanges();
 		$updates->removeDuplicates();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addStep($player, $updates);
 
@@ -287,7 +287,7 @@ class Printer {
 
 		$updates = $fillSession->getChanges();
 		$updates->removeDuplicates();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addStep($player, $updates);
 
@@ -349,7 +349,7 @@ class Printer {
 
 		$updates = $fillSession->getChanges();
 		$updates->removeDuplicates();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addStep($player, $updates);
 
@@ -457,7 +457,7 @@ class Printer {
 
 		$updates = $fillSession->getChanges();
 		$updates->removeDuplicates();
-		$updates->save();
+		$updates->unload();
 		Canceller::getInstance()->addStep($player, $updates);
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);

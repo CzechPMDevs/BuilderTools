@@ -30,7 +30,7 @@ use RuntimeException;
 class CenterCommand extends BuilderToolsCommand {
 
 	public function __construct() {
-		parent::__construct("/center", "Makes pattern blocks in the middle of selection");
+		parent::__construct("/center", "Make pattern blocks in the middle of selection");
 	}
 
 	/** @noinspection PhpUnused */

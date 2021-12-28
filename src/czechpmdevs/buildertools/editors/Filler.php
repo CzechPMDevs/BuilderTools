@@ -70,7 +70,7 @@ class Filler {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addStep($player, $updates);
 
@@ -101,7 +101,7 @@ class Filler {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addStep($player, $updates);
 

@@ -117,7 +117,7 @@ abstract class SelectionHolder {
 	 *
 	 * @throws RuntimeException If there is not enough positions set to move area
 	 */
-	abstract public function move(int $x, int $y, int $z): UpdateResult;
+	abstract public function move(int $xMotion, int $yMotion, int $zMotion): UpdateResult;
 
 	/**
 	 * @return World Returns world the selection is located in

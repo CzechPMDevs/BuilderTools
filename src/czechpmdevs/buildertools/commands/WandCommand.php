@@ -29,7 +29,7 @@ use pocketmine\player\Player;
 class WandCommand extends BuilderToolsCommand {
 
 	public function __construct() {
-		parent::__construct("/wand", "Switch wand tool", null, []);
+		parent::__construct("/wand", "Give want axe item to player inventory", null, []);
 	}
 
 	/** @noinspection PhpUnused */

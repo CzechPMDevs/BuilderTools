@@ -75,7 +75,7 @@ class ClipboardHolder {
 		$fillSession->close();
 
 		$changes = $fillSession->getChanges();
-		$changes->save();
+		$changes->unload();
 
 		$this->session->getReverseDataHolder()->saveUndo($changes);
 

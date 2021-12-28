@@ -35,7 +35,7 @@ class HelpCommand extends BuilderToolsCommand {
 	public static array $pages = [];
 
 	public function __construct() {
-		parent::__construct("/help", "Displays BuilderTools commands", null, ["/?", "buildertools", "/commands"]);
+		parent::__construct("/help", "Display BuilderTools commands", null, ["/?", "buildertools", "/commands"]);
 	}
 
 	public static function buildPages(): void {

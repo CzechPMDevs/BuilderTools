@@ -49,7 +49,8 @@ class OutlineCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->outline($blockIds);
+			$session = SessionManager::getInstance()->getSession($sender);
+			$result = $session->getSelectionHolder()->outline($blockIds, $session->getMask());
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§cError while processing the command: {$exception->getMessage()}");
 			return;

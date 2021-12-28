@@ -26,7 +26,7 @@ use pocketmine\command\CommandSender;
 class FixCommand extends BuilderToolsCommand {
 
 	public function __construct() {
-		parent::__construct("/fix", "Fixes world");
+		parent::__construct("/fix", "Covert blocks from Minecraft: Java Edition world to Minecraft: Bedrock Edition format");
 	}
 
 	/** @noinspection PhpUnused */

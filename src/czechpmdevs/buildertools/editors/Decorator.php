@@ -66,7 +66,7 @@ class Decorator {
 		$fillSession->reloadChunks($center->getWorld());
 
 		$updates = $fillSession->getChanges();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addStep($player, $updates);
 

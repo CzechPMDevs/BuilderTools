@@ -23,6 +23,8 @@ namespace czechpmdevs\buildertools;
 use czechpmdevs\buildertools\commands\BiomeCommand;
 use czechpmdevs\buildertools\commands\BlockInfoCommand;
 use czechpmdevs\buildertools\commands\CenterCommand;
+use czechpmdevs\buildertools\commands\ChunkCommand;
+use czechpmdevs\buildertools\commands\ClearClipboardCommand;
 use czechpmdevs\buildertools\commands\ClearInventoryCommand;
 use czechpmdevs\buildertools\commands\CopyCommand;
 use czechpmdevs\buildertools\commands\CubeCommand;
@@ -41,6 +43,7 @@ use czechpmdevs\buildertools\commands\HollowPyramidCommand;
 use czechpmdevs\buildertools\commands\HollowSphereCommand;
 use czechpmdevs\buildertools\commands\IdCommand;
 use czechpmdevs\buildertools\commands\IslandCommand;
+use czechpmdevs\buildertools\commands\MaskCommand;
 use czechpmdevs\buildertools\commands\MergeCommand;
 use czechpmdevs\buildertools\commands\MoveCommand;
 use czechpmdevs\buildertools\commands\NaturalizeCommand;
@@ -154,6 +157,8 @@ class BuilderTools extends PluginBase {
 			new BiomeCommand,
 			new BlockInfoCommand,
 			new CenterCommand,
+			new ChunkCommand,
+			new ClearClipboardCommand,
 			new ClearInventoryCommand,
 			new CopyCommand,
 			new CubeCommand,
@@ -173,6 +178,7 @@ class BuilderTools extends PluginBase {
 			new IdCommand,
 			new IslandCommand,
 			new MergeCommand,
+			new MaskCommand,
 			new MoveCommand,
 			new NaturalizeCommand,
 			new OutlineCommand,

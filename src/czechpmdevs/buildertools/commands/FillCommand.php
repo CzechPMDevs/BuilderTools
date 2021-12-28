@@ -49,7 +49,8 @@ class FillCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->fill($blockIds);
+			$session = SessionManager::getInstance()->getSession($sender);
+			$result = $session->getSelectionHolder()->fill($blockIds, $session->getMask());
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;

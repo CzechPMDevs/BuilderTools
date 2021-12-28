@@ -59,7 +59,7 @@ class Canceller {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addRedo($player, $updates);
 
@@ -93,7 +93,7 @@ class Canceller {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->save();
+		$updates->unload();
 
 		Canceller::getInstance()->addStep($player, $updates);
 

@@ -185,7 +185,7 @@ class SchematicsManager {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->save();
+		$updates->unload();
 		Canceller::getInstance()->addStep($player, $updates);
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);

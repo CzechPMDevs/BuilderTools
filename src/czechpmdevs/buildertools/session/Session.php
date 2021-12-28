@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\session;
 
+use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\session\selection\CuboidSelection;
 use pocketmine\player\Player;
 use pocketmine\utils\AssumptionFailedError;
@@ -29,8 +30,13 @@ class Session {
 	private ClipboardHolder $clipboardHolder;
 	private ReverseDataHolder $reverseDataHolder;
 
-	/** @var ?array{0: int, 1: int, 2: bool} $drawData */
+	/**
+	 * @var ?array{0: int, 1: int, 2: bool} $drawData
+	 * @deprecated
+	 */
 	private ?array $drawData = null;
+
+	private ?BlockIdentifierList $mask = null;
 
 	public function __construct(
 		private Player $player,
@@ -54,6 +60,14 @@ class Session {
 
 	public function getReverseDataHolder(): ReverseDataHolder {
 		return $this->reverseDataHolder;
+	}
+
+	public function setMask(?BlockIdentifierList $mask): void {
+		$this->mask = $mask;
+	}
+
+	public function getMask(): ?BlockIdentifierList {
+		return $this->mask;
 	}
 
 	public function startDrawing(int $brush, int $mode, bool $fall): void {

@@ -32,7 +32,7 @@ use function round;
 class RotateCommand extends BuilderToolsCommand {
 
 	public function __construct() {
-		parent::__construct("/rotate", "Rotates selected area", null, []);
+		parent::__construct("/rotate", "Rotate selected area", null, []);
 	}
 
 	/** @noinspection PhpUnused */

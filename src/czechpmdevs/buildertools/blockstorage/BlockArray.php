@@ -206,18 +206,20 @@ class BlockArray implements UpdateLevelData, Serializable {
 		$this->blocks = array_values($blocks);
 	}
 
-	public function save(): void {
+	public function unload(): self {
 		if(BuilderTools::getConfiguration()->getBoolProperty("clipboard-compression")) {
 			$this->compress();
 			$this->isCompressed = true;
 		}
+		return $this;
 	}
 
-	public function load(): void {
+	public function load(): self {
 		if(BuilderTools::getConfiguration()->getBoolProperty("clipboard-compression")) {
 			$this->decompress();
 			$this->isCompressed = false;
 		}
+		return $this;
 	}
 
 	public function compress(bool $cleanDecompressed = true): void {

@@ -32,7 +32,7 @@ use function strtolower;
 class FlipCommand extends BuilderToolsCommand {
 
 	public function __construct() {
-		parent::__construct("/flip", "Flips selected area", null, []);
+		parent::__construct("/flip", "Flip selected area", null, []);
 	}
 
 	/** @noinspection PhpUnused */

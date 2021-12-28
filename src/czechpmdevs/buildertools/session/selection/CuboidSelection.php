@@ -24,7 +24,7 @@ use Closure;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
-use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\editors\ForwardExtendCopy;
 use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
@@ -38,7 +38,9 @@ use pocketmine\math\Vector3;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
+use function max;
 use function microtime;
+use function min;
 
 class CuboidSelection extends SelectionHolder {
 	private World $world;
@@ -118,10 +120,23 @@ class CuboidSelection extends SelectionHolder {
 	public function stack(int $count, int $direction): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		return Copier::getInstance()->stack($this->session->getPlayer(), $this->firstPosition, $this->secondPosition, $count, $direction);
+		$startTime = microtime(true);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+		$fillSession = (new FillSession($this->world, false, true))
+			->setDimensions($minX, $maxX, $minZ, $maxZ);
+
+		(new ForwardExtendCopy())->stack($fillSession, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $count, $direction);
+
+		$reverseData = $fillSession->reloadChunks($this->world)
+			->getChanges()
+			->unload();
+
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	// TODO - Mask
 	public function naturalize(?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
@@ -136,13 +151,15 @@ class CuboidSelection extends SelectionHolder {
 
 		$naturalizer->naturalize($fillSession, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-		$reverseData = $fillSession->reloadChunks($this->world)->getChanges();
+		$reverseData = $fillSession->reloadChunks($this->world)
+			->getChanges()
+			->unload();
+
 		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
 		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
 	}
 
-	// TODO - Mask
 	public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
@@ -160,7 +177,6 @@ class CuboidSelection extends SelectionHolder {
 		return UpdateResult::success($clipboard->size(), microtime(true) - $startTime);
 	}
 
-	// TODO - Mask
 	public function cutToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
@@ -218,10 +234,48 @@ class CuboidSelection extends SelectionHolder {
 		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
-	public function move(int $x, int $y, int $z): UpdateResult {
+	public function move(int $xMotion, int $yMotion, int $zMotion): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		return Copier::getInstance()->move($this->firstPosition, $this->secondPosition, new Vector3($x, $y, $z), $this->session->getPlayer());
+		$startTime = microtime(true);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+		$finalMinX = $minX + $xMotion;
+		$finalMaxX = $maxX + $xMotion;
+		$finalMinY = $minY + $yMotion;
+		$finalMaxY = $maxY + $yMotion;
+		$finalMinZ = $minZ + $zMotion;
+		$finalMaxZ = $maxZ + $zMotion;
+
+		$fillSession = new FillSession($this->world, false, true);
+		$fillSession->setDimensions(min($minX, $finalMinX), max($maxX, $finalMaxX), min($minZ, $finalMinZ), max($maxZ, $finalMaxZ));
+		$fillSession->loadChunks($this->world);
+
+		for($x = $minX; $x <= $maxX; ++$x) {
+			$isXInside = $x >= $finalMinX && $x <= $finalMaxX;
+			for($z = $minZ; $z <= $maxZ; ++$z) {
+				$isZInside = $z >= $finalMinZ && $z <= $finalMaxZ;
+				for($y = $minY; $y <= $maxY; ++$y) {
+					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
+
+					// We remove the block if it is not inside the final area
+					if(!($isXInside && $isZInside && $y >= $finalMinY && $y <= $finalMaxY)) {
+						$fillSession->setBlockAt($x, $y, $z, 0);
+					}
+
+					$finalY = $yMotion + $y;
+					if($finalY >= World::Y_MIN && $finalY <= World::Y_MAX) {
+						$fillSession->setBlockAt($xMotion + $x, $finalY, $zMotion + $z, $fullBlockId);
+					}
+				}
+			}
+		}
+
+		$fillSession->reloadChunks($this->world);
+		$this->session->getReverseDataHolder()->saveUndo($fillSession->getChanges());
+
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 
 	public function getWorld(): World {

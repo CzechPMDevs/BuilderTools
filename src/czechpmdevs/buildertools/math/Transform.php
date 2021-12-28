@@ -196,6 +196,6 @@ class Transform {
 	}
 
 	public function close(): void {
-		$this->clipboard->save();
+		$this->clipboard->unload();
 	}
 }

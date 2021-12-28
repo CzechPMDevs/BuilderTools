@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
@@ -31,13 +30,10 @@ use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\math\Transform;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\math\Axis;
-use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
-use function max;
 use function microtime;
-use function min;
 
 /** @deprecated */
 class Copier {
@@ -67,7 +63,7 @@ class Copier {
 			}
 		}
 
-		$clipboard->save();
+		$clipboard->unload();
 		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 
 		return UpdateResult::success(Math::selectionSize($pos1, $pos2), microtime(true) - $startTime);
@@ -98,11 +94,11 @@ class Copier {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$clipboard->save();
+		$clipboard->unload();
 		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
 
 		$changes = $fillSession->getChanges();
-		$changes->save();
+		$changes->unload();
 
 		Canceller::getInstance()->addStep($player, $changes);
 
@@ -136,11 +132,13 @@ class Copier {
 			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
+		$clipboard->unload();
+
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
 		$changes = $fillSession->getChanges();
-		$changes->save();
+		$changes->unload();
 		Canceller::getInstance()->addStep($player, $changes);
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
@@ -173,11 +171,13 @@ class Copier {
 			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
+		$clipboard->unload();
+
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
 		$changes = $fillSession->getChanges();
-		$changes->save();
+		$changes->unload();
 
 		Canceller::getInstance()->addStep($player, $changes);
 
@@ -224,153 +224,5 @@ class Copier {
 		$transform->close();
 
 		SessionManager::getInstance()->getSession($player)->getClipboardHolder()->setClipboard($clipboard);
-	}
-
-	public function stack(Player $player, Vector3 $pos1, Vector3 $pos2, int $pasteCount, int $direction): UpdateResult {
-		$startTime = microtime(true);
-
-		$fillSession = new FillSession($player->getWorld(), false, true);
-
-		// Copying on to block array
-		$temporaryBlockArray = new BlockArray();
-
-		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
-		for($x = $minX; $x <= $maxX; ++$x) {
-			for($z = $minZ; $z <= $maxZ; ++$z) {
-				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
-					$temporaryBlockArray->addBlockAt($x, $y, $z, $fullBlockId);
-				}
-			}
-		}
-
-		if($direction !== Facing::DOWN && $direction !== Facing::UP) {
-			if($direction === Facing::WEST || $direction === Facing::SOUTH) { // Moving along x-axis (z = const)
-				$xSize = ($maxX - $minX) + 1;
-
-				if($direction === Facing::WEST) {
-					$fillSession->setDimensions($minX, $minX + ($xSize * $pasteCount), $minZ, $maxZ);
-				} else {
-					$fillSession->setDimensions($minX - ($xSize * $pasteCount), $minX, $minZ, $maxZ);
-					$xSize = -$xSize;
-				}
-
-				$fillSession->loadChunks($player->getWorld());
-
-				for($i = 1; $i < $pasteCount; ++$i) {
-					$j = $i * $xSize;
-					while($temporaryBlockArray->hasNext()) {
-						$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
-						$fillSession->setBlockAt($x + $j, $y, $z, $fullBlockId);
-					}
-
-					// Resets the array reader
-					$temporaryBlockArray->offset = 0;
-				}
-			} else { // Moving along z axis (x = const)
-				$zSize = ($maxZ - $minZ) + 1;
-
-				if($direction === Facing::EAST) {
-					$fillSession->setDimensions($minX, $maxX, $minZ, $minZ + ($zSize * $pasteCount));
-				} else {
-					$fillSession->setDimensions($minX, $maxX, $minZ - ($zSize * $pasteCount), $maxZ);
-					$zSize = -$zSize;
-				}
-
-				$fillSession->loadChunks($player->getWorld());
-
-				for($i = 1; $i < $pasteCount; ++$i) {
-					$j = $i * $zSize;
-					while($temporaryBlockArray->hasNext()) {
-						$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
-						$fillSession->setBlockAt($x, $y, $z + $j, $fullBlockId);
-					}
-
-					// Resets array reader
-					$temporaryBlockArray->offset = 0;
-				}
-			}
-		} else {
-			$ySize = ($maxY - $minY) + 1;
-
-			$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-			if($direction === Facing::DOWN) {
-				$ySize = -$ySize;
-			}
-
-			$fillSession->loadChunks($player->getWorld());
-
-			for($i = 1; $i < $pasteCount; ++$i) {
-				$j = $i * $ySize;
-				while($temporaryBlockArray->hasNext()) {
-					$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
-					if($y >= 0 && $y <= 255) {
-						$fillSession->setBlockAt($x, $y + $j, $z, $fullBlockId);
-					}
-				}
-
-				// Resets array header
-				$temporaryBlockArray->offset = 0;
-			}
-		}
-
-		$fillSession->reloadChunks($player->getWorld());
-		$fillSession->close();
-
-		$changes = $fillSession->getChanges();
-		$changes->save();
-		Canceller::getInstance()->addStep($player, $changes);
-
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
-	}
-
-	public function move(Vector3 $pos1, Vector3 $pos2, Vector3 $motion, Player $player): UpdateResult {
-		$startTime = microtime(true);
-
-		$fillSession = new FillSession($player->getWorld(), false, true);
-
-		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
-
-		$floorX = $motion->getFloorX();
-		$floorY = $motion->getFloorY();
-		$floorZ = $motion->getFloorZ();
-
-		$finalMinX = $minX + $motion->getFloorX();
-		$finalMaxX = $maxX + $motion->getFloorX();
-		$finalMinY = $minY + $motion->getFloorY();
-		$finalMaxY = $maxY + $motion->getFloorY();
-		$finalMinZ = $minZ + $motion->getFloorZ();
-		$finalMaxZ = $maxZ + $motion->getFloorZ();
-
-		$fillSession->setDimensions(min($minX, $finalMinX), max($maxX, $finalMaxX), min($minZ, $finalMinZ), max($maxZ, $finalMaxZ));
-		$fillSession->loadChunks($player->getWorld());
-
-		for($x = $minX; $x <= $maxX; ++$x) {
-			$isXInside = $x >= $finalMinX && $x <= $finalMaxX;
-			for($z = $minZ; $z <= $maxZ; ++$z) {
-				$isZInside = $z >= $finalMinZ && $z <= $finalMaxZ;
-				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
-
-					// We remove the block if it is not inside the final area
-					if(!($isXInside && $isZInside && $y >= $finalMinY && $y <= $finalMaxY)) {
-						$fillSession->setBlockAt($x, $y, $z, 0);
-					}
-
-					/** @phpstan-var int $finalY */
-					$finalY = $floorY + $y;
-					if($finalY >= 0 && $finalY <= 255) {
-						$fillSession->setBlockAt($floorX + $x, $finalY, $floorZ + $z, $fullBlockId);
-					}
-				}
-			}
-		}
-
-		$fillSession->reloadChunks($player->getWorld());
-
-		$changes = $fillSession->getChanges();
-		Canceller::getInstance()->addStep($player, $changes);
-
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
 }

@@ -21,15 +21,16 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\session\selection\CuboidSelection;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
-use RuntimeException;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
-class NaturalizeCommand extends BuilderToolsCommand {
-
+class ChunkCommand extends BuilderToolsCommand {
 	public function __construct() {
-		parent::__construct("/naturalize", "Naturalize selected area.", null, []);
+		parent::__construct("/chunk", "Selects the whole chunk as selection");
 	}
 
 	/** @noinspection PhpUnused */
@@ -40,14 +41,18 @@ class NaturalizeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		try {
-			$session = SessionManager::getInstance()->getSession($sender);
-			$result = $session->getSelectionHolder()->naturalize($session->getMask());
-		} catch(RuntimeException $exception) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
+		$selection = SessionManager::getInstance()->getSession($sender)->getSelectionHolder();
+		if(!$selection instanceof CuboidSelection) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cIt is not possible to select chunk with current selection type. Use §l//sel cuboid§r§c and try executing the command again.");
 			return;
 		}
 
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+		$realChunkX = $sender->getPosition()->getFloorX() << 4 >> 4;
+		$realChunkZ = $sender->getPosition()->getFloorZ() << 4 >> 4;
+
+		$selection->handleWandAxeBlockBreak(new Position($realChunkX, World::Y_MIN, $realChunkZ, $sender->getWorld()));
+		$selection->handleWandAxeBlockClick(new Position($realChunkX + 15, World::Y_MAX, $realChunkZ + 15, $selection->getWorld()));
+
+		$sender->sendMessage(BuilderTools::getPrefix() . "Chunk selected ({$selection->size()})");
 	}
 }

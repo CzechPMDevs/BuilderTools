@@ -24,12 +24,10 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
-use RuntimeException;
 
-class NaturalizeCommand extends BuilderToolsCommand {
-
+class ClearClipboardCommand extends BuilderToolsCommand {
 	public function __construct() {
-		parent::__construct("/naturalize", "Naturalize selected area.", null, []);
+		parent::__construct("/clearclipboard", "Clears clipboard from memory", null, ["/cc"]);
 	}
 
 	/** @noinspection PhpUnused */
@@ -40,14 +38,7 @@ class NaturalizeCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		try {
-			$session = SessionManager::getInstance()->getSession($sender);
-			$result = $session->getSelectionHolder()->naturalize($session->getMask());
-		} catch(RuntimeException $exception) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
-			return;
-		}
-
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area successfully naturalized, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+		SessionManager::getInstance()->getSession($sender)->getClipboardHolder()->setClipboard(null);
+		$sender->sendMessage(BuilderTools::getPrefix() . "Clipboard cleared!");
 	}
 }
