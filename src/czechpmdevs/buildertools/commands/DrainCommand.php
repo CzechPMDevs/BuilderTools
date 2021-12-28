@@ -20,16 +20,18 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
+use czechpmdevs\buildertools\blockstorage\identifiers\LiquidBlockIdentifier;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\SessionManager;
-use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 
-class MaskCommand extends BuilderToolsCommand {
+class DrainCommand extends BuilderToolsCommand {
+
 	public function __construct() {
-		parent::__construct("/mask", "Set mask rule to selected item(s) so it can only affect a particular blocks.");
+		parent::__construct("/drain", "Remove liquid from selected area");
 	}
 
 	/** @noinspection PhpUnused */
@@ -40,20 +42,13 @@ class MaskCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		if(isset($args[0]) && $args[0] === "remove") {
-			SessionManager::getInstance()->getSession($sender)->setMask(null);
-			$sender->sendMessage(BuilderTools::getPrefix() . "§aMask removed!");
+		try {
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->fill(SingleBlockIdentifier::airIdentifier(), new LiquidBlockIdentifier());
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 
-		if(!isset($args[0])) {
-			$block = $sender->getInventory()->getItemInHand()->getBlock();
-			$mask = new SingleBlockIdentifier($block->getId(), $block->getMeta());
-		} else {
-			$mask = new StringToBlockDecoder($args[0], $sender->getInventory()->getItemInHand());
-		}
-
-		SessionManager::getInstance()->getSession($sender)->setMask($mask);
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aMask was successfully updated! To remove mask, use §l//mask remove§r§a.");
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aArea drained, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
 	}
 }

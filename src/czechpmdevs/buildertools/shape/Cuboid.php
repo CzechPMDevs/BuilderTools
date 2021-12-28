@@ -24,7 +24,6 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
-use pocketmine\math\Vector3;
 use pocketmine\world\World;
 
 class Cuboid {

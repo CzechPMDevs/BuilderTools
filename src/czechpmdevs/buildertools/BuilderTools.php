@@ -31,6 +31,7 @@ use czechpmdevs\buildertools\commands\CubeCommand;
 use czechpmdevs\buildertools\commands\CutCommand;
 use czechpmdevs\buildertools\commands\CylinderCommand;
 use czechpmdevs\buildertools\commands\DecorationCommand;
+use czechpmdevs\buildertools\commands\DrainCommand;
 use czechpmdevs\buildertools\commands\DrawCommand;
 use czechpmdevs\buildertools\commands\FillCommand;
 use czechpmdevs\buildertools\commands\FirstPositionCommand;
@@ -43,6 +44,7 @@ use czechpmdevs\buildertools\commands\HollowPyramidCommand;
 use czechpmdevs\buildertools\commands\HollowSphereCommand;
 use czechpmdevs\buildertools\commands\IdCommand;
 use czechpmdevs\buildertools\commands\IslandCommand;
+use czechpmdevs\buildertools\commands\LineCommand;
 use czechpmdevs\buildertools\commands\MaskCommand;
 use czechpmdevs\buildertools\commands\MergeCommand;
 use czechpmdevs\buildertools\commands\MoveCommand;
@@ -165,6 +167,7 @@ class BuilderTools extends PluginBase {
 			new CutCommand,
 			new CylinderCommand,
 			new DecorationCommand,
+			new DrainCommand,
 			new DrawCommand,
 			new FillCommand,
 			new FirstPositionCommand,
@@ -177,6 +180,7 @@ class BuilderTools extends PluginBase {
 			new HollowSphereCommand,
 			new IdCommand,
 			new IslandCommand,
+			new LineCommand,
 			new MergeCommand,
 			new MaskCommand,
 			new MoveCommand,

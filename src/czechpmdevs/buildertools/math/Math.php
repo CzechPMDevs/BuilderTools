@@ -31,7 +31,6 @@ use function sin;
 use const M_PI;
 
 class Math {
-
 	public const PI_360 = M_PI * 2.0;
 
 	/** @var float[] */

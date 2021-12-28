@@ -21,32 +21,29 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
 use pocketmine\block\Block;
+use pocketmine\block\VanillaBlocks;
+use pocketmine\utils\AssumptionFailedError;
+use function array_push;
+use function in_array;
 
-class SingleBlockIdentifier implements BlockIdentifierList {
+class LiquidBlockIdentifier implements BlockIdentifierList {
+	/** @var int[] */
+	private array $ids = [];
 
-	protected int $id;
-	protected int $meta;
-
-	public function __construct(int $id, ?int $meta = null) {
-		$this->id = $id;
-		if($meta !== null) {
-			$this->meta = $meta;
-		}
+	public function __construct() {
+		array_push($this->ids, ...VanillaBlocks::WATER()->getIdInfo()->getAllBlockIds());
+		array_push($this->ids, ...VanillaBlocks::LAVA()->getIdInfo()->getAllBlockIds());
 	}
 
 	public function nextBlock(?int &$fullBlockId): void {
-		$fullBlockId = $this->id << Block::INTERNAL_METADATA_BITS | $this->meta;
+		throw new AssumptionFailedError("nextBlock does not work with MergedBlockIdentifier");
 	}
 
 	public function containsBlock(int $fullBlockId): bool {
-		return isset($this->meta) ? $fullBlockId === ($this->id << Block::INTERNAL_METADATA_BITS | $this->meta) : $fullBlockId >> Block::INTERNAL_METADATA_BITS === $this->id;
+		return in_array($fullBlockId << Block::INTERNAL_METADATA_BITS, $this->ids);
 	}
 
 	public function containsBlockId(int $id): bool {
-		return $this->id === $id;
-	}
-
-	public static function airIdentifier(): SingleBlockIdentifier {
-		return new SingleBlockIdentifier(0, 0);
+		return in_array($id, $this->ids);
 	}
 }

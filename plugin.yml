@@ -41,10 +41,13 @@ permissions:
     description: Permissions for //cut
     default: op
   buildertools.command.cylinder:
-    description: Permission for //cylinder
+    description: Permissions for //cylinder
     default: op
   buildertools.command.decoration:
-    description: Permission for //decoration
+    description: Permissions for //decoration
+    default: op
+  buildertools.command.drain:
+    description: Permissions for //drain
     default: op
   buildertools.command.draw:
     description: Permission for //draw
@@ -65,13 +68,13 @@ permissions:
     description: Permissions for //commands
     default: op
   buildertools.command.hcube:
-    description: Permission for //hcube
+    description: Permissions for //hcube
     default: op
   buildertools.command.hcylinder:
-    description: Permission for //hcylinder
+    description: Permissions for //hcylinder
     default: op
   buildertools.command.hpyramid:
-    description: Permission for //hpyramid
+    description: Permissions for //hpyramid
     default: op
   buildertools.command.hsphere:
     descripton: Permissions for //hsphere
@@ -82,6 +85,9 @@ permissions:
   buildertools.command.island:
     description: Permissions for //island
     default: op
+  buildertools.command.line:
+    description: Permissions for //line
+    default: op
   buildertools.command.mask:
     description: Permissions for //mask
     default: op
@@ -89,31 +95,31 @@ permissions:
     description: Permissions for //merge
     default: op
   buildertools.command.move:
-    description: Permission for //move
+    description: Permissions for //move
     default: op
   buildertools.command.naturalize:
     description: Permissions for //naturalize
     default: op
   buildertools.command.outline:
-    description: Permission for //outline
+    description: Permissions for //outline
     default: op
   buildertools.command.paste:
     description: Permissions for //paste
     default: op
   buildertools.command.pyramid:
-    description: Permission for //pyramid
+    description: Permissions for //pyramid
     default: op
   buildertools.command.redo:
-    description: Permission for //redo
+    description: Permissions for //redo
     default: op
   buildertools.command.replace:
-    description: Permission for //replace
+    description: Permissions for //replace
     default: op
   buildertools.command.rotate:
     description: Permission for //rotate
     default: op
   buildertools.command.schematic:
-    description: Permission for //schematics
+    description: Permissions for //schematics
     default: op
   buildertools.command.pos2:
     description: Permissions for //pos2
@@ -125,16 +131,16 @@ permissions:
     description: Permissions for //sphere
     default: op
   buildertools.command.stack:
-    description: Permission for //stack
+    description: Permissions for //stack
     default: op
   buildertools.command.tree:
-    description: Permission for //tree
+    description: Permissions for //tree
     default: op
   buildertools.command.undo:
-    description: Permission for //undo
+    description: Permissions for //undo
     default: op
   buildertools.command.walls:
-    description: Permission for //walls
+    description: Permissions for //walls
     default: op
   buildertools.command.wand:
     description: Permissions for //wand

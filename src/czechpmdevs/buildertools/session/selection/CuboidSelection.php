@@ -35,6 +35,7 @@ use czechpmdevs\buildertools\session\SelectionHolder;
 use czechpmdevs\buildertools\shape\Cuboid;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\math\Vector3;
+use pocketmine\math\VoxelRayTrace;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
@@ -273,7 +274,31 @@ class CuboidSelection extends SelectionHolder {
 		}
 
 		$fillSession->reloadChunks($this->world);
-		$this->session->getReverseDataHolder()->saveUndo($fillSession->getChanges());
+		$this->session->getReverseDataHolder()->saveUndo($fillSession->getChanges()->unload());
+
+		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+	}
+
+	public function createLineBetweenPositions(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
+		$this->assureHasPositionsSelected();
+
+		$startTime = microtime(true);
+
+		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+		$fillSession = $mask === null ?
+			new FillSession($this->world, false, true) :
+			new MaskedFillSession($this->world, false, true, $mask);
+		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
+		$fillSession->loadChunks($this->world);
+
+		foreach(VoxelRayTrace::betweenPoints($this->firstPosition, $this->secondPosition) as $pos) {
+			$blockGenerator->nextBlock($fullBlockId);
+			$fillSession->setBlockAt((int)$pos->getX(), (int)$pos->getY(), (int)$pos->getZ(), $fullBlockId);
+		}
+
+		$fillSession->reloadChunks($this->world);
+		$this->session->getReverseDataHolder()->saveUndo($fillSession->getChanges()->unload());
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
 	}
