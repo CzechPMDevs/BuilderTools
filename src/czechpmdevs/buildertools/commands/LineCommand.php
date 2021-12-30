@@ -23,7 +23,6 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\selection\CuboidSelection;
 use czechpmdevs\buildertools\session\SessionManager;
-use pocketmine\block\VanillaBlocks;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use RuntimeException;

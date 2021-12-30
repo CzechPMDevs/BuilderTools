@@ -24,6 +24,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\world\World;
+use function array_shift;
 use function fmod;
 use function max;
 use function min;
@@ -98,6 +99,21 @@ class Math {
 
 		$minY = min(World::Y_MAX - 1, max(World::Y_MIN, $minY));
 		$maxY = min(World::Y_MAX - 1, max(World::Y_MIN, $maxY));
+	}
+
+	public static function calculateMultipleMinAndMaxValues(?int &$minX, ?int &$maxX, ?int &$minY, ?int &$maxY, IntVector2 ...$pos): void {
+		$pos1 = array_shift($pos);
+		if($pos1 !== null) {
+			$minX = $maxX = $pos1->x;
+			$minY = $maxY = $pos1->y;
+		}
+
+		foreach($pos as $vector3) {
+			$minX = min($minX, $vector3->x);
+			$maxX = max($maxX, $vector3->x);
+			$minY = min($minY, $vector3->y);
+			$maxY = max($maxY, $vector3->y);
+		}
 	}
 
 	public static function selectionSize(Vector3 $pos1, Vector3 $pos2): int {

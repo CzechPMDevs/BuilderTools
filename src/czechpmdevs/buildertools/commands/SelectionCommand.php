@@ -23,11 +23,11 @@ namespace czechpmdevs\buildertools\commands;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\selection\CuboidSelection;
 use czechpmdevs\buildertools\session\selection\ExtendSelection;
+use czechpmdevs\buildertools\session\selection\PolygonalSelection;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use function get_class;
-use function is_a;
 use function strtolower;
 
 class SelectionCommand extends BuilderToolsCommand {
@@ -43,13 +43,14 @@ class SelectionCommand extends BuilderToolsCommand {
 		}
 
 		if(!isset($args[0])) {
-			$sender->sendMessage("§cUsage: §7//sel <cuboid|extend>");
+			$sender->sendMessage("§cUsage: §7//sel <cuboid|extend|poly>");
 			return;
 		}
 
 		$class = match(strtolower($args[0])) {
 			"cuboid" => CuboidSelection::class,
 			"extend" => ExtendSelection::class,
+			"poly" => PolygonalSelection::class,
 			default => null
 		};
 

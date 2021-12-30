@@ -22,21 +22,15 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\editors\object\FillSession;
+use czechpmdevs\buildertools\shape\Shape;
 use pocketmine\math\Facing;
 use pocketmine\world\World;
 
 class ForwardExtendCopy {
-	public function stack(FillSession $fillSession, int $minX, int $maxX, int $minY, int $maxY, int $minZ, int $maxZ, int $count, int $direction): void {
+	public function stack(FillSession $fillSession, Shape $shape, int $minX, int $maxX, int $minY, int $maxY, int $minZ, int $maxZ, int $count, int $direction): void {
 		$temporaryBlockArray = new BlockArray();
 
-		for($x = $minX; $x <= $maxX; ++$x) {
-			for($z = $minZ; $z <= $maxZ; ++$z) {
-				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
-					$temporaryBlockArray->addBlockAt($x, $y, $z, $fullBlockId);
-				}
-			}
-		}
+		$shape->read($temporaryBlockArray);
 
 		if($direction === Facing::DOWN || $direction === Facing::UP) {
 			$ySize = ($maxY - $minY) + 1;

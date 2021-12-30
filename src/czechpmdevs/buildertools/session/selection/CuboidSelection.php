@@ -26,9 +26,9 @@ use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\editors\ForwardExtendCopy;
 use czechpmdevs\buildertools\editors\Naturalizer;
+use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use czechpmdevs\buildertools\session\SelectionHolder;
@@ -127,7 +127,7 @@ class CuboidSelection extends SelectionHolder {
 		$fillSession = (new FillSession($this->world, false, true))
 			->setDimensions($minX, $maxX, $minZ, $maxZ);
 
-		(new ForwardExtendCopy())->stack($fillSession, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $count, $direction);
+		(new ForwardExtendCopy())->stack($fillSession, new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ), $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $count, $direction);
 
 		$reverseData = $fillSession->reloadChunks($this->world)
 			->getChanges()

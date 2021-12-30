@@ -88,7 +88,7 @@ use function version_compare;
 
 class BuilderTools extends PluginBase {
 
-	public const CURRENT_CONFIG_VERSION = "1.4.0.0";
+	public const CURRENT_CONFIG_VERSION = "1.4.0.1";
 
 	private static BuilderTools $instance;
 	private static Configuration $configuration;

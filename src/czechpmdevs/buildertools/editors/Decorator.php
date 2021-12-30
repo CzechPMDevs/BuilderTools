@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\editors\object\FillSession;
+use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;

@@ -26,7 +26,7 @@ use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use pocketmine\world\World;
 
-class Cuboid {
+class Cuboid implements Shape {
 	protected BlockArray $reverseData;
 
 	public function __construct(
@@ -61,8 +61,7 @@ class Cuboid {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$fillSession->getChanges()->unload();
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = $fillSession->getChanges()->unload();
 		}
 
 		return $this;
@@ -95,8 +94,7 @@ class Cuboid {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$fillSession->getChanges()->unload();
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = $fillSession->getChanges()->unload();
 		}
 
 		return $this;
@@ -128,14 +126,13 @@ class Cuboid {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$fillSession->getChanges()->unload();
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = $fillSession->getChanges()->unload();
 		}
 
 		return $this;
 	}
 
-	public function read(BlockArray $blockArray): self {
+	public function read(BlockArray $blockArray, bool $unloadReadData = true): self {
 		$fillSession = $this->mask === null ?
 			new FillSession($this->world, false, false) :
 			new MaskedFillSession($this->world, false, false, $this->mask);
@@ -152,7 +149,9 @@ class Cuboid {
 			}
 		}
 
-		$blockArray->unload();
+		if($unloadReadData) {
+			$blockArray->unload();
+		}
 
 		return $this;
 	}
