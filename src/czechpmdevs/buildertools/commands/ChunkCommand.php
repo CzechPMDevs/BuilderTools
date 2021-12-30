@@ -25,6 +25,7 @@ use czechpmdevs\buildertools\session\selection\CuboidSelection;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\world\format\SubChunk;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 
@@ -47,8 +48,8 @@ class ChunkCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$realChunkX = $sender->getPosition()->getFloorX() << 4 >> 4;
-		$realChunkZ = $sender->getPosition()->getFloorZ() << 4 >> 4;
+		$realChunkX = $sender->getPosition()->getFloorX() >>  SubChunk::COORD_BIT_SIZE << SubChunk::COORD_BIT_SIZE;
+		$realChunkZ = $sender->getPosition()->getFloorZ() >> SubChunk::COORD_BIT_SIZE << SubChunk::COORD_BIT_SIZE;
 
 		$selection->handleWandAxeBlockBreak(new Position($realChunkX, World::Y_MIN, $realChunkZ, $sender->getWorld()));
 		$selection->handleWandAxeBlockClick(new Position($realChunkX + 15, World::Y_MAX, $realChunkZ + 15, $selection->getWorld()));
