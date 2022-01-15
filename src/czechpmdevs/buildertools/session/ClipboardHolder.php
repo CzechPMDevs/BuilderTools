@@ -34,7 +34,8 @@ class ClipboardHolder {
 
 	public function __construct(
 		private Session $session
-	) {}
+	) {
+	}
 
 	public function setClipboard(?Clipboard $clipboard): void {
 		$this->clipboard = $clipboard;

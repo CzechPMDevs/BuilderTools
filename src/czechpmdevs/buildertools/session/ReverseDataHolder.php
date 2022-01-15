@@ -31,7 +31,8 @@ class ReverseDataHolder {
 
 	public function __construct(
 		private Session $session
-	) {}
+	) {
+	}
 
 	/**
 	 * Removes and returns last step added to undo

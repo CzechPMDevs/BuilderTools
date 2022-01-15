@@ -48,7 +48,7 @@ class ChunkCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$realChunkX = $sender->getPosition()->getFloorX() >>  SubChunk::COORD_BIT_SIZE << SubChunk::COORD_BIT_SIZE;
+		$realChunkX = $sender->getPosition()->getFloorX() >> SubChunk::COORD_BIT_SIZE << SubChunk::COORD_BIT_SIZE;
 		$realChunkZ = $sender->getPosition()->getFloorZ() >> SubChunk::COORD_BIT_SIZE << SubChunk::COORD_BIT_SIZE;
 
 		$selection->handleWandAxeBlockBreak(new Position($realChunkX, World::Y_MIN, $realChunkZ, $sender->getWorld()));

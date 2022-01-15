@@ -23,7 +23,7 @@ namespace czechpmdevs\buildertools\math;
 use InvalidArgumentException;
 
 class SelectionSize {
-	
+
 	public function __construct(
 		protected int $minX,
 		protected int $minY,
@@ -47,7 +47,7 @@ class SelectionSize {
 
 		return $this;
 	}
-	
+
 	public function getMinimum(int &$minX = null, int &$minY = null, int &$minZ = null): self {
 		$minX = $this->minX;
 		$minY = $this->minY;
@@ -55,7 +55,7 @@ class SelectionSize {
 
 		return $this;
 	}
-	
+
 	public function getMaximum(int &$maxX = null, int &$maxY = null, int &$maxZ = null): self {
 		$maxX = $this->maxX;
 		$maxY = $this->maxY;
