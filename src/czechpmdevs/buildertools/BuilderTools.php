@@ -70,10 +70,13 @@ use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\item\WoodenAxe;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use InvalidArgumentException;
+use pocketmine\block\BlockFactory;
 use pocketmine\command\Command;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
+use pocketmine\item\StringToItemParser;
 use pocketmine\item\ToolTier;
 use pocketmine\plugin\PluginBase;
 use function array_key_exists;
@@ -104,6 +107,7 @@ class BuilderTools extends PluginBase {
 		$this->cleanCache();
 		$this->registerCommands();
 		$this->registerItems();
+		$this->registerLegacyItemParser();
 		$this->initMath();
 		$this->initListener();
 		$this->sendWarnings();
@@ -215,6 +219,20 @@ class BuilderTools extends PluginBase {
 
 	private function registerItems(): void {
 		ItemFactory::getInstance()->register(new WoodenAxe(new ItemIdentifier(ItemIds::WOODEN_AXE, 0), "Wooden Axe", ToolTier::WOOD()), true);
+	}
+
+	private function registerLegacyItemParser(): void {
+		foreach(BlockFactory::getInstance()->getAllKnownStates() as $blockState) {
+			try {
+				if($blockState->getMeta() === 0) {
+					StringToItemParser::getInstance()->register((string)$blockState->getId(), fn() => $blockState->asItem());
+				}
+
+				StringToItemParser::getInstance()->register("{$blockState->getId()}:{$blockState->getMeta()}", fn() => $blockState->asItem());
+			} catch(InvalidArgumentException) {
+				// For the case item is already registered
+			}
+		}
 	}
 
 	private function sendWarnings(): void {
