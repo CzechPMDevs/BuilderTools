@@ -38,8 +38,8 @@ use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
 use function abs;
+use function ceil;
 use function count;
-use function floor;
 use function max;
 use function microtime;
 use function min;
@@ -52,17 +52,19 @@ class PolygonalSelection extends SelectionHolder {
 	protected int $minY, $maxY;
 
 	public function size(): int {
-		$area = 0;
-		$k = count($this->points);
-		$j = $k - 1;
-		for($i = 0; $i < $k; ++$i) {
-			$x = $this->points[$j]->x + $this->points[$i]->x;
-			$z = $this->points[$j]->y - $this->points[$i]->y;
-			$area += $x * $z;
-			$j = $i;
+		$j = count($this->points);
+		if($j < 3) {
+			throw new RuntimeException("Attempted to get size of uncompleted polygon selection");
 		}
 
-		return (int)floor(abs((float)$j * 0.5)) * ($this->maxY - $this->minY + 1);
+		$area = 0;
+		for($i = 0; $i < $j; ++$i) {
+			$k = ($i + 1) % $j;
+			$area += ($this->points[$i]->x * $this->points[$k]->y) - ($this->points[$i]->y * $this->points[$k]->x);
+		}
+
+		$area = $area * ($this->maxY - $this->minY + 1) * 0.5;
+		return (int)abs(ceil($area));
 	}
 
 	public function center(): Vector3 {
