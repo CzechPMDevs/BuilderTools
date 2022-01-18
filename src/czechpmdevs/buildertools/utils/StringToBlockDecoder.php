@@ -116,10 +116,6 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 				continue;
 			}
 
-			if($item === null) {
-				continue;
-			}
-
 			$class = $item->getBlock();
 			if($class->getId() === 0 && $item->getId() !== 0) {
 				continue;
