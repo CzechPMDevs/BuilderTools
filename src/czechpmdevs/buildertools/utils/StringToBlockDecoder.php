@@ -23,6 +23,8 @@ namespace czechpmdevs\buildertools\utils;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use OutOfBoundsException;
 use pocketmine\item\Item;
+use pocketmine\item\LegacyStringToItemParser;
+use pocketmine\item\LegacyStringToItemParserException;
 use pocketmine\item\StringToItemParser;
 use function array_rand;
 use function count;
@@ -108,7 +110,12 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 				$block = substr($entry, $pos + 1);
 			}
 
-			$item = StringToItemParser::getInstance()->parse($block);
+			try {
+				$item = StringToItemParser::getInstance()->parse($block) ?? LegacyStringToItemParser::getInstance()->parse($block);
+			} catch (LegacyStringToItemParserException) {
+				continue;
+			}
+
 			if($item === null) {
 				continue;
 			}
