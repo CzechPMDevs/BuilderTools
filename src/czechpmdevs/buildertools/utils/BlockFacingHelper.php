@@ -40,19 +40,19 @@ class BlockFacingHelper {
 
 	/**
 	 * @var int[][]
-	 * @phpstan-var array<1|2|3, array<int, int>>
+	 * @phpstan-var array<int<1, 3>, array<int, int>>
 	 */
 	private array $rotateXMap = [];
 
 	/**
 	 * @var int[][]
-	 * @phpstan-var array<1|2|3, array<int, int>>
+	 * @phpstan-var array<int<1, 3>, array<int, int>>
 	 */
 	private array $rotateYMap = [];
 
 	/**
 	 * @var int[][]
-	 * @phpstan-var array<1|2|3, array<int, int>>
+	 * @phpstan-var array<int<1, 3>, array<int, int>>
 	 */
 	private array $rotateZMap = [];
 
