@@ -54,7 +54,7 @@ class ReplaceCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->fill(new OppositeBlockIdentifier($fromBlockIds), $toBlockIds);
+			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->fill($toBlockIds, $fromBlockIds);
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
