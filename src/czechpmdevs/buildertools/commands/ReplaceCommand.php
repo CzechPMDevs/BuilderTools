@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
-use czechpmdevs\buildertools\blockstorage\identifiers\OppositeBlockIdentifier;
+use czechpmdevs\buildertools\blockstorage\identifiers\MergedBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
@@ -54,7 +54,8 @@ class ReplaceCommand extends BuilderToolsCommand {
 		}
 
 		try {
-			$result = SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->fill($toBlockIds, $fromBlockIds);
+			$session = SessionManager::getInstance()->getSession($sender);
+			$result = $session->getSelectionHolder()->fill($toBlockIds, $session->getMask() === null ? $fromBlockIds : new MergedBlockIdentifier($fromBlockIds, $session->getMask()));
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;

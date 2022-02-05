@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands;
 
-use czechpmdevs\buildertools\blockstorage\identifiers\MergedBlockIdentifier;
+use czechpmdevs\buildertools\blockstorage\identifiers\MultipleBlockIdentifier;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\session\SessionManager;
@@ -44,7 +44,7 @@ class MergeCommand extends BuilderToolsCommand {
 
 		try {
 			$session = SessionManager::getInstance()->getSession($sender);
-			$result = $session->getClipboardHolder()->paste($sender->getPosition(), new MergedBlockIdentifier(SingleBlockIdentifier::airIdentifier(), $session->getMask()));
+			$result = $session->getClipboardHolder()->paste($sender->getPosition(), new MultipleBlockIdentifier(SingleBlockIdentifier::airIdentifier(), $session->getMask()));
 		} catch(RuntimeException $exception) {
 			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
