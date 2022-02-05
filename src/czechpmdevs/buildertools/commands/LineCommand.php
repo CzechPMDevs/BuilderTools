@@ -53,7 +53,7 @@ class LineCommand extends BuilderToolsCommand {
 		$session = SessionManager::getInstance()->getSession($sender);
 		$selection = $session->getSelectionHolder();
 		if(!$selection instanceof CuboidSelection) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cIt is not possible to select chunk with current selection type. Use §l//sel cuboid§r§c and try executing the command again.");
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cIt is not possible to draw a line with current selection type. Use §l//sel cuboid§r§c and try executing the command again.");
 			return;
 		}
 
