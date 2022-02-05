@@ -122,6 +122,10 @@ class Polygon implements Shape {
 				if(!$draw) {
 					$blockGenerator->nextBlock($fullBlockId);
 					$fillSession->setBlockAt($x, $this->minY, $z, $fullBlockId);
+					if($this->maxY === $this->minY) {
+						continue;
+					}
+
 					$blockGenerator->nextBlock($fullBlockId);
 					$fillSession->setBlockAt($x, $this->maxY, $z, $fullBlockId);
 					continue;
@@ -190,10 +194,6 @@ class Polygon implements Shape {
 				}
 
 				if(!$draw) {
-					$blockGenerator->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $this->minY, $z, $fullBlockId);
-					$blockGenerator->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $this->maxY, $z, $fullBlockId);
 					continue;
 				}
 
