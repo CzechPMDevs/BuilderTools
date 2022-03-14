@@ -219,6 +219,10 @@ class BlockArray implements UpdateLevelData, Serializable {
 			$this->decompress();
 			$this->isCompressed = false;
 		}
+
+		// This should ensure that loaded clipboard has always offset 0.
+		$this->offset = 0;
+
 		return $this;
 	}
 
