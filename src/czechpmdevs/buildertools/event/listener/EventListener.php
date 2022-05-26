@@ -131,7 +131,7 @@ class EventListener implements Listener {
 					"§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" .
 					"§aName: §7" . $block->getName() . "\n" .
 					"§aPosition: §7" . $block->getPosition()->getFloorX() . ";" . $block->getPosition()->getFloorY() . ";" . $block->getPosition()->getFloorZ() . " (" . ($block->getPosition()->getFloorX() >> 4) . ";" . ($block->getPosition()->getFloorZ() >> 4) . ")\n" .
-					"§World: §7" . $world->getDisplayName() . "\n" .
+					"§aWorld: §7" . $world->getDisplayName() . "\n" .
 					"§aBiome: §7" . $world->getBiomeId($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ()) . " (" . $world->getBiome($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ())->getName() . ")"
 				);
 			}
