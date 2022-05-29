@@ -26,8 +26,8 @@ use pocketmine\block\BlockFactory;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\utils\SubChunkExplorer;
+use pocketmine\world\utils\SubChunkExplorerStatus;
 use pocketmine\world\World;
-use Throwable;
 
 class FillSession {
 	protected SubChunkExplorer $explorer;
@@ -195,7 +195,7 @@ class FillSession {
 		// If dimensions are not set, there should not be any blocks changed within fill session.
 		// Also, it is not needed to reload chunks in that case
 		if(!isset($this->minX) || !isset($this->maxX) || !isset($this->minZ) || !isset($this->maxZ)) {
-			BuilderTools::getInstance()->getLogger()->debug("Received empty undo action");
+			BuilderTools::getInstance()->getLogger()->debug("Requested to reload chunks for empty fill session");
 			return $this;
 		}
 
@@ -222,16 +222,8 @@ class FillSession {
 	}
 
 	protected function moveTo(int $x, int $y, int $z): bool {
-		$this->explorer->moveTo($x, $y, $z);
-
-		if($this->explorer->currentSubChunk === null) {
-			try {
-				/** @phpstan-ignore-next-line */
-				$this->explorer->currentSubChunk = $this->explorer->currentChunk->getSubChunk($y >> 4);
-			} catch(Throwable) { // For the case if chunk is null or y coordinate is less than 0
-				$this->error = true;
-				return false;
-			}
+		if($this->explorer->moveTo($x, $y, $z) === SubChunkExplorerStatus::INVALID) {
+			return false;
 		}
 
 		if($this->calculateDimensions) {
