@@ -25,9 +25,9 @@ use czechpmdevs\buildertools\item\WoodenAxe;
 use pocketmine\command\CommandSender;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
+use pocketmine\utils\AssumptionFailedError;
 
 class WandCommand extends BuilderToolsCommand {
-
 	public function __construct() {
 		parent::__construct("/wand", "Give want axe item to player inventory", null, []);
 	}
@@ -41,9 +41,18 @@ class WandCommand extends BuilderToolsCommand {
 		}
 
 		$item = VanillaItems::WOODEN_AXE();
-		if($item instanceof WoodenAxe) {
-			$item->setIsWandAxe(true);
+		if(!$item instanceof WoodenAxe) {
+			BuilderTools::getInstance()->registerItems();
+		} else {
+			$item = VanillaItems::WOODEN_AXE();
+			if(!$item instanceof WoodenAxe) {
+				throw new AssumptionFailedError("Received item should be BuilderTools WoodenAxe");
+			}
+
 		}
+
+		/** @phpstan-var WoodenAxe $item */
+		$item->setIsWandAxe(true);
 
 		$item->setCustomName(BuilderTools::getConfiguration()->getStringProperty("wand-axe-name"));
 		$item->getNamedTag()->setByte("buildertools", 1);

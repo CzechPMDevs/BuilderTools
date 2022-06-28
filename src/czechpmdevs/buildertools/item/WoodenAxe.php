@@ -39,6 +39,7 @@ class WoodenAxe extends Axe {
 
 	protected function serializeCompoundTag(CompoundTag $tag): void {
 		parent::serializeCompoundTag($tag);
+
 		if($this->isWandAxe) {
 			$tag->setTag(Item::TAG_ENCH, new ListTag([], NBT::TAG_Compound));
 		}
@@ -46,6 +47,7 @@ class WoodenAxe extends Axe {
 
 	public function deserializeCompoundTag(CompoundTag $tag): void {
 		parent::deserializeCompoundTag($tag);
+
 		$enchTag = $tag->getListTag(Item::TAG_ENCH);
 		if($enchTag !== null && count($enchTag->getValue()) === 0) {
 			$tag->removeTag(Item::TAG_ENCH);

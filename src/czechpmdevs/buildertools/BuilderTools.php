@@ -70,13 +70,15 @@ use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\item\WoodenAxe;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
-use czechpmdevs\buildertools\utils\StringToBlockParser;
 use pocketmine\command\Command;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
 use pocketmine\item\ToolTier;
+use pocketmine\item\VanillaItems;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\AssumptionFailedError;
+use ReflectionClass;
 use function array_key_exists;
 use function glob;
 use function is_dir;
@@ -97,6 +99,10 @@ class BuilderTools extends PluginBase {
 	/** @var Command[] */
 	private static array $commands = [];
 
+	protected function onLoad(): void {
+		$this->registerItems();
+	}
+
 	/** @noinspection PhpUnused */
 	protected function onEnable(): void {
 		BuilderTools::$instance = $this;
@@ -104,7 +110,6 @@ class BuilderTools extends PluginBase {
 		$this->initConfig();
 		$this->cleanCache();
 		$this->registerCommands();
-		$this->registerItems();
 		$this->initMath();
 		$this->initListener();
 		$this->sendWarnings();
@@ -214,8 +219,19 @@ class BuilderTools extends PluginBase {
 		HelpCommand::buildPages();
 	}
 
-	private function registerItems(): void {
+	public function registerItems(): void {
 		ItemFactory::getInstance()->register(new WoodenAxe(new ItemIdentifier(ItemIds::WOODEN_AXE, 0), "Wooden Axe", ToolTier::WOOD()), true);
+
+		$class = new ReflectionClass(VanillaItems::class);
+		$prop = $class->getProperty("members");
+		$prop->setAccessible(true);
+		$prop->setValue(null);
+
+		if(VanillaItems::WOODEN_AXE() instanceof WoodenAxe) {
+			$this->getLogger()->debug("Wooden axe registered successfully");
+		} else {
+			throw new AssumptionFailedError("Unable to register WoodenAxe");
+		}
 	}
 
 	private function sendWarnings(): void {
