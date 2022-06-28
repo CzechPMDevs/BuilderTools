@@ -48,7 +48,6 @@ use function zlib_encode;
 use const ZLIB_ENCODING_GZIP;
 
 class BlockArray implements UpdateLevelData, Serializable {
-
 	/** @var int[] */
 	public array $blocks = [];
 	/** @var int[] */
@@ -275,6 +274,13 @@ class BlockArray implements UpdateLevelData, Serializable {
 		$this->offset = 0;
 	}
 
+	/**
+	 * @phpstan-return null[]|string[]
+	 */
+	public function __serialize(): array {
+		return [$this->serialize()];
+	}
+
 	public function serialize(): ?string {
 		$this->compress();
 
@@ -293,6 +299,16 @@ class BlockArray implements UpdateLevelData, Serializable {
 		return $buffer;
 	}
 
+	/**
+	 * @phpstan-param mixed[] $data
+	 */
+	public function __unserialize(array $data): void {
+		$this->unserialize($data[0] ?? null);
+	}
+
+	/**
+	 * @phpstan-param mixed $data
+	 */
 	public function unserialize($data): void {
 		if(!is_string($data)) {
 			return;
