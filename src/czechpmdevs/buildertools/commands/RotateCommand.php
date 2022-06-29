@@ -22,11 +22,11 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Axis;
 use pocketmine\player\Player;
 use function is_numeric;
-use function microtime;
 use function round;
 
 class RotateCommand extends BuilderToolsCommand {
@@ -61,7 +61,7 @@ class RotateCommand extends BuilderToolsCommand {
 			}
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$copier = Copier::getInstance();
 		foreach($args as $i => $arg) {
@@ -74,7 +74,7 @@ class RotateCommand extends BuilderToolsCommand {
 			}
 		}
 
-		$time = round(microtime(true) - $startTime, 3);
+		$time = round($timer->time(), 3);
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected area rotated (Took $time seconds)!");
 	}
 }

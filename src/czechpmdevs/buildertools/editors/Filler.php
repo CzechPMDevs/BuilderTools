@@ -20,21 +20,23 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\session\SessionManager;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
-use function microtime;
 
 /** @deprecated */
 class Filler {
 	use SingletonTrait;
 
 	public function directFill(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blockGenerator, bool $hollow = false): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -69,16 +71,12 @@ class Filler {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
-		$updates->unload();
-
-		Canceller::getInstance()->addStep($player, $updates);
-
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function directWalls(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blocks): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -100,11 +98,7 @@ class Filler {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
-		$updates->unload();
-
-		Canceller::getInstance()->addStep($player, $updates);
-
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 }

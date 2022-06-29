@@ -42,5 +42,5 @@ interface Shape {
 	/**
 	 * Reads blocks inside the shape
 	 */
-	public function read(BlockArray $blockArray, bool $unloadReadData = true): self;
+	public function read(BlockArray $blockArray): self;
 }

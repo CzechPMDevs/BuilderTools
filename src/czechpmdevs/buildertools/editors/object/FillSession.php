@@ -57,7 +57,7 @@ class FillSession {
 		$this->saveChanges = $saveChanges;
 
 		if($this->saveChanges) {
-			$this->changes = (new BlockArray())->setWorld($world);
+			$this->changes = new BlockArray();
 		}
 	}
 

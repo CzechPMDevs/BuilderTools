@@ -22,10 +22,10 @@ namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Axis;
 use pocketmine\player\Player;
-use function microtime;
 use function round;
 use function strtolower;
 
@@ -59,12 +59,12 @@ class FlipCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$copier = Copier::getInstance();
 		$copier->flip($sender, $axis);
 
-		$time = round(microtime(true) - $startTime, 3);
+		$time = round($timer->time(), 3);
 
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aSelected are rotated (Took $time seconds)!");
 	}

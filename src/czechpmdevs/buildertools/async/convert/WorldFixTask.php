@@ -22,13 +22,13 @@ namespace czechpmdevs\buildertools\async\convert;
 
 use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
 use czechpmdevs\buildertools\editors\Fixer;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\world\format\io\leveldb\LevelDB;
 use pocketmine\world\format\io\WorldProviderManager;
 use RuntimeException;
 use function ceil;
 use function get_class;
 use function is_dir;
-use function microtime;
 use function round;
 use const DIRECTORY_SEPARATOR;
 
@@ -72,7 +72,7 @@ class WorldFixTask extends BuilderToolsAsyncTask {
 			throw new RuntimeException("World provider " . get_class($provider) . " is not supported.");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$chunksFixed = 0;
 		$this->totalChunkCount = $provider->calculateChunkCount();
@@ -98,7 +98,7 @@ class WorldFixTask extends BuilderToolsAsyncTask {
 			}
 		}
 
-		$this->totalTime = round(microtime(true) - $startTime, 2);
+		$this->totalTime = round($timer->time(), 2);
 		$this->isTaskDone = true;
 	}
 }

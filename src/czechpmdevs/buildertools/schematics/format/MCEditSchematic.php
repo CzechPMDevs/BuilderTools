@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\schematics\format;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockArraySizeData;
+use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\nbt\BigEndianNbtSerializer;
@@ -38,7 +40,6 @@ use function zlib_encode;
 use const ZLIB_ENCODING_GZIP;
 
 class MCEditSchematic implements Schematic {
-
 	public const MATERIALS_CLASSIC = "Classic";
 	public const MATERIALS_BEDROCK = "Pocket";
 	public const MATERIALS_ALPHA = "Alpha";
@@ -123,7 +124,7 @@ class MCEditSchematic implements Schematic {
 	public function save(BlockArray $blockArray): string {
 		$nbt = new CompoundTag();
 
-		$sizeData = $blockArray->getSizeData();
+		$sizeData = new BlockArraySizeData($blockArray);
 
 		$width = (($sizeData->maxX - $sizeData->minX) + 1);
 		$height = (($sizeData->maxY - $sizeData->minY) + 1);
@@ -133,8 +134,10 @@ class MCEditSchematic implements Schematic {
 		$totalSize = $xz * $height;
 
 		$blocks = $data = str_repeat(chr(0), $totalSize);
-		while($blockArray->hasNext()) {
-			$blockArray->readNext($x, $y, $z, $fullBlockId);
+
+		$iterator = new BlockArrayIteratorHelper($blockArray);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 			$key = $x + ($width * $z) + ($xz * $y);
 
 			$blocks[$key] = chr($fullBlockId >> 4);
@@ -196,7 +199,7 @@ class MCEditSchematic implements Schematic {
 			}
 
 			return false;
-		} catch(Throwable $ignore) {
+		} catch(Throwable) {
 			return false;
 		}
 	}

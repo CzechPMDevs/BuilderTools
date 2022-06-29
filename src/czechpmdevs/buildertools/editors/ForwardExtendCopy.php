@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\shape\Shape;
 use pocketmine\math\Facing;
@@ -29,6 +30,7 @@ use pocketmine\world\World;
 class ForwardExtendCopy {
 	public function stack(FillSession $fillSession, Shape $shape, int $minX, int $maxX, int $minY, int $maxY, int $minZ, int $maxZ, int $count, int $direction): void {
 		$temporaryBlockArray = new BlockArray();
+		$iterator = new BlockArrayIteratorHelper($temporaryBlockArray);
 
 		$shape->read($temporaryBlockArray);
 
@@ -40,14 +42,14 @@ class ForwardExtendCopy {
 
 			for($i = 1; $i < $count; ++$i) {
 				$j = $i * $ySize;
-				while($temporaryBlockArray->hasNext()) {
-					$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
+				while($iterator->hasNext()) {
+					$iterator->readNext($x, $y, $z, $fullBlockId);
 					if($y >= World::Y_MIN && $y < World::Y_MAX) {
 						$fillSession->setBlockAt($x, $y + $j, $z, $fullBlockId);
 					}
 				}
 
-				$temporaryBlockArray->offset = 0;
+				$iterator->resetOffset();
 			}
 		} elseif($direction === Facing::NORTH || $direction === Facing::SOUTH) {
 			$xSize = ($maxX - $minX) + 1;
@@ -61,13 +63,13 @@ class ForwardExtendCopy {
 
 			for($i = 1; $i < $count; ++$i) {
 				$j = $i * $xSize;
-				while($temporaryBlockArray->hasNext()) {
-					$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
+				while($iterator->hasNext()) {
+					$iterator->readNext($x, $y, $z, $fullBlockId);
 					$fillSession->setBlockAt($x + $j, $y, $z, $fullBlockId);
 				}
 
 				// Resets the array reader
-				$temporaryBlockArray->offset = 0;
+				$iterator->resetOffset();
 			}
 		} else {
 			$zSize = ($maxZ - $minZ) + 1;
@@ -81,13 +83,13 @@ class ForwardExtendCopy {
 
 			for($i = 1; $i < $count; ++$i) {
 				$j = $i * $zSize;
-				while($temporaryBlockArray->hasNext()) {
-					$temporaryBlockArray->readNext($x, $y, $z, $fullBlockId);
+				while($iterator->hasNext()) {
+					$iterator->readNext($x, $y, $z, $fullBlockId);
 					$fillSession->setBlockAt($x, $y, $z + $j, $fullBlockId);
 				}
 
 				// Resets array reader
-				$temporaryBlockArray->offset = 0;
+				$iterator->resetOffset();
 			}
 		}
 

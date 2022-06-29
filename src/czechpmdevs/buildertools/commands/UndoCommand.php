@@ -21,7 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Canceller;
+use czechpmdevs\buildertools\session\SessionManager;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
@@ -39,14 +40,18 @@ class UndoCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$result = Canceller::getInstance()->undo($sender);
-
-		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst processing the command: {$result->getErrorMessage()}");
+		$undoAction = SessionManager::getInstance()->getSession($sender)->getReverseDataHolder()->nextUndoAction();
+		if($undoAction === null) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cThere are not any actions to redo.");
 			return;
 		}
 
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aStep was cancelled, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+		$timer = new Timer();
+
+		$redoAction = $undoAction->insert(); // TODO - This should not be done in command class
+		SessionManager::getInstance()->getSession($sender)->getReverseDataHolder()->saveRedo($redoAction);
+
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aAction reversed, {$redoAction->getSize()} blocks changed (Took {$timer->time()} seconds)!");
 	}
 
 }

@@ -28,7 +28,6 @@ use function is_int;
 use function is_string;
 
 class Configuration {
-
 	public function __construct(
 		/** @var array<array-key, mixed> $data */
 		private array $data

@@ -51,9 +51,6 @@ class MCStructureSchematic implements Schematic {
 
 	public function load(string $rawData): BlockArray {
 		$nbt = (new LittleEndianNbtSerializer())->read($rawData)->mustGetCompoundTag();
-		if(!$nbt instanceof CompoundTag) {
-			throw new SchematicException("NBT root must be compound tag");
-		}
 
 		$size = $this->readVector3($nbt, "size");
 

@@ -61,7 +61,7 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges()->unload();
+			$this->reverseData = $fillSession->getChanges();
 		}
 
 		return $this;
@@ -94,7 +94,7 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges()->unload();
+			$this->reverseData = $fillSession->getChanges();
 		}
 
 		return $this;
@@ -126,13 +126,13 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges()->unload();
+			$this->reverseData = $fillSession->getChanges();
 		}
 
 		return $this;
 	}
 
-	public function read(BlockArray $blockArray, bool $unloadReadData = true): self {
+	public function read(BlockArray $blockArray): self {
 		$fillSession = $this->mask === null ?
 			new FillSession($this->world, false, false) :
 			new MaskedFillSession($this->world, false, false, $this->mask);
@@ -147,10 +147,6 @@ class Cuboid implements Shape {
 					$blockArray->addBlockAt($x, $y, $z, $fullBlockId);
 				}
 			}
-		}
-
-		if($unloadReadData) {
-			$blockArray->unload();
 		}
 
 		return $this;

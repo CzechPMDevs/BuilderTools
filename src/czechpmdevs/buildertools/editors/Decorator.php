@@ -20,13 +20,15 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
+use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\Position;
-use function microtime;
 use function mt_rand;
 
 /** @deprecated */
@@ -34,7 +36,7 @@ class Decorator {
 	use SingletonTrait;
 
 	public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$fillSession = new FillSession($center->getWorld(), false, true);
 
@@ -66,10 +68,9 @@ class Decorator {
 		$fillSession->reloadChunks($center->getWorld());
 
 		$updates = $fillSession->getChanges();
-		$updates->unload();
 
-		Canceller::getInstance()->addStep($player, $updates);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $center->getWorld()));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 }

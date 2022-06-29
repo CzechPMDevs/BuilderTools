@@ -20,15 +20,17 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
+use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
 use function max;
-use function microtime;
 use function min;
 
 /** @deprecated */
@@ -36,13 +38,13 @@ class Replacement {
 	use SingletonTrait;
 
 	public function directReplace(Player $player, Vector3 $pos1, Vector3 $pos2, string $blocks, string $replace): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$mask = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand(), false);
 		$stringToBlockDecoder = new StringToBlockDecoder($replace, $player->getInventory()->getItemInHand());
 
 		if(!$mask->isValid(false)) { // Nothing to replace
-			return UpdateResult::success(0, microtime(true) - $startTime);
+			return UpdateResult::success(0, $timer->time());
 		}
 		if(!$stringToBlockDecoder->isValid()) {
 			return UpdateResult::error("Could not read blocks from $blocks");
@@ -71,10 +73,8 @@ class Replacement {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
-		$updates->unload();
-		Canceller::getInstance()->addStep($player, $updates);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 }

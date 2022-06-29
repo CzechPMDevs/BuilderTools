@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\session\selection;
 
 use Closure;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
@@ -33,6 +35,7 @@ use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\session\SelectionHolder;
 use czechpmdevs\buildertools\shape\Polygon;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\math\Vector3;
 use pocketmine\world\Position;
 use pocketmine\world\World;
@@ -41,7 +44,6 @@ use function abs;
 use function ceil;
 use function count;
 use function max;
-use function microtime;
 use function min;
 
 class PolygonalSelection extends SelectionHolder {
@@ -78,15 +80,15 @@ class PolygonalSelection extends SelectionHolder {
 			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$reverseData = (new Polygon($this->world, $this->minY, $this->maxY, $this->points, $mask))
 			->fill($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), $timer->time());
 	}
 
 	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -96,15 +98,15 @@ class PolygonalSelection extends SelectionHolder {
 			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$reverseData = (new Polygon($this->world, $this->minY, $this->maxY, $this->points, $mask))
 			->outline($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), $timer->time());
 	}
 
 	public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -114,21 +116,21 @@ class PolygonalSelection extends SelectionHolder {
 			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$reverseData = (new Polygon($this->world, $this->minY, $this->maxY, $this->points, $mask))
 			->walls($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), $timer->time());
 	}
 
 	public function stack(int $count, int $direction): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMultipleMinAndMaxValues($minX, $maxX, $minZ, $maxZ, ...$this->points);
 		$fillSession = (new FillSession($this->world, false, true))
@@ -137,12 +139,11 @@ class PolygonalSelection extends SelectionHolder {
 		(new ForwardExtendCopy())->stack($fillSession, (new Polygon($this->world, $this->minY, $this->maxY, $this->points)), $minX, $maxX, $this->minY, $this->maxY, $minZ, $maxZ, $count, $direction);
 
 		$reverseData = $fillSession->reloadChunks($this->world)
-			->getChanges()
-			->unload();
+			->getChanges();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function naturalize(?BlockIdentifierList $mask = null): UpdateResult {
@@ -152,37 +153,35 @@ class PolygonalSelection extends SelectionHolder {
 	public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
-		$clipboard = new Clipboard();
-		$clipboard->setRelativePosition($relativePosition);
+		$blockArray = new BlockArray();
 
 		(new Polygon($this->world, $this->minY, $this->maxY, $this->points, $mask))
-			->read($clipboard);
+			->read($blockArray);
 
-		$this->session->getClipboardHolder()->setClipboard($clipboard);
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
 
-		return UpdateResult::success($clipboard->size(), microtime(true) - $startTime);
+		return UpdateResult::success($blockArray->size(), $timer->time());
 
 	}
 
 	public function cutToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
-		$clipboard = new Clipboard();
-		$clipboard->setRelativePosition($relativePosition);
+		$blockArray = new BlockArray();
 
 		$reverseData = (new Polygon($this->world, $this->minY, $this->maxY, $this->points, $mask))
-			->read($clipboard)
+			->read($blockArray)
 			->fill(SingleBlockIdentifier::airIdentifier(), true)
 			->getReverseData();
 
-		$this->session->getClipboardHolder()->setClipboard($clipboard);
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($clipboard->size(), microtime(true) - $startTime);
+		return UpdateResult::success($blockArray->size(), $timer->time());
 	}
 
 	public function saveToSchematic(string $name, Closure $callback, ?BlockIdentifierList $mask = null): void {

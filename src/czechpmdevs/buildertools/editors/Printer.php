@@ -21,11 +21,15 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
+use czechpmdevs\buildertools\blockstorage\helpers\DuplicateBlockCleanHelper;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -33,7 +37,6 @@ use pocketmine\utils\SingletonTrait;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use function abs;
-use function microtime;
 
 /** @deprecated */
 class Printer {
@@ -48,7 +51,6 @@ class Printer {
 
 	public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false): void {
 		$updates = new BlockArray();
-		$updates->setWorld($center->getWorld());
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$level = $center->getWorld();
@@ -75,12 +77,12 @@ class Printer {
 			foreach(BlockGenerator::generateSphere($brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$updates->removeDuplicates();
+			(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 		} elseif($mode === Printer::CYLINDER) {
 			foreach(BlockGenerator::generateCylinder($brush, $brush) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$updates->removeDuplicates();
+			(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 		} elseif($mode === Printer::HOLLOW_CUBE) {
 			foreach(BlockGenerator::generateCube($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
@@ -89,16 +91,17 @@ class Printer {
 			foreach(BlockGenerator::generateSphere($brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$updates->removeDuplicates();
+			(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 		} elseif($mode === Printer::HOLLOW_CYLINDER) {
 			foreach(BlockGenerator::generateCylinder($brush, $brush, true) as [$x, $y, $z]) {
 				$placeBlock($center->add($x, $y, $z));
 			}
-			$updates->removeDuplicates();
+			(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 		}
 
-		$updates->unload();
-		Canceller::getInstance()->addStep($player, $updates);
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
+
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
 	}
 
 	private function throwBlock(Position $position): Vector3 {
@@ -115,7 +118,7 @@ class Printer {
 	}
 
 	public function makeSphere(Player $player, Position $center, int $radius, string $blockArgs, bool $hollow = false): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 		$radius = abs($radius);
 		if($radius === 0) {
@@ -198,12 +201,11 @@ class Printer {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->removeDuplicates();
-		$updates->unload();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
-		Canceller::getInstance()->addStep($player, $updates);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function makeHollowSphere(Player $player, Position $center, int $radius, string $blocks): UpdateResult {
@@ -211,7 +213,7 @@ class Printer {
 	}
 
 	public function makeCylinder(Player $player, Position $center, int $radius, int $height, string $blockArgs, bool $hollow = false): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$radius = abs($radius);
@@ -252,7 +254,7 @@ class Printer {
 				$incDivZ = ($z + 1) / $radius;
 
 				$lengthSquared = Math::lengthSquared2d($divX, $divZ);
-				if($lengthSquared > 1) { // checking if can skip blocks outside of circle
+				if($lengthSquared > 1) { // checking if it can skip blocks outside of circle
 					if($z === 0) {
 						break 2;
 					}
@@ -286,12 +288,11 @@ class Printer {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->removeDuplicates();
-		$updates->unload();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
-		Canceller::getInstance()->addStep($player, $updates);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function makeHollowCylinder(Player $player, Position $center, int $radius, int $height, string $blockArgs): UpdateResult {
@@ -299,7 +300,7 @@ class Printer {
 	}
 
 	public function makePyramid(Player $player, Position $center, int $size, string $blockArgs, bool $hollow = false): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$size = abs($size);
@@ -348,12 +349,11 @@ class Printer {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->removeDuplicates();
-		$updates->unload();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
-		Canceller::getInstance()->addStep($player, $updates);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function makeHollowPyramid(Player $player, Position $center, int $size, string $blockArgs): UpdateResult {
@@ -381,7 +381,7 @@ class Printer {
 	}
 
 	public function makeIsland(Player $player, Position $center, int $radius, int $step, string $blockArgs): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
 		$radius = abs($radius);
@@ -456,10 +456,10 @@ class Printer {
 		$fillSession->close();
 
 		$updates = $fillSession->getChanges();
-		$updates->removeDuplicates();
-		$updates->unload();
-		Canceller::getInstance()->addStep($player, $updates);
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
+
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 }

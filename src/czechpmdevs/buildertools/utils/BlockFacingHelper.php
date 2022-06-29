@@ -82,7 +82,7 @@ class BlockFacingHelper {
 		}
 
 		try {
-			$ref = new ReflectionClass($block);
+			$ref = new ReflectionClass($block); // @phpstan-ignore-line
 
 			$getter = $ref->getMethod("getFacing");
 			if($getter->getReturnType()?->__toString() !== "int") {
@@ -140,7 +140,6 @@ class BlockFacingHelper {
 					} catch(InvalidArgumentException) {
 					}
 				}
-				continue;
 			}
 		}
 

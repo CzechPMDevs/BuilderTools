@@ -30,7 +30,6 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemUseEvent;
-use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\item\VanillaItems;
@@ -146,13 +145,7 @@ class EventListener implements Listener {
 	}
 
 	/** @noinspection PhpUnused */
-	public function onJoin(PlayerJoinEvent $event): void {
-		OfflineSession::loadPlayerSession($event->getPlayer());
-	}
-
-	/** @noinspection PhpUnused */
 	public function onQuit(PlayerQuitEvent $event): void {
-		OfflineSession::savePlayerSession($event->getPlayer());
 		SessionManager::getInstance()->closeSession($event->getPlayer());
 	}
 

@@ -21,9 +21,12 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\math;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockArraySizeData;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
+use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\utils\BlockFacingHelper;
 use pocketmine\math\Axis;
+use pocketmine\math\Vector3;
 use pocketmine\world\World;
 use function atan2;
 use function deg2rad;
@@ -31,24 +34,30 @@ use function round;
 use function sqrt;
 
 class Transform {
+	private BlockArray $blockStorage;
+	private Vector3 $relativePosition;
+	private World $world;
 
-	public function __construct(
-		private Clipboard $clipboard
-	) {
-		$this->clipboard->load();
+	public function __construct(Clipboard $clipboard) {
+		$this->blockStorage = $clipboard->getBlockStorage();
+		$this->relativePosition = $clipboard->getRelativePosition();
+		$this->world = $clipboard->getWorld();
 	}
 
 	public function rotateY(int $degrees): void {
 		$rad = deg2rad($degrees);
 
-		$diff = $this->clipboard->getRelativePosition();
+		$diff = $this->relativePosition;
 		[$diffX, $diffZ] = [$diff->getFloorX(), $diff->getFloorZ()];
 
 		$rotationMapping = BlockFacingHelper::getInstance()->getRotationMapping(Axis::Y, $degrees);
 
+		$blockArray = $this->blockStorage;
+		$iterator = new BlockArrayIteratorHelper($blockArray);
+
 		$modifiedClipboard = new BlockArray();
-		while($this->clipboard->hasNext()) {
-			$this->clipboard->readNext($x, $y, $z, $fullBlockId);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 
 			$dist = sqrt(Math::lengthSquared2d($x - $diffX, $z - $diffZ));
 			$angle = atan2($z - $diffZ, $x - $diffX) + $rad;
@@ -60,22 +69,24 @@ class Transform {
 			);
 		}
 
-		$this->clipboard->blocks = $modifiedClipboard->blocks;
-		$this->clipboard->coords = $modifiedClipboard->coords;
-		$this->clipboard->offset = 0;
+		$blockArray->blocks = $modifiedClipboard->blocks;
+		$blockArray->coords = $modifiedClipboard->coords;
 	}
 
 	public function rotateX(int $degrees): void {
 		$rad = deg2rad($degrees);
 
-		$diff = $this->clipboard->getRelativePosition();
+		$diff = $this->relativePosition;
 		[$diffY, $diffZ] = [$diff->getFloorY(), $diff->getFloorZ()];
 
 		$rotationMapping = BlockFacingHelper::getInstance()->getRotationMapping(Axis::Y, $degrees);
 
+		$blockArray = $this->blockStorage;
+		$iterator = new BlockArrayIteratorHelper($blockArray);
+
 		$modifiedClipboard = new BlockArray();
-		while($this->clipboard->hasNext()) {
-			$this->clipboard->readNext($x, $y, $z, $fullBlockId);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 
 			$dist = sqrt(Math::lengthSquared2d($z - $diffZ, $y - $diffY));
 			$angle = atan2($y - $diffY, $z - $diffZ) + $rad;
@@ -91,22 +102,24 @@ class Transform {
 				$rotationMapping[$fullBlockId] ?? $fullBlockId);
 		}
 
-		$this->clipboard->blocks = $modifiedClipboard->blocks;
-		$this->clipboard->coords = $modifiedClipboard->coords;
-		$this->clipboard->offset = 0;
+		$blockArray->blocks = $modifiedClipboard->blocks;
+		$blockArray->coords = $modifiedClipboard->coords;
 	}
 
 	public function rotateZ(int $degrees): void {
 		$rad = deg2rad($degrees);
 
-		$diff = $this->clipboard->getRelativePosition();
+		$diff = $this->relativePosition;
 		[$diffX, $diffY] = [$diff->getFloorX(), $diff->getFloorY()];
 
 		$rotationMapping = BlockFacingHelper::getInstance()->getRotationMapping(Axis::Z, $degrees);
 
+		$blockArray = $this->blockStorage;
+		$iterator = new BlockArrayIteratorHelper($blockArray);
+
 		$modifiedBlockArray = new BlockArray();
-		while($modifiedBlockArray->hasNext()) {
-			$this->clipboard->readNext($x, $y, $z, $fullBlockId);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 
 			$dist = sqrt(Math::lengthSquared2d($y - $diffY, $x - $diffX));
 			$angle = atan2($x - $diffX, $y - $diffY) + $rad;
@@ -123,18 +136,20 @@ class Transform {
 			);
 		}
 
-		$this->clipboard->blocks = $modifiedBlockArray->blocks;
-		$this->clipboard->coords = $modifiedBlockArray->coords;
-		$this->clipboard->offset = 0;
+		$blockArray->blocks = $modifiedBlockArray->blocks;
+		$blockArray->coords = $modifiedBlockArray->coords;
 	}
 
 	public function flipX(): void {
-		$sizeData = $this->clipboard->getSizeData();
+		$blockArray = $this->blockStorage;
+		$sizeData = new BlockArraySizeData($blockArray);
+
 		$flipMapping = BlockFacingHelper::getInstance()->getFlipMapping(Axis::X);
 
 		$modifiedBlockArray = new BlockArray();
-		while($this->clipboard->hasNext()) {
-			$this->clipboard->readNext($x, $y, $z, $fullBlockId);
+		$iterator = new BlockArrayIteratorHelper($blockArray);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 
 			$modifiedBlockArray->addBlockAt(
 				($sizeData->minX + $sizeData->maxX) - $x,
@@ -144,18 +159,20 @@ class Transform {
 			);
 		}
 
-		$this->clipboard->blocks = $modifiedBlockArray->blocks;
-		$this->clipboard->coords = $modifiedBlockArray->coords;
-		$this->clipboard->offset = 0;
+		$blockArray->blocks = $modifiedBlockArray->blocks;
+		$blockArray->coords = $modifiedBlockArray->coords;
 	}
 
 	public function flipZ(): void {
-		$sizeData = $this->clipboard->getSizeData();
+		$blockArray = $this->blockStorage;
+		$sizeData = new BlockArraySizeData($blockArray);
+
 		$flipMapping = BlockFacingHelper::getInstance()->getRotationMapping(Axis::Z, 180);
 
 		$modifiedBlockArray = new BlockArray();
-		while($this->clipboard->hasNext()) {
-			$this->clipboard->readNext($x, $y, $z, $fullBlockId);
+		$iterator = new BlockArrayIteratorHelper($blockArray);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 
 			$modifiedBlockArray->addBlockAt(
 				$x,
@@ -165,18 +182,20 @@ class Transform {
 			);
 		}
 
-		$this->clipboard->blocks = $modifiedBlockArray->blocks;
-		$this->clipboard->coords = $modifiedBlockArray->coords;
-		$this->clipboard->offset = 0;
+		$blockArray->blocks = $modifiedBlockArray->blocks;
+		$blockArray->coords = $modifiedBlockArray->coords;
 	}
 
 	public function flipY(): void {
-		$sizeData = $this->clipboard->getSizeData();
+		$blockArray = $this->blockStorage;
+		$sizeData = new BlockArraySizeData($blockArray);
+
 		$flipMapping = BlockFacingHelper::getInstance()->getFlipMapping(Axis::Y);
 
 		$modifiedBlockArray = new BlockArray();
-		while($this->clipboard->hasNext()) {
-			$this->clipboard->readNext($x, $y, $z, $fullBlockId);
+		$iterator = new BlockArrayIteratorHelper($blockArray);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 			$y = ($sizeData->minY + $sizeData->maxY) - $y;
 			if($y < World::Y_MIN || $y >= World::Y_MAX) {
 				continue;
@@ -190,12 +209,11 @@ class Transform {
 			);
 		}
 
-		$this->clipboard->blocks = $modifiedBlockArray->blocks;
-		$this->clipboard->coords = $modifiedBlockArray->coords;
-		$this->clipboard->offset = 0;
+		$blockArray->blocks = $modifiedBlockArray->blocks;
+		$blockArray->coords = $modifiedBlockArray->coords;
 	}
 
-	public function close(): void {
-		$this->clipboard->unload();
+	public function collectChanges(): Clipboard {
+		return new Clipboard($this->blockStorage, $this->relativePosition, $this->world);
 	}
 }

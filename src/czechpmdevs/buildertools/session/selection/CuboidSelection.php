@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\session\selection;
 
 use Closure;
+use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
@@ -34,13 +36,13 @@ use czechpmdevs\buildertools\schematics\SchematicsManager;
 use czechpmdevs\buildertools\session\SelectionHolder;
 use czechpmdevs\buildertools\shape\Cuboid;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\math\Vector3;
 use pocketmine\math\VoxelRayTrace;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
 use function max;
-use function microtime;
 use function min;
 
 class CuboidSelection extends SelectionHolder {
@@ -67,16 +69,16 @@ class CuboidSelection extends SelectionHolder {
 			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
 			->fill($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), $timer->time());
 	}
 
 	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -86,16 +88,16 @@ class CuboidSelection extends SelectionHolder {
 			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
 			->outline($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), $timer->time());
 	}
 
 	public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -105,23 +107,23 @@ class CuboidSelection extends SelectionHolder {
 			return throw new RuntimeException("No blocks found in string.");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
 			->walls($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), $timer->time());
 	}
 
 
 	public function stack(int $count, int $direction): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		$fillSession = (new FillSession($this->world, false, true))
@@ -130,18 +132,17 @@ class CuboidSelection extends SelectionHolder {
 		(new ForwardExtendCopy())->stack($fillSession, new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ), $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $count, $direction);
 
 		$reverseData = $fillSession->reloadChunks($this->world)
-			->getChanges()
-			->unload();
+			->getChanges();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function naturalize(?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$naturalizer = new Naturalizer();
 
@@ -153,49 +154,45 @@ class CuboidSelection extends SelectionHolder {
 		$naturalizer->naturalize($fillSession, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
 		$reverseData = $fillSession->reloadChunks($this->world)
-			->getChanges()
-			->unload();
+			->getChanges();
 
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($reverseData->size(), microtime(true) - $startTime);
+		return UpdateResult::success($reverseData->size(), $timer->time());
 	}
 
 	public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
-		$clipboard = new Clipboard();
-		$clipboard->setRelativePosition($relativePosition);
+		$blockArray = new BlockArray();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		(new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
-			->read($clipboard);
+			->read($blockArray);
 
-		$this->session->getClipboardHolder()->setClipboard($clipboard);
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
 
-		return UpdateResult::success($clipboard->size(), microtime(true) - $startTime);
+		return UpdateResult::success($blockArray->size(), $timer->time());
 	}
 
 	public function cutToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
-
-		$clipboard = new Clipboard();
-		$clipboard->setRelativePosition($relativePosition);
+		$timer = new Timer();
+		$blockStorage = new BlockArray();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
-			->read($clipboard)
+			->read($blockStorage)
 			->fill(SingleBlockIdentifier::airIdentifier(), true)
 			->getReverseData();
 
-		$this->session->getClipboardHolder()->setClipboard($clipboard);
-		$this->session->getReverseDataHolder()->saveUndo($reverseData);
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockStorage, $relativePosition, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 
-		return UpdateResult::success($clipboard->size(), microtime(true) - $startTime);
+		return UpdateResult::success($blockStorage->size(), $timer->time());
 	}
 
 	// TODO - Mask
@@ -218,7 +215,7 @@ class CuboidSelection extends SelectionHolder {
 	public function changeBiome(int $biomeId): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, false, $minX, $maxX, $_, $_, $minZ, $maxZ);
 
@@ -232,13 +229,13 @@ class CuboidSelection extends SelectionHolder {
 
 		$fillSession->reloadChunks($this->getWorld());
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function move(int $xMotion, int $yMotion, int $zMotion): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -274,15 +271,15 @@ class CuboidSelection extends SelectionHolder {
 		}
 
 		$fillSession->reloadChunks($this->world);
-		$this->session->getReverseDataHolder()->saveUndo($fillSession->getChanges()->unload());
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $this->world));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function createLineBetweenPositions(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
@@ -298,9 +295,9 @@ class CuboidSelection extends SelectionHolder {
 		}
 
 		$fillSession->reloadChunks($this->world);
-		$this->session->getReverseDataHolder()->saveUndo($fillSession->getChanges()->unload());
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $this->world));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function getWorld(): World {

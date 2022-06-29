@@ -18,24 +18,25 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\blockstorage;
+namespace czechpmdevs\buildertools\utils;
 
-use pocketmine\world\ChunkManager;
+use function microtime;
+use function round;
 
-interface UpdateLevelData {
+class Timer {
+	private static int $precision = 3;
 
-	/**
-	 * @return bool Returns if it is possible read next blocks
-	 */
-	public function hasNext(): bool;
+	private float $startTime;
 
-	/**
-	 * Reads next block from the array
-	 */
-	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$fullBlockId): void;
+	public function __construct() {
+		$this->startTime = microtime(true);
+	}
 
-	/**
-	 * Should not be null when used in filler
-	 */
-	public function getWorld(): ?ChunkManager;
+	public function time(): float {
+		return round(microtime(true) - $this->startTime, self::$precision);
+	}
+
+	public static function setPrecision(int $precision): void {
+		self::$precision = $precision;
+	}
 }

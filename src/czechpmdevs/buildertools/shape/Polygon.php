@@ -68,7 +68,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges()->unload();
+			$this->reverseData = $fillSession->getChanges();
 		}
 
 		return $this;
@@ -142,7 +142,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges()->unload();
+			$this->reverseData = $fillSession->getChanges();
 		}
 
 		return $this;
@@ -208,7 +208,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges()->unload();
+			$this->reverseData = $fillSession->getChanges();
 		}
 
 		return $this;
@@ -234,10 +234,6 @@ class Polygon implements Shape {
 					$blockArray->addBlockAt($x, $y, $z, $fullBlockId);
 				}
 			}
-		}
-
-		if($unloadReadData) {
-			$blockArray->unload();
 		}
 
 		return $this;

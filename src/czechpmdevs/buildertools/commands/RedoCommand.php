@@ -21,7 +21,8 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\commands;
 
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Canceller;
+use czechpmdevs\buildertools\session\SessionManager;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
@@ -38,13 +39,18 @@ class RedoCommand extends BuilderToolsCommand {
 			$sender->sendMessage("§cThis command can be used only in game!");
 			return;
 		}
-
-		$result = Canceller::getInstance()->redo($sender);
-		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cError whilst processing the command: {$result->getErrorMessage()}");
+	
+		$redoAction = SessionManager::getInstance()->getSession($sender)->getReverseDataHolder()->nextRedoAction();
+		if($redoAction === null) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§cThere are not any actions to redo.");
 			return;
 		}
 
-		$sender->sendMessage(BuilderTools::getPrefix() . "§aUndo was cancelled, {$result->getBlocksChanged()} blocks changed (Took {$result->getProcessTime()} seconds)!");
+		$timer = new Timer();
+		
+		$undoAction = $redoAction->insert(); // TODO - This should not be done in command class
+		SessionManager::getInstance()->getSession($sender)->getReverseDataHolder()->saveUndo($undoAction);
+		
+		$sender->sendMessage(BuilderTools::getPrefix() . "§aUndo was cancelled, {$undoAction->getSize()} blocks changed (Took {$timer->time()} seconds)!");
 	}
 }

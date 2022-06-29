@@ -27,7 +27,6 @@ use pocketmine\player\Player;
 use RuntimeException;
 
 class FillCommand extends BuilderToolsCommand {
-
 	public function __construct() {
 		parent::__construct("/fill", "Fill selected positions.", null, ["/set", "/change"]);
 	}

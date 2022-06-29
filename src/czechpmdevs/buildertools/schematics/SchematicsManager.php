@@ -25,8 +25,9 @@ use czechpmdevs\buildertools\async\AsyncQueue;
 use czechpmdevs\buildertools\async\schematics\SchematicCreateTask;
 use czechpmdevs\buildertools\async\schematics\SchematicLoadTask;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
+use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\Canceller;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\Math;
@@ -35,6 +36,8 @@ use czechpmdevs\buildertools\schematics\format\MCEditSchematic;
 use czechpmdevs\buildertools\schematics\format\MCStructureSchematic;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\format\SpongeSchematic;
+use czechpmdevs\buildertools\session\SessionManager;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use function array_keys;
@@ -43,7 +46,6 @@ use function array_unique;
 use function basename;
 use function file_exists;
 use function in_array;
-use function microtime;
 use function pathinfo;
 use function strtolower;
 use function touch;
@@ -74,7 +76,7 @@ class SchematicsManager {
 	 * @phpstan-param Closure(SchematicActionResult $result): void $callback
 	 */
 	public static function loadSchematic(string $schematic, Closure $callback): void {
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$file = $schematic;
 		if(!SchematicsManager::findSchematicFile($file)) {
@@ -83,7 +85,7 @@ class SchematicsManager {
 		}
 
 		/** @phpstan-ignore-next-line */
-		AsyncQueue::submitTask(new SchematicLoadTask($file), function(SchematicLoadTask $task) use ($startTime, $schematic, $callback): void {
+		AsyncQueue::submitTask(new SchematicLoadTask($file), function(SchematicLoadTask $task) use ($timer, $schematic, $callback): void {
 			if($task->getErrorMessage() !== null) {
 				$callback(SchematicActionResult::error($task->getErrorMessage()));
 				return;
@@ -96,7 +98,7 @@ class SchematicsManager {
 			}
 
 			SchematicsManager::$loadedSchematics[$task->name] = $blockArray;
-			$callback(SchematicActionResult::success(microtime(true) - $startTime));
+			$callback(SchematicActionResult::success($timer->time()));
 		});
 	}
 
@@ -120,7 +122,7 @@ class SchematicsManager {
 	 * @phpstan-param Closure(SchematicActionResult $result): void $callback
 	 */
 	public static function createSchematic(Player $player, Vector3 $pos1, Vector3 $pos2, string $schematicName, Closure $callback): void {
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		$format = SchematicsManager::getSchematicByExtension(BuilderTools::getConfiguration()->getStringProperty("output-schematics-format"));
 		BuilderTools::getInstance()->getLogger()->debug("Using $format format to create schematic...");
@@ -147,18 +149,18 @@ class SchematicsManager {
 		}
 
 		/** @phpstan-ignore-next-line */
-		AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function(SchematicCreateTask $task) use ($callback, $startTime): void {
+		AsyncQueue::submitTask(new SchematicCreateTask($targetFile, $format, $blocks), function(SchematicCreateTask $task) use ($timer, $callback): void {
 			if($task->error !== null) {
 				$callback(SchematicActionResult::error($task->error));
 				return;
 			}
 
-			$callback(SchematicActionResult::success(microtime(true) - $startTime));
+			$callback(SchematicActionResult::success($timer->time()));
 		});
 	}
 
 	public static function pasteSchematic(Player $player, string $schematicName): UpdateResult {
-		$startTime = microtime(true);
+		$timer = new Timer();
 
 		if(!isset(SchematicsManager::$loadedSchematics[$schematicName])) {
 			return UpdateResult::error("Schematic $schematicName is not loaded.");
@@ -172,8 +174,9 @@ class SchematicsManager {
 		$floorY = $player->getPosition()->getFloorY();
 		$floorZ = $player->getPosition()->getFloorZ();
 
-		while($schematic->hasNext()) {
-			$schematic->readNext($x, $y, $z, $fullBlockId);
+		$iterator = new BlockArrayIteratorHelper($schematic);
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 			if($fullBlockId !== 0) $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
@@ -184,11 +187,9 @@ class SchematicsManager {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
-		$updates->unload();
-		Canceller::getInstance()->addStep($player, $updates);
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	private static function findSchematicFile(string &$file): bool {

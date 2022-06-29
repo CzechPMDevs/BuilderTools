@@ -20,14 +20,16 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\session;
 
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
+use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
+use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\world\Position;
 use RuntimeException;
-use function microtime;
 
 class ClipboardHolder {
 	private ?Clipboard $clipboard = null;
@@ -50,9 +52,8 @@ class ClipboardHolder {
 			throw new RuntimeException("There is not clipboard copied");
 		}
 
-		$startTime = microtime(true);
+		$timer = new Timer();
 
-		$this->clipboard->load();
 		$relativePosition = $this->clipboard->getRelativePosition();
 
 		if($mask === null) {
@@ -67,8 +68,9 @@ class ClipboardHolder {
 		$floorY = $motion->getFloorY();
 		$floorZ = $motion->getFloorZ();
 
-		while($this->clipboard->hasNext()) {
-			$this->clipboard->readNext($x, $y, $z, $fullBlockId);
+		$iterator = new BlockArrayIteratorHelper($this->clipboard->getBlockStorage());
+		while($iterator->hasNext()) {
+			$iterator->readNext($x, $y, $z, $fullBlockId);
 			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
 		}
 
@@ -76,11 +78,10 @@ class ClipboardHolder {
 		$fillSession->close();
 
 		$changes = $fillSession->getChanges();
-		$changes->unload();
 
-		$this->session->getReverseDataHolder()->saveUndo($changes);
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($changes, $position->getWorld()));
 
-		return UpdateResult::success($fillSession->getBlocksChanged(), microtime(true) - $startTime);
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	protected function getSession(): Session {

@@ -20,62 +20,26 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
-use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\BigEndianNbtSerializer;
-use pocketmine\nbt\tag\ByteArrayTag;
-use pocketmine\nbt\tag\ByteTag;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\TreeRoot;
-use pocketmine\world\ChunkManager;
 use pocketmine\world\World;
-use RuntimeException;
-use Serializable;
-use function array_combine;
-use function array_keys;
-use function array_reverse;
-use function array_slice;
-use function array_values;
 use function count;
 use function in_array;
-use function intdiv;
-use function is_string;
-use function pack;
-use function strlen;
-use function unpack;
-use function zlib_decode;
-use function zlib_encode;
-use const ZLIB_ENCODING_GZIP;
 
-class BlockArray implements UpdateLevelData, Serializable {
+final class BlockArray {
 	/** @var int[] */
 	public array $blocks = [];
 	/** @var int[] */
 	public array $coords = [];
 
-	protected ?BlockArraySizeData $sizeData = null;
-
-	protected ?ChunkManager $world = null;
-
-	protected bool $detectDuplicates;
-
-	protected bool $isCompressed = false;
-
-	public string $compressedBlocks;
-	public string $compressedCoords;
-
-	public int $offset = 0;
-
 	/**
-	 * Fields to avoid allocating memory every time
-	 * when writing or reading block from the
-	 * array
+	 * Fields to avoid allocating memory every time when writing or reading
+	 * block from the array
 	 */
 	protected int $lastHash;
 
-	public function __construct(bool $detectDuplicates = false) {
-		$this->detectDuplicates = $detectDuplicates;
-	}
+	public function __construct(
+		protected bool $detectDuplicates = false
+	) {}
 
 	/**
 	 * Adds block to the block array
@@ -105,30 +69,9 @@ class BlockArray implements UpdateLevelData, Serializable {
 	}
 
 	/**
-	 * Returns if it is possible read next block from the array
-	 */
-	public function hasNext(): bool {
-		return $this->offset < count($this->blocks);
-	}
-
-	/**
-	 * Reads next block in the array
-	 */
-	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$fullBlockId): void {
-		$this->lastHash = $this->coords[$this->offset];
-
-		World::getBlockXYZ($this->lastHash, $x, $y, $z);
-		$fullBlockId = $this->blocks[$this->offset++];
-	}
-
-	/**
 	 * @return int $size
 	 */
 	public function size(): int {
-		if($this->isCompressed) {
-			return intdiv(strlen($this->compressedCoords), 8);
-		}
-
 		return count($this->coords);
 	}
 
@@ -159,24 +102,10 @@ class BlockArray implements UpdateLevelData, Serializable {
 	}
 
 	/**
-	 * @return BlockArraySizeData is used for calculating dimensions
+	 * @param int[] $blocks
 	 */
-	public function getSizeData(): BlockArraySizeData {
-		if($this->sizeData === null) {
-			$this->sizeData = new BlockArraySizeData($this);
-		}
-
-		return $this->sizeData;
-	}
-
-	public function setWorld(?ChunkManager $level): self {
-		$this->world = $level;
-
-		return $this;
-	}
-
-	public function getWorld(): ?ChunkManager {
-		return $this->world;
+	public function setBlockArray(array $blocks): void {
+		$this->blocks = $blocks;
 	}
 
 	/**
@@ -187,147 +116,16 @@ class BlockArray implements UpdateLevelData, Serializable {
 	}
 
 	/**
+	 * @param int[] $coords
+	 */
+	public function setCoordsArray(array $coords): void {
+		$this->coords = $coords;
+	}
+
+	/**
 	 * @return int[]
 	 */
 	public function getCoordsArray(): array {
 		return $this->coords;
-	}
-
-	public function removeDuplicates(): void {
-		if(!(BuilderTools::getConfiguration()->getBoolProperty("remove-duplicate-blocks"))) {
-			return;
-		}
-
-		// TODO - Optimize this
-		$blocks = array_combine(array_reverse($this->coords, true), array_reverse($this->blocks, true));
-
-		$this->coords = array_keys($blocks);
-		$this->blocks = array_values($blocks);
-	}
-
-	public function unload(): self {
-		if(BuilderTools::getConfiguration()->getBoolProperty("clipboard-compression")) {
-			$this->compress();
-			$this->isCompressed = true;
-		}
-		return $this;
-	}
-
-	public function load(): self {
-		if(BuilderTools::getConfiguration()->getBoolProperty("clipboard-compression")) {
-			$this->decompress();
-			$this->isCompressed = false;
-		}
-
-		// This should ensure that loaded clipboard has always offset 0.
-		$this->offset = 0;
-
-		return $this;
-	}
-
-	public function compress(bool $cleanDecompressed = true): void {
-		/** @phpstan-var string $coords */
-		$coords = pack("q*", ...$this->coords);
-		/** @phpstan-var string $blocks */
-		$blocks = pack("N*", ...$this->blocks);
-
-		$this->compressedCoords = $coords;
-		$this->compressedBlocks = $blocks;
-
-		if($cleanDecompressed) {
-			$this->coords = [];
-			$this->blocks = [];
-		}
-	}
-
-	public function decompress(bool $cleanCompressed = true): void {
-		/** @phpstan-var int[]|false $coords */
-		$coords = unpack("q*", $this->compressedCoords);
-		/** @phpstan-var int[]|false $coords */
-		$blocks = unpack("N*", $this->compressedBlocks);
-
-		if($coords === false || $blocks === false) {
-			throw new RuntimeException("Error whilst decompressing");
-		}
-
-		$this->coords = array_values($coords);
-		$this->blocks = array_values($blocks);
-
-		if($cleanCompressed) {
-			unset($this->compressedCoords);
-			unset($this->compressedBlocks);
-		}
-	}
-
-	public function isCompressed(): bool {
-		return $this->isCompressed;
-	}
-
-	/**
-	 * Removes all the blocks whose were checked already
-	 * For cleaning duplicate cache use cancelDuplicateDetection()
-	 */
-	public function cleanGarbage(): void {
-		$this->coords = array_slice($this->coords, $this->offset);
-		$this->blocks = array_slice($this->blocks, $this->offset);
-
-		$this->offset = 0;
-	}
-
-	/**
-	 * @phpstan-return null[]|string[]
-	 */
-	public function __serialize(): array {
-		return [$this->serialize()];
-	}
-
-	public function serialize(): ?string {
-		$this->compress();
-
-		$nbt = new CompoundTag();
-		$nbt->setByteArray("Coords", $this->compressedCoords);
-		$nbt->setByteArray("Blocks", $this->compressedBlocks);
-		$nbt->setByte("DuplicateDetection", $this->detectDuplicates ? 1 : 0);
-
-		$serializer = new BigEndianNbtSerializer();
-		$buffer = zlib_encode($serializer->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP);
-
-		if($buffer === false) {
-			return null;
-		}
-
-		return $buffer;
-	}
-
-	/**
-	 * @phpstan-param mixed[] $data
-	 */
-	public function __unserialize(array $data): void {
-		$this->unserialize($data[0] ?? null);
-	}
-
-	/**
-	 * @phpstan-param mixed $data
-	 */
-	public function unserialize($data): void {
-		if(!is_string($data)) {
-			return;
-		}
-
-		if(!($data = zlib_decode($data))) {
-			return;
-		}
-
-		/** @var CompoundTag $nbt */
-		$nbt = (new BigEndianNbtSerializer())->read($data)->getTag();
-		if(!$nbt->getTag("Coords") instanceof ByteArrayTag || !$nbt->getTag("Blocks") instanceof ByteArrayTag || !$nbt->getTag("DuplicateDetection") instanceof ByteTag) {
-			return;
-		}
-
-		$this->compressedCoords = $nbt->getByteArray("Coords");
-		$this->compressedBlocks = $nbt->getByteArray("Blocks");
-		$this->detectDuplicates = $nbt->getByte("DuplicateDetection") === 1;
-
-		$this->decompress();
 	}
 }

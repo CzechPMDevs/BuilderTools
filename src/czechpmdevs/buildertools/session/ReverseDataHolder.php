@@ -20,13 +20,13 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\session;
 
-use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use function array_pop;
 
 class ReverseDataHolder {
-	/** @var BlockArray[] */
+	/** @var BlockStorageHolder[] */
 	private array $undoData = [];
-	/** @var BlockArray[] */
+	/** @var BlockStorageHolder[] */
 	private array $redoData = [];
 
 	public function __construct(
@@ -37,23 +37,23 @@ class ReverseDataHolder {
 	/**
 	 * Removes and returns last step added to undo
 	 */
-	public function nextUndoAction(): ?BlockArray {
+	public function nextUndoAction(): ?BlockStorageHolder {
 		return array_pop($this->undoData);
 	}
 
-	public function saveUndo(BlockArray $blockArray): void {
-		$this->undoData[] = $blockArray;
+	public function saveUndo(BlockStorageHolder $blockStorage): void {
+		$this->undoData[] = $blockStorage;
 	}
 
 	/**
 	 * Removes and returns last step added to redo
 	 */
-	public function nextRedoAction(): ?BlockArray {
+	public function nextRedoAction(): ?BlockStorageHolder {
 		return array_pop($this->redoData);
 	}
 
-	public function saveRedo(BlockArray $blockArray): void {
-		$this->redoData[] = $blockArray;
+	public function saveRedo(BlockStorageHolder $blockStorage): void {
+		$this->redoData[] = $blockStorage;
 	}
 
 	protected function getSession(): Session {
