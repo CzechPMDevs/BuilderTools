@@ -41,7 +41,7 @@ class BlockStorageHolder {
 		protected ?World $world = null
 	) {
 		$this->blockStorage = new CompressedBlockArray($blockArray);
-//		unset($blockArray);
+		unset($blockArray);
 	}
 
 	public function getBlockStorage(): BlockArray {
@@ -69,7 +69,7 @@ class BlockStorageHolder {
 		$iterator = new BlockArrayIteratorHelper($this->getBlockStorage());
 		while($iterator->hasNext()) {
 			$iterator->readNext($x, $y, $z, $fullBlockId);
-			$fillSession->setBlockIdAt($x, $y, $z, $fullBlockId);
+			$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
 		}
 
 		$fillSession->reloadChunks($this->getWorld());
