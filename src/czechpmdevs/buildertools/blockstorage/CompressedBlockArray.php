@@ -25,7 +25,6 @@ use pocketmine\utils\AssumptionFailedError;
 use function array_values;
 use function pack;
 use function unpack;
-use function var_dump;
 
 class CompressedBlockArray {
 	protected string $compressedBlocks;
@@ -55,9 +54,6 @@ class CompressedBlockArray {
 		if($coords === false || $blocks === false) {
 			throw new AssumptionFailedError("Error whilst decompressing");
 		}
-
-		var_dump(pack("q*", ...$coords) === $this->compressedCoords);
-		var_dump(pack("N*", ...$blocks) === $this->compressedBlocks);
 
 		$blockArray->setCoordsArray(array_values($coords));
 		$blockArray->setBlockArray(array_values($blocks));
