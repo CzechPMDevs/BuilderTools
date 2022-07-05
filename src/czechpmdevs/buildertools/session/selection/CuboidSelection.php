@@ -26,6 +26,7 @@ use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
+use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\ForwardExtendCopy;
 use czechpmdevs\buildertools\editors\Naturalizer;
 use czechpmdevs\buildertools\editors\object\FillSession;
@@ -64,6 +65,7 @@ class CuboidSelection extends SelectionHolder {
 
 	public function fill(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit());
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
 			return throw new RuntimeException("No blocks found in string.");
@@ -91,6 +93,12 @@ class CuboidSelection extends SelectionHolder {
 		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+		$diffX = $maxX - $minX;
+		$diffY = $maxY - $minY;
+		$diffZ = $maxZ - $minZ;
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit(), ($diffX * $diffY * $diffZ) - (($diffX - 2) * ($diffZ - 2) * $diffY - 2));
+
 		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
 			->outline($blockGenerator, true)
 			->getReverseData();
@@ -110,6 +118,12 @@ class CuboidSelection extends SelectionHolder {
 		$timer = new Timer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
+
+		$diffX = $maxX - $minX;
+		$diffY = $maxY - $minY;
+		$diffZ = $maxZ - $minZ;
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit(), ($diffX * $diffY * $diffZ) - (($diffX - 2) * ($diffZ - 2) * $diffY));
+
 		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
 			->walls($blockGenerator, true)
 			->getReverseData();
@@ -119,9 +133,9 @@ class CuboidSelection extends SelectionHolder {
 		return UpdateResult::success($reverseData->getSize(), $timer->time());
 	}
 
-
 	public function stack(int $count, int $direction): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit(), $this->size() * ($count - 1));
 
 		$timer = new Timer();
 
@@ -141,6 +155,7 @@ class CuboidSelection extends SelectionHolder {
 
 	public function naturalize(?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit());
 
 		$timer = new Timer();
 
@@ -163,6 +178,7 @@ class CuboidSelection extends SelectionHolder {
 
 	public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getClipboardLimit());
 
 		$timer = new Timer();
 
@@ -179,6 +195,7 @@ class CuboidSelection extends SelectionHolder {
 
 	public function cutToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getClipboardLimit());
 
 		$timer = new Timer();
 		$blockStorage = new BlockArray();
@@ -200,16 +217,6 @@ class CuboidSelection extends SelectionHolder {
 		$this->assureHasPositionsSelected();
 
 		SchematicsManager::createSchematic($this->session->getPlayer(), $this->firstPosition, $this->secondPosition, $name, $callback);
-	}
-
-	private function assureHasPositionsSelected(): void {
-		if(!isset($this->firstPosition)) {
-			throw new RuntimeException("First position is not selected");
-		}
-
-		if(!isset($this->secondPosition)) {
-			throw new RuntimeException("Second position is not selected");
-		}
 	}
 
 	public function changeBiome(int $biomeId): UpdateResult {
@@ -324,5 +331,29 @@ class CuboidSelection extends SelectionHolder {
 
 		$this->secondPosition = $position->asVector3()->floor();
 		$this->world = $position->getWorld();
+	}
+
+	protected function assureIsUnderLimit(int $limit, ?int $expectedSize = null): void {
+		if($limit === -1) {
+			return;
+		}
+
+		if($expectedSize === null) {
+			$expectedSize = $this->size();
+		}
+
+		if($expectedSize > $limit) {
+			throw new RuntimeException("Size of the selection ($expectedSize) is bigger than the limit specified in config.yml ($limit).");
+		}
+	}
+
+	private function assureHasPositionsSelected(): void {
+		if(!isset($this->firstPosition)) {
+			throw new RuntimeException("First position is not selected");
+		}
+
+		if(!isset($this->secondPosition)) {
+			throw new RuntimeException("Second position is not selected");
+		}
 	}
 }

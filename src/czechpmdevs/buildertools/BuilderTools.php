@@ -70,6 +70,7 @@ use czechpmdevs\buildertools\event\listener\EventListener;
 use czechpmdevs\buildertools\item\WoodenAxe;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use czechpmdevs\buildertools\utils\IncompatibleConfigException;
 use pocketmine\command\Command;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIdentifier;
@@ -90,11 +91,11 @@ use function unlink;
 use function version_compare;
 
 class BuilderTools extends PluginBase {
-
-	public const CURRENT_CONFIG_VERSION = "1.4.0.1";
+	public const CURRENT_CONFIG_VERSION = "1.4.0.2";
 
 	private static BuilderTools $instance;
 	private static Configuration $configuration;
+	private static Limits $limits;
 
 	/** @var Command[] */
 	private static array $commands = [];
@@ -121,6 +122,9 @@ class BuilderTools extends PluginBase {
 		$this->cleanCache();
 	}
 
+	/**
+	 * @throws IncompatibleConfigException
+	 */
 	private function initConfig(): void {
 		if(!is_dir($this->getDataFolder() . "schematics")) {
 			@mkdir($this->getDataFolder() . "schematics");
@@ -151,6 +155,10 @@ class BuilderTools extends PluginBase {
 		}
 
 		self::$configuration = new Configuration($this->getConfig()->getAll());
+		self::$limits = new Limits(
+			self::$configuration->getIntProperty("clipboard-limit"),
+			self::$configuration->getIntProperty("fill-limit")
+		);
 	}
 
 	private function initListener(): void {
@@ -273,6 +281,10 @@ class BuilderTools extends PluginBase {
 
 	public static function getConfiguration(): Configuration {
 		return self::$configuration;
+	}
+
+	public static function getLimits(): Limits {
+		return self::$limits;
 	}
 
 	public static function getInstance(): BuilderTools {

@@ -3,15 +3,11 @@
 # Target BuilderTools version: 1.4.0
 
 # Do not change this line.
-config-version: 1.4.0.1
+config-version: 1.4.0.2
 
 # This is format which will be used for creating schematics
 # Supported formats: 'mcedit', 'buildertools'
 output-schematics-format: 'mcedit'
-
-# Option for compressing clipboards. This will make the actions
-# slower, but reduces RAM usage.
-clipboard-compression: true
 
 # Some shapes are generated with duplicate blocks. This problem causes
 # some blocks are not reverted right when doing //undo. This option
@@ -39,6 +35,14 @@ max-ray-trace-distance: 128
 # These limits point count of 2D polygon, since each point makes the action more
 # expensive in terms of process speed.
 poly-points-limit: 16
+
+# Maximum limit for blocks copied to clipboard (//copy, //cut)
+# Set to -1 to disable the limit
+clipboard-limit: 250000
+
+# Maximum limit of blocks filled. This does not apply to shapes (//cube, sphere, ...)
+# Set to -1 to disable the limit
+fill-limit: 1000000
 
 # There is possible to change wand items names:
 wand-axe-name: "§r§fWand Axe\n§7§oBreak for first pos\n§7§oTouch for second pos"

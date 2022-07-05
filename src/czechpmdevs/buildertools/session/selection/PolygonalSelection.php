@@ -75,6 +75,7 @@ class PolygonalSelection extends SelectionHolder {
 
 	public function fill(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit());
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
 			return throw new RuntimeException("No blocks found in string.");
@@ -93,6 +94,7 @@ class PolygonalSelection extends SelectionHolder {
 
 	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit());
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
 			return throw new RuntimeException("No blocks found in string.");
@@ -111,6 +113,7 @@ class PolygonalSelection extends SelectionHolder {
 
 	public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit());
 
 		if($blockGenerator instanceof StringToBlockDecoder && !$blockGenerator->isValid()) {
 			return throw new RuntimeException("No blocks found in string.");
@@ -129,6 +132,7 @@ class PolygonalSelection extends SelectionHolder {
 
 	public function stack(int $count, int $direction): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getFillLimit(), $this->size() * $count);
 
 		$timer = new Timer();
 
@@ -152,6 +156,7 @@ class PolygonalSelection extends SelectionHolder {
 
 	public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getClipboardLimit());
 
 		$timer = new Timer();
 
@@ -168,6 +173,7 @@ class PolygonalSelection extends SelectionHolder {
 
 	public function cutToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
 		$this->assureHasPositionsSelected();
+		$this->assureIsUnderLimit(BuilderTools::getLimits()->getClipboardLimit());
 
 		$timer = new Timer();
 
@@ -223,6 +229,20 @@ class PolygonalSelection extends SelectionHolder {
 		}
 
 		$this->points[] = new IntVector2($position->getFloorX(), $position->getFloorZ());
+	}
+
+	protected function assureIsUnderLimit(int $limit, ?int $expectedSize = null): void {
+		if($limit === -1) {
+			return;
+		}
+
+		if($expectedSize === null) {
+			$expectedSize = $this->size();
+		}
+
+		if($expectedSize > $limit) {
+			throw new RuntimeException("Size of the selection ($expectedSize) is bigger than the limit specified in config.yml ($limit).");
+		}
 	}
 
 	private function assureHasPositionsSelected(): void {
