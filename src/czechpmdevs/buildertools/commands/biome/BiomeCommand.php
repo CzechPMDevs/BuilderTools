@@ -18,9 +18,10 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\commands;
+namespace czechpmdevs\buildertools\commands\biome;
 
 use czechpmdevs\buildertools\BuilderTools;
+use czechpmdevs\buildertools\commands\BuilderToolsCommand;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -32,7 +33,6 @@ use function is_numeric;
 use function json_decode;
 
 class BiomeCommand extends BuilderToolsCommand {
-
 	// Script to generate that https://gist.github.com/VixikHD/241fdd02dba69f62ec91c571a305c8f8
 	public const BIOME_DATA = '{"ocean":0,"plains":1,"desert":2,"mountains":3,"forest":4,"swamp":5,"river":7,"hell":8,"ice_plains":12,"mushroom_fields":14,"jungle":21,"dark_forest":29,"savanna":35,"badlands":37}';
 

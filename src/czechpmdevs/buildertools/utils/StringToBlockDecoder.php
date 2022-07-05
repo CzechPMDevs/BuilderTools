@@ -34,7 +34,6 @@ use function strpos;
 use function substr;
 
 final class StringToBlockDecoder implements BlockIdentifierList {
-
 	private string $string;
 
 	private ?string $itemInHand = null;
@@ -55,8 +54,7 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 	}
 
 	/**
-	 * @return bool Returns if the string contains
-	 * any valid blocks
+	 * @return bool Returns if the string contains at least one valid block
 	 */
 	public function isValid(bool $requireBlockMap = true): bool {
 		return count($this->blockMap) !== 0 || (!$requireBlockMap && count($this->blockIdMap) !== 0);
