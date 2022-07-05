@@ -86,9 +86,9 @@ class PolygonalSelection extends SelectionHolder {
 			->fill($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return UpdateResult::success($reverseData->size(), $timer->time());
+		return UpdateResult::success($reverseData->getSize(), $timer->time());
 	}
 
 	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -104,9 +104,9 @@ class PolygonalSelection extends SelectionHolder {
 			->outline($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return UpdateResult::success($reverseData->size(), $timer->time());
+		return UpdateResult::success($reverseData->getSize(), $timer->time());
 	}
 
 	public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -122,9 +122,9 @@ class PolygonalSelection extends SelectionHolder {
 			->walls($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return UpdateResult::success($reverseData->size(), $timer->time());
+		return UpdateResult::success($reverseData->getSize(), $timer->time());
 	}
 
 	public function stack(int $count, int $direction): UpdateResult {
@@ -179,7 +179,7 @@ class PolygonalSelection extends SelectionHolder {
 			->getReverseData();
 
 		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
 		return UpdateResult::success($blockArray->size(), $timer->time());
 	}

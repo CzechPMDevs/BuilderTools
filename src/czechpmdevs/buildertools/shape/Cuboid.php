@@ -21,13 +21,14 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\shape;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use pocketmine\world\World;
 
 class Cuboid implements Shape {
-	protected BlockArray $reverseData;
+	protected BlockStorageHolder $reverseData;
 
 	public function __construct(
 		protected World $world,
@@ -61,7 +62,7 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
 		}
 
 		return $this;
@@ -94,7 +95,7 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
 		}
 
 		return $this;
@@ -126,7 +127,7 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
 		}
 
 		return $this;
@@ -152,7 +153,7 @@ class Cuboid implements Shape {
 		return $this;
 	}
 
-	public function getReverseData(): BlockArray {
+	public function getReverseData(): BlockStorageHolder {
 		return $this->reverseData;
 	}
 }

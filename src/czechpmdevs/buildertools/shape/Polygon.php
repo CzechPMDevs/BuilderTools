@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\shape;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\MaskedFillSession;
@@ -31,7 +32,7 @@ use function count;
 use function str_repeat;
 
 class Polygon implements Shape {
-	protected BlockArray $reverseData;
+	protected BlockStorageHolder $reverseData;
 
 	public function __construct(
 		protected World $world,
@@ -68,7 +69,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
 		}
 
 		return $this;
@@ -142,7 +143,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
 		}
 
 		return $this;
@@ -208,7 +209,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = $fillSession->getChanges();
+			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
 		}
 
 		return $this;
@@ -283,7 +284,7 @@ class Polygon implements Shape {
 		return $inside;
 	}
 
-	public function getReverseData(): BlockArray {
+	public function getReverseData(): BlockStorageHolder {
 		return $this->reverseData;
 	}
 }

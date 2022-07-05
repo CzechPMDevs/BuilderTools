@@ -76,9 +76,9 @@ class CuboidSelection extends SelectionHolder {
 			->fill($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return UpdateResult::success($reverseData->size(), $timer->time());
+		return UpdateResult::success($reverseData->getSize(), $timer->time());
 	}
 
 	public function outline(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -95,9 +95,9 @@ class CuboidSelection extends SelectionHolder {
 			->outline($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return UpdateResult::success($reverseData->size(), $timer->time());
+		return UpdateResult::success($reverseData->getSize(), $timer->time());
 	}
 
 	public function walls(BlockIdentifierList $blockGenerator, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -114,9 +114,9 @@ class CuboidSelection extends SelectionHolder {
 			->walls($blockGenerator, true)
 			->getReverseData();
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
-		return UpdateResult::success($reverseData->size(), $timer->time());
+		return UpdateResult::success($reverseData->getSize(), $timer->time());
 	}
 
 
@@ -190,7 +190,7 @@ class CuboidSelection extends SelectionHolder {
 			->getReverseData();
 
 		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockStorage, $relativePosition, $this->world));
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
 		return UpdateResult::success($blockStorage->size(), $timer->time());
 	}
