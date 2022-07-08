@@ -23,13 +23,14 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\helpers\DuplicateBlockCleanHelper;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\session\SessionManager;
+use czechpmdevs\buildertools\shape\Cuboid;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -200,7 +201,7 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
+		$updates = $fillSession->getBlockChanges();
 		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
 		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
@@ -287,7 +288,7 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
+		$updates = $fillSession->getBlockChanges();
 		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
 		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
@@ -348,7 +349,7 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
+		$updates = $fillSession->getBlockChanges();
 		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
 		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
@@ -373,7 +374,21 @@ class Printer {
 			return UpdateResult::error("No blocks found in string $blockArgs");
 		}
 
-		return Filler::getInstance()->directFill($player, $center->subtract($radius, $radius, $radius), $center->add($radius, $radius, $radius), $stringToBlockDecoder, $hollow);
+		$timer = new Timer();
+
+		$session = SessionManager::getInstance()->getSession($player);
+		$cuboid = new Cuboid(
+			$player->getWorld(),
+			$center->getX() - $radius, $center->getX() + $radius,
+			$center->getY() - $radius, $center->getY() + $radius,
+			$center->getZ() - $radius, $center->getZ() + $radius,
+			$session->getMask()
+		);
+
+		$cuboid->fill($stringToBlockDecoder, true);
+		$session->getReverseDataHolder()->saveUndo($cuboid->getReverseData());
+
+		return UpdateResult::success($cuboid->getReverseData()->getSize(), $timer->time());
 	}
 
 	public function makeHollowCube(Player $player, Position $center, int $radius, string $blockArgs): UpdateResult {
@@ -455,7 +470,7 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getChanges();
+		$updates = $fillSession->getBlockChanges();
 		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
 		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));

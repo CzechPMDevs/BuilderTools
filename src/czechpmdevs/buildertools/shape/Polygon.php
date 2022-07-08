@@ -23,10 +23,10 @@ namespace czechpmdevs\buildertools\shape;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\editors\object\FillSession;
-use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\math\IntVector2;
 use czechpmdevs\buildertools\math\Math;
+use czechpmdevs\buildertools\world\FillSession;
+use czechpmdevs\buildertools\world\MaskedFillSession;
 use pocketmine\world\World;
 use function count;
 use function str_repeat;
@@ -69,7 +69,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
 		}
 
 		return $this;
@@ -143,7 +143,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
 		}
 
 		return $this;
@@ -209,7 +209,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
 		}
 
 		return $this;

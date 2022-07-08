@@ -21,11 +21,11 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\Position;
@@ -67,7 +67,7 @@ class Decorator {
 
 		$fillSession->reloadChunks($center->getWorld());
 
-		$updates = $fillSession->getChanges();
+		$updates = $fillSession->getBlockChanges();
 
 		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $center->getWorld()));
 

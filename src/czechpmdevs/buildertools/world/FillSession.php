@@ -18,11 +18,15 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\object;
+namespace czechpmdevs\buildertools\world;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\block\BlockFactory;
+use pocketmine\block\tile\Tile;
+use pocketmine\block\tile\TileFactory;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\utils\SubChunkExplorer;
@@ -35,20 +39,13 @@ class FillSession {
 	protected bool $calculateDimensions;
 	protected bool $saveChanges;
 
-	protected BlockArray $changes;
+	protected BlockArray $blockChanges;
 
 	protected int $minX, $maxX;
 	protected int $minZ, $maxZ;
 
 	protected int $blocksChanged = 0;
 	protected bool $error = false;
-
-	/**
-	 * @var int
-	 *
-	 * Variable to avoid re-allocating memory all the time
-	 */
-	protected int $lastHash;
 
 	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true) {
 		$this->explorer = new SubChunkExplorer($world);
@@ -57,7 +54,7 @@ class FillSession {
 		$this->saveChanges = $saveChanges;
 
 		if($this->saveChanges) {
-			$this->changes = new BlockArray();
+			$this->blockChanges = new BlockArray();
 		}
 	}
 
@@ -83,23 +80,7 @@ class FillSession {
 
 		$this->saveChanges($x, $y, $z);
 
-		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId);
-		++$this->blocksChanged;
-	}
-
-	/**
-	 * @param int $y 0-255
-	 */
-	public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
-		if(!$this->moveTo($x, $y, $z)) {
-			return;
-		}
-
-		$this->saveChanges($x, $y, $z);
-
-		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId); // @phpstan-ignore-line
 		++$this->blocksChanged;
 	}
 
@@ -111,22 +92,41 @@ class FillSession {
 			return;
 		}
 
-		/** @phpstan-ignore-next-line */
-		$fullBlockId = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+		$fullBlockId = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);  // @phpstan-ignore-line
 	}
 
 	/**
 	 * @param int $y 0-255
 	 */
-	public function getBlockIdAt(int $x, int $y, int $z, ?int &$id): void {
+	public function setBlockAndTileAt(int $x, int $y, int $z, int $fullBlockId, ?Tile $tile = null): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
 
-		/** @phpstan-ignore-next-line */
-		$this->lastHash = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+		$this->saveChanges($x, $y, $z);
 
-		$id = $this->lastHash >> 4;
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId);  // @phpstan-ignore-line
+
+		// Closing a tile, if there is any, so we can put a different tile here
+		$this->explorer->currentChunk->getTile($x & 0xf, $y & 0xf, $z & 0xf)?->close(); // @phpstan-ignore-line
+
+		if($tile !== null) {
+			$this->explorer->currentChunk->addTile($tile); // @phpstan-ignore-line
+		}
+
+		++$this->blocksChanged;
+	}
+
+	/**
+	 * @param int $y 0-255
+	 */
+	public function getBlockAndTileAt(int $x, int $y, int $z, ?int &$fullBlockId = 0, ?Tile &$tile = null): void {
+		if(!$this->moveTo($x, $y, $z)) {
+			return;
+		}
+
+		$fullBlockId = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf); // @phpstan-ignore-line
+		$tile = $this->explorer->currentChunk->getTile($x & 0xf, $y, $z & 0xf); // @phpstan-ignore-line
 	}
 
 	public function setBiomeAt(int $x, int $z, int $id): void {
@@ -134,8 +134,7 @@ class FillSession {
 			return;
 		}
 
-		/** @phpstan-ignore-next-line */
-		$this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
+		$this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);  // @phpstan-ignore-line
 		++$this->blocksChanged;
 	}
 
@@ -143,8 +142,7 @@ class FillSession {
 		for($y = 255; $y >= 0; --$y) {
 			$this->explorer->moveTo($x, $y, $z);
 
-			/** @phpstan-ignore-next-line */
-			$id = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+			$id = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);  // @phpstan-ignore-line
 			if($id >> 4 !== 0) {
 				if(BlockFactory::getInstance()->get($id >> 4, $id & 0xf)->isSolid()) {
 					$y++;
@@ -157,12 +155,11 @@ class FillSession {
 		return false;
 	}
 
-	public function getChanges(): BlockArray {
-		if(!isset($this->changes)) {
+	public function getBlockChanges(): BlockArray {
+		if(!isset($this->blockChanges)) {
 			throw new AssumptionFailedError("Could not request non-saved changes");
 		}
-
-		return $this->changes;
+		return $this->blockChanges;
 	}
 
 	public function getBlocksChanged(): int {
@@ -238,8 +235,7 @@ class FillSession {
 
 	protected function saveChanges(int $x, int $y, int $z): void {
 		if($this->saveChanges) {
-			/** @phpstan-ignore-next-line */
-			$this->changes->addBlockAt($x, $y, $z, $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf));
+			$this->blockChanges->addBlockAt($x, $y, $z, $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf));  // @phpstan-ignore-line
 		}
 	}
 

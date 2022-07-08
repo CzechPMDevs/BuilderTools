@@ -23,11 +23,11 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\Transform;
 use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\math\Axis;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -36,43 +36,6 @@ use pocketmine\utils\SingletonTrait;
 /** @deprecated */
 class Copier {
 	use SingletonTrait;
-
-	public const DIRECTION_PLAYER = 0;
-	public const DIRECTION_UP = 1;
-	public const DIRECTION_DOWN = 2;
-
-	public function paste(Player $player): UpdateResult {
-		$timer = new Timer();
-
-		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();
-		if($clipboard === null) {
-			return UpdateResult::error("Clipboard is empty");
-		}
-
-		/** @phpstan-var Vector3 $relativePosition */
-		$relativePosition = $clipboard->getRelativePosition();
-
-		$fillSession = new FillSession($player->getWorld(), true, true);
-
-		$motion = $player->getPosition()->add(0.5, 0, 0.5)->subtractVector($relativePosition);
-
-		$floorX = $motion->getFloorX();
-		$floorY = $motion->getFloorY();
-		$floorZ = $motion->getFloorZ();
-
-		$iterator = new BlockArrayIteratorHelper($clipboard->getBlockStorage());
-		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
-			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
-		}
-
-		$fillSession->reloadChunks($player->getWorld());
-		$fillSession->close();
-
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
-
-		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
-	}
 
 	public function rotate(Player $player, int $axis, int $rotation): void {
 		$clipboard = SessionManager::getInstance()->getSession($player)->getClipboardHolder()->getClipboard();

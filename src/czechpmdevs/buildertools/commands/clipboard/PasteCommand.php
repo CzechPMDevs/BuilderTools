@@ -20,11 +20,15 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands\clipboard;
 
+use czechpmdevs\buildertools\blockstorage\identifiers\MultipleBlockIdentifier;
+use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\commands\BuilderToolsCommand;
 use czechpmdevs\buildertools\editors\Copier;
+use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 
 class PasteCommand extends BuilderToolsCommand {
 	public function __construct() {
@@ -39,10 +43,12 @@ class PasteCommand extends BuilderToolsCommand {
 			return;
 		}
 
-		$result = Copier::getInstance()->paste($sender);
+		$session = SessionManager::getInstance()->getSession($sender);
 
-		if(!$result->successful()) {
-			$sender->sendMessage(BuilderTools::getPrefix() . "§cCould not paste clipboard: {$result->getErrorMessage()}");
+		try {
+			$result = $session->getClipboardHolder()->paste($sender->getPosition(), $session->getMask());
+		} catch(RuntimeException $exception) {
+			$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
 			return;
 		}
 

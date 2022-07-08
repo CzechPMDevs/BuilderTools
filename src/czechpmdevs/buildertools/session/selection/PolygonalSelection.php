@@ -28,7 +28,6 @@ use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\ForwardExtendCopy;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\IntVector2;
 use czechpmdevs\buildertools\math\Math;
@@ -36,6 +35,7 @@ use czechpmdevs\buildertools\session\SelectionHolder;
 use czechpmdevs\buildertools\shape\Polygon;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\math\Vector3;
 use pocketmine\world\Position;
 use pocketmine\world\World;
@@ -143,7 +143,7 @@ class PolygonalSelection extends SelectionHolder {
 		(new ForwardExtendCopy())->stack($fillSession, (new Polygon($this->world, $this->minY, $this->maxY, $this->points)), $minX, $maxX, $this->minY, $this->maxY, $minZ, $maxZ, $count, $direction);
 
 		$reverseData = $fillSession->reloadChunks($this->world)
-			->getChanges();
+			->getBlockChanges();
 
 		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
 

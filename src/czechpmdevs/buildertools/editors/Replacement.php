@@ -21,11 +21,11 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
-use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\MaskedFillSession;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
@@ -73,7 +73,7 @@ class Replacement {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}

@@ -24,10 +24,11 @@ use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\editors\object\FillSession;
-use czechpmdevs\buildertools\editors\object\MaskedFillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\FillSession;
+use czechpmdevs\buildertools\world\Inserter;
+use czechpmdevs\buildertools\world\MaskedFillSession;
 use pocketmine\world\Position;
 use RuntimeException;
 
@@ -54,34 +55,17 @@ class ClipboardHolder {
 
 		$timer = new Timer();
 
-		$relativePosition = $this->clipboard->getRelativePosition();
+		$inserter = (new Inserter($this->clipboard))
+			->setMotion($position->add(0.5, 0, 0.5)->subtractVector($this->clipboard->getRelativePosition()))
+			->setWorld($position->getWorld());
 
-		if($mask === null) {
-			$fillSession = new FillSession($position->getWorld(), true, true);
-		} else {
-			$fillSession = new MaskedFillSession($position->getWorld(), true, true, $mask);
+		if($mask !== null) {
+			$inserter->setMask($mask);
 		}
 
-		$motion = $position->add(0.5, 0, 0.5)->subtractVector($relativePosition);
+		$this->session->getReverseDataHolder()->saveUndo($changes = $inserter->insert());
 
-		$floorX = $motion->getFloorX();
-		$floorY = $motion->getFloorY();
-		$floorZ = $motion->getFloorZ();
-
-		$iterator = new BlockArrayIteratorHelper($this->clipboard->getBlockStorage());
-		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
-			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
-		}
-
-		$fillSession->reloadChunks($position->getWorld());
-		$fillSession->close();
-
-		$changes = $fillSession->getChanges();
-
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($changes, $position->getWorld()));
-
-		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
+		return UpdateResult::success($changes->getSize(), $timer->time());
 	}
 
 	protected function getSession(): Session {

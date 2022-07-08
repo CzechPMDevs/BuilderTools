@@ -20,8 +20,10 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage;
 
+use czechpmdevs\buildertools\blockstorage\compressed\CompressedBlockArray;
+use czechpmdevs\buildertools\blockstorage\compressed\CompressedTileArray;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
-use czechpmdevs\buildertools\editors\object\FillSession;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
@@ -35,9 +37,11 @@ use const ZLIB_ENCODING_GZIP;
 
 class BlockStorageHolder {
 	protected CompressedBlockArray $blockStorage;
+	protected CompressedTileArray $tileArray;
 
 	public function __construct(
 		BlockArray $blockArray,
+		TileArray $tileArray,
 		protected ?World $world = null
 	) {
 		$this->blockStorage = new CompressedBlockArray($blockArray);
@@ -58,24 +62,6 @@ class BlockStorageHolder {
 		}
 
 		return $this->world;
-	}
-
-	/**
-	 * @return BlockStorageHolder Changes done during insertion
-	 */
-	public function insert(): BlockStorageHolder {
-		$fillSession = new FillSession($this->getWorld());
-
-		$iterator = new BlockArrayIteratorHelper($this->getBlockStorage());
-		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
-			$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
-		}
-
-		$fillSession->reloadChunks($this->getWorld());
-		$fillSession->close();
-
-		return new BlockStorageHolder($fillSession->getChanges(), $this->getWorld());
 	}
 
 	protected function nbtSerialize(CompoundTag $nbt): void {}

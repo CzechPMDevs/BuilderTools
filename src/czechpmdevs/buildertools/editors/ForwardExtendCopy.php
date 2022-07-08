@@ -22,8 +22,8 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\shape\Shape;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\math\Facing;
 use pocketmine\world\World;
 

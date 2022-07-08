@@ -18,8 +18,9 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\blockstorage;
+namespace czechpmdevs\buildertools\blockstorage\compressed;
 
+use czechpmdevs\buildertools\blockstorage\BlockArray;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\utils\AssumptionFailedError;
 use function array_values;
@@ -27,8 +28,8 @@ use function pack;
 use function unpack;
 
 class CompressedBlockArray {
-	protected string $compressedBlocks;
 	protected string $compressedCoords;
+	protected string $compressedBlocks;
 
 	protected int $size;
 

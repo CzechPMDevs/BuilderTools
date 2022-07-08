@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\commands\BuilderToolsCommand;
 use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\Inserter;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
@@ -48,7 +49,7 @@ class RedoCommand extends BuilderToolsCommand {
 
 		$timer = new Timer();
 		
-		$undoAction = $redoAction->insert(); // TODO - This should not be done in command class
+		$undoAction = (new Inserter($redoAction))->insert(); // TODO - This should not be done in command class
 		SessionManager::getInstance()->getSession($sender)->getReverseDataHolder()->saveUndo($undoAction);
 		
 		$sender->sendMessage(BuilderTools::getPrefix() . "§aUndo was cancelled, {$undoAction->getSize()} blocks changed (Took {$timer->time()} seconds)!");

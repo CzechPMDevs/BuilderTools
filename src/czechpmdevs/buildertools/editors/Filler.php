@@ -22,11 +22,11 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
@@ -71,34 +71,7 @@ class Filler {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
-		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
-	}
-
-	public function directWalls(Player $player, Vector3 $pos1, Vector3 $pos2, BlockIdentifierList $blocks): UpdateResult {
-		$timer = new Timer();
-
-		Math::calculateMinAndMaxValues($pos1, $pos2, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
-
-		$fillSession = new FillSession($player->getWorld(), false);
-		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
-		$fillSession->loadChunks($player->getWorld());
-
-		for($x = $minX; $x <= $maxX; ++$x) {
-			for($z = $minZ; $z <= $maxZ; ++$z) {
-				for($y = $minY; $y <= $maxY; ++$y) {
-					if($x === $minX || $x === $maxX || $z === $minZ || $z === $maxZ) {
-						$blocks->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
-					}
-				}
-			}
-		}
-
-		$fillSession->reloadChunks($player->getWorld());
-		$fillSession->close();
-
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $player->getWorld()));
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 }

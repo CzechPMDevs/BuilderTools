@@ -28,7 +28,6 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
 use czechpmdevs\buildertools\BuilderTools;
-use czechpmdevs\buildertools\editors\object\FillSession;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\format\BuilderToolsSchematic;
@@ -38,6 +37,7 @@ use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\format\SpongeSchematic;
 use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\Timer;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use function array_keys;
@@ -187,7 +187,7 @@ class SchematicsManager {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getChanges(), $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}

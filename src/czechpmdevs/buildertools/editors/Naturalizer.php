@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\editors;
 
-use czechpmdevs\buildertools\editors\object\FillSession;
+use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\block\VanillaBlocks;
 
 class Naturalizer {

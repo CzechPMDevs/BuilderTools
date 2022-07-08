@@ -18,13 +18,12 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\editors\object;
+namespace czechpmdevs\buildertools\world;
 
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use pocketmine\world\ChunkManager;
 
 class MaskedFillSession extends FillSession {
-
 	protected ?BlockIdentifierList $mask;
 
 	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true, ?BlockIdentifierList $mask = null) {

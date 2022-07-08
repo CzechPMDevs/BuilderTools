@@ -23,8 +23,9 @@ namespace czechpmdevs\buildertools\shape;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\editors\object\FillSession;
-use czechpmdevs\buildertools\editors\object\MaskedFillSession;
+use czechpmdevs\buildertools\blockstorage\TileArray;
+use czechpmdevs\buildertools\world\FillSession;
+use czechpmdevs\buildertools\world\MaskedFillSession;
 use pocketmine\world\World;
 
 class Cuboid implements Shape {
@@ -42,12 +43,7 @@ class Cuboid implements Shape {
 	) {}
 
 	public function fill(BlockIdentifierList $blockGenerator, bool $saveReverseData): self {
-		$fillSession = $this->mask === null ?
-			new FillSession($this->world, false, $saveReverseData) :
-			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
-
-		$fillSession->setDimensions($this->minX, $this->maxX, $this->minZ, $this->maxZ);
-		$fillSession->loadChunks($this->world);
+		$fillSession = $this->loadFillSession($saveReverseData);
 
 		for($x = $this->minX; $x <= $this->maxX; ++$x) {
 			for($z = $this->minZ; $z <= $this->maxZ; ++$z) {
@@ -62,19 +58,14 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world);
 		}
 
 		return $this;
 	}
 
 	public function outline(BlockIdentifierList $blockGenerator, bool $saveReverseData): self {
-		$fillSession = $this->mask === null ?
-			new FillSession($this->world, false, $saveReverseData) :
-			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
-
-		$fillSession->setDimensions($this->minX, $this->maxX, $this->minZ, $this->maxZ);
-		$fillSession->loadChunks($this->world);
+		$fillSession = $this->loadFillSession($saveReverseData);
 
 		for($x = $this->minX; $x <= $this->maxX; ++$x) {
 			$skipX = $x !== $this->minX && $x !== $this->maxX;
@@ -95,19 +86,14 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
 		}
 
 		return $this;
 	}
 
 	public function walls(BlockIdentifierList $blockGenerator, bool $saveReverseData): self {
-		$fillSession = $this->mask === null ?
-			new FillSession($this->world, false, $saveReverseData) :
-			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
-
-		$fillSession->setDimensions($this->minX, $this->maxX, $this->minZ, $this->maxZ);
-		$fillSession->loadChunks($this->world);
+		$fillSession = $this->loadFillSession($saveReverseData);
 
 		for($x = $this->minX; $x <= $this->maxX; ++$x) {
 			$skipX = $x !== $this->minX && $x !== $this->maxX;
@@ -127,19 +113,14 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
 		}
 
 		return $this;
 	}
 
-	public function read(BlockArray $blockArray): self {
-		$fillSession = $this->mask === null ?
-			new FillSession($this->world, false, false) :
-			new MaskedFillSession($this->world, false, false, $this->mask);
-
-		$fillSession->setDimensions($this->minX, $this->maxX, $this->minZ, $this->maxZ);
-		$fillSession->loadChunks($this->world);
+	public function read(BlockArray $blockArray, TileArray $tileArray): self {
+		$fillSession = $this->loadFillSession();
 
 		for($x = $this->minX; $x <= $this->maxX; ++$x) {
 			for($z = $this->minZ; $z <= $this->maxZ; ++$z) {
@@ -150,10 +131,76 @@ class Cuboid implements Shape {
 			}
 		}
 
+		for($x = $this->minX >> 4, $maxX = $this->maxX >> 4; $x <= $maxX; ++$x) {
+			for($z = $this->maxZ >> 4, $maxZ = $this->maxZ >> 4; $z <= $maxZ; ++$z) {
+				$chunk = $this->world->getChunk($x, $z);
+				if($chunk === null) {
+					continue;
+				}
+
+				foreach($chunk->getTiles() as $tile) {
+					/** @var int $x */
+					$x = $tile->getPosition()->getX();
+					/** @var int $y */
+					$y = $tile->getPosition()->getY();
+					/** @var int $z */
+					$z = $tile->getPosition()->getZ();
+
+					if(
+						$x > $this->minX && $x < $this->maxX &&
+						$y > $this->minY && $y < $this->maxY &&
+						$z > $this->minZ && $z < $this->maxZ
+					) {
+						$tileArray->addTileAt($x, $y, $z, $tile->saveNBT());
+					}
+				}
+			}
+		}
+
+		return $this;
+	}
+
+	protected function clearTiles(): self {
+		for($x = $this->minX >> 4, $maxX = $this->maxX >> 4; $x <= $maxX; ++$x) {
+			for($z = $this->maxZ >> 4, $maxZ = $this->maxZ >> 4; $z <= $maxZ; ++$z) {
+				$chunk = $this->world->getChunk($x, $z);
+				if($chunk === null) {
+					continue;
+				}
+
+				foreach($chunk->getTiles() as $tile) {
+					/** @var int $x */
+					$x = $tile->getPosition()->getX();
+					/** @var int $y */
+					$y = $tile->getPosition()->getY();
+					/** @var int $z */
+					$z = $tile->getPosition()->getZ();
+
+					if(
+						$x > $this->minX && $x < $this->maxX &&
+						$y > $this->minY && $y < $this->maxY &&
+						$z > $this->minZ && $z < $this->maxZ
+					) {
+						$tile->close();
+					}
+				}
+			}
+		}
 		return $this;
 	}
 
 	public function getReverseData(): BlockStorageHolder {
 		return $this->reverseData;
+	}
+
+	public function loadFillSession(bool $saveReverseData = false): FillSession|MaskedFillSession {
+		$fillSession = $this->mask === null ?
+			new FillSession($this->world, false, $saveReverseData) :
+			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
+
+		$fillSession->setDimensions($this->minX, $this->maxX, $this->minZ, $this->maxZ);
+		$fillSession->loadChunks($this->world);
+
+		return $fillSession;
 	}
 }

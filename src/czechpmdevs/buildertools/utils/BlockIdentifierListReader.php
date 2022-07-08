@@ -18,30 +18,21 @@
 
 declare(strict_types=1);
 
-namespace czechpmdevs\buildertools\shape;
+namespace czechpmdevs\buildertools\utils;
 
-use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
-use czechpmdevs\buildertools\blockstorage\TileArray;
+use pocketmine\block\Block;
+use pocketmine\block\tile\Tile;
+use pocketmine\world\World;
 
-interface Shape {
-	/**
-	 * Fills the shape
-	 */
-	public function fill(BlockIdentifierList $blockGenerator, bool $saveReverseData): self;
+class BlockIdentifierListReader {
+	public function __construct(
+		protected BlockIdentifierList $blockIdentifierList,
+		protected World $world
+	) {}
 
-	/**
-	 * Fills all the outer sides of shape
-	 */
-	public function outline(BlockIdentifierList $blockGenerator, bool $saveReverseData): self;
-
-	/**
-	 * Fills all the walls of shape
-	 */
-	public function walls(BlockIdentifierList $blockGenerator, bool $saveReverseData): self;
-
-	/**
-	 * Reads blocks inside the shape
-	 */
-	public function read(BlockArray $blockArray, TileArray $tileArray): self;
+	public function readNext(int $x, int $y, int $z, ?int &$fullBlockId = null, ?Tile &$tile = null): void {
+		$this->blockIdentifierList->nextBlock($fullBlockId);
+		$tile = BlockToTileMap::getInstance()->createTile($this->world, $x, $y, $z, $fullBlockId >> Block::INTERNAL_METADATA_BITS);
+	}
 }
