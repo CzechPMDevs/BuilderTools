@@ -27,6 +27,7 @@ use czechpmdevs\buildertools\schematics\SchematicsManager;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use RuntimeException;
 use function count;
 use function implode;
 use function in_array;
@@ -65,7 +66,11 @@ class SchematicCommand extends BuilderToolsCommand {
 				};
 
 				$sender->sendMessage(BuilderTools::getPrefix() . "§6Saving schematic in background...");
-				SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->saveToSchematic($args[1], $callback);
+				try {
+					SessionManager::getInstance()->getSession($sender)->getSelectionHolder()->saveToSchematic($args[1], $callback);
+				} catch(RuntimeException $exception) {
+					$sender->sendMessage(BuilderTools::getPrefix() . "§c{$exception->getMessage()}");
+				}
 				break;
 
 			case "load":
