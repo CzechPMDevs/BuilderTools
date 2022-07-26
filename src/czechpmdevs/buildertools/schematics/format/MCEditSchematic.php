@@ -153,7 +153,7 @@ class MCEditSchematic implements Schematic {
 		$this->writeBlockData($nbt, $blocks, $data);
 		$this->writeMaterials($nbt, MCEditSchematic::MATERIALS_BEDROCK);
 
-		$rawData = zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP);
+		$rawData = zlib_encode((new BigEndianNbtSerializer())->write(new TreeRoot($nbt, "Schematic")), ZLIB_ENCODING_GZIP);
 		if($rawData === false) {
 			throw new SchematicException("Could not compress nbt");
 		}

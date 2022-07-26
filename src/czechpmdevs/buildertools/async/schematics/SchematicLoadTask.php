@@ -21,20 +21,20 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\async\schematics;
 
 use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
+use czechpmdevs\buildertools\blockstorage\CompressedBlockArray;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use RuntimeException;
 use function basename;
 use function file_exists;
 use function file_get_contents;
-use function serialize;
 
 class SchematicLoadTask extends BuilderToolsAsyncTask {
 
 	public string $file;
 	public string $name;
 
-	public string $blockArray;
+	public CompressedBlockArray $blockStorage;
 
 	public function __construct(string $file) {
 		parent::__construct();
@@ -64,6 +64,6 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 		$blockArray = $schematic->load($rawData);
 
 		$this->name = basename($this->file, "." . $schematic::getFileExtension());
-		$this->blockArray = serialize($blockArray);
+		$this->blockStorage = new CompressedBlockArray($blockArray);
 	}
 }

@@ -50,7 +50,6 @@ use function pathinfo;
 use function strtolower;
 use function touch;
 use function trim;
-use function unserialize;
 use const DIRECTORY_SEPARATOR;
 use const PATHINFO_EXTENSION;
 
@@ -91,13 +90,7 @@ class SchematicsManager {
 				return;
 			}
 
-			$blockArray = unserialize($task->blockArray);
-			if(!$blockArray instanceof BlockArray) {
-				$callback(SchematicActionResult::error("Error whilst reading object from another thread."));
-				return;
-			}
-
-			SchematicsManager::$loadedSchematics[$task->name] = $blockArray;
+			SchematicsManager::$loadedSchematics[$task->name] = $task->blockStorage->asBlockArray();
 			$callback(SchematicActionResult::success($timer->time()));
 		});
 	}
@@ -166,7 +159,7 @@ class SchematicsManager {
 			return UpdateResult::error("Schematic $schematicName is not loaded.");
 		}
 
-		$schematic = clone SchematicsManager::$loadedSchematics[$schematicName];
+		$schematic = SchematicsManager::$loadedSchematics[$schematicName];
 
 		$fillSession = new FillSession($player->getWorld(), true, true, true);
 
