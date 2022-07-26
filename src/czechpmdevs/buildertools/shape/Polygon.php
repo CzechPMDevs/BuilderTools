@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\shape;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
+use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\math\IntVector2;
 use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\world\FillSession;
@@ -48,7 +49,7 @@ class Polygon implements Shape {
 
 		$fillSession = $this->mask === null ?
 			new FillSession($this->world, false, $saveReverseData) :
-			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
+			new MaskedFillSession($this->world, false, $saveReverseData, true, $this->mask);
 
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 		$fillSession->loadChunks($this->world);
@@ -69,7 +70,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world);
 		}
 
 		return $this;
@@ -80,7 +81,7 @@ class Polygon implements Shape {
 
 		$fillSession = $this->mask === null ?
 			new FillSession($this->world, false, $saveReverseData) :
-			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
+			new MaskedFillSession($this->world, false, $saveReverseData, true, $this->mask);
 
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 		$fillSession->loadChunks($this->world);
@@ -143,7 +144,7 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world);
 		}
 
 		return $this;
@@ -154,7 +155,7 @@ class Polygon implements Shape {
 
 		$fillSession = $this->mask === null ?
 			new FillSession($this->world, false, $saveReverseData) :
-			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
+			new MaskedFillSession($this->world, false, $saveReverseData, true, $this->mask);
 
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 		$fillSession->loadChunks($this->world);
@@ -209,18 +210,19 @@ class Polygon implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world);
 		}
 
 		return $this;
 	}
 
-	public function read(BlockArray $blockArray, bool $unloadReadData = true): self {
+	// TODO - tiles
+	public function read(BlockArray $blockArray, TileArray $tileArray, bool $unloadReadData = true): self {
 		Math::calculateMultipleMinAndMaxValues($minX, $maxX, $minZ, $maxZ, ...$this->points);
 
 		$fillSession = $this->mask === null ?
 			new FillSession($this->world, false, false) :
-			new MaskedFillSession($this->world, false, false, $this->mask);
+			new MaskedFillSession($this->world, false, false, true, $this->mask);
 
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 		$fillSession->loadChunks($this->world);

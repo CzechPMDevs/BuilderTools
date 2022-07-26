@@ -23,6 +23,7 @@ namespace czechpmdevs\buildertools\editors;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\helpers\DuplicateBlockCleanHelper;
+use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
 use czechpmdevs\buildertools\math\BlockGenerator;
 use czechpmdevs\buildertools\math\Math;
@@ -50,6 +51,7 @@ class Printer {
 	public const HOLLOW_SPHERE = 0x04;
 	public const HOLLOW_CYLINDER = 0x05;
 
+	// TODO - Tiles
 	public function draw(Player $player, Position $center, Block $block, int $brush = 4, int $mode = 0x00, bool $throwBlock = false): void {
 		$updates = new BlockArray();
 		$center = Position::fromObject($center->floor(), $center->getWorld());
@@ -102,7 +104,7 @@ class Printer {
 
 		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, new TileArray(), $player->getWorld()));
 	}
 
 	private function throwBlock(Position $position): Vector3 {
@@ -135,7 +137,7 @@ class Printer {
 		$floorY = $center->getFloorY();
 		$floorZ = $center->getFloorZ();
 
-		$fillSession = new FillSession($player->getWorld(), false, true);
+		$fillSession = new FillSession($player->getWorld(), false, true, true);
 		$fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 
 		$incDivX = 0;
@@ -201,10 +203,12 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getBlockChanges();
-		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
+		$blockChanges = $fillSession->getBlockChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($blockChanges);
+		$tileChanges = $fillSession->getTileChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($tileChanges);
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($blockChanges, $tileChanges, $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
@@ -241,7 +245,7 @@ class Printer {
 		}
 		$finalHeight = $height + $floorY;
 
-		$fillSession = new FillSession($player->getWorld(), false);
+		$fillSession = new FillSession($player->getWorld(), false, true, true);
 		$fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 		$fillSession->loadChunks($player->getWorld());
 
@@ -288,10 +292,12 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getBlockChanges();
-		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
+		$blockChanges = $fillSession->getBlockChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($blockChanges);
+		$tileChanges = $fillSession->getTileChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($tileChanges);
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($blockChanges, $tileChanges, $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
@@ -315,7 +321,7 @@ class Printer {
 		$floorY = $center->getFloorY();
 		$floorZ = $center->getFloorZ();
 
-		$fillSession = new FillSession($player->getWorld(), false);
+		$fillSession = new FillSession($player->getWorld(), false, true, true);
 		$fillSession->setDimensions($floorX - $size, $floorX + $size, $floorZ - $size, $floorZ + $size);
 
 		$currentLevelHeight = $size;
@@ -349,10 +355,12 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getBlockChanges();
-		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
+		$blockChanges = $fillSession->getBlockChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($blockChanges);
+		$tileChanges = $fillSession->getTileChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($tileChanges);
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($blockChanges, $tileChanges, $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
@@ -379,9 +387,9 @@ class Printer {
 		$session = SessionManager::getInstance()->getSession($player);
 		$cuboid = new Cuboid(
 			$player->getWorld(),
-			$center->getX() - $radius, $center->getX() + $radius,
-			$center->getY() - $radius, $center->getY() + $radius,
-			$center->getZ() - $radius, $center->getZ() + $radius,
+			$center->getFloorX() - $radius, $center->getFloorX() + $radius,
+			$center->getFloorY() - $radius, $center->getFloorY() + $radius,
+			$center->getFloorZ() - $radius, $center->getFloorZ() + $radius,
 			$session->getMask()
 		);
 
@@ -421,7 +429,7 @@ class Printer {
 		$floorX = $center->getFloorX();
 		$floorZ = $center->getFloorZ();
 
-		$fillSession = new FillSession($player->getWorld(), false);
+		$fillSession = new FillSession($player->getWorld(), false, true, true);
 		$fillSession->setDimensions($floorX - $radius, $floorX + $radius, $floorZ - $radius, $floorZ + $radius);
 		$fillSession->loadChunks($player->getWorld());
 
@@ -470,10 +478,12 @@ class Printer {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		$updates = $fillSession->getBlockChanges();
-		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($updates);
+		$blockChanges = $fillSession->getBlockChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($blockChanges);
+		$tileChanges = $fillSession->getTileChanges();
+		(new DuplicateBlockCleanHelper())->cleanDuplicateBlocks($tileChanges);
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($blockChanges, $tileChanges, $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}

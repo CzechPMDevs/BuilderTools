@@ -31,8 +31,8 @@ use function unpack;
 class Clipboard extends BlockStorageHolder {
 	protected Vector3 $relativePosition;
 
-	public function __construct(BlockArray $blockArray, Vector3 $relativePosition, ?World $world = null) {
-		parent::__construct($blockArray, $world);
+	public function __construct(BlockArray $blockArray, TileArray $tileArray, Vector3 $relativePosition, ?World $world = null) {
+		parent::__construct($blockArray, $tileArray, $world);
 
 		$this->relativePosition = $relativePosition;
 	}

@@ -25,8 +25,6 @@ use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\BuilderTools;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\tile\Tile;
-use pocketmine\block\tile\TileFactory;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\ChunkManager;
 use pocketmine\world\utils\SubChunkExplorer;
@@ -36,10 +34,8 @@ use pocketmine\world\World;
 class FillSession {
 	protected SubChunkExplorer $explorer;
 
-	protected bool $calculateDimensions;
-	protected bool $saveChanges;
-
 	protected BlockArray $blockChanges;
+	protected TileArray $tileChanges;
 
 	protected int $minX, $maxX;
 	protected int $minZ, $maxZ;
@@ -47,11 +43,13 @@ class FillSession {
 	protected int $blocksChanged = 0;
 	protected bool $error = false;
 
-	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true) {
+	public function __construct(
+		ChunkManager $world,
+		protected bool $calculateDimensions = true,
+		protected bool $saveChanges = true,
+		protected bool $saveTileChanges = true
+	) {
 		$this->explorer = new SubChunkExplorer($world);
-
-		$this->calculateDimensions = $calculateDimensions;
-		$this->saveChanges = $saveChanges;
 
 		if($this->saveChanges) {
 			$this->blockChanges = new BlockArray();
@@ -166,6 +164,13 @@ class FillSession {
 		return $this->blocksChanged;
 	}
 
+	public function getTileChanges(): TileArray {
+		if(!isset($this->tileChanges)) {
+			throw new AssumptionFailedError("Could not request non-saved tile changes");
+		}
+		return $this->tileChanges;
+	}
+
 	public function loadChunks(World $world): self {
 		$minX = $this->minX >> 4;
 		$maxX = $this->maxX >> 4;
@@ -236,6 +241,12 @@ class FillSession {
 	protected function saveChanges(int $x, int $y, int $z): void {
 		if($this->saveChanges) {
 			$this->blockChanges->addBlockAt($x, $y, $z, $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf));  // @phpstan-ignore-line
+
+			if($this->saveTileChanges) {
+				if(($tile = $this->explorer->currentChunk->getTile($x & 0xf, $y, $z & 0xf)) !== null) { // @phpstan-ignore-line
+					$this->tileChanges->addTileAt($x, $y, $z, $tile->saveNBT());
+				}
+			}
 		}
 	}
 

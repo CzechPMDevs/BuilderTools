@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockArraySizeData;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
+use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\utils\BlockFacingHelper;
 use pocketmine\math\Axis;
 use pocketmine\math\Vector3;
@@ -33,13 +34,16 @@ use function deg2rad;
 use function round;
 use function sqrt;
 
+// TODO - Tiles
 class Transform {
 	private BlockArray $blockStorage;
+	private TileArray $tileArray;
 	private Vector3 $relativePosition;
 	private World $world;
 
 	public function __construct(Clipboard $clipboard) {
 		$this->blockStorage = $clipboard->getBlockStorage();
+		$this->tileArray = $clipboard->getTileStorage();
 		$this->relativePosition = $clipboard->getRelativePosition();
 		$this->world = $clipboard->getWorld();
 	}
@@ -214,6 +218,6 @@ class Transform {
 	}
 
 	public function collectChanges(): Clipboard {
-		return new Clipboard($this->blockStorage, $this->relativePosition, $this->world);
+		return new Clipboard($this->blockStorage, $this->tileArray, $this->relativePosition, $this->world);
 	}
 }

@@ -21,24 +21,36 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\blockstorage\helpers;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\BuilderTools;
+use pocketmine\nbt\tag\CompoundTag;
 use function array_combine;
 use function array_keys;
 use function array_reverse;
 use function array_values;
 
 class DuplicateBlockCleanHelper {
-	public function cleanDuplicateBlocks(BlockArray $blockArray): void {
+	public function cleanDuplicateBlocks(BlockArray|TileArray $blockOrTileArray): void {
 		if(!(BuilderTools::getConfiguration()->getBoolProperty("remove-duplicate-blocks"))) {
 			return;
 		}
 
+		$keys = $blockOrTileArray->getCoordsArray();
+		$values = $blockOrTileArray instanceof BlockArray ? $blockOrTileArray->getBlockArray() : $blockOrTileArray->getTilesArray();
+
 		// This seems to be the fastest way to remove duplicate blocks. It is even faster
 		// than just sorting keys array, or combining those arrays manually. In the future,
 		// it would be better to add this to php extension.
-		$blocks = array_combine(array_reverse($blockArray->getCoordsArray(), true), array_reverse($blockArray->getBlockArray(), true));
+		$arr = array_combine(array_reverse($keys, true), array_reverse($values, true));
 
-		$blockArray->setCoordsArray(array_keys($blocks));
-		$blockArray->setBlockArray(array_values($blocks));
+		$blockOrTileArray->setCoordsArray(array_keys($arr));
+
+		if($blockOrTileArray instanceof BlockArray) {
+			/** @phpstan-var array<int, int> $arr */
+			$blockOrTileArray->setBlockArray(array_values($arr));
+		} else {
+			/** @phpstan-var array<int, CompoundTag> $arr */
+			$blockOrTileArray->setTileArray(array_values($arr));
+		}
 	}
 }

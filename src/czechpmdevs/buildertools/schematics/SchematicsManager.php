@@ -168,7 +168,7 @@ class SchematicsManager {
 
 		$schematic = clone SchematicsManager::$loadedSchematics[$schematicName];
 
-		$fillSession = new FillSession($player->getWorld(), true, true);
+		$fillSession = new FillSession($player->getWorld(), true, true, true);
 
 		$floorX = $player->getPosition()->getFloorX();
 		$floorY = $player->getPosition()->getFloorY();
@@ -187,7 +187,7 @@ class SchematicsManager {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}

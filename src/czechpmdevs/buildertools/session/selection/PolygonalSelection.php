@@ -26,6 +26,7 @@ use czechpmdevs\buildertools\blockstorage\BlockStorageHolder;
 use czechpmdevs\buildertools\blockstorage\Clipboard;
 use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
+use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\ForwardExtendCopy;
 use czechpmdevs\buildertools\editors\object\UpdateResult;
@@ -142,10 +143,9 @@ class PolygonalSelection extends SelectionHolder {
 
 		(new ForwardExtendCopy())->stack($fillSession, (new Polygon($this->world, $this->minY, $this->maxY, $this->points)), $minX, $maxX, $this->minY, $this->maxY, $minZ, $maxZ, $count, $direction);
 
-		$reverseData = $fillSession->reloadChunks($this->world)
-			->getBlockChanges();
+		$fillSession->reloadChunks($this->world);
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
@@ -161,11 +161,12 @@ class PolygonalSelection extends SelectionHolder {
 		$timer = new Timer();
 
 		$blockArray = new BlockArray();
+		$tileArray = new TileArray();
 
 		(new Polygon($this->world, $this->minY, $this->maxY, $this->points, $mask))
-			->read($blockArray);
+			->read($blockArray, $tileArray);
 
-		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $tileArray, $relativePosition, $this->world));
 
 		return UpdateResult::success($blockArray->size(), $timer->time());
 
@@ -178,13 +179,14 @@ class PolygonalSelection extends SelectionHolder {
 		$timer = new Timer();
 
 		$blockArray = new BlockArray();
+		$tileArray = new TileArray();
 
 		$reverseData = (new Polygon($this->world, $this->minY, $this->maxY, $this->points, $mask))
-			->read($blockArray)
+			->read($blockArray, $tileArray)
 			->fill(SingleBlockIdentifier::airIdentifier(), true)
 			->getReverseData();
 
-		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $tileArray, $relativePosition, $this->world));
 		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
 		return UpdateResult::success($blockArray->size(), $timer->time());

@@ -146,10 +146,9 @@ class CuboidSelection extends SelectionHolder {
 
 		(new ForwardExtendCopy())->stack($fillSession, new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ), $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $count, $direction);
 
-		$reverseData = $fillSession->reloadChunks($this->world)
-			->getBlockChanges();
+		$fillSession->reloadChunks($this->world);
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
@@ -163,18 +162,17 @@ class CuboidSelection extends SelectionHolder {
 		$naturalizer = new Naturalizer();
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
-		$fillSession = ($mask === null ? new FillSession($this->world, false, true) : new MaskedFillSession($this->world, false, true, $mask))
+		$fillSession = ($mask === null ? new FillSession($this->world, false, true) : new MaskedFillSession($this->world, false, true, true, $mask))
 			->setDimensions($minX, $maxX, $minZ, $maxZ)
 			->loadChunks($this->world);
 
 		$naturalizer->naturalize($fillSession, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 
-		$reverseData = $fillSession->reloadChunks($this->world)
-			->getBlockChanges();
+		$fillSession->reloadChunks($this->world);
 
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($reverseData, $this->world));
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world));
 
-		return UpdateResult::success($reverseData->size(), $timer->time());
+		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
 	public function saveToClipboard(Vector3 $relativePosition, ?BlockIdentifierList $mask = null): UpdateResult {
@@ -188,10 +186,9 @@ class CuboidSelection extends SelectionHolder {
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		(new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
-			->read($blockArray)
-			->readTiles($tileArray);
+			->read($blockArray, $tileArray);
 
-		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $tileArray, $relativePosition, $this->world));
 
 		return UpdateResult::success($blockArray->size(), $timer->time());
 	}
@@ -207,12 +204,11 @@ class CuboidSelection extends SelectionHolder {
 
 		Math::calculateMinAndMaxValues($this->firstPosition, $this->secondPosition, true, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
 		$reverseData = (new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ, $mask))
-			->read($blockArray)
-			->readTiles($tileArray)
+			->read($blockArray, $tileArray)
 			->fill(SingleBlockIdentifier::airIdentifier(), true)
 			->getReverseData();
 
-		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $relativePosition, $this->world));
+		$this->session->getClipboardHolder()->setClipboard(new Clipboard($blockArray, $tileArray, $relativePosition, $this->world));
 		$this->session->getReverseDataHolder()->saveUndo($reverseData);
 
 		return UpdateResult::success($blockArray->size(), $timer->time());
@@ -245,7 +241,7 @@ class CuboidSelection extends SelectionHolder {
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
 
-	// TODO - Mask
+	// TODO - Mask, Tiles
 	public function move(int $xMotion, int $yMotion, int $zMotion): UpdateResult {
 		$this->assureHasPositionsSelected();
 
@@ -286,14 +282,7 @@ class CuboidSelection extends SelectionHolder {
 
 		$fillSession->reloadChunks($this->world);
 
-		$tileArray = new TileArray();
-
-		$cuboid = new Cuboid($this->world, $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
-		$cuboid->readTiles($tileArray);
-
-		$tileArray->addVector3(new Vector3($xMotion, $yMotion, $zMotion));
-
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $this->world));
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}
@@ -307,7 +296,7 @@ class CuboidSelection extends SelectionHolder {
 
 		$fillSession = $mask === null ?
 			new FillSession($this->world, false, true) :
-			new MaskedFillSession($this->world, false, true, $mask);
+			new MaskedFillSession($this->world, false, true,true, $mask);
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 		$fillSession->loadChunks($this->world);
 
@@ -317,7 +306,7 @@ class CuboidSelection extends SelectionHolder {
 		}
 
 		$fillSession->reloadChunks($this->world);
-		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $this->world));
+		$this->session->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}

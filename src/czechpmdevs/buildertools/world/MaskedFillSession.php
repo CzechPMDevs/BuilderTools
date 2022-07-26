@@ -26,8 +26,8 @@ use pocketmine\world\ChunkManager;
 class MaskedFillSession extends FillSession {
 	protected ?BlockIdentifierList $mask;
 
-	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true, ?BlockIdentifierList $mask = null) {
-		parent::__construct($world, $calculateDimensions, $saveChanges);
+	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true, bool $saveTileChanges = true, ?BlockIdentifierList $mask = null) {
+		parent::__construct($world, $calculateDimensions, $saveChanges, $saveTileChanges);
 
 		$this->mask = $mask;
 	}

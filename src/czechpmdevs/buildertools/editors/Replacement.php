@@ -58,7 +58,7 @@ class Replacement {
 		$minY = (int)max(min($pos1->getY(), $pos2->getY(), World::Y_MAX - 1), 0);
 		$maxY = (int)min(max($pos1->getY(), $pos2->getY(), 0), World::Y_MAX - 1);
 
-		$fillSession = new MaskedFillSession($player->getWorld(), false, true, $mask);
+		$fillSession = new MaskedFillSession($player->getWorld(), false, true, true, $mask);
 		$fillSession->setDimensions($minX, $maxX, $minZ, $maxZ);
 
 		for($x = $minX; $x <= $maxX; ++$x) {
@@ -73,7 +73,7 @@ class Replacement {
 		$fillSession->reloadChunks($player->getWorld());
 		$fillSession->close();
 
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $player->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $player->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}

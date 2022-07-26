@@ -22,8 +22,6 @@ namespace czechpmdevs\buildertools\blockstorage;
 
 use czechpmdevs\buildertools\blockstorage\compressed\CompressedBlockArray;
 use czechpmdevs\buildertools\blockstorage\compressed\CompressedTileArray;
-use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
-use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\CompoundTag;
@@ -37,7 +35,7 @@ use const ZLIB_ENCODING_GZIP;
 
 class BlockStorageHolder {
 	protected CompressedBlockArray $blockStorage;
-	protected CompressedTileArray $tileArray;
+	protected CompressedTileArray $tileStorage;
 
 	public function __construct(
 		BlockArray $blockArray,
@@ -46,10 +44,16 @@ class BlockStorageHolder {
 	) {
 		$this->blockStorage = new CompressedBlockArray($blockArray);
 		unset($blockArray);
+		$this->tileStorage = new CompressedTileArray($tileArray);
+		unset($tileArray);
 	}
 
 	public function getBlockStorage(): BlockArray {
 		return $this->blockStorage->asBlockArray();
+	}
+
+	public function getTileStorage(): TileArray {
+		return $this->tileStorage->asTileArray();
 	}
 
 	public function getSize(): int {
@@ -68,9 +72,9 @@ class BlockStorageHolder {
 
 	public function saveToNbt(): string {
 		$nbt = $this->blockStorage->nbtSerialize();
+		$nbt->setTag("Tiles", $this->tileStorage->nbtSerialize());
 
 		$this->nbtSerialize($nbt);
-
 
 		$serializer = new BigEndianNbtSerializer();
 		$buffer = zlib_encode($serializer->write(new TreeRoot($nbt)), ZLIB_ENCODING_GZIP);
@@ -98,11 +102,18 @@ class BlockStorageHolder {
 			throw new RuntimeException("Invalid Block Storage format received");
 		}
 
-
 		$compressedStorage = CompressedBlockArray::nbtDeserialize($nbt);
 
-		$instance = new self(new BlockArray(), null);
+		$tileNbt = $nbt->getTag("Tiles");
+		if($tileNbt instanceof CompoundTag) {
+			$compressedTileStorage = CompressedTileArray::nbtDeserialize($nbt);
+		} else {
+			$compressedTileStorage = new CompressedTileArray(new TileArray());
+		}
+
+		$instance = new self(new BlockArray(),  new TileArray(), null);
 		$instance->blockStorage = $compressedStorage;
+		$instance->tileStorage = $compressedTileStorage;
 
 		$instance->nbtDeserialize($nbt);
 

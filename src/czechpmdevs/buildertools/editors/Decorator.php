@@ -38,7 +38,7 @@ class Decorator {
 	public function addDecoration(Position $center, string $blocks, int $radius, int $percentage, Player $player): UpdateResult {
 		$timer = new Timer();
 
-		$fillSession = new FillSession($center->getWorld(), false, true);
+		$fillSession = new FillSession($center->getWorld(), false, true, true);
 
 		$stringToBlockDecoder = new StringToBlockDecoder($blocks);
 
@@ -67,9 +67,7 @@ class Decorator {
 
 		$fillSession->reloadChunks($center->getWorld());
 
-		$updates = $fillSession->getBlockChanges();
-
-		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($updates, $center->getWorld()));
+		SessionManager::getInstance()->getSession($player)->getReverseDataHolder()->saveUndo(new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $center->getWorld()));
 
 		return UpdateResult::success($fillSession->getBlocksChanged(), $timer->time());
 	}

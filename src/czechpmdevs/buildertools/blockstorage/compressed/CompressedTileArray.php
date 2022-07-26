@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage\compressed;
 
-use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\TileArray;
-use pocketmine\block\tile\Tile;
-use pocketmine\block\tile\TileFactory;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\utils\AssumptionFailedError;
-use function array_count_values;
 use function array_values;
 use function pack;
 use function unpack;
@@ -88,6 +84,10 @@ class CompressedTileArray {
 
 		$nbt = (new BigEndianNbtSerializer())->read($buffer)->mustGetCompoundTag();
 		foreach($nbt->getValue() as $index => $value) {
+			if(!$value instanceof CompoundTag) {
+				// TODO - Exception?
+				continue;
+			}
 			$tiles[(int)$index] = $value;
 		}
 

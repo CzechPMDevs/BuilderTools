@@ -20,11 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\commands\clipboard;
 
-use czechpmdevs\buildertools\blockstorage\identifiers\MultipleBlockIdentifier;
-use czechpmdevs\buildertools\blockstorage\identifiers\SingleBlockIdentifier;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\commands\BuilderToolsCommand;
-use czechpmdevs\buildertools\editors\Copier;
 use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;

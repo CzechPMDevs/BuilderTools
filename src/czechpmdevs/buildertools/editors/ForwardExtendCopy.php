@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\editors;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
+use czechpmdevs\buildertools\blockstorage\TileArray;
 use czechpmdevs\buildertools\shape\Shape;
 use czechpmdevs\buildertools\world\FillSession;
 use pocketmine\math\Facing;
@@ -31,8 +32,9 @@ class ForwardExtendCopy {
 	public function stack(FillSession $fillSession, Shape $shape, int $minX, int $maxX, int $minY, int $maxY, int $minZ, int $maxZ, int $count, int $direction): void {
 		$temporaryBlockArray = new BlockArray();
 		$iterator = new BlockArrayIteratorHelper($temporaryBlockArray);
+		$temporaryTileArray = new TileArray();
 
-		$shape->read($temporaryBlockArray);
+		$shape->read($temporaryBlockArray, $temporaryTileArray); // TODO - Tiles
 
 		if($direction === Facing::DOWN || $direction === Facing::UP) {
 			$ySize = ($maxY - $minY) + 1;

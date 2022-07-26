@@ -86,7 +86,7 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world);
 		}
 
 		return $this;
@@ -113,7 +113,7 @@ class Cuboid implements Shape {
 		$fillSession->close();
 
 		if($saveReverseData) {
-			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $this->world);
+			$this->reverseData = new BlockStorageHolder($fillSession->getBlockChanges(), $fillSession->getTileChanges(), $this->world);
 		}
 
 		return $this;
@@ -147,9 +147,9 @@ class Cuboid implements Shape {
 					$z = $tile->getPosition()->getZ();
 
 					if(
-						$x > $this->minX && $x < $this->maxX &&
-						$y > $this->minY && $y < $this->maxY &&
-						$z > $this->minZ && $z < $this->maxZ
+						$x >= $this->minX && $x <= $this->maxX &&
+						$y >= $this->minY && $y <= $this->maxY &&
+						$z >= $this->minZ && $z <= $this->maxZ
 					) {
 						$tileArray->addTileAt($x, $y, $z, $tile->saveNBT());
 					}
@@ -161,9 +161,9 @@ class Cuboid implements Shape {
 	}
 
 	protected function clearTiles(): self {
-		for($x = $this->minX >> 4, $maxX = $this->maxX >> 4; $x <= $maxX; ++$x) {
-			for($z = $this->maxZ >> 4, $maxZ = $this->maxZ >> 4; $z <= $maxZ; ++$z) {
-				$chunk = $this->world->getChunk($x, $z);
+		for($chunkX = $this->minX >> 4, $maxX = $this->maxX >> 4; $chunkX <= $maxX; ++$chunkX) {
+			for($chunkZ = $this->maxZ >> 4, $maxZ = $this->maxZ >> 4; $chunkZ <= $maxZ; ++$chunkZ) {
+				$chunk = $this->world->getChunk($chunkX, $chunkZ);
 				if($chunk === null) {
 					continue;
 				}
@@ -177,9 +177,9 @@ class Cuboid implements Shape {
 					$z = $tile->getPosition()->getZ();
 
 					if(
-						$x > $this->minX && $x < $this->maxX &&
-						$y > $this->minY && $y < $this->maxY &&
-						$z > $this->minZ && $z < $this->maxZ
+						$x >= $this->minX && $x <= $this->maxX &&
+						$y >= $this->minY && $y <= $this->maxY &&
+						$z >= $this->minZ && $z <= $this->maxZ
 					) {
 						$tile->close();
 					}
@@ -193,10 +193,10 @@ class Cuboid implements Shape {
 		return $this->reverseData;
 	}
 
-	public function loadFillSession(bool $saveReverseData = false): FillSession|MaskedFillSession {
+	public function loadFillSession(bool $saveBlockChanges = false, bool $saveTileChanges = false): FillSession|MaskedFillSession {
 		$fillSession = $this->mask === null ?
-			new FillSession($this->world, false, $saveReverseData) :
-			new MaskedFillSession($this->world, false, $saveReverseData, $this->mask);
+			new FillSession($this->world, false, $saveBlockChanges, $saveTileChanges) :
+			new MaskedFillSession($this->world, false, $saveBlockChanges, $saveTileChanges, $this->mask);
 
 		$fillSession->setDimensions($this->minX, $this->maxX, $this->minZ, $this->maxZ);
 		$fillSession->loadChunks($this->world);
