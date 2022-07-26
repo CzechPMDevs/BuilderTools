@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\async\schematics;
 
 use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
-use czechpmdevs\buildertools\blockstorage\CompressedBlockArray;
+use czechpmdevs\buildertools\blockstorage\compressed\CompressedBlockArray;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use RuntimeException;
