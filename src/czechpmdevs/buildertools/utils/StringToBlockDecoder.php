@@ -39,54 +39,41 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 	private ?string $itemInHand = null;
 
 	/** @var int[] */
-	private array $blockIdMap = [];
-	/** @var int[] */
 	private array $blockMap = [];
 
-	public function __construct(string $string, ?Item $handItem = null, bool $mixBlockIds = true) {
+	public function __construct(string $string, ?Item $handItem = null) {
 		$this->string = $string;
 
 		if($handItem !== null) {
-			$this->itemInHand = "{$handItem->getId()}:{$handItem->getMeta()}";
+			$this->itemInHand = "{$handItem->getBlock()->getStateId()}";
 		}
 
-		$this->decode($mixBlockIds);
+		$this->decode();
 	}
 
 	/**
 	 * @return bool Returns if the string contains at least one valid block
 	 */
-	public function isValid(bool $requireBlockMap = true): bool {
-		return count($this->blockMap) !== 0 || (!$requireBlockMap && count($this->blockIdMap) !== 0);
+	public function isValid(): bool {
+		return count($this->blockMap) !== 0;
 	}
 
 	/**
 	 * Reads next block from the string,
 	 * @throws OutOfBoundsException if string is not valid.
 	 */
-	public function nextBlock(?int &$fullBlockId): void {
-		$fullBlockId = $this->blockMap[array_rand($this->blockMap)];
+	public function nextBlock(?int &$fullStateId): void {
+		$fullStateId = $this->blockMap[array_rand($this->blockMap)];
 	}
 
 	/**
 	 * @return bool Returns if the block is in the array
 	 */
-	public function containsBlock(int $fullBlockId): bool {
-		return in_array($fullBlockId, $this->blockMap, true);
+	public function containsBlock(int $fullStateId): bool {
+		return in_array($fullStateId, $this->blockMap, true);
 	}
 
-	/**
-	 * @return bool Returns if block id is in the array
-	 */
-	public function containsBlockId(int $id): bool {
-		return in_array($id, $this->blockIdMap, true);
-	}
-
-	/**
-	 * @param bool $mixBlockIds If enabled, block ids will be saved
-	 * to both block and blockId maps
-	 */
-	public function decode(bool $mixBlockIds = true): void {
+	public function decode(): void {
 		if($this->itemInHand !== null) {
 			$this->string = str_replace("hand", $this->itemInHand, $this->string);
 		}
@@ -110,22 +97,8 @@ final class StringToBlockDecoder implements BlockIdentifierList {
 				continue;
 			}
 
-			if(!$mixBlockIds) {
-				if(str_contains($entry, ":")) { // Meta is specified
-					for($i = 0; $i < $count; ++$i) {
-						$this->blockMap[] = $class->getId() << 4 | $class->getMeta();
-					}
-				} else {
-					for($i = 0; $i < $count; ++$i) {
-						$this->blockIdMap[] = $class->getId();
-					}
-				}
-				continue;
-			}
-
 			for($i = 0; $i < $count; ++$i) {
-				$this->blockIdMap[] = $class->getId();
-				$this->blockMap[] = $class->getId() << 4 | $class->getMeta();
+				$this->blockMap[] = $class->getStateId();
 			}
 		}
 	}

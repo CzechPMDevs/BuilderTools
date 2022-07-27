@@ -137,11 +137,11 @@ class MCEditSchematic implements Schematic {
 
 		$iterator = new BlockArrayIteratorHelper($blockArray);
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
 			$key = $x + ($width * $z) + ($xz * $y);
 
-			$blocks[$key] = chr($fullBlockId >> 4);
-			$data[$key] = chr($fullBlockId & 0xf);
+			$blocks[$key] = chr($fullStateId >> 4);
+			$data[$key] = chr($fullStateId & 0xf);
 		}
 
 		$this->writeDimensions($nbt, $width, $height, $length);

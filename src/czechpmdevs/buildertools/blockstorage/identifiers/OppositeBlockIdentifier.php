@@ -23,21 +23,16 @@ namespace czechpmdevs\buildertools\blockstorage\identifiers;
 use pocketmine\utils\AssumptionFailedError;
 
 class OppositeBlockIdentifier implements BlockIdentifierList {
-
 	public function __construct(
 		private BlockIdentifierList $blockIdentifierList
 	) {
 	}
 
-	public function nextBlock(?int &$fullBlockId): void {
+	public function nextBlock(?int &$fullStateId): void {
 		throw new AssumptionFailedError("nextBlock does not work with OppositeIdentifier");
 	}
 
-	public function containsBlock(int $fullBlockId): bool {
-		return !$this->blockIdentifierList->containsBlock($fullBlockId);
-	}
-
-	public function containsBlockId(int $id): bool {
-		return !$this->blockIdentifierList->containsBlockId($id);
+	public function containsBlock(int $fullStateId): bool {
+		return !$this->blockIdentifierList->containsBlock($fullStateId);
 	}
 }

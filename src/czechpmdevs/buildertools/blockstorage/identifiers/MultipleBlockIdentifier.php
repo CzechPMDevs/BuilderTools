@@ -28,15 +28,11 @@ class MultipleBlockIdentifier implements BlockIdentifierList {
 		private ?BlockIdentifierList $anotherList
 	) {}
 
-	public function nextBlock(?int &$fullBlockId): void {
+	public function nextBlock(?int &$fullStateId): void {
 		throw new AssumptionFailedError("nextBlock does not work with MultipleBlockIdentifier");
 	}
 
-	public function containsBlock(int $fullBlockId): bool {
-		return $this->list->containsBlock($fullBlockId) || $this->anotherList?->containsBlock($fullBlockId);
-	}
-
-	public function containsBlockId(int $id): bool {
-		return $this->list->containsBlockId($id) || $this->anotherList?->containsBlockId($id);
+	public function containsBlock(int $fullStateId): bool {
+		return $this->list->containsBlock($fullStateId) || $this->anotherList?->containsBlock($fullStateId);
 	}
 }

@@ -41,7 +41,7 @@ final class BlockArraySizeData {
 
 		$iterator = new BlockArrayIteratorHelper($this->blockArray);
 
-		$iterator->readNext($x, $y, $z, $fullBlockId);
+		$iterator->readNext($x, $y, $z, $fullStateId);
 
 		$minX = $maxX = $x;
 		$minY = $maxY = $y;
@@ -52,7 +52,7 @@ final class BlockArraySizeData {
 		}
 
 		while($iterator->hasNext()) {
-			$iterator->readNext($x1, $y1, $z1, $fullBlockId);
+			$iterator->readNext($x1, $y1, $z1, $fullStateId);
 			if(!$iterator->hasNext()) {
 				if($x1 < $minX) {
 					$minX = $x1;
@@ -72,7 +72,7 @@ final class BlockArraySizeData {
 				break;
 			}
 
-			$iterator->readNext($x2, $y2, $z2, $fullBlockId);
+			$iterator->readNext($x2, $y2, $z2, $fullStateId);
 			if($x1 > $x2) {
 				if($x2 < $minX) {
 					$minX = $x2;

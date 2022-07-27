@@ -40,10 +40,10 @@ class Replacement {
 	public function directReplace(Player $player, Vector3 $pos1, Vector3 $pos2, string $blocks, string $replace): UpdateResult {
 		$timer = new Timer();
 
-		$mask = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand(), false);
+		$mask = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
 		$stringToBlockDecoder = new StringToBlockDecoder($replace, $player->getInventory()->getItemInHand());
 
-		if(!$mask->isValid(false)) { // Nothing to replace
+		if(!$mask->isValid()) { // Nothing to replace
 			return UpdateResult::success(0, $timer->time());
 		}
 		if(!$stringToBlockDecoder->isValid()) {
@@ -64,8 +64,8 @@ class Replacement {
 		for($x = $minX; $x <= $maxX; ++$x) {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 				}
 			}
 		}

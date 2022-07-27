@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\event\listener;
 
-use czechpmdevs\buildertools\blockstorage\OfflineSession;
 use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\item\WoodenAxe;
@@ -36,6 +35,7 @@ use pocketmine\item\VanillaItems;
 use pocketmine\Server;
 use RuntimeException;
 use function array_key_exists;
+use function intlcal_set_time;
 use function microtime;
 
 class EventListener implements Listener {
@@ -64,7 +64,6 @@ class EventListener implements Listener {
 	/** @noinspection PhpUnused */
 	public function onBlockBreak(BlockBreakEvent $event): void {
 		if(
-			$event->getItem()->getNamedTag()->getTag("buildertools") !== null &&
 			($item = $event->getItem()) instanceof WoodenAxe &&
 			$item->isWandAxe()
 		) {
@@ -90,7 +89,7 @@ class EventListener implements Listener {
 
 	/** @noinspection PhpUnused */
 	public function onBlockTouch(PlayerInteractEvent $event): void {
-		if($event->getItem()->getNamedTag()->getTag("buildertools") !== null && $event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
+		if($event->getItem() instanceof WoodenAxe && $event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
 			$player = $event->getPlayer();
 			$item = $event->getItem();
 			if(array_key_exists($player->getName(), $this->clickTime) && microtime(true) - $this->clickTime[$player->getName()] < 0.5) {
@@ -127,7 +126,7 @@ class EventListener implements Listener {
 				$world = $event->getBlock()->getPosition()->getWorld();
 
 				$player->sendTip(
-					"§aID: §7" . $block->getId() . ":" . $block->getMeta() . "\n" .
+					"§aID: §7" . $block->getStateId() . "\n" .
 					"§aName: §7" . $block->getName() . "\n" .
 					"§aPosition: §7" . $block->getPosition()->getFloorX() . ";" . $block->getPosition()->getFloorY() . ";" . $block->getPosition()->getFloorZ() . " (" . ($block->getPosition()->getFloorX() >> 4) . ";" . ($block->getPosition()->getFloorZ() >> 4) . ")\n" .
 					"§aWorld: §7" . $world->getDisplayName() . "\n" .

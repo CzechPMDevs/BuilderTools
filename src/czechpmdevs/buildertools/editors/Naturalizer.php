@@ -27,10 +27,10 @@ class Naturalizer {
 	private int $air, $grass, $dirt, $stone;
 
 	public function __construct() {
-		$this->air = VanillaBlocks::AIR()->getFullId();
-		$this->grass = VanillaBlocks::GRASS()->getFullId();
-		$this->dirt = VanillaBlocks::DIRT()->getFullId();
-		$this->stone = VanillaBlocks::STONE()->getFullId();
+		$this->air = VanillaBlocks::AIR()->getStateId();
+		$this->grass = VanillaBlocks::GRASS()->getStateId();
+		$this->dirt = VanillaBlocks::DIRT()->getStateId();
+		$this->stone = VanillaBlocks::STONE()->getStateId();
 	}
 
 	public function naturalize(FillSession $session, int $minX, int $maxX, int $minY, int $maxY, int $minZ, int $maxZ): void {
@@ -38,9 +38,9 @@ class Naturalizer {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				$layer = 0;
 				for($y = $maxY; $y >= $minY; --$y) {
-					$session->getBlockAt($x, $y, $z, $fullBlockId);
+					$session->getBlockAt($x, $y, $z, $fullStateId);
 
-					if($fullBlockId === $this->air) {
+					if($fullStateId === $this->air) {
 						$layer = 0;
 						continue;
 					}

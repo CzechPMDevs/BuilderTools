@@ -57,7 +57,7 @@ class Transform {
 
 		$modifiedClipboard = new BlockArray();
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
 
 			$dist = sqrt(Math::lengthSquared2d($x - $diffX, $z - $diffZ));
 			$angle = atan2($z - $diffZ, $x - $diffX) + $rad;
@@ -65,7 +65,7 @@ class Transform {
 				(int)round($dist * Math::cos($angle)) + $diffX,
 				$y,
 				(int)round($dist * Math::sin($angle)) + $diffZ,
-				$rotationMapping[$fullBlockId] ?? $fullBlockId
+				$rotationMapping[$fullStateId] ?? $fullStateId
 			);
 		}
 
@@ -86,7 +86,7 @@ class Transform {
 
 		$modifiedClipboard = new BlockArray();
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
 
 			$dist = sqrt(Math::lengthSquared2d($z - $diffZ, $y - $diffY));
 			$angle = atan2($y - $diffY, $z - $diffZ) + $rad;
@@ -99,7 +99,7 @@ class Transform {
 				$x,
 				$y,
 				(int)round($dist * Math::cos($angle)) + $diffZ,
-				$rotationMapping[$fullBlockId] ?? $fullBlockId);
+				$rotationMapping[$fullStateId] ?? $fullStateId);
 		}
 
 		$blockArray->blocks = $modifiedClipboard->blocks;
@@ -119,7 +119,7 @@ class Transform {
 
 		$modifiedBlockArray = new BlockArray();
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
 
 			$dist = sqrt(Math::lengthSquared2d($y - $diffY, $x - $diffX));
 			$angle = atan2($x - $diffX, $y - $diffY) + $rad;
@@ -132,7 +132,7 @@ class Transform {
 				(int)round($dist * Math::sin($angle)) + $diffX,
 				$y,
 				$z,
-				$rotationMapping[$fullBlockId] ?? $fullBlockId
+				$rotationMapping[$fullStateId] ?? $fullStateId
 			);
 		}
 
@@ -149,13 +149,13 @@ class Transform {
 		$modifiedBlockArray = new BlockArray();
 		$iterator = new BlockArrayIteratorHelper($blockArray);
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
 
 			$modifiedBlockArray->addBlockAt(
 				($sizeData->minX + $sizeData->maxX) - $x,
 				$y,
 				$z,
-				$flipMapping[$fullBlockId] ?? $fullBlockId
+				$flipMapping[$fullStateId] ?? $fullStateId
 			);
 		}
 
@@ -172,13 +172,13 @@ class Transform {
 		$modifiedBlockArray = new BlockArray();
 		$iterator = new BlockArrayIteratorHelper($blockArray);
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
 
 			$modifiedBlockArray->addBlockAt(
 				$x,
 				$y,
 				($sizeData->minZ + $sizeData->maxZ) - $z,
-				$flipMapping[$fullBlockId] ?? $fullBlockId
+				$flipMapping[$fullStateId] ?? $fullStateId
 			);
 		}
 
@@ -195,7 +195,7 @@ class Transform {
 		$modifiedBlockArray = new BlockArray();
 		$iterator = new BlockArrayIteratorHelper($blockArray);
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
 			$y = ($sizeData->minY + $sizeData->maxY) - $y;
 			if($y < World::Y_MIN || $y >= World::Y_MAX) {
 				continue;
@@ -205,7 +205,7 @@ class Transform {
 				$x,
 				$y,
 				$z,
-				$flipMapping[$fullBlockId] ?? $fullBlockId
+				$flipMapping[$fullStateId] ?? $fullStateId
 			);
 		}
 

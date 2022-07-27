@@ -31,6 +31,7 @@ use czechpmdevs\buildertools\session\SessionManager;
 use czechpmdevs\buildertools\utils\StringToBlockDecoder;
 use czechpmdevs\buildertools\utils\Timer;
 use pocketmine\block\Block;
+use pocketmine\block\BlockTypeIds;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
@@ -53,9 +54,9 @@ class Printer {
 		$updates = new BlockArray();
 		$center = Position::fromObject($center->floor(), $center->getWorld());
 
-		$level = $center->getWorld();
+		$world = $center->getWorld();
 
-		$placeBlock = function(Vector3 $vector3) use ($level, $updates, $block, $center, $throwBlock) {
+		$placeBlock = function(Vector3 $vector3) use ($world, $updates, $block, $center, $throwBlock) {
 			if($throwBlock) {
 				$vector3 = $this->throwBlock(Position::fromObject($vector3, $center->getWorld()));
 			}
@@ -63,10 +64,10 @@ class Printer {
 				return;
 			}
 
-			$updates->addBlock($vector3, $level->getBlock($vector3, true, false)->getId());
+			$updates->addBlock($vector3, $world->getBlock($vector3, true, false)->getStateId());
 
 			/** @phpstan-ignore-next-line */
-			$level->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block); // We provide valid values
+			$world->setBlockAt($vector3->getX(), $vector3->getY(), $vector3->getZ(), $block); // We provide valid values
 		};
 
 		if($mode === Printer::CUBE) {
@@ -112,7 +113,7 @@ class Printer {
 		$z = $position->getFloorZ();
 
 		/** @noinspection PhpStatementHasEmptyBodyInspection */
-		for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getId() === 0; $y--) ;
+		for(; $y >= 0 && $level->getBlockAt($x, $y, $z, true, false)->getTypeId() === BlockTypeIds::AIR; $y--) ;
 
 		return new Vector3($x, ++$y, $z);
 	}
@@ -168,30 +169,30 @@ class Printer {
 					}
 
 					if($floorY + $y >= 0 && $floorY + $y < 256) { // TODO - Try creating 4 chunk iterators
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullStateId);
 
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $fullStateId);
 
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $fullStateId);
 
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $fullStateId);
 					}
 					if($floorY - $y >= 0 && $floorY - $y < 256) {
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ + $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ + $z, $fullStateId);
 
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ + $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ + $z, $fullStateId);
 
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ - $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX + $x, $floorY - $y, $floorZ - $z, $fullStateId);
 
-						$stringToBlockDecoder->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ - $z, $fullBlockId);
+						$stringToBlockDecoder->nextBlock($fullStateId);
+						$fillSession->setBlockAt($floorX - $x, $floorY - $y, $floorZ - $z, $fullStateId);
 					}
 				}
 			}
@@ -266,20 +267,20 @@ class Printer {
 				}
 
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $fullStateId);
 				}
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $fullStateId);
 				}
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $fullStateId);
 				}
 				for($y = $floorY; $y < $finalHeight; ++$y) {
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $fullStateId);
 				}
 			}
 		}
@@ -329,17 +330,17 @@ class Printer {
 						continue;
 					}
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullStateId);
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ + $z, $fullStateId);
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ - $z, $fullStateId);
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX - $x, $floorY + $y, $floorZ - $z, $fullStateId);
 				}
 			}
 			$currentLevelHeight--;
@@ -431,17 +432,17 @@ class Printer {
 						break;
 					}
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ + $z, $fullStateId);
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ + $z, $fullStateId);
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX + $x, $y, $floorZ - $z, $fullStateId);
 
-					$stringToBlockDecoder->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $fullBlockId);
+					$stringToBlockDecoder->nextBlock($fullStateId);
+					$fillSession->setBlockAt($floorX - $x, $y, $floorZ - $z, $fullStateId);
 				}
 			}
 

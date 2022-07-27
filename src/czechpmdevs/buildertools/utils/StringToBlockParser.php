@@ -46,15 +46,8 @@ final class StringToBlockParser extends StringToTParser {
 
 		foreach(BlockFactory::getInstance()->getAllKnownStates() as $state) {
 			try {
-				$result->register("{$state->getId()}:{$state->getMeta()}", fn() => $state);
+				$result->register("{$state->getStateId()}", fn() => $state);
 			} catch(InvalidArgumentException) {
-			}
-
-			if($state->getMeta() === 0) {
-				try {
-					$result->register((string)$state->getId(), fn() => $state);
-				} catch(InvalidArgumentException) {
-				}
 			}
 		}
 

@@ -46,8 +46,8 @@ final class BlockArray {
 	 *
 	 * @return $this
 	 */
-	public function addBlock(Vector3 $vector3, int $fullBlockId): BlockArray {
-		return $this->addBlockAt($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ(), $fullBlockId);
+	public function addBlock(Vector3 $vector3, int $fullStateId): BlockArray {
+		return $this->addBlockAt($vector3->getFloorX(), $vector3->getFloorY(), $vector3->getFloorZ(), $fullStateId);
 	}
 
 	/**
@@ -55,7 +55,7 @@ final class BlockArray {
 	 *
 	 * @return $this
 	 */
-	public function addBlockAt(int $x, int $y, int $z, int $fullBlockId): BlockArray {
+	public function addBlockAt(int $x, int $y, int $z, int $fullStateId): BlockArray {
 		$this->lastHash = World::blockHash($x, $y, $z);
 
 		if($this->detectDuplicates && in_array($this->lastHash, $this->coords, true)) {
@@ -63,7 +63,7 @@ final class BlockArray {
 		}
 
 		$this->coords[] = $this->lastHash;
-		$this->blocks[] = $fullBlockId;
+		$this->blocks[] = $fullStateId;
 
 		return $this;
 	}

@@ -31,16 +31,16 @@ class LiquidBlockIdentifier implements BlockIdentifierList {
 	private array $ids = [];
 
 	public function __construct() {
-		array_push($this->ids, ...VanillaBlocks::WATER()->getIdInfo()->getAllBlockIds());
-		array_push($this->ids, ...VanillaBlocks::LAVA()->getIdInfo()->getAllBlockIds());
+		$this->ids[] = VanillaBlocks::WATER()->getStateId();
+		$this->ids[] = VanillaBlocks::LAVA()->getStateId();
 	}
 
-	public function nextBlock(?int &$fullBlockId): void {
+	public function nextBlock(?int &$fullStateId): void {
 		throw new AssumptionFailedError("nextBlock does not work with MergedBlockIdentifier");
 	}
 
-	public function containsBlock(int $fullBlockId): bool {
-		return in_array($fullBlockId << Block::INTERNAL_METADATA_BITS, $this->ids);
+	public function containsBlock(int $fullStateId): bool {
+		return in_array($fullStateId, $this->ids);
 	}
 
 	public function containsBlockId(int $id): bool {

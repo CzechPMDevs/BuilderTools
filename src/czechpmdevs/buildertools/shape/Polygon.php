@@ -59,8 +59,8 @@ class Polygon implements Shape {
 					continue;
 				}
 				for($y = $this->minY; $y <= $this->maxY; ++$y) {
-					$blockGenerator->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+					$blockGenerator->nextBlock($fullStateId);
+					$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 				}
 			}
 		}
@@ -121,20 +121,20 @@ class Polygon implements Shape {
 				}
 
 				if(!$draw) {
-					$blockGenerator->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $this->minY, $z, $fullBlockId);
+					$blockGenerator->nextBlock($fullStateId);
+					$fillSession->setBlockAt($x, $this->minY, $z, $fullStateId);
 					if($this->maxY === $this->minY) {
 						continue;
 					}
 
-					$blockGenerator->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $this->maxY, $z, $fullBlockId);
+					$blockGenerator->nextBlock($fullStateId);
+					$fillSession->setBlockAt($x, $this->maxY, $z, $fullStateId);
 					continue;
 				}
 
 				for($y = $this->minY; $y <= $this->maxY; ++$y) {
-					$blockGenerator->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+					$blockGenerator->nextBlock($fullStateId);
+					$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 				}
 			}
 		}
@@ -199,8 +199,8 @@ class Polygon implements Shape {
 				}
 
 				for($y = $this->minY; $y <= $this->maxY; ++$y) {
-					$blockGenerator->nextBlock($fullBlockId);
-					$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+					$blockGenerator->nextBlock($fullStateId);
+					$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 				}
 			}
 		}
@@ -231,8 +231,8 @@ class Polygon implements Shape {
 					continue;
 				}
 				for($y = $this->minY; $y <= $this->maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
-					$blockArray->addBlockAt($x, $y, $z, $fullBlockId);
+					$fillSession->getBlockAt($x, $y, $z, $fullStateId);
+					$blockArray->addBlockAt($x, $y, $z, $fullStateId);
 				}
 			}
 		}

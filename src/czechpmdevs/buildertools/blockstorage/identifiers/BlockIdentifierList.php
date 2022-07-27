@@ -25,16 +25,11 @@ interface BlockIdentifierList {
 	/**
 	 * Function which outputs next random block
 	 */
-	public function nextBlock(?int &$fullBlockId): void;
+	public function nextBlock(?int &$fullStateId): void;
 
 	/**
 	 * Function which returns if the block
 	 * in the list
 	 */
-	public function containsBlock(int $fullBlockId): bool;
-
-	/**
-	 * Returns if the id is on the list
-	 */
-	public function containsBlockId(int $id): bool;
+	public function containsBlock(int $fullStateId): bool;
 }

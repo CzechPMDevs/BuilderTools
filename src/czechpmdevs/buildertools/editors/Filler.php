@@ -52,8 +52,8 @@ class Filler {
 							continue;
 						}
 
-						$blockGenerator->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+						$blockGenerator->nextBlock($fullStateId);
+						$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 					}
 				}
 			}
@@ -61,8 +61,8 @@ class Filler {
 			for($x = $minX; $x <= $maxX; ++$x) {
 				for($z = $minZ; $z <= $maxZ; ++$z) {
 					for($y = $minY; $y <= $maxY; ++$y) {
-						$blockGenerator->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+						$blockGenerator->nextBlock($fullStateId);
+						$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 					}
 				}
 			}
@@ -88,8 +88,8 @@ class Filler {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				for($y = $minY; $y <= $maxY; ++$y) {
 					if($x === $minX || $x === $maxX || $z === $minZ || $z === $maxZ) {
-						$blocks->nextBlock($fullBlockId);
-						$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+						$blocks->nextBlock($fullStateId);
+						$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 					}
 				}
 			}

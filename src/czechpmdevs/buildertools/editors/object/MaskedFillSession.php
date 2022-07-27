@@ -24,7 +24,6 @@ use czechpmdevs\buildertools\blockstorage\identifiers\BlockIdentifierList;
 use pocketmine\world\ChunkManager;
 
 class MaskedFillSession extends FillSession {
-
 	protected ?BlockIdentifierList $mask;
 
 	public function __construct(ChunkManager $world, bool $calculateDimensions = true, bool $saveChanges = true, ?BlockIdentifierList $mask = null) {
@@ -36,7 +35,7 @@ class MaskedFillSession extends FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function setBlockAt(int $x, int $y, int $z, int $fullBlockId): void {
+	public function setBlockAt(int $x, int $y, int $z, int $fullStateId): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
@@ -46,11 +45,7 @@ class MaskedFillSession extends FillSession {
 			!$this->mask->containsBlock(
 				/** @phpstan-ignore-next-line */
 				$this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf)
-			)) && (
-			!$this->mask->containsBlockId(
-				/** @phpstan-ignore-next-line */
-				$this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf) >> 4)
-			)
+			))
 		) {
 			return;
 		}
@@ -58,7 +53,7 @@ class MaskedFillSession extends FillSession {
 		$this->saveChanges($x, $y, $z);
 
 		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId);
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullStateId);
 		$this->blocksChanged++;
 	}
 

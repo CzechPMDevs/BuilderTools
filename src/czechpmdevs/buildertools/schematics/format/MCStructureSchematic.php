@@ -72,9 +72,9 @@ class MCStructureSchematic implements Schematic {
 		for($x = 0; $x < $width; ++$x) {
 			for($y = 0; $y < $height; ++$y) {
 				for($z = 0; $z < $length; ++$z) {
-					$fullBlockId = $palette[$indexes[$i]];
-					$id = $fullBlockId >> 4;
-					$meta = $fullBlockId & 0xf;
+					$fullStateId = $palette[$indexes[$i]];
+					$id = $fullStateId >> 4;
+					$meta = $fullStateId & 0xf;
 
 					if($id > 255 || $id < 0) {
 						$id = 0;

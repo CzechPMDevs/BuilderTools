@@ -1,122 +1,142 @@
 <?php
 
 /**
- * Copyright (C) 2018-2021  CzechPMDevs
+ * PocketMine Tools - Tools to simplify PocketMine plugin development
+ * Copyright (C) 2022 CzechPMDevs
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 declare(strict_types=1);
 
-chdir("../");
+const OUTPUT_FILE = "";
+const WORKSPACE_DIRECTORY = "out";
 
-exec("vendor\bin\php-cs-fixer.bat");
+const COMPOSER_DIR = "vendor";
+const SOURCES_FILE = "src";
+const RESOURCES_FILE = "resources";
+const INCLUDED_VIRIONS = [];
 
-/**
- * Build script
- */
+const PLUGIN_DESCRIPTION_FILE = "plugin.yml";
 
-// For example C:/pmmp-server/plugins/BuilderTools.phar
-const CUSTOM_OUTPUT_PATH = "";
-const COMPRESS_FILES = true;
-const COMPRESSION = Phar::GZ;
+chdir("..");
+if(file_exists("out")) {
+	out("Cleaning workspace...");
+	cleanDirectory(WORKSPACE_DIRECTORY);
+}
+
+out("Building phar from sources...");
 
 $startTime = microtime(true);
 
-// Input & Output directory...
-$from = getcwd() . DIRECTORY_SEPARATOR;
-$to = getcwd() . DIRECTORY_SEPARATOR . "out" . DIRECTORY_SEPARATOR . "BuilderTools" . DIRECTORY_SEPARATOR;
-
-@mkdir($to, 0777, true);
-
-// Clean output directory...
-cleanDirectory($to);
-
-// Copying new files...
-copyDirectory($from . "src", $to . "src");
-copyDirectory($from . "resources", $to . "resources");
-
-$description = yaml_parse_file($from . "plugin.yml");
-yaml_emit_file($to . "plugin.yml", $description);
-
-// Defining output path...
-$outputPath = CUSTOM_OUTPUT_PATH == "" ? getcwd() . DIRECTORY_SEPARATOR . "out" . DIRECTORY_SEPARATOR . "BuilderTools_{$description["version"]}_dev.phar" : CUSTOM_OUTPUT_PATH;
-@unlink($outputPath);
-
-// Generate phar
-$phar = new Phar($outputPath);
-$phar->buildFromDirectory($to);
-
-if(COMPRESS_FILES) {
-    $phar->compressFiles(COMPRESSION);
+@mkdir(WORKSPACE_DIRECTORY);
+@mkdir(WORKSPACE_DIRECTORY . "/" . SOURCES_FILE);;
+if(RESOURCES_FILE !== "") {
+	@mkdir(WORKSPACE_DIRECTORY . "/" . RESOURCES_FILE);
 }
 
-printf("Plugin built in %s seconds! Output path: %s\n", round(microtime(true) - $startTime, 3), $outputPath);
+if(!is_file(PLUGIN_DESCRIPTION_FILE)) {
+	out("Plugin description file not found. Cancelling the process..");
+	return;
+}
 
-function copyDirectory(string $from, string $to): void {
-    mkdir($to, 0777, true);
+$pluginDescription = yaml_parse_file(PLUGIN_DESCRIPTION_FILE);
+$mainClass = $pluginDescription["main"];
+$splitNamespace = explode("\\", $mainClass);
+$mainClass = array_pop($splitNamespace);
+$pluginNamespace = implode("\\", $splitNamespace);
 
-    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($from, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST);
-    /** @var SplFileInfo $fileInfo */
-    foreach ($files as $fileInfo) {
-        $target = str_replace($from, $to, $fileInfo->getPathname());
-        if($fileInfo->isDir()) {
-            mkdir($target, 0777, true);
-        } else {
-            $contents = file_get_contents($fileInfo->getPathname());
-            preProcess($contents);
-            file_put_contents($target, $contents);
-        }
-    }
+$sourceReplacements = [[], []];
+$virionReplacements = [];
+foreach(INCLUDED_VIRIONS as $composerPath => $namespace) {
+	$sourceReplacements[0][] = "use $namespace";
+	$sourceReplacements[1][] = "use $pluginNamespace\\libs\\$namespace";
+
+	$virionReplacements[$composerPath][0][] = "namespace $namespace";
+	$virionReplacements[$composerPath][0][] = "use $namespace";
+	$virionReplacements[$composerPath][1][] = "namespace $pluginNamespace\\libs\\$namespace";
+	$virionReplacements[$composerPath][1][] = "use $pluginNamespace\\libs\\$namespace";
+	foreach(INCLUDED_VIRIONS as $virionComposerPath => $virionNamespace) {
+		if($composerPath === $virionComposerPath) {
+			continue;
+		}
+
+		$virionReplacements[$composerPath][0][] = "use $virionNamespace";
+		$virionReplacements[$composerPath][1][] = "use $pluginNamespace\\libs\\$virionNamespace";
+	}
+}
+
+// Copying plugin.yml
+copy(PLUGIN_DESCRIPTION_FILE, WORKSPACE_DIRECTORY . "/" . PLUGIN_DESCRIPTION_FILE);
+
+// Copying plugin /src/...
+copyDirectory(
+	SOURCES_FILE,
+	WORKSPACE_DIRECTORY,
+	fn(string $file) => str_replace($sourceReplacements[0], $sourceReplacements[1], $file),
+	fn(string $path) => $path
+);
+
+if(RESOURCES_FILE !== "") {
+	copyDirectory(RESOURCES_FILE, WORKSPACE_DIRECTORY, fn(string $content) => $content, fn(string $path) => $path);
+}
+
+// Copying libraries
+if(count(INCLUDED_VIRIONS) > 0) {
+	out("Including libraries used...");
+	foreach(INCLUDED_VIRIONS as $composerPath => $namespace) {
+		out("Adding $composerPath");
+		copyDirectory(
+			COMPOSER_DIR . "/" . $composerPath . "/" . SOURCES_FILE,
+			WORKSPACE_DIRECTORY . "/" . SOURCES_FILE . "/" . $pluginNamespace . "/libs",
+			fn(string $file) => str_replace($virionReplacements[$composerPath][0], $virionReplacements[$composerPath][1], $file),
+			fn(string $path) => str_replace(COMPOSER_DIR . "/" . $composerPath . "/" . SOURCES_FILE, "", $path)
+		);
+	}
+}
+
+out("Packing phar file...");
+$phar = new Phar(OUTPUT_FILE ?? "output.phar");
+$phar->buildFromDirectory(WORKSPACE_DIRECTORY);
+$phar->compressFiles(Phar::GZ);
+
+out("Done (took " . round(microtime(true) - $startTime, 3) . " seconds)");
+
+function copyDirectory(string $directory, string $targetFolder, Closure $modifyFileClosure, Closure $modifyPathClosure): void {
+	@mkdir($targetFolder, 0777, true);
+	/** @var SplFileInfo $file */
+	foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST) as $file) {
+		$targetPath = $modifyPathClosure($targetFolder . "/" . $file->getPath() . "/" . $file->getFilename());
+		if($file->isFile()) {
+			file_put_contents($targetPath, $modifyFileClosure(file_get_contents($file->getPath() . "/" . $file->getFilename())));
+		} else {
+			mkdir($targetPath);
+		}
+	}
 }
 
 function cleanDirectory(string $directory): void {
-    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
-    /** @var SplFileInfo $fileInfo */
-    foreach ($files as $fileInfo) {
-        if($fileInfo->isDir()) {
-            rmdir($fileInfo->getPathname());
-        } else {
-            unlink($fileInfo->getPathname());
-        }
-    }
+	/** @var SplFileInfo $file */
+	foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $file) {
+		if($file->isFile()) {
+			unlink($file->getPath() . "/" . $file->getFilename());
+		} else {
+			rmdir($file->getPath() . "/" . $file->getFilename());
+		}
+	}
 }
 
-function preProcess(string &$file): void {
-//    if(!defined("replacements")) {
-//        $patterns = [
-//            'Math::lengthSquared2d({%1}, {%2})' => '({%1} ** 2) + ({%2} ** 2)',
-//            'Math::lengthSquared3d({%1}, {%2}, {%3})' => '({%1} ** 2) + ({%2} ** 2) + ({%3} ** 2)',
-//        ];
-//
-//        $replacements = [];
-//
-//        foreach ($patterns as $key => $value) {
-//            $key = "#" . str_replace(["(", ")"], ["\(", "\)"], $key) . "#";
-//
-//            /** @noinspection PhpStatementHasEmptyBodyInspection */
-//            for($i = 0; strpos($key, "{%" . (++$i) ."}") !== false;);
-//
-//            for($j = 1; $j < $i; ++$j) {
-//                $key = str_replace("{%$j}", "(.*?)", $key);
-//                $value = str_replace("{%$j}", "\$$j", $value);
-//            }
-//
-//            $replacements[$key] = $value;
-//        }
-//
-//        define("replacements", $replacements);
-//    }
-//
-//    $file = preg_replace(array_keys(replacements), array_values(replacements), $file);
+function out(string $message): void {
+	echo "[" . gmdate("H:i:s") . "] " . $message . "\n";
 }

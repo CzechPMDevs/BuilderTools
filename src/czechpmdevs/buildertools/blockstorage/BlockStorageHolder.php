@@ -68,8 +68,8 @@ class BlockStorageHolder {
 
 		$iterator = new BlockArrayIteratorHelper($this->getBlockStorage());
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
-			$fillSession->setBlockAt($x, $y, $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
+			$fillSession->setBlockAt($x, $y, $z, $fullStateId);
 		}
 
 		$fillSession->reloadChunks($this->getWorld());

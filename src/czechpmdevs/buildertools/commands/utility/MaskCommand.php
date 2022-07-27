@@ -49,7 +49,7 @@ class MaskCommand extends BuilderToolsCommand {
 
 		if(!isset($args[0])) {
 			$block = $sender->getInventory()->getItemInHand()->getBlock();
-			$mask = new SingleBlockIdentifier($block->getId(), $block->getMeta());
+			$mask = new SingleBlockIdentifier($block->getStateId());
 		} else {
 			$mask = new StringToBlockDecoder($args[0], $sender->getInventory()->getItemInHand());
 		}

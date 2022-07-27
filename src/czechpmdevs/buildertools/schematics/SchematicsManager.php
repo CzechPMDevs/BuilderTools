@@ -135,8 +135,8 @@ class SchematicsManager {
 		for($y = $minY; $y <= $maxY; ++$y) {
 			for($x = $minX; $x <= $maxX; ++$x) {
 				for($z = $minZ; $z <= $maxZ; ++$z) {
-					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
-					$blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $fullBlockId);
+					$fillSession->getBlockAt($x, $y, $z, $fullStateId);
+					$blocks->addBlockAt($x - $minX, $y - $minY, $z - $minZ, $fullStateId);
 				}
 			}
 		}
@@ -169,8 +169,8 @@ class SchematicsManager {
 
 		$iterator = new BlockArrayIteratorHelper($schematic);
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
-			if($fullBlockId !== 0) $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
+			if($fullStateId !== 0) $fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullStateId);
 		}
 
 		if($fillSession->getBlocksChanged() === 0) {

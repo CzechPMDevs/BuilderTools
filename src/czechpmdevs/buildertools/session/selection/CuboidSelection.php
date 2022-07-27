@@ -262,7 +262,7 @@ class CuboidSelection extends SelectionHolder {
 			for($z = $minZ; $z <= $maxZ; ++$z) {
 				$isZInside = $z >= $finalMinZ && $z <= $finalMaxZ;
 				for($y = $minY; $y <= $maxY; ++$y) {
-					$fillSession->getBlockAt($x, $y, $z, $fullBlockId);
+					$fillSession->getBlockAt($x, $y, $z, $fullStateId);
 
 					// We remove the block if it is not inside the final area
 					if(!($isXInside && $isZInside && $y >= $finalMinY && $y <= $finalMaxY)) {
@@ -271,7 +271,7 @@ class CuboidSelection extends SelectionHolder {
 
 					$finalY = $yMotion + $y;
 					if($finalY >= World::Y_MIN && $finalY <= World::Y_MAX) {
-						$fillSession->setBlockAt($xMotion + $x, $finalY, $zMotion + $z, $fullBlockId);
+						$fillSession->setBlockAt($xMotion + $x, $finalY, $zMotion + $z, $fullStateId);
 					}
 				}
 			}
@@ -297,8 +297,8 @@ class CuboidSelection extends SelectionHolder {
 		$fillSession->loadChunks($this->world);
 
 		foreach(VoxelRayTrace::betweenPoints($this->firstPosition, $this->secondPosition) as $pos) {
-			$blockGenerator->nextBlock($fullBlockId);
-			$fillSession->setBlockAt((int)$pos->getX(), (int)$pos->getY(), (int)$pos->getZ(), $fullBlockId);
+			$blockGenerator->nextBlock($fullStateId);
+			$fillSession->setBlockAt((int)$pos->getX(), (int)$pos->getY(), (int)$pos->getZ(), $fullStateId);
 		}
 
 		$fillSession->reloadChunks($this->world);

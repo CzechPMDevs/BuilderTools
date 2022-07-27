@@ -23,7 +23,6 @@ namespace czechpmdevs\buildertools\editors\object;
 use function round;
 
 final class UpdateResult {
-
 	protected int $blocksChanged = 0;
 	protected float $processTime = 0.0;
 

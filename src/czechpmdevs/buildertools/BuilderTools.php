@@ -72,9 +72,10 @@ use czechpmdevs\buildertools\math\Math;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
 use czechpmdevs\buildertools\utils\IncompatibleConfigException;
 use pocketmine\command\Command;
-use pocketmine\item\ItemFactory;
+use pocketmine\item\Item;
 use pocketmine\item\ItemIdentifier;
-use pocketmine\item\ItemIds;
+use pocketmine\item\ItemIdentifier as IID;
+use pocketmine\item\ItemTypeIds as Ids;
 use pocketmine\item\ToolTier;
 use pocketmine\item\VanillaItems;
 use pocketmine\plugin\PluginBase;
@@ -228,12 +229,15 @@ class BuilderTools extends PluginBase {
 	}
 
 	public function registerItems(): void {
-		ItemFactory::getInstance()->register(new WoodenAxe(new ItemIdentifier(ItemIds::WOODEN_AXE, 0), "Wooden Axe", ToolTier::WOOD()), true);
-
 		$class = new ReflectionClass(VanillaItems::class);
 		$prop = $class->getProperty("members");
 		$prop->setAccessible(true);
-		$prop->setValue(null);
+
+		/** @var array<string, Item> $val */
+		$val = $prop->getValue();
+		$val["WOODEN_AXE"] = new WoodenAxe(new IID(Ids::WOODEN_AXE), "Wooden Axe", ToolTier::WOOD());
+
+		$prop->setValue($val);
 
 		if(VanillaItems::WOODEN_AXE() instanceof WoodenAxe) {
 			$this->getLogger()->debug("Wooden axe registered successfully");

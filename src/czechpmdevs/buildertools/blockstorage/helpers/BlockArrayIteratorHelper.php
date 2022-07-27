@@ -42,11 +42,11 @@ class BlockArrayIteratorHelper {
 	/**
 	 * Reads next block in the array
 	 */
-	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$fullBlockId): void {
+	public function readNext(?int &$x, ?int &$y, ?int &$z, ?int &$fullStateId): void {
 		$this->lastHash = $this->blockArray->coords[$this->offset];
 
 		World::getBlockXYZ($this->lastHash, $x, $y, $z);
-		$fullBlockId = $this->blockArray->blocks[$this->offset++];
+		$fullStateId = $this->blockArray->blocks[$this->offset++];
 	}
 
 	public function resetOffset(): void {

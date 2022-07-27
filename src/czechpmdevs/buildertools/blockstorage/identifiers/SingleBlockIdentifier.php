@@ -20,33 +20,20 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
-use pocketmine\block\Block;
+use pocketmine\block\BlockTypeIds;
 
 class SingleBlockIdentifier implements BlockIdentifierList {
+	public function __construct(protected int $fullStateId) {}
 
-	protected int $id;
-	protected int $meta;
-
-	public function __construct(int $id, ?int $meta = null) {
-		$this->id = $id;
-		if($meta !== null) {
-			$this->meta = $meta;
-		}
+	public function nextBlock(?int &$fullStateId): void {
+		$fullStateId = $this->fullStateId;
 	}
 
-	public function nextBlock(?int &$fullBlockId): void {
-		$fullBlockId = $this->id << Block::INTERNAL_METADATA_BITS | $this->meta;
+	public function containsBlock(int $fullStateId): bool {
+		return $fullStateId === $this->fullStateId;
 	}
-
-	public function containsBlock(int $fullBlockId): bool {
-		return isset($this->meta) ? $fullBlockId === ($this->id << Block::INTERNAL_METADATA_BITS | $this->meta) : $fullBlockId >> Block::INTERNAL_METADATA_BITS === $this->id;
-	}
-
-	public function containsBlockId(int $id): bool {
-		return $this->id === $id;
-	}
-
+	
 	public static function airIdentifier(): SingleBlockIdentifier {
-		return new SingleBlockIdentifier(0, 0);
+		return new SingleBlockIdentifier(BlockTypeIds::AIR);
 	}
 }

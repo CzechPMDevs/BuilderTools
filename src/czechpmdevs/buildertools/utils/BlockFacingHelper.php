@@ -115,7 +115,7 @@ class BlockFacingHelper {
 
 		foreach(BlockFactory::getInstance()->getAllKnownStates() as $block) {
 			if($this->hasFacingTrait($block)) {
-				$originalFullId = $block->getFullId();
+				$originalFullId = $block->getStateId();
 
 				$x = clone $block;
 				$y = clone $block;
@@ -124,19 +124,19 @@ class BlockFacingHelper {
 				for($i = 1; $i <= 3; ++$i) {
 					try {
 						$x->setFacing(Facing::rotateX($x->getFacing(), true)); // @phpstan-ignore-line
-						$this->rotateXMap[$i][$originalFullId] = $x->getFullId();
+						$this->rotateXMap[$i][$originalFullId] = $x->getStateId();
 					} catch(InvalidArgumentException) {
 					}
 
 					try {
 						$y->setFacing(Facing::rotateY($y->getFacing(), true)); // @phpstan-ignore-line
-						$this->rotateYMap[$i][$originalFullId] = $y->getFullId();
+						$this->rotateYMap[$i][$originalFullId] = $y->getStateId();
 					} catch(InvalidArgumentException) {
 					}
 
 					try {
 						$z->setFacing(Facing::rotateZ($z->getFacing(), true)); // @phpstan-ignore-line
-						$this->rotateZMap[$i][$originalFullId] = $z->getFullId();
+						$this->rotateZMap[$i][$originalFullId] = $z->getStateId();
 					} catch(InvalidArgumentException) {
 					}
 				}
@@ -153,7 +153,7 @@ class BlockFacingHelper {
 
 		foreach(BlockFactory::getInstance()->getAllKnownStates() as $block) {
 			if($this->hasFacingTrait($block)) {
-				$sourceId = $block->getFullId();
+				$sourceId = $block->getStateId();
 				$sourceFacing = $block->getFacing(); // @phpstan-ignore-line
 				if(Facing::axis($sourceFacing) === Axis::X) {
 					try {
@@ -161,7 +161,7 @@ class BlockFacingHelper {
 					} catch(InvalidArgumentException) {
 					}
 
-					$this->flipXMap[$sourceId] = $block->getFullId();
+					$this->flipXMap[$sourceId] = $block->getStateId();
 				}
 				if(Facing::axis($sourceFacing) === Axis::Z) {
 					try {
@@ -169,7 +169,7 @@ class BlockFacingHelper {
 					} catch(InvalidArgumentException) {
 					}
 
-					$this->flipZMap[$sourceId] = $block->getFullId();
+					$this->flipZMap[$sourceId] = $block->getStateId();
 				}
 				if(Facing::axis($sourceFacing) === Axis::Y) {
 					try {
@@ -177,7 +177,7 @@ class BlockFacingHelper {
 					} catch(InvalidArgumentException) {
 					}
 
-					$this->flipYMap[$sourceId] = $block->getFullId();
+					$this->flipYMap[$sourceId] = $block->getStateId();
 				}
 			}
 		}

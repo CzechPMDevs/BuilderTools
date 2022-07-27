@@ -22,6 +22,7 @@ namespace czechpmdevs\buildertools\editors\object;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\BuilderTools;
+use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\world\ChunkManager;
@@ -76,7 +77,7 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function setBlockAt(int $x, int $y, int $z, int $fullBlockId): void {
+	public function setBlockAt(int $x, int $y, int $z, int $fullStateId): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
@@ -84,7 +85,7 @@ class FillSession {
 		$this->saveChanges($x, $y, $z);
 
 		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullBlockId);
+		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullStateId);
 		++$this->blocksChanged;
 	}
 
@@ -106,13 +107,13 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function getBlockAt(int $x, int $y, int $z, ?int &$fullBlockId = 0): void {
+	public function getBlockAt(int $x, int $y, int $z, ?int &$fullStateId = 0): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
 		}
 
 		/** @phpstan-ignore-next-line */
-		$fullBlockId = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
+		$fullStateId = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
 	}
 
 	/**
@@ -144,14 +145,9 @@ class FillSession {
 			$this->explorer->moveTo($x, $y, $z);
 
 			/** @phpstan-ignore-next-line */
-			$id = $this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-			if($id >> 4 !== 0) {
-				if(BlockFactory::getInstance()->get($id >> 4, $id & 0xf)->isSolid()) {
-					$y++;
-					return true;
-				}
-
-				return false;
+			$id = $this->explorer->currentChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf) >> Block::INTERNAL_STATE_DATA_BITS;
+			if($id !== 0) {
+				return true;
 			}
 		}
 		return false;

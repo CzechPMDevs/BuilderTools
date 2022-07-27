@@ -23,21 +23,16 @@ namespace czechpmdevs\buildertools\blockstorage\identifiers;
 use pocketmine\utils\AssumptionFailedError;
 
 class MergedBlockIdentifier implements BlockIdentifierList {
-
 	public function __construct(
 		public BlockIdentifierList $blockIdentifierList,
 		public BlockIdentifierList $filter
 	) {}
 
-	public function nextBlock(?int &$fullBlockId): void {
+	public function nextBlock(?int &$fullStateId): void {
 		throw new AssumptionFailedError("nextBlock does not work with MergedBlockIdentifier");
 	}
 
-	public function containsBlock(int $fullBlockId): bool {
-		return $this->blockIdentifierList->containsBlock($fullBlockId) && $this->filter->containsBlock($fullBlockId);
-	}
-
-	public function containsBlockId(int $id): bool {
-		return $this->blockIdentifierList->containsBlockId($id) && $this->filter->containsBlockId($id);
+	public function containsBlock(int $fullStateId): bool {
+		return $this->blockIdentifierList->containsBlock($fullStateId) && $this->filter->containsBlock($fullStateId);
 	}
 }

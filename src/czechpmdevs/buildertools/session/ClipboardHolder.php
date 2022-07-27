@@ -70,8 +70,8 @@ class ClipboardHolder {
 
 		$iterator = new BlockArrayIteratorHelper($this->clipboard->getBlockStorage());
 		while($iterator->hasNext()) {
-			$iterator->readNext($x, $y, $z, $fullBlockId);
-			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullBlockId);
+			$iterator->readNext($x, $y, $z, $fullStateId);
+			$fillSession->setBlockAt($floorX + $x, $floorY + $y, $floorZ + $z, $fullStateId);
 		}
 
 		$fillSession->reloadChunks($position->getWorld());

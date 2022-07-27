@@ -43,9 +43,9 @@ class ForwardExtendCopy {
 			for($i = 1; $i < $count; ++$i) {
 				$j = $i * $ySize;
 				while($iterator->hasNext()) {
-					$iterator->readNext($x, $y, $z, $fullBlockId);
+					$iterator->readNext($x, $y, $z, $fullStateId);
 					if($y >= World::Y_MIN && $y < World::Y_MAX) {
-						$fillSession->setBlockAt($x, $y + $j, $z, $fullBlockId);
+						$fillSession->setBlockAt($x, $y + $j, $z, $fullStateId);
 					}
 				}
 
@@ -64,8 +64,8 @@ class ForwardExtendCopy {
 			for($i = 1; $i < $count; ++$i) {
 				$j = $i * $xSize;
 				while($iterator->hasNext()) {
-					$iterator->readNext($x, $y, $z, $fullBlockId);
-					$fillSession->setBlockAt($x + $j, $y, $z, $fullBlockId);
+					$iterator->readNext($x, $y, $z, $fullStateId);
+					$fillSession->setBlockAt($x + $j, $y, $z, $fullStateId);
 				}
 
 				// Resets the array reader
@@ -84,8 +84,8 @@ class ForwardExtendCopy {
 			for($i = 1; $i < $count; ++$i) {
 				$j = $i * $zSize;
 				while($iterator->hasNext()) {
-					$iterator->readNext($x, $y, $z, $fullBlockId);
-					$fillSession->setBlockAt($x, $y, $z + $j, $fullBlockId);
+					$iterator->readNext($x, $y, $z, $fullStateId);
+					$fillSession->setBlockAt($x, $y, $z + $j, $fullStateId);
 				}
 
 				// Resets array reader
