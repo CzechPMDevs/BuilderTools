@@ -26,6 +26,7 @@ use czechpmdevs\buildertools\session\SessionManager;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 use RuntimeException;
 
 class CenterCommand extends BuilderToolsCommand {
@@ -62,13 +63,17 @@ class CenterCommand extends BuilderToolsCommand {
 			$max->z = $center->getFloorZ() + 1;
 		}
 
-		for($x = $min->getFloorX(); $x <= $max->getFloorX(); ++$x) {
 			for($y = $min->getFloorY(); $y <= $max->getFloorY(); ++$y) {
-				for($z = $min->getFloorZ(); $z <= $max->getFloorZ(); ++$z) {
-					$selection->getWorld()->setBlockAt($x, $y, $z, VanillaBlocks::BEDROCK());
+				if($y < World::Y_MIN || $y >= World::Y_MAX) {
+					continue;
+				}
+
+				for($x = $min->getFloorX(); $x <= $max->getFloorX(); ++$x) {
+					for($z = $min->getFloorZ(); $z <= $max->getFloorZ(); ++$z) {
+						$selection->getWorld()->setBlockAt($x, $y, $z, VanillaBlocks::BEDROCK());
+					}
 				}
 			}
-		}
 
 		$sender->sendMessage(BuilderTools::getPrefix() . "Center of the selection found at {$center->getX()}, {$center->getY()}, {$center->getZ()}");
 	}
