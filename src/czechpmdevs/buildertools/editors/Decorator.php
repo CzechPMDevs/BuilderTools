@@ -40,7 +40,10 @@ class Decorator {
 
 		$fillSession = new FillSession($center->getWorld(), false, true);
 
-		$stringToBlockDecoder = new StringToBlockDecoder($blocks);
+		$stringToBlockDecoder = new StringToBlockDecoder($blocks, $player->getInventory()->getItemInHand());
+		if(!$stringToBlockDecoder->isValid()) {
+			return UpdateResult::error("No blocks found in string $blocks");
+		}
 
 		$minX = $center->getFloorX() - $radius;
 		$maxX = $center->getFloorX() + $radius;
