@@ -5,6 +5,7 @@ authors: [VixikHD]
 version: 1.4.0-beta3
 main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
+description: A powerful World Editor plugin for PocketMine servers
 
 extensions:
   Core: '>=8.0'
@@ -53,7 +54,7 @@ permissions:
     description: Permission for //draw
     default: op
   buildertools.command.fill:
-    descripion: Permissions for //fill
+    description: Permissions for //fill
     default: op
   buildertools.command.pos1:
     description: Permissions for //pos1
@@ -62,10 +63,10 @@ permissions:
     description: Permissions for //hpos1
     default: op
   buildertools.command.fix:
-    descripion: Permissions for //fix
+    description: Permissions for //fix
     default: op
   buildertools.command.flip:
-    descripion: Permissions for //flip
+    description: Permissions for //flip
     default: op
   buildertools.command.help:
     description: Permissions for //commands
@@ -80,7 +81,7 @@ permissions:
     description: Permissions for //hpyramid
     default: op
   buildertools.command.hsphere:
-    descripton: Permissions for //hsphere
+    description: Permissions for //hsphere
     default: op
   buildertools.command.id:
     description: Permissions for //id
