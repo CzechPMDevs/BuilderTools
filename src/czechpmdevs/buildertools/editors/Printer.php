@@ -59,7 +59,7 @@ class Printer {
 			if($throwBlock) {
 				$vector3 = $this->throwBlock(Position::fromObject($vector3, $center->getWorld()));
 			}
-			if($vector3->getY() < 0) {
+			if($vector3->getY() < World::Y_MIN || $vector3->getY() >= World::Y_MAX) {
 				return;
 			}
 
