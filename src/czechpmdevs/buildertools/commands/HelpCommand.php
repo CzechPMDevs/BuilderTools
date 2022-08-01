@@ -28,7 +28,6 @@ use function is_numeric;
 use function is_string;
 
 class HelpCommand extends BuilderToolsCommand {
-
 	public const COMMANDS_PER_PAGE = 5;
 
 	/** @var string[] */
@@ -78,7 +77,7 @@ class HelpCommand extends BuilderToolsCommand {
 	public function execute(CommandSender $sender, string $commandLabel, array $args) {
 		if(!$this->testPermission($sender)) return;
 		$page = 1;
-		if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands()) / HelpCommand::COMMANDS_PER_PAGE))) {
+		if(isset($args[0]) && is_numeric($args[0]) && (int)$args[0] <= ((int)(count(BuilderTools::getAllCommands()) / HelpCommand::COMMANDS_PER_PAGE)) && (int)$args[0] >= 1) {
 			$page = (int)$args[0];
 		}
 
