@@ -1,26 +1,20 @@
 <p align="center"><img src="https://i.ibb.co/ckmrTb0/bt.png"></p>  
-  
-<p align="center">  
-   <a href="https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools">  
-      <img src="https://poggit.pmmp.io/ci.shield/CzechPMDevs/BuilderTools/BuilderTools?style=flat-square">  
-   </a>  
-   <a href="https://discord.gg/uwBf2jS">  
-      <img src="https://img.shields.io/discord/365202594932719616.svg?style=flat-square">  
-   </a>  
-   <a href="https://github.com/CzechPMDevs/BuilderTools/releases">  
-      <img src="https://img.shields.io/github/release/CzechPMDevs/BuilderTools.svg?style=flat-square">  
-   </a>  
-   <a href="https://github.com/CzechPMDevs/BuilderTools/releases">  
-      <img src="https://img.shields.io/github/downloads/CzechPMDevs/BuilderTools/total.svg?style=flat-square">  
-   </a>
-   <a href="https://github.com/CzechPMDevs/BuilderTools/blob/master/LICENSE">  
-      <img src="https://img.shields.io/github/license/CzechPMDevs/BuilderTools.svg?style=flat-square">  
-   </a>  
-   <a href="https://poggit.pmmp.io/p/BuilderTools">  
-      <img src="https://poggit.pmmp.io/shield.downloads/BuilderTools?style=flat-square">  
-   </a>  
+
+<p align="center">
+  <a href="">
+    <img src="https://img.shields.io/badge/donate-paypal-ff69b4?style=for-the-badge&logo=paypal">  
+  </a>
+  <a href="https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools">  
+    <img src="https://poggit.pmmp.io/ci.shield/CzechPMDevs/BuilderTools/BuilderTools?style=for-the-badge">  
+  </a>  
+  <a href="https://discord.gg/uwBf2jS">  
+    <img src="https://img.shields.io/discord/365202594932719616.svg?style=for-the-badge&color=7289da&logo=discord&logoColor=white&logoWidth=12">  
+  </a>
+  <a href="https://poggit.pmmp.io/p/BuilderTools">  
+    <img src="https://poggit.pmmp.io/shield.downloads/BuilderTools?style=for-the-badge">  
+  </a>  
 <br><br>  
-   ✔️ Advanced WorldEdit commands  
+   ✔️ Advanced WorldEdit commands
     <br>  
     ✔️ Using Sub Chunk Iterator to make block placing faster
     <br>  
@@ -31,55 +25,53 @@
     ✔️ Supports last PocketMine API version  
     <br><br>  
 </p>  
-  
-## 👍 1.3.0 Update:  
+
+## 👍 1.3.0 Update:
+
 - Bug fixes
 - Clipboard compression
 - Huge performance boost
 - Support for API 4.0
 - Added Sponge and MCStructure schematics formats
-  
-## ⬇️ Downloads:  
-  
-| Version     | Phar Download                                                                                                      | Zip Download                                                                                                          | API          | Min php version |
-|-------------|--------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|--------------|-----------------|
-| 1.3.0-beta2 | [Poggit](https://poggit.pmmp.io/r/150805/BuilderTools.phar)                                                        | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.3.0-beta2.zip)                               | 4.0.0^       | 8.0             |
-| 1.3.0-beta1 | [Poggit](https://poggit.pmmp.io/r/149219/BuilderTools.phar)                                                        | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/b0edbf0885ffabd04f4a0122c70187a6f18bd821.zip)            | 4.0.0^       | 8.0             |
-| 1.2.0-beta4 | [Poggit](https://poggit.pmmp.io/r/125306/BuilderTools.phar)                                                        | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.2.0-beta4.zip)                               | 3.16.0^      | 7.4             |
-| 1.2.0-beta3 | [Poggit](https://poggit.pmmp.io/r/122470/BuilderTools.phar)                                                        | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/tags/1.2.0-beta3.zip)                               | 3.16.0^      | 7.4             |
-| 1.2.0-beta2 | [Poggit](https://poggit.pmmp.io/r/62312/BuilderTools.phar)                                                         | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/41b127a689d523683f8cd3c5e3704688073a818f.zip) | 3.x.x        | 7.0             |
-| 1.2.0-beta1 | [Poggit](https://poggit.pmmp.io/r/55728/BuilderTools.phar)                                                         | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/refs/heads/648661f756b8bd8c89582e637ee864f9411763a2.zip) | 3.x.x        | 7.0             |
-| 1.1.0       | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0/BuilderTools_v1.1.0.phar)             | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0)                                                   | 3.x.x        | 7.0             |
-| 1.1.0-beta2 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta2/BuilderTools_v1.1.0-beta2.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta2)                                             | 3.x.x        | 7.0             |
-| 1.1.0-beta1 | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.1.0-beta1/BuilderTools_v1.1.0-beta1.phar) | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.1.0-beta1)                                             | 3.x.x        | 7.0             |
-| 1.0.0       | [GitHub](https://github.com/CzechPMDevs/BuilderTools/releases/download/1.0.0/BuilderTools.phar)                    | [GitHub](https://github.com/CzechPMDevs/BuilderTools/archive/1.0.0.zip)                                               | 3.0.0-ALPHA7 | 7.0             |
+
+## ⬇️ Downloads:
+
+| Downloads                                         | API       | Downloads                                                                     |
+|---------------------------------------------------|-----------|-------------------------------------------------------------------------------|
+| Latest Stable Release (1.3.1)                     | 4.x       | [Poggit](https://poggit.pmmp.io/p/BuilderTools/1.3.1)                         |
+| Latest Beta Release (1.4.0-beta2)                 | 4.x       | [Poggit](https://poggit.pmmp.io/r/184935/BuilderTools.phar)                   |
+| Latest Dev Build  (1.4.0 for 4.x / 2.0.0 for 5.x) | 4.x / 5.x | [Poggit CI](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools/) |
 
 <br>  
 
 > **All released versions [here](https://github.com/CzechPMDevs/BuilderTools/releases)**  
 > **Other plugins by CzechPMDevs [here](https://poggit.pmmp.io/plugins/by/CzechPMDevs)**
 
-<br> 
+<br>
 
 ## 💬 FAQ
+
 - `Required extension Core has an incompatible version (7.* not >=7.4)`
-    - Your server is using outdated PHP version. If you host your server by yourself, update your php binaries [More information](https://pmmp.readthedocs.io/en/rtfd/installation/installing-manually.html#getting-php-for-your-server). If you are using some host provider, contact them to update their php version.
-  
-## 🔧 How to install BuilderTools?  
-  
-1) [Download](https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/~) latest stable version from poggit  
-2) Move dowloaded file to your server **/plugins/** folder  
-3) Restart the server  
-  
-## 🏠 BuilderTools commands  
-  
-- All BuilderTools commands starts with `//`except for the `/buildertools` command that was added as an alias because `//help` not works in newer versions.  
-- In game, you can get list of all commands using commands `//commands`  
-  
+    - Your server is using outdated PHP version. If you host your server by yourself, update your php
+      binaries [More information](https://pmmp.readthedocs.io/en/rtfd/installation/installing-manually.html#getting-php-for-your-server)
+      . If you are using some host provider, contact them to update their php version.
+
+## 🔧 Installing the plugin
+
+1) [Download](https://poggit.pmmp.io/p/BuilderTools) the latest stable version from poggit
+2) Move downloaded file to your server **/plugins/** folder
+3) Restart the server
+
+## 🏠 BuilderTools commands
+
+- All BuilderTools commands starts with `//`except for the `/buildertools` command that was added as an alias
+  because `//help` not works in newer versions.
+- In game, you can get list of all commands using commands `//commands`
+
 <br>  
-  
-**Commands**  
-  
+
+**Commands**
+
 | **Command**          | **Description**                                                                                                                                                                                                                                                                |
 |----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **//commands**       | **Displays list BuilderTools commands** <br><br> Alias: `//commands`, `/buildertools` <br>Usage: `//commands <page: 1-4>`                                                                                                                                                      |
@@ -116,39 +108,47 @@
 | **//stack**          | **Stacks copied area** <br><br>Usage: `//stack <count> [side or up or down]`<br><br>Stacks blocks in line.                                                                                                                                                                     |
 | **//tree**           | **Spawns tree** <br><br> Usage: `//tree <tree OR list>` <br><br> There are implemented only basic trees (`oak`, `spruce`, `jungle` and `birch`)                                                                                                                                |
 | **//undo**           | **Cancels BuilderTools action** <br><br> Usage: `//undo`                                                                                                                                                                                                                       |
-| **//wand**           | **Switch wand tool** <br><br> Usage: `//wand` <br><br> First p<br/>osition is set  by breaking the block, second by touching the block. Wand tool can be turned of typing `//wand` again.                                                                                      |
+| **//wand**           | **Switch wand tool** <br><br> Usage: `//wand` <br><br> First position is set  by breaking the block, second by touching the block. Wand tool can be turned of typing `//wand` again.                                                                                           |
+
 
 <br>
 
 ## 🛠️ Other features:
 
 ### 📜 Schematics
+
 - You can save your selection to a file and then load it again
-- BuilderTools supports loading [MCEdit](https://minecraft.fandom.com/wiki/Schematic_file_format) and [MCStructure](https://minecraft.fandom.com/wiki/Structure_Block#Save) formats and creating schematics wth MCEdit format.
+- BuilderTools supports loading [MCEdit](https://minecraft.fandom.com/wiki/Schematic_file_format)
+  and [MCStructure](https://minecraft.fandom.com/wiki/Structure_Block#Save) formats and creating schematics wth MCEdit
+  format.
 - Schematics are loaded asynchronously, that means it won't lag server while loading.
 
 #### Loading schematics:
+
 1) Move schematic file to `/plugin_data/BuilderTools/schematics` directory
 2) Load schematic using `//schem load <schematic>`
 3) Paste into the world using `//schem paste <schematic>`
 
 #### Creating schematics:
+
 1) Select two positions using `//pos1` & `//pos2` commands or using wand axe.
 2) Use `//schem create <schematicName>`
 3) File will be saved in directory `/plugin_data/BuilderTools/schematics/schematicName.schematic`
 
 ### 🌎 Fixing Java: Edition worlds
+
 - BuilderTools is able to fix block ids in worlds generated by Minecraft: Java Edition.
 - Currently, we support only [Anvil](https://minecraft.fandom.com/wiki/Anvil_file_format) world format
 - To fix a world use `//fix <worldName>`
-- Worlds are fixed asynchronously, so the process will not freeze server. Players are able to play while fixing world, but are not able to join the world, which is being fixed.
+- Worlds are fixed asynchronously, so the process will not freeze server. Players are able to play while fixing world,
+  but are not able to join the world, which is being fixed.
 
-## 📃  Permissions  
-  
+## 📃 Permissions
+
 <br>  
-  
+
 **All BuilderTools Permissions:**
-  
+
 | Permission                          | Command            | Operator Permissions required |
 |-------------------------------------|--------------------|-------------------------------|
 | buildertools.command.help           | `//commands`       | ✔️                            |
@@ -184,8 +184,9 @@
 | buildertools.command.undo           | `//undo`           | ✔️                            |
 | buildertools.command.walls          | `//walls`          | ✔️                            |
 | buildertools.command.wand           | `//wand`           | ✔️                            |  
-  
-## 🔧 Configuration  
+
+## 🔧 Configuration
+
 - Default configuration:
 
 ```yaml  
@@ -235,16 +236,18 @@ blockinfo-stick:
 ```
 
 <br>
-  
-## 💰 Credits  
-  
-- Icon made by [Freepik](http://www.freepik.com/ "Freepik") from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")  
+
+## 💰 Credits
+
+- Icon made by [Freepik](http://www.freepik.com/ "Freepik")
+  from [www.flaticon.com](https://www.flaticon.com/ "Flaticon") is licensed
+  by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
 - Seabuild spawn built by CryptoKey
 
 <br>
 
-##  💡 License  
-  
+## 💡 License
+
 ```  
 Copyright 2018-2022 CzechPMDevs    
     
@@ -260,5 +263,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and    
 limitations under the License.  
 ```  
-  
+
 Full license [here](https://github.com/CzechPMDevs/BuilderTools/blob/master/LICENSE).
