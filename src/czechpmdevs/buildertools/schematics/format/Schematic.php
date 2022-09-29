@@ -30,7 +30,7 @@ interface Schematic {
 	 * convert it to BlockArray.
 	 *
 	 * - It should be independent on main thread classes if used
-	 *   on pmmp server
+	 *   on PocketMine server
 	 *
 	 * @throws SchematicException
 	 */
@@ -41,7 +41,7 @@ interface Schematic {
 	 * BlockArray as string.
 	 *
 	 * - It should be independent on main thread classes if used
-	 *   on pmmp server
+	 *   on PocketMine server
 	 *
 	 * @throws SchematicException
 	 */
