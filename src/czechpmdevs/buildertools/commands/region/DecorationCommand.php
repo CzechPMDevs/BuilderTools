@@ -31,7 +31,7 @@ use function str_replace;
 
 class DecorationCommand extends BuilderToolsCommand {
 	public function __construct() {
-		parent::__construct("/decoration", "Decoration commands", null, ["/d"]);
+		parent::__construct("/decoration", "Decorates the selection with specified blocks", null, ["/d"]);
 	}
 
 	/** @noinspection PhpUnused */
