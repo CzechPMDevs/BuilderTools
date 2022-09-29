@@ -30,7 +30,6 @@ use pocketmine\player\Player;
 use RuntimeException;
 
 class DrainCommand extends BuilderToolsCommand {
-
 	public function __construct() {
 		parent::__construct("/drain", "Remove liquid from selected area");
 	}
