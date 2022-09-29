@@ -1,7 +1,7 @@
 <p align="center"><img src="https://i.ibb.co/ckmrTb0/bt.png"></p>  
 
 <p align="center">
-  <a href="">
+  <a href="https://www.paypal.com/donate/?hosted_button_id=SRQH6M2S6LV6Y">
     <img src="https://img.shields.io/badge/donate-paypal-ff69b4?style=for-the-badge&logo=paypal">  
   </a>
   <a href="https://poggit.pmmp.io/ci/CzechPMDevs/BuilderTools/BuilderTools">  
@@ -26,13 +26,11 @@
     <br><br>  
 </p>  
 
-## 👍 1.3.0 Update:
+## 👍 2.0.0 Update:
 
-- Bug fixes
-- Clipboard compression
-- Huge performance boost
-- Support for API 4.0
-- Added Sponge and MCStructure schematics formats
+- PocketMine 5.0 support
+- More selection types
+- Supporting NBT structure schematics
 
 ## ⬇️ Downloads:
 
