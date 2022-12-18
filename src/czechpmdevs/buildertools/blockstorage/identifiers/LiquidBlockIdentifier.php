@@ -20,10 +20,8 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
-use pocketmine\block\Block;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\utils\AssumptionFailedError;
-use function array_push;
 use function in_array;
 
 class LiquidBlockIdentifier implements BlockIdentifierList {

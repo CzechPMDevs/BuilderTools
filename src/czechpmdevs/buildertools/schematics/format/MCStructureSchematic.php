@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace czechpmdevs\buildertools\schematics\format;
 
 use czechpmdevs\buildertools\blockstorage\BlockArray;
+use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\schematics\ReadonlySchematic;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\math\Vector3;
@@ -37,7 +38,6 @@ use function intval;
 use function is_array;
 use function is_file;
 use function json_decode;
-use const DIRECTORY_SEPARATOR;
 
 /**
  * MCStructSchematic is schematic format created by Mojang for structure blocks
@@ -147,7 +147,7 @@ class MCStructureSchematic implements Schematic {
 	 * @throws SchematicException
 	 */
 	private function loadMapping(): void {
-		$dataPath = getcwd() . DIRECTORY_SEPARATOR . "plugin_data" . DIRECTORY_SEPARATOR . "BuilderTools" . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR;
+		$dataPath = getcwd() . BuilderTools::RESOURCE_DATA_PATH;
 
 		if(!is_file($bedrockStatesMapPath = $dataPath . "bedrock_block_states_map.json")) {
 			throw new SchematicException($bedrockStatesMapPath . " was not found");
