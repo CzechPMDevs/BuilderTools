@@ -1,7 +1,7 @@
 {
   "name": "czechpmdevs/buildertools",
   "description": "Powerful World Editor plugin for PocketMine servers",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "license": "Apache-2.0",
   "require": {
     "php": "^8.0",
@@ -9,10 +9,10 @@
     "ext-pthreads": "*",
     "ext-zlib": "*",
     "ext-json": "*",
-    "pocketmine/pocketmine-mp": "^4.4.0-BETA1"
+    "pocketmine/pocketmine-mp": "^4.12.2"
   },
   "require-dev": {
-    "phpstan/phpstan": "1.7.1"
+    "phpstan/phpstan": "1.9.4"
   },
   "autoload": {
     "psr-4": {

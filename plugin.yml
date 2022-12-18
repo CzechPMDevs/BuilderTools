@@ -2,7 +2,7 @@ name: BuilderTools
 api: [4.0.0]
 author: CzechPMDevs
 authors: [VixikHD]
-version: 1.4.0-beta3
+version: 1.4.0
 main: czechpmdevs\buildertools\BuilderTools
 website: https://github.com/CzechPMDevs/BuilderTools
 description: A powerful World Editor plugin for PocketMine servers
