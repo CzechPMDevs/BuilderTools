@@ -56,26 +56,4 @@ class MaskedFillSession extends FillSession {
 		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullStateId);
 		$this->blocksChanged++;
 	}
-
-	/**
-	 * @param int $y 0-255
-	 */
-	public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
-		if(!$this->moveTo($x, $y, $z)) {
-			return;
-		}
-
-		if($this->mask !== null && !$this->mask->containsBlock(
-			/** @phpstan-ignore-next-line */
-				$this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf))
-		) {
-			return;
-		}
-
-		$this->saveChanges($x, $y, $z);
-
-		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id);
-		$this->blocksChanged++;
-	}
 }

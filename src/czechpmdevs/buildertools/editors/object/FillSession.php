@@ -91,21 +91,6 @@ class FillSession {
 	/**
 	 * @param int $y 0-255
 	 */
-	public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
-		if(!$this->moveTo($x, $y, $z)) {
-			return;
-		}
-
-		$this->saveChanges($x, $y, $z);
-
-		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
-		++$this->blocksChanged;
-	}
-
-	/**
-	 * @param int $y 0-255
-	 */
 	public function getBlockAt(int $x, int $y, int $z, ?int &$fullStateId = 0): void {
 		if(!$this->moveTo($x, $y, $z)) {
 			return;
