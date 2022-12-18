@@ -23,7 +23,6 @@ namespace czechpmdevs\buildertools\schematics\format;
 use czechpmdevs\buildertools\blockstorage\BlockArray;
 use czechpmdevs\buildertools\blockstorage\BlockArraySizeData;
 use czechpmdevs\buildertools\blockstorage\helpers\BlockArrayIteratorHelper;
-use czechpmdevs\buildertools\editors\Fixer;
 use czechpmdevs\buildertools\schematics\SchematicException;
 use pocketmine\nbt\BigEndianNbtSerializer;
 use pocketmine\nbt\tag\ByteArrayTag;
@@ -70,14 +69,6 @@ class MCEditSchematic implements Schematic {
 					$blockArray->addBlockAt($x, $y, $z, $id << 4 | $meta);
 					++$i;
 				}
-			}
-		}
-
-		if($materials === MCEditSchematic::MATERIALS_CLASSIC || $materials === MCEditSchematic::MATERIALS_ALPHA) {
-			$fixer = Fixer::getInstance();
-
-			foreach($blockArray->blocks as &$fullBlock) {
-				$fixer->convertJavaToBedrockId($fullBlock);
 			}
 		}
 

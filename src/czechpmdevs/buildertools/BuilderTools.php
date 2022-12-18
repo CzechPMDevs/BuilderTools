@@ -63,7 +63,6 @@ use czechpmdevs\buildertools\commands\selection\SelectionCommand;
 use czechpmdevs\buildertools\commands\selection\WandCommand;
 use czechpmdevs\buildertools\commands\utility\BlockInfoCommand;
 use czechpmdevs\buildertools\commands\utility\ClearInventoryCommand;
-use czechpmdevs\buildertools\commands\utility\FixCommand;
 use czechpmdevs\buildertools\commands\utility\IdCommand;
 use czechpmdevs\buildertools\commands\utility\MaskCommand;
 use czechpmdevs\buildertools\event\listener\EventListener;
@@ -73,7 +72,6 @@ use czechpmdevs\buildertools\schematics\SchematicsManager;
 use czechpmdevs\buildertools\utils\IncompatibleConfigException;
 use pocketmine\command\Command;
 use pocketmine\item\Item;
-use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIdentifier as IID;
 use pocketmine\item\ItemTypeIds as Ids;
 use pocketmine\item\ToolTier;
@@ -93,6 +91,7 @@ use function version_compare;
 
 class BuilderTools extends PluginBase {
 	public const CURRENT_CONFIG_VERSION = "1.4.0.2";
+	public const RESOURCE_DATA_PATH = "/plugin_data/BuilderTools/data/";
 
 	private static BuilderTools $instance;
 	private static Configuration $configuration;
@@ -142,6 +141,9 @@ class BuilderTools extends PluginBase {
 		if(!is_file($this->getDataFolder() . "data/java_block_states_map.json")) {
 			$this->saveResource("data/java_block_states_map.json");
 		}
+		if(!is_file($this->getDataFolder() . "data/legacy_java_to_bedrock_id_map.json")) {
+			$this->saveResource("data/legacy_java_to_bedrock_id_map.json");
+		}
 
 		$configuration = $this->getConfig()->getAll();
 		if(!array_key_exists("config-version", $configuration) || !is_string($version = $configuration["config-version"]) || version_compare($version, BuilderTools::CURRENT_CONFIG_VERSION) < 0) {
@@ -189,7 +191,6 @@ class BuilderTools extends PluginBase {
 			new FillCommand,
 			new FirstPositionCommand,
 			new FirstTargetingPositionCommand,
-			new FixCommand,
 			new FlipCommand,
 			new HelpCommand,
 			new HollowCubeCommand,
@@ -235,7 +236,7 @@ class BuilderTools extends PluginBase {
 
 		/** @var array<string, Item> $val */
 		$val = $prop->getValue();
-		$val["WOODEN_AXE"] = new WoodenAxe(new IID(Ids::WOODEN_AXE), "Wooden Axe", ToolTier::WOOD());
+		$val["WOODEN_AXE"] = $axe = new WoodenAxe(new IID(Ids::WOODEN_AXE), "Wooden Axe", ToolTier::WOOD());
 
 		$prop->setValue($val);
 
@@ -244,6 +245,9 @@ class BuilderTools extends PluginBase {
 		} else {
 			throw new AssumptionFailedError("Unable to register WoodenAxe");
 		}
+//
+//		GlobalItemDataHandlers::getSerializer()->map($axe, fn() => new SavedItemData("buildertools:wand_axe"));
+//		GlobalItemDataHandlers::getDeserializer()->map("buildertools:wand_axe", fn() => $axe);
 	}
 
 	private function sendWarnings(): void {

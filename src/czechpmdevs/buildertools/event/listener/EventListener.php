@@ -24,18 +24,14 @@ use czechpmdevs\buildertools\BuilderTools;
 use czechpmdevs\buildertools\editors\Printer;
 use czechpmdevs\buildertools\item\WoodenAxe;
 use czechpmdevs\buildertools\session\SessionManager;
-use czechpmdevs\buildertools\utils\WorldFixUtil;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemUseEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\item\VanillaItems;
-use pocketmine\Server;
 use RuntimeException;
 use function array_key_exists;
-use function intlcal_set_time;
 use function microtime;
 
 class EventListener implements Listener {
@@ -133,13 +129,6 @@ class EventListener implements Listener {
 					"§aBiome: §7" . $world->getBiomeId($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ()) . " (" . $world->getBiome($block->getPosition()->getFloorX(), $block->getPosition()->getFloorZ())->getName() . ")"
 				);
 			}
-		}
-	}
-
-	/** @noinspection PhpUnused */
-	public function onLevelLoad(WorldLoadEvent $event): void {
-		if(WorldFixUtil::isInWorldFixQueue($event->getWorld()->getFolderName())) {
-			Server::getInstance()->getWorldManager()->unloadWorld($event->getWorld(), true);
 		}
 	}
 
