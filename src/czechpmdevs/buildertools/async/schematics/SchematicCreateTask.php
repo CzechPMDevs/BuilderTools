@@ -43,8 +43,6 @@ class SchematicCreateTask extends BuilderToolsAsyncTask {
 	 * @param class-string<Schematic> $format
 	 */
 	public function __construct(string $targetFilePath, string $format, BlockArray $blockArray) {
-		parent::__construct();
-
 		$this->targetFilePath = $targetFilePath;
 		$this->format = $format;
 		$this->blockArray = serialize($blockArray);

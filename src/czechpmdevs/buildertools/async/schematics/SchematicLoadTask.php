@@ -37,8 +37,6 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 	public CompressedBlockArray $blockStorage;
 
 	public function __construct(string $file) {
-		parent::__construct();
-
 		$this->file = $file;
 	}
 

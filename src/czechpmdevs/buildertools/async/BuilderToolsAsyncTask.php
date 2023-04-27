@@ -20,19 +20,13 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
 
-use AttachableLogger;
-use czechpmdevs\buildertools\BuilderTools;
+use GlobalLogger;
+use Logger;
 use pocketmine\scheduler\AsyncTask;
 use Throwable;
 
 abstract class BuilderToolsAsyncTask extends AsyncTask {
-	private AttachableLogger $logger;
-
 	private string $error = "";
-
-	public function __construct() {
-		$this->logger = BuilderTools::getInstance()->getLogger();
-	}
 
 	abstract public function execute(): void;
 
@@ -57,8 +51,8 @@ abstract class BuilderToolsAsyncTask extends AsyncTask {
 		AsyncQueue::callCallback($this);
 	}
 
-	protected function getLogger(): AttachableLogger {
-		return $this->logger;
+	protected function getLogger(): Logger {
+		return GlobalLogger::get();
 	}
 
 	public function getErrorMessage(): ?string {
