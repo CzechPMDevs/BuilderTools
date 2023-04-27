@@ -44,7 +44,7 @@ class MaskedFillSession extends FillSession {
 		if($this->mask !== null && (
 			!$this->mask->containsBlock(
 				/** @phpstan-ignore-next-line */
-				$this->explorer->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf)
+				$this->explorer->currentSubChunk->getBlockStateId($x & 0xf, $y & 0xf, $z & 0xf)
 			))
 		) {
 			return;
@@ -53,7 +53,7 @@ class MaskedFillSession extends FillSession {
 		$this->saveChanges($x, $y, $z);
 
 		/** @phpstan-ignore-next-line */
-		$this->explorer->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $fullStateId);
+		$this->explorer->currentSubChunk->setBlockStateId($x & 0xf, $y & 0xf, $z & 0xf, $fullStateId);
 		$this->blocksChanged++;
 	}
 }
