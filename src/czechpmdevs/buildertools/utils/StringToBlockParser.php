@@ -6,6 +6,7 @@ namespace czechpmdevs\buildertools\utils;
 
 use InvalidArgumentException;
 use pocketmine\block\Block;
+use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\item\StringToItemParser;
 use pocketmine\utils\SingletonTrait;
