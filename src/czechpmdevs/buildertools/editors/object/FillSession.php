@@ -119,8 +119,11 @@ class FillSession {
 			return;
 		}
 
-		/** @phpstan-ignore-next-line */
-		$this->explorer->currentChunk->setBiomeId($x & 0xf, $z & 0xf, $id);
+        for($y = World::Y_MIN; $y < World::Y_MAX; $y++) {
+            /** @phpstan-ignore-next-line */
+            $this->explorer->currentChunk->setBiomeId($x & 0xf, $y & 0xf, $z & 0xf, $id); //TODO: Properly support subchunks with y axis
+        }
+
 		++$this->blocksChanged;
 	}
 
