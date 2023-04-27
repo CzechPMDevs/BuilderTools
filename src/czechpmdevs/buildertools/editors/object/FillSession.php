@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -119,10 +119,10 @@ class FillSession {
 			return;
 		}
 
-        for($y = World::Y_MIN; $y < World::Y_MAX; $y++) {
-            /** @phpstan-ignore-next-line */
-            $this->explorer->currentChunk->setBiomeId($x & 0xf, $y & 0xf, $z & 0xf, $id); //TODO: Properly support subchunks with y axis
-        }
+		for($y = World::Y_MIN; $y < World::Y_MAX; $y++) {
+			/** @phpstan-ignore-next-line */
+			$this->explorer->currentChunk->setBiomeId($x & 0xf, $y & 0xf, $z & 0xf, $id); //TODO: Properly support subchunks with y axis
+		}
 
 		++$this->blocksChanged;
 	}
