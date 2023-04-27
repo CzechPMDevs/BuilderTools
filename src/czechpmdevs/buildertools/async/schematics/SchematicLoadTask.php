@@ -34,7 +34,7 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 	public string $file;
 	public string $name;
 
-	public CompressedBlockArray $blockStorage;
+	public string $blockStorage;
 
 	public function __construct(string $file) {
 		$this->file = $file;
@@ -62,6 +62,6 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 		$blockArray = $schematic->load($rawData);
 
 		$this->name = basename($this->file, "." . $schematic::getFileExtension());
-		$this->blockStorage = new CompressedBlockArray($blockArray);
+		$this->blockStorage = igbinary_serialize(new CompressedBlockArray($blockArray));
 	}
 }
