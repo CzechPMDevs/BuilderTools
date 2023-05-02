@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\async;
 
-use GlobalLogger;
-use Logger;
 use pocketmine\scheduler\AsyncTask;
 use Throwable;
 
@@ -49,10 +47,6 @@ abstract class BuilderToolsAsyncTask extends AsyncTask {
 	final public function onCompletion(): void {
 		$this->complete();
 		AsyncQueue::callCallback($this);
-	}
-
-	protected function getLogger(): Logger {
-		return GlobalLogger::get();
 	}
 
 	public function getErrorMessage(): ?string {
