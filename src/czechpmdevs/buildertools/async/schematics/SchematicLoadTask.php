@@ -24,6 +24,7 @@ use czechpmdevs\buildertools\async\BuilderToolsAsyncTask;
 use czechpmdevs\buildertools\blockstorage\CompressedBlockArray;
 use czechpmdevs\buildertools\schematics\format\Schematic;
 use czechpmdevs\buildertools\schematics\SchematicsManager;
+use pocketmine\thread\NonThreadSafeValue;
 use RuntimeException;
 use function basename;
 use function file_exists;
@@ -34,7 +35,7 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 	public string $file;
 	public string $name;
 
-	public string $blockStorage;
+	public NonThreadSafeValue $blockStorage;
 
 	public function __construct(string $file) {
 		$this->file = $file;
@@ -62,6 +63,6 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 		$blockArray = $schematic->load($rawData);
 
 		$this->name = basename($this->file, "." . $schematic::getFileExtension());
-		$this->blockStorage = igbinary_serialize(new CompressedBlockArray($blockArray));
+		$this->blockStorage = new NonThreadSafeValue(new CompressedBlockArray($blockArray));
 	}
 }
