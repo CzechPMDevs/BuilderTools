@@ -35,6 +35,7 @@ class SchematicLoadTask extends BuilderToolsAsyncTask {
 	public string $file;
 	public string $name;
 
+	/** @var NonThreadSafeValue<CompressedBlockArray> */
 	public NonThreadSafeValue $blockStorage;
 
 	public function __construct(string $file) {
