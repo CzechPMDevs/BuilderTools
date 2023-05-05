@@ -30,6 +30,7 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\StringTag;
 use Throwable;
+use function array_filter;
 use function array_map;
 use function file_get_contents;
 use function getcwd;
@@ -37,6 +38,9 @@ use function implode;
 use function intval;
 use function is_array;
 use function is_file;
+use function is_float;
+use function is_int;
+use function is_string;
 use function json_decode;
 
 /**
@@ -98,7 +102,9 @@ class MCStructureSchematic implements Schematic {
 			throw new SchematicException("List Tag $name was not found.");
 		}
 
-		return new Vector3(...array_map(fn(mixed $val) => intval($val), $tag->getAllValues()));
+		return new Vector3(...array_map(fn(string|int|float $val) => (int)$val,
+			array_filter($tag->getAllValues(), fn(mixed $val) => is_string($val) || is_int($val) || is_float($val))
+		));
 	}
 
 	/**
