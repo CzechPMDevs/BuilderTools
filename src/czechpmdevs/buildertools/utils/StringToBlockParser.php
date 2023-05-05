@@ -53,8 +53,4 @@ final class StringToBlockParser extends StringToTParser {
 
 		return $result;
 	}
-
-	public function parse(string $input): ?Block {
-		return parent::parse($input);
-	}
 }
