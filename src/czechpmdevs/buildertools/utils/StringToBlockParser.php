@@ -6,7 +6,7 @@ namespace czechpmdevs\buildertools\utils;
 
 use InvalidArgumentException;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
+use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\item\StringToItemParser;
 use pocketmine\utils\SingletonTrait;
@@ -44,7 +44,7 @@ final class StringToBlockParser extends StringToTParser {
 			$result->register($alias, fn() => $item->getBlock());
 		}
 
-		foreach(BlockFactory::getInstance()->getAllKnownStates() as $state) {
+		foreach(RuntimeBlockStateRegistry::getInstance()->getAllKnownStates() as $state) {
 			try {
 				$result->register("{$state->getStateId()}", fn() => $state);
 			} catch(InvalidArgumentException) {

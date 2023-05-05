@@ -22,7 +22,7 @@ namespace czechpmdevs\buildertools\utils;
 
 use InvalidArgumentException;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
+use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\utils\SingletonTrait;
@@ -113,7 +113,7 @@ class BlockFacingHelper {
 			return;
 		}
 
-		foreach(BlockFactory::getInstance()->getAllKnownStates() as $block) {
+		foreach(RuntimeBlockStateRegistry::getInstance()->getAllKnownStates() as $block) {
 			if($this->hasFacingTrait($block)) {
 				$originalFullId = $block->getStateId();
 
@@ -151,7 +151,7 @@ class BlockFacingHelper {
 			return;
 		}
 
-		foreach(BlockFactory::getInstance()->getAllKnownStates() as $block) {
+		foreach(RuntimeBlockStateRegistry::getInstance()->getAllKnownStates() as $block) {
 			if($this->hasFacingTrait($block)) {
 				$sourceId = $block->getStateId();
 				$sourceFacing = $block->getFacing(); // @phpstan-ignore-line

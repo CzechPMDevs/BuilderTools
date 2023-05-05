@@ -92,7 +92,7 @@ class SchematicsManager {
 				return;
 			}
 
-			self::$loadedSchematics[$task->name] = $task->blockStorage->asBlockArray();
+			self::$loadedSchematics[$task->name] = $task->blockStorage->deserialize()->asBlockArray();
 			$callback(SchematicActionResult::success($timer->time()));
 		});
 	}
