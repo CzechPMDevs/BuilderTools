@@ -82,7 +82,7 @@ class BlockFacingHelper {
 		}
 
 		try {
-			$ref = new ReflectionClass($block); // @phpstan-ignore-line
+			$ref = new ReflectionClass($block);
 
 			$getter = $ref->getMethod("getFacing");
 			if($getter->getReturnType()?->__toString() !== "int") {
