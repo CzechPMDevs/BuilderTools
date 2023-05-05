@@ -9,7 +9,7 @@
     "ext-pthreads": "*",
     "ext-zlib": "*",
     "ext-json": "*",
-    "pocketmine/pocketmine-mp": "^5.0.0-ALPHA5"
+    "pocketmine/pocketmine-mp": "^5.0.0-BETA2"
   },
   "require-dev": {
     "phpstan/phpstan": "^1.9.4"
