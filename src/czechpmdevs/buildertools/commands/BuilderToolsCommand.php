@@ -38,18 +38,6 @@ abstract class BuilderToolsCommand extends Command implements PluginOwned {
 		parent::__construct($name, $description, $usageMessage, $aliases);
 	}
 
-	/** @noinspection PhpUnused */
-	public function execute(CommandSender $sender, string $commandLabel, array $args) {
-		$permission = $this->getPermission();
-		if($permission === null) {
-			throw new RuntimeException("Command " . __CLASS__ . " is registered wrong.");
-		}
-
-		if(!$sender->hasPermission($permission)) {
-			$sender->sendMessage((string)$this->getPermissionMessage());
-		}
-	}
-
 	protected function createBlockDecoder(Player $player, string $args): ?StringToBlockDecoder {
 		$decoder = new StringToBlockDecoder($args, $player->getInventory()->getItemInHand());
 		if(!$decoder->isValid()) {
