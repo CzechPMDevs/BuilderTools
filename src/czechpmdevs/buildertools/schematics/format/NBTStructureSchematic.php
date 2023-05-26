@@ -16,7 +16,7 @@ use pocketmine\nbt\NoSuchTagException;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\UnexpectedTagTypeException;
-use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use function array_key_exists;
 use function get_class;
 use function is_int;
@@ -97,7 +97,7 @@ class NBTStructureSchematic implements Schematic {
 	 * @throws SchematicException
 	 */
 	private function decodePalette(ListTag $palette): array {
-		$mapping = RuntimeBlockMapping::getInstance();
+		$mapping = TypeConverter::getInstance()->getBlockTranslator();
 		$dictionary = $mapping->getBlockStateDictionary();
 
 		$fallbackStateId = VanillaBlocks::AIR()->getStateId();
