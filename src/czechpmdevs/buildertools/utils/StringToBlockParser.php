@@ -37,7 +37,7 @@ final class StringToBlockParser extends StringToTParser {
 			}
 
 			$block = $item->getBlock();
-			if($block->isSameType(VanillaBlocks::AIR())) {
+			if($block->isSameState(VanillaBlocks::AIR())) {
 				continue;
 			}
 

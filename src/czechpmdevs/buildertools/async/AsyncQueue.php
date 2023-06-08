@@ -30,8 +30,8 @@ class AsyncQueue {
 	private static array $queue = [];
 
 	/**
-	 * @phpstan-param BuilderToolsAsyncTask<mixed> $task
-	 * @phpstan-param Closure(BuilderToolsAsyncTask<mixed> $task): void $callback
+	 * @phpstan-param BuilderToolsAsyncTask $task
+	 * @phpstan-param Closure(BuilderToolsAsyncTask $task): void $callback
 	 */
 	public static function submitTask(BuilderToolsAsyncTask $task, ?Closure $callback = null): void {
 		Server::getInstance()->getAsyncPool()->submitTask($task);
@@ -44,7 +44,7 @@ class AsyncQueue {
 	/**
 	 * @internal
 	 *
-	 * @phpstan-param BuilderToolsAsyncTask<mixed> $task
+	 * @phpstan-param BuilderToolsAsyncTask $task
 	 */
 	public static function callCallback(BuilderToolsAsyncTask $task): void {
 		if(!isset(self::$queue[spl_object_hash($task)])) {

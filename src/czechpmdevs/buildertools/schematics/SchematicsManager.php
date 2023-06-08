@@ -70,7 +70,6 @@ class SchematicsManager {
 		self::$registeredTypes[] = MCEditSchematic::class;
 		self::$registeredTypes[] = MCStructureSchematic::class;
 		self::$registeredTypes[] = SpongeSchematic::class;
-		self::$registeredTypes[] = NBTStructureSchematic::class;
 	}
 
 	/**
