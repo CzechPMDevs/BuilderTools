@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace czechpmdevs\buildertools\blockstorage\identifiers;
 
-use pocketmine\block\BlockTypeIds;
+use pocketmine\block\VanillaBlocks;
 
 class SingleBlockIdentifier implements BlockIdentifierList {
 	public function __construct(protected int $fullStateId) {}
@@ -34,6 +34,6 @@ class SingleBlockIdentifier implements BlockIdentifierList {
 	}
 	
 	public static function airIdentifier(): SingleBlockIdentifier {
-		return new SingleBlockIdentifier(BlockTypeIds::AIR);
+		return new SingleBlockIdentifier(VanillaBlocks::AIR()->getStateId());
 	}
 }
